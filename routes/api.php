@@ -22,10 +22,11 @@ use Illuminate\Support\Facades\Route;
 Route::group(
     [
         'namespace' => 'App\Http\Controllers',
-        'middleware' => 'cors',
+        ///  'middleware' => 'cors',
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
+        Route::post('/testing', 'AdminController@testing_api');
     }
 );
 

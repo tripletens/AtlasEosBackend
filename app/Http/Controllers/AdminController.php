@@ -89,4 +89,9 @@ class AdminController extends Controller
     {
         return $this->respondWithToken(auth()->refresh());
     }
+
+    public function testing_api()
+    {
+        return 'hello woel';
+    }
 }

@@ -14,7 +14,7 @@ use App\Models\Admin;
 // use App\Models\Dealer;
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Imports\ProductsImport;
-use App\Http\Helpers;
+// use App\Http\Helpers;
 // use App\Models\Products;
 // use App\Models\Category;
 // use Illuminate\Support\Str;
@@ -26,12 +26,12 @@ use App\Http\Helpers;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
 
-use App\Models\DealerCart;
-use App\Models\ServiceParts;
-use App\Models\CardedProducts;
-use App\Models\PromotionalCategory;
+// use App\Models\DealerCart;
+// use App\Models\ServiceParts;
+// use App\Models\CardedProducts;
+// use App\Models\PromotionalCategory;
 
-use Barryvdh\DomPDF\Facade as PDF;
+// use Barryvdh\DomPDF\Facade as PDF;
 
 class AdminController extends Controller
 {

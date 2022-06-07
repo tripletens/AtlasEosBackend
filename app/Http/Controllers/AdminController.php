@@ -47,4 +47,46 @@ class AdminController extends Controller
             'debug' => null,
         ];
     }
+
+    public function admin_login(Request $request)
+    {
+        //valid credential
+        $this->validate($request, [
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        if (
+            !($token = Auth::guard('api')->attempt([
+                'email' => $request->email,
+                'password' => $request->password,
+            ]))
+        ) {
+            $this->result->status_code = 401;
+            $this->result->message = 'Invalid login credentials';
+            return response()->json($this->result);
+        }
+
+        $this->result->token = $this->respondWithToken($token);
+        $this->result->status = true;
+        return $this->result;
+        return response()->json($this->result);
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' =>
+                auth()
+                    ->factory()
+                    ->getTTL() * 60,
+        ]);
+    }
+
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
 }

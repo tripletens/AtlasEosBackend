@@ -25,7 +25,7 @@ Route::group(
         'middleware' => 'cors',
     ],
     function () {
-        Route::post('/admin-login', 'AdminController@login');
+        Route::post('/admin-login', 'AdminController@admin_login');
     }
 );
 

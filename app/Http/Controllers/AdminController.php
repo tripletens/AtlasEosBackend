@@ -92,6 +92,6 @@ class AdminController extends Controller
 
     public function testing_api()
     {
-        return 'hello woel';
+        echo 'hello woel';
     }
 }

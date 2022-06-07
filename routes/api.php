@@ -26,7 +26,7 @@ Route::group(
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
-        Route::post('/testing', 'AdminController@testing_api');
+        Route::get('/testing', 'AdminController@testing_api');
     }
 );
 

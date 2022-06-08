@@ -26,17 +26,27 @@ Route::group(
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
+        Route::post('/upload-users', 'AdminController@upload_users');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
 
-///////////////// Dealer /////////////
+///////////////// Users /////////////
 Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
-        Route::post('/dealer-login', 'DealerController@login');
+        Route::post('/dealer-login', 'UserController@login');
     }
 );
+
+///////////////// Dealer /////////////
+// Route::group(
+//     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+//     function () {
+//         Route::post('/dealer-login', 'DealerController@login');
+//     }
+// );
 
 ///////////////// Branch /////////////
 Route::group(

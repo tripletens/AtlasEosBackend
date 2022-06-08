@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -42,7 +41,7 @@ return [
         ],
         'api' => [
             'driver' => 'jwt',
-            'provider' => 'dealer',
+            'provider' => 'users',
             'hash' => false,
         ],
 
@@ -57,7 +56,6 @@ return [
             'provider' => 'branch',
             'hash' => false,
         ],
-
     ],
 
     /*
@@ -83,9 +81,9 @@ return [
             'model' => App\Models\Admin::class,
         ],
 
-        'dealer' => [
+        'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Dealer::class,
+            'model' => App\Models\Users::class,
         ],
 
         'branch' => [
@@ -135,5 +133,4 @@ return [
     */
 
     'password_timeout' => 10800,
-
 ];

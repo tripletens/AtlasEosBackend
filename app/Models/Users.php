@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Dealer extends Authenticatable implements JWTSubject
+class Users extends Authenticatable implements JWTSubject
 {
     use HasFactory;
 
-    protected $table = 'dealers';
+    protected $table = 'users';
 
     protected $fillable = [
         'first_name',
@@ -23,11 +23,12 @@ class Dealer extends Authenticatable implements JWTSubject
         'phone',
         'account_id',
         'status',
-        'password_clear',
+        'password_show',
         'username',
         'last_login',
         'company_name',
         'full_name',
+        'role',
         'placed_order_date',
     ];
 

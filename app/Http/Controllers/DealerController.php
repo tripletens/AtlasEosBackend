@@ -42,4 +42,8 @@ class DealerController extends Controller
             'debug' => null,
         ];
     }
+
+    public function login(){
+        echo "login page setup";
+    }
 }

@@ -79,8 +79,6 @@ class UserController extends Controller
         }
 
         $dealer = Users::where('email', $request->email)->first();
-        $dealer->role = 'dealer';
-
         $dealer_details = Users::where('email', $request->email)->get();
 
         $dealer_details[0]->update([

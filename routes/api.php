@@ -36,7 +36,7 @@ Route::group(
 Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
-        Route::post('/dealer-login', 'UserController@login');
+        Route::post('/login', 'UserController@login');
     }
 );
 

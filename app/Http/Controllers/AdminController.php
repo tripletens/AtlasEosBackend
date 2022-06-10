@@ -71,7 +71,7 @@ class AdminController extends Controller
             $code = $request->input('vendorCode');
 
             // save to the db
-            $save_vendor = Products::create([
+            $save_vendor = Vendors::create([
                 'vendor_name' => $name,
                 'vendor_code' => $code,
                 'role_name' => 'vendor',

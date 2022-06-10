@@ -78,7 +78,7 @@ class AdminController extends Controller
 
                 $save_product = Vendors::create([
                     'vendor_name' => $vendor_name,
-                    'role_name' => strlower($role_name),
+                    'role_name' => strtolower($role_name),
                     'vendor_id' => $vendor_id,
                     'role' => $role,
                 ]);

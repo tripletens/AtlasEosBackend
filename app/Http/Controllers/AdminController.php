@@ -51,6 +51,73 @@ class AdminController extends Controller
         ];
     }
 
+    public function register_vendor_users()
+    {
+    }
+
+    public function upload_vendor_users()
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealers in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+            foreach ($csv_data as $key => $value) {
+                //$sep = explode( $value[ 1 ], '' );
+                $vendor_name = $value[0];
+                $username = $value[1];
+                $first_name = $value[2];
+                $password = bcrypt($value[3]);
+                $password_show = $value[3];
+                $privilege_vendors = $value[4];
+                $email = $value[5];
+                $role = '3';
+                $role_name = 'vendor';
+                $vendor = $value[6];
+
+                $save_product = Vendors::create([
+                    'full_name' => $first_name,
+                    'first_name' => $first_name,
+                    'email' => $email,
+                    'password' => $password,
+                    'password_show' => $password_show,
+                    'role' => $role,
+                    'role_name' => $role_name,
+                    'vendor' => $vendor,
+                    'vendor_name' => $vendor_name,
+                    'privileged_vendors' => $privilege_vendors,
+                    'username' => $email,
+                    'company_name' => $vendor_name,
+                ]);
+
+                if (!$save_users) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor Users uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
     public function register_vendors()
     {
         $validator = Validator::make($request->all(), [

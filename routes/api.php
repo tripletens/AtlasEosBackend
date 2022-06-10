@@ -30,6 +30,11 @@ Route::group(
         Route::post('/upload-vendors', 'AdminController@upload_vendors');
         Route::post('/register-vendors', 'AdminController@register_vendors');
 
+        Route::post(
+            '/upload-vendor-users',
+            'AdminController@upload_vendor_users'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

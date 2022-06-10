@@ -84,7 +84,7 @@ class AdminController extends Controller
                 $email = $value[5];
                 $role = '3';
                 $role_name = 'vendor';
-                $vendor = $value[6];
+                $vendor = $value[7];
 
                 $save_product = Users::create([
                     'full_name' => $first_name,

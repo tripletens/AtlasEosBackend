@@ -40,7 +40,8 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        //// $this->middleware( 'auth:api', [ 'except' => [ 'login', 'register', 'test' ] ] );
+        // set timeout limit 
+        set_time_limit(6000);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,
@@ -73,28 +74,35 @@ class AdminController extends Controller
             }
             array_shift($csv_data);
             // remove the first row of the csv
+
             foreach ($csv_data as $key => $value) {
-                //$sep = explode( $value[ 1 ], '' );
-                $vendor_name = $value[0];
-                $username = $value[1];
+                // `full_name`, `first_name`, `last_name`, `email`, `password`, 
+                // `password_show`, `role`, `role_name`, `dealer`, `vendor`, 
+                // `vendor_name`, `privileged_vendors`, `username`, `account_id`, 
+                // `phone`, `status`, `order_status`, `location`, `company_name`, 
+                // `last_login`,`login_device`, `place_order_date`, `created_at`, 
+                // `updated_at`
+                $dealer_code = $value[0];
+                $vendor_name = $value[1];
                 $first_name = $value[2];
-                $password = bcrypt($value[3]);
-                $password_show = $value[3];
-                $privilege_vendors = $value[4];
+                $last_name = $value[3];
+                $password = bcrypt($value[4]);
+                $password_show = $value[4];
                 $email = $value[5];
+                $privilege_vendors = $value[6];
+                
                 $role = '3';
                 $role_name = 'vendor';
-                $vendor = $value[7];
 
                 $save_users = Users::create([
-                    'full_name' => $first_name,
+                    'full_name' => $first_name . ' ' . $last_name,
                     'first_name' => $first_name,
                     'email' => $email,
                     'password' => $password,
                     'password_show' => $password_show,
                     'role' => $role,
                     'role_name' => $role_name,
-                    'vendor' => $vendor,
+                    // 'vendor' => $vendor,
                     'vendor_name' => $vendor_name,
                     'privileged_vendors' => json_encode($privilege_vendors),
                     'username' => $email,
@@ -260,13 +268,15 @@ class AdminController extends Controller
                     return response()->json($this->result);
                 }
             }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Dealers uploaded successfully';
+            return response()->json($this->result);
+            fclose($file);
         }
 
-        $this->result->status = true;
-        $this->result->status_code = 200;
-        $this->result->message = 'Dealers uploaded successfully';
-        return response()->json($this->result);
-        fclose($file);
+        
     }
 
     public function admin_login(Request $request)

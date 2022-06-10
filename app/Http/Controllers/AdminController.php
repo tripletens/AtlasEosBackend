@@ -187,10 +187,10 @@ class AdminController extends Controller
             array_shift($csv_data);
             // remove the first row of the csv
             foreach ($csv_data as $key => $value) {
-                //$sep = explode( $value[ 1 ], '' );
+
                 $vendor_name = $value[0];
-                $role_name = $value[1];
-                $vendor_id = $value[2];
+                $role_name = $value[6];
+                $vendor_id = $value[7];
                 $role = 3;
 
                 $save_product = Vendors::create([

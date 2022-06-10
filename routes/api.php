@@ -39,11 +39,12 @@ Route::group(
     }
 );
 
-///////////////// Users /////////////
+///////////////// Users (DEALERS AND VENDORS) /////////////
 Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/login', 'UserController@login');
+        Route::post('/get-all-vendors', 'VendorController@get_all_vendors');
     }
 );
 

@@ -51,6 +51,48 @@ class AdminController extends Controller
         ];
     }
 
+    public function register_vendors()
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorName' => 'required',
+            'vendorCode' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->input('vendorName');
+            $code = $request->input('vendorCode');
+
+            // save to the db
+            $save_vendor = Products::create([
+                'vendor_name' => $name,
+                'vendor_code' => $code,
+                'role_name' => 'vendor',
+                'role' => '3',
+            ]);
+
+            if ($save_vendor) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Vendor Successfully Added';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Addition failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
     public function upload_vendors(Request $request)
     {
         $csv = $request->file('csv');
@@ -95,7 +137,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Dealers uploaded successfully';
+        $this->result->message = 'Vendors uploaded successfully';
         return response()->json($this->result);
         fclose($file);
     }

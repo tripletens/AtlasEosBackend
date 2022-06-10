@@ -67,13 +67,13 @@ class AdminController extends Controller
             return response()->json($this->result);
         } else {
             // process the request
-            $name = $request->input('vendorName');
-            $code = $request->input('vendorCode');
+            $name = $request->vendorName;
+            $code = $request->vendorCode;
 
             // save to the db
             $save_vendor = Vendors::create([
                 'vendor_name' => $name,
-                'vendor_code' => $code,
+                'vendor_id' => $code,
                 'role_name' => 'vendor',
                 'role' => '3',
             ]);

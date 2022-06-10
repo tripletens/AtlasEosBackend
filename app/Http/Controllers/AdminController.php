@@ -51,11 +51,11 @@ class AdminController extends Controller
         ];
     }
 
-    public function register_vendor_users()
+    public function register_vendor_users(Request $request)
     {
     }
 
-    public function upload_vendor_users()
+    public function upload_vendor_users(Request $request)
     {
         $csv = $request->file('csv');
         if ($csv == null) {
@@ -118,7 +118,7 @@ class AdminController extends Controller
         fclose($file);
     }
 
-    public function register_vendors()
+    public function register_vendors(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'vendorName' => 'required',

@@ -96,7 +96,7 @@ class AdminController extends Controller
                     'role_name' => $role_name,
                     'vendor' => $vendor,
                     'vendor_name' => $vendor_name,
-                    'privileged_vendors' => $privilege_vendors,
+                    'privileged_vendors' => json_encode($privilege_vendors),
                     'username' => $email,
                     'company_name' => $vendor_name,
                 ]);

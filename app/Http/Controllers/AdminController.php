@@ -41,7 +41,7 @@ class AdminController extends Controller
     public function __construct()
     {
         // set timeout limit 
-        set_time_limit(6000);
+        set_time_limit(0);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,
@@ -296,9 +296,6 @@ class AdminController extends Controller
             ->where('email', $request->email)
             ->get()
             ->first();
-
-        // $admin = Admin::where('email', $request->email)->first();
-        // $admin->role = 'admin';
 
         $this->result->token = $this->respondWithToken($token);
         $this->result->status = true;

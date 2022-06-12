@@ -61,6 +61,16 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_all_vendor_users()
+    {
+        $vendor_user = Users::where('role', '3')->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all vendor users was successful';
+        $this->result->data = $vendors;
+        return response()->json($this->result);
+    }
+
     public function upload_admin(Request $request)
     {
         $csv = $request->file('csv');

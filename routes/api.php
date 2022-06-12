@@ -34,6 +34,11 @@ Route::group(
             'AdminController@register_vendor_users'
         );
 
+        Route::get(
+            '/get-all-vendor-users',
+            'AdminController@get_all_vendor_users'
+        );
+
         Route::post(
             '/upload-vendor-users',
             'AdminController@upload_vendor_users'

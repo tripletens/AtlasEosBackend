@@ -29,7 +29,11 @@ Route::group(
         Route::post('/upload-users', 'AdminController@upload_users');
         Route::post('/upload-vendors', 'AdminController@upload_vendors');
         Route::post('/register-vendors', 'AdminController@register_vendors');
-        Route::post('/upload-vendor-users','AdminController@upload_vendor_users'); # working fine 
+        Route::post(
+            '/upload-vendor-users',
+            'AdminController@upload_vendor_users'
+        ); # working fine
+        Route::post('/upload-admin', 'AdminController@upload_admin'); # working fine
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

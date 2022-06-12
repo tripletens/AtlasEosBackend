@@ -67,7 +67,7 @@ class AdminController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get all vendor users was successful';
-        $this->result->data = $vendors;
+        $this->result->data = $vendor_user;
         return response()->json($this->result);
     }
 

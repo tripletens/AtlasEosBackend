@@ -150,5 +150,22 @@ class DealerController extends Controller
         }
     }
 
-    
+    public function fetch_all_faqs(){
+        $fetch_faqs = Faq::orderBy('id','desc')->get();
+
+        if(!$fetch_faqs){
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch all the faqs";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_faqs;
+        $this->result->message = 'FAQs fetched Successfully';
+        return response()->json($this->result);
+
+    }
+
 }

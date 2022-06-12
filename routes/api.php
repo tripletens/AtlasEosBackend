@@ -42,6 +42,7 @@ Route::group(
         Route::post('/get-all-vendors', 'VendorController@get_all_vendors');
         Route::post('/create-report', 'DealerController@create_report');
         Route::post('/create-faq', 'DealerController@create_faq');
+        Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         
     }
 );

@@ -139,6 +139,66 @@ class AdminController extends Controller
 
     public function register_vendor_users(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required',
+            'fullName' => 'required',
+            'location' => 'required',
+            'password' => 'required',
+            'vendor' => 'required',
+            'vendorName' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->fullName;
+            $email = $request->email;
+            $location = $request->location;
+            $vendor_code = $request->vendor;
+            $privilege_vendors = $request->privilegeVendors;
+            $password = bcrypt($request->password);
+            $password_show = $request->password;
+            $vendor_name = $request->vendorName;
+
+            $name_split = explode(' ', $name);
+            $first_name = $name_split[0];
+
+            // save to the db
+            $save_vendor = Users::create([
+                'full_name' => $name,
+                'first_name' => $first_name,
+                'email' => $email,
+                'password' => $password,
+                'password_show' => $password_show,
+                'role' => '3',
+                'role_name' => 'vendor',
+                'vendor' => $vendor,
+                'vendor_name' => $vendor_code,
+                'privilege_vendors' => $privilege_vendors,
+                'username' => $email,
+                'location' => $location,
+                'company_name' => $vendor_name,
+            ]);
+
+            if ($save_vendor) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Vendor Successfully Added';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Addition failed';
+                return response()->json($this->result);
+            }
+        }
     }
 
     public function upload_vendor_users(Request $request)

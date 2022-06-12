@@ -27,6 +27,7 @@ use App\Models\CardedProducts;
 
 use App\Models\ServiceParts;
 use App\Models\Cart;
+use App\Models\Faq;
 use App\Models\Report;
 
 class DealerController extends Controller
@@ -44,11 +45,13 @@ class DealerController extends Controller
         ];
     }
 
-    public function login(){
+    public function login()
+    {
         echo "login page setup";
     }
 
-    public function create_report(Request $request){
+    public function create_report(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'subject' => 'required',
             'description' => 'required',
@@ -64,36 +67,88 @@ class DealerController extends Controller
             return response()->json($this->result);
         } else {
 
-            if($request->hasFile('file'))
-            {
+            if ($request->hasFile('file')) {
                 $filenameWithExt    = $request->file('file')->getClientOriginalName();
                 $filename           = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 $extension          = $request->file('file')->getClientOriginalExtension();
-                $fileNameToStore    = $filename.'_'.time().'.'.$extension;
-                $filepath               = env('APP_URL') . Storage::url($request->file('file')->storeAs('public/reports', $fileNameToStore));   
+                $fileNameToStore    = $filename . '_' . time() . '.' . $extension;
+                $filepath               = env('APP_URL') . Storage::url($request->file('file')->storeAs('public/reports', $fileNameToStore));
             }
 
             $subject = $request->input('subject');
-                $description = $request->input('description');
+            $description = $request->input('description');
 
-                $create_report = Report::create([
-                    'subject' => $subject ? $subject : null,
-                    'description' => $description ? $description : null,
-                    'file_url' => $request->hasFile('file') ? $filepath : null 
-                ]);
+            $create_report = Report::create([
+                'subject' => $subject ? $subject : null,
+                'description' => $description ? $description : null,
+                'file_url' => $request->hasFile('file') ? $filepath : null
+            ]);
 
-                if(!$create_report){
-                    $this->result->status = true;
-                    $this->result->status_code = 400;
-                    $this->result->message =
-                        'An Error Ocurred, Vendor Addition failed';
-                    return response()->json($this->result);
-                }
-                      
+            if (!$create_report) {
                 $this->result->status = true;
-                $this->result->status_code = 200;
-                $this->result->message = 'Report Created Successfully';
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Addition failed';
                 return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Report Created Successfully';
+            return response()->json($this->result);
         }
     }
+
+    public function create_faq(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'subtitle' => 'required',
+            'description' => 'required',
+            'link' => 'required',
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+
+            $title = $request->input('title');
+            $subtitle = $request->input('subtitle');
+            $description = $request->input('description');
+            $link = $request->input('link');
+            $username = $request->input('username');
+            $password = $request->input('password');
+
+            $createfaq = Faq::create([
+                'title' => $title ? $title : null,
+                'subtitle' => $subtitle ? $subtitle : null,
+                'description' => $description ? $description : null,
+                'link' => $link ? $link : null,
+                'username' => $username ? $username : null,
+                'password' => $password ? $password : null,
+            ]);
+
+            if (!$createfaq) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'An Error Ocurred, Faq Addition failed';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'FAQ Created Successfully';
+            return response()->json($this->result);
+        }
+    }
+
+    
 }

@@ -41,6 +41,8 @@ Route::group(
         Route::post('/login', 'UserController@login');
         Route::post('/get-all-vendors', 'VendorController@get_all_vendors');
         Route::post('/create-report', 'DealerController@create_report');
+        Route::post('/create-faq', 'DealerController@create_faq');
+        
     }
 );
 

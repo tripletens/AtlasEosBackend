@@ -166,13 +166,13 @@ class AdminController extends Controller
             $password_show = $request->password;
             $vendor_name = $request->vendorName;
 
-            $name_split = explode(' ', $name);
-            $first_name = $name_split[0];
+            // $name_split = explode(' ', $name);
+            // $first_name = $name_split[0];
 
             // save to the db
             $save_vendor = Users::create([
                 'full_name' => $name,
-                'first_name' => $first_name,
+                'first_name' => $name,
                 'email' => $email,
                 'password' => $password,
                 'password_show' => $password_show,

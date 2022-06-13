@@ -29,7 +29,21 @@ Route::group(
         Route::post('/upload-users', 'AdminController@upload_users');
         Route::post('/upload-vendors', 'AdminController@upload_vendors');
         Route::post('/register-vendors', 'AdminController@register_vendors');
-        Route::post('/upload-vendor-users','AdminController@upload_vendor_users'); # working fine 
+        Route::post(
+            '/register-vendor-users',
+            'AdminController@register_vendor_users'
+        );
+
+        Route::get(
+            '/get-all-vendor-users',
+            'AdminController@get_all_vendor_users'
+        );
+
+        Route::post(
+            '/upload-vendor-users',
+            'AdminController@upload_vendor_users'
+        ); # working fine
+        Route::post('/upload-admin', 'AdminController@upload_admin'); # working fine
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -39,11 +53,11 @@ Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/login', 'UserController@login');
-        Route::post('/get-all-vendors', 'VendorController@get_all_vendors');
+        Route::get('/get-all-vendors', 'VendorController@get_all_vendors');
         Route::post('/create-report', 'DealerController@create_report');
         Route::post('/create-faq', 'DealerController@create_faq');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
-        
+
         //---------------------- seminar apis here -------------------- //
         Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get('/fetch-all-seminars', 'SeminarController@fetch_all_seminars');

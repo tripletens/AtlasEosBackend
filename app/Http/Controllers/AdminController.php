@@ -41,7 +41,7 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        // set timeout limit 
+        // set timeout limit
         set_time_limit(25000000);
         $this->result = (object) [
             'status' => false,
@@ -53,8 +53,162 @@ class AdminController extends Controller
         ];
     }
 
+    ///// Permission Role Access
+    // admin == 1
+    // branch manager == 2
+    // vendor == 3
+    // dealer == 4
+    // inside sales == 5
+    // outside == 6
+
+    public function get_all_vendor_users()
+    {
+        $vendor_user = Users::where('role', '3')->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all vendor users was successful';
+        $this->result->data = $vendor_user;
+        return response()->json($this->result);
+    }
+
+    public function upload_admin(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload admin in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                $role = 0;
+                if (strtolower($value[3]) == 'admin') {
+                    $role = 1;
+                }
+
+                if (strtolower($value[3]) == 'branch manager') {
+                    $role = 2;
+                }
+
+                if (strtolower($value[3]) == 'inside sales') {
+                    $role = 5;
+                }
+                if (strtolower($value[3]) == 'outside sales') {
+                    $role = 6;
+                }
+
+                $name = $value[0];
+                $designation = $value[1];
+                $email = $value[2];
+                $role_name = $value[3];
+                $first_level_access = $value[4];
+                $second_level_access = $value[5];
+                $password = bcrypt($value[6]);
+                $password_show = $value[6];
+                $region = $value[7];
+
+                $save_admin = Admin::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => $password,
+                    'password_show' => $password_show,
+                    'role' => $role,
+                    'designation' => $designation,
+                    'role_name' => $role_name,
+                    'region_ab' => $region,
+                    'first_level_access' => $first_level_access,
+                    'second_level_access' => $second_level_access,
+                ]);
+
+                if (!$save_admin) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Admin uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
     public function register_vendor_users(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required',
+            'fullName' => 'required',
+            'location' => 'required',
+            'password' => 'required',
+            'vendor' => 'required',
+            'vendorName' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->fullName;
+            $email = $request->email;
+            $location = $request->location;
+            $vendor_code = $request->vendor;
+            $privilege_vendors = $request->privilegeVendors;
+            $password = bcrypt($request->password);
+            $password_show = $request->password;
+            $vendor_name = $request->vendorName;
+
+            // $name_split = explode(' ', $name);
+            // $first_name = $name_split[0];
+
+            // save to the db
+            $save_vendor = Users::create([
+                'full_name' => $name,
+                'first_name' => $name,
+                'email' => $email,
+                'password' => $password,
+                'password_show' => $password_show,
+                'role' => '3',
+                'role_name' => 'vendor',
+                'vendor' => $vendor_code,
+                'vendor_name' => $vendor_name,
+                'privilege_vendors' => $privilege_vendors,
+                'username' => $email,
+                'location' => $location,
+                'company_name' => $vendor_name,
+            ]);
+
+            if ($save_vendor) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Vendor Successfully Added';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Addition failed';
+                return response()->json($this->result);
+            }
+        }
     }
 
     public function upload_vendor_users(Request $request)
@@ -77,11 +231,11 @@ class AdminController extends Controller
             // remove the first row of the csv
 
             foreach ($csv_data as $key => $value) {
-                // `full_name`, `first_name`, `last_name`, `email`, `password`, 
-                // `password_show`, `role`, `role_name`, `dealer`, `vendor`, 
-                // `vendor_name`, `privileged_vendors`, `username`, `account_id`, 
-                // `phone`, `status`, `order_status`, `location`, `company_name`, 
-                // `last_login`,`login_device`, `place_order_date`, `created_at`, 
+                // `full_name`, `first_name`, `last_name`, `email`, `password`,
+                // `password_show`, `role`, `role_name`, `dealer`, `vendor`,
+                // `vendor_name`, `privileged_vendors`, `username`, `account_id`,
+                // `phone`, `status`, `order_status`, `location`, `company_name`,
+                // `last_login`,`login_device`, `place_order_date`, `created_at`,
                 // `updated_at`
                 $dealer_code = $value[0];
                 $vendor_name = $value[1];
@@ -91,7 +245,7 @@ class AdminController extends Controller
                 $password_show = $value[4];
                 $email = $value[5];
                 $privilege_vendors = $value[6];
-                
+
                 $role = '3';
                 $role_name = 'vendor';
 
@@ -188,15 +342,13 @@ class AdminController extends Controller
             array_shift($csv_data);
             // remove the first row of the csv
             foreach ($csv_data as $key => $value) {
-
                 $vendor_name = $value[0];
-                $role_name = $value[6];
-                $vendor_id = $value[7];
+                $vendor_id = $value[2];
                 $role = 3;
 
                 $save_product = Vendors::create([
                     'vendor_name' => $vendor_name,
-                    'role_name' => strtolower($role_name),
+                    'role_name' => 'vendor',
                     'vendor_id' => $vendor_id,
                     'role' => $role,
                 ]);
@@ -276,8 +428,6 @@ class AdminController extends Controller
             return response()->json($this->result);
             fclose($file);
         }
-
-        
     }
 
     public function admin_login(Request $request)

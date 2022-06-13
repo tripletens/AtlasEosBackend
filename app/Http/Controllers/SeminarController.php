@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Seminar;
+use App\Models\SeminarMembers;
 use Carbon\Carbon;
 
 class SeminarController extends Controller
@@ -78,6 +79,8 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
     }
+
+    // fetch all the seminars
     public function fetch_all_seminars(){
         $fetch_seminars = Seminar::orderBy('id','desc')->get();
 
@@ -95,6 +98,7 @@ class SeminarController extends Controller
         return response()->json($this->result);
     }
 
+    // fetch all scheduled seminars 
     public function fetch_scheduled_seminars(){
         // this is for active seminars
         $fetch_seminars = Seminar::where('status',1)->orderBy('id','desc')->get();
@@ -121,6 +125,7 @@ class SeminarController extends Controller
         return response()->json($this->result);
     }
 
+    // fetch all ongoing seminars
     public function fetch_ongoing_seminars(){
         // this is for active seminars
         $fetch_seminars = Seminar::where('status',2)->orderBy('id','desc')->get();
@@ -147,6 +152,7 @@ class SeminarController extends Controller
         return response()->json($this->result);
     }
 
+    // fetched watched seminars 
     public function fetch_watched_seminars(){
         // this is for active seminars
         $fetch_seminars = Seminar::where('status',0)->orderBy('id','desc')->get();
@@ -173,5 +179,62 @@ class SeminarController extends Controller
         return response()->json($this->result);
     }
     
-    
+    // bookmark a seminar i.e join a seminar 
+    public function bookmark_seminar(Request $request){
+        // `seminar_id`, `dealer_id`, `bookmark_status`
+        // ÷ `current_seminar_status`, 
+        // `status`,
+        $validator = Validator::make($request->all(), [
+            'seminar_id' => 'required|integer',
+            'dealer_id' => 'required|integer',
+            'bookmark_status' => 'required|integer',
+            'current_seminar_status' => 'required|integer'
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+
+            // check if the seminar exists
+            
+
+            $seminar_id = $request->input('seminar_id');
+            $dealer_id = $request->input('dealer_id');
+            $bookmark_status = $request->input('bookmark_status');
+            $current_seminar_status = $request->input('current_seminar_status');
+
+            $createseminar = SeminarMembers::create([
+                'seminar_id' => $seminar_id ? $seminar_id : null,
+                'dealer_id' => $dealer_id ? $dealer_id : null,
+                'bookmark_status' => $bookmark_status ? $bookmark_status : null,
+                'current_seminar_status' => $current_seminar_status ? $current_seminar_status : null
+            ]);
+
+            if (!$createseminar) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'Sorry you cannot join the seminar at this time. Try again later';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'You have successfully joined the seminar';
+            return response()->json($this->result);
+        }
+    }
+
+    // fetch all the dealers that bookmarked the seminar 
+
+    // fetch all the dealers that didnt bookmark a seminar 
+
+    // activate seminar cron job 
+
+    // send email to dealer that bookmarked the seminar 15 mins before the seminar time 
 }

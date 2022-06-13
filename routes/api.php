@@ -50,6 +50,7 @@ Route::group(
         Route::get('/fetch-scheduled-seminars', 'SeminarController@fetch_scheduled_seminars');
         Route::get('/fetch-ongoing-seminars', 'SeminarController@fetch_ongoing_seminars');
         Route::get('/fetch-watched-seminars', 'SeminarController@fetch_watched_seminars');
+        Route::post('/join-seminar', 'SeminarController@bookmark_seminar');
         
     }
 );

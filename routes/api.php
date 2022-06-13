@@ -57,6 +57,13 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::post('/create-faq', 'DealerController@create_faq');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
+
+        //---------------------- seminar apis here -------------------- //
+        Route::post('/create-seminar', 'SeminarController@create_seminar');
+        Route::get('/fetch-all-seminars', 'SeminarController@fetch_all_seminars');
+        Route::get('/fetch-scheduled-seminars', 'SeminarController@fetch_scheduled_seminars');
+        Route::get('/fetch-ongoing-seminars', 'SeminarController@fetch_ongoing_seminars');
+        Route::get('/fetch-watched-seminars', 'SeminarController@fetch_watched_seminars');
     }
 );
 

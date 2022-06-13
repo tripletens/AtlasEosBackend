@@ -81,7 +81,8 @@ class DealerController extends Controller
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('file') ? $filepath : null
+                'file_url' => $request->hasFile('file') ? $filepath : null,
+                'ticket_id' => Str::random(8)
             ]);
 
             if (!$create_report) {

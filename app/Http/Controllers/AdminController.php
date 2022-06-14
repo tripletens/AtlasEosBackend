@@ -53,6 +53,104 @@ class AdminController extends Controller
         ];
     }
 
+    public function get_all_dealer_users()
+    {
+        $vendors = Users::where('status', '1')
+            ->where('role', '4')
+            ->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all dealer users was successful';
+        $this->result->data = $vendors;
+        return response()->json($this->result);
+    }
+
+    public function deactivate_dealer_user($id)
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Dealer User Deactivated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Dealer Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function upload_dealer_users(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealer in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                $dealer_code = $value[0];
+                $dealer_name = $value[1];
+                $first_name = $value[2];
+                $last_name = $value[3];
+                $password = bcrypt($value[4]);
+                $password_show = $value[4];
+
+                $email = $value[5];
+                $privilege_vendors = $value[6];
+                $full_name = $first_name . ' ' . $last_name;
+
+                $role = '4';
+                $role_name = 'dealer';
+
+                $save_dealer = Users::create([
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'full_name' => $full_name,
+                    'email' => $email,
+                    'password' => $password,
+                    'password_show' => $password_show,
+                    'role' => $role,
+                    'role_name' => $role_name,
+                    'dealer_name' => $dealer_name,
+                    'privileged_vendors' => $privilege_vendors,
+                    'account_id' => $dealer_code,
+                    'company_name' => $dealer_name,
+                ]);
+
+                if (!$save_dealer) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
     public function edit_vendor_user_data(Request $request)
     {
         // process the request

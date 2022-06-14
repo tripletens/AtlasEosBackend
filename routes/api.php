@@ -70,6 +70,23 @@ Route::group(
             'AdminController@edit_vendor_user_data'
         );
 
+        Route::post(
+            '/upload-dealer-users',
+            'AdminController@upload_dealer_users'
+        );
+
+        Route::get(
+            '/get-all-dealer-users',
+            'AdminController@get_all_dealer_users'
+        );
+
+        Route::get(
+            '/deactivate-dealer-user/{id}',
+            'AdminController@deactivate_dealer_user'
+        );
+
+        Route::post('/upload-item', 'AdminController@upload_product_csv');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

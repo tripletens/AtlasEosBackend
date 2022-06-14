@@ -11,5 +11,5 @@ class Vendors extends Model
 
     protected $table = 'vendors';
 
-    protected $fillable = ['vendor_id', 'vendor_name', 'role', 'role_name'];
+    protected $fillable = ['vendor_code', 'vendor_name', 'role', 'role_name'];
 }

@@ -53,6 +53,128 @@ class AdminController extends Controller
         ];
     }
 
+    public function activate_vendor_user()
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '1',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor User Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_vendor_user()
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor User Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function activate_vendor($id)
+    {
+        // update to the db
+        $update = Vendors::where('id', $id)->update([
+            'status' => '1',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_vendor($id)
+    {
+        // update to the db
+        $update = Vendors::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Deactivated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function edit_vendor_data(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorName' => 'required',
+            'vendorCode' => 'required',
+            'vendorId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->vendorName;
+            $code = $request->vendorCode;
+            $id = $request->vendorId;
+
+            // update to the db
+            $update = Vendors::where('id', $id)->update([
+                'vendor_name' => $name,
+                'vendor_code' => $code,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Vendor Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Update failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
     ///// Permission Role Access
     // admin == 1
     // branch manager == 2
@@ -349,7 +471,7 @@ class AdminController extends Controller
                 $save_product = Vendors::create([
                     'vendor_name' => $vendor_name,
                     'role_name' => 'vendor',
-                    'vendor_id' => $vendor_id,
+                    'vendor_code' => $vendor_id,
                     'role' => $role,
                 ]);
 

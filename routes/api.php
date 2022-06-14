@@ -44,6 +44,32 @@ Route::group(
             'AdminController@upload_vendor_users'
         ); # working fine
         Route::post('/upload-admin', 'AdminController@upload_admin'); # working fine
+        Route::post('/edit-vendor-data', 'AdminController@edit_vendor_data');
+        Route::get(
+            '/deactivate-vendor/{id}',
+            'AdminController@deactivate_vendor'
+        );
+
+        Route::get('/activate-vendor/{id}', 'AdminController@activate_vendor');
+
+        Route::get(
+            '/deactivate-vendor-user/{id}',
+            'AdminController@deactivate_vendor_user'
+        );
+        Route::get(
+            '/activate-vendor-user/{id}',
+            'AdminController@activate_vendor_user'
+        );
+
+        Route::get('/get-vendor-user/{id}', 'AdminController@get_vendor_user');
+
+        Route::post('/upload-dealers', 'AdminController@upload_dealers');
+
+        Route::post(
+            '/edit-vendor-user',
+            'AdminController@edit_vendor_user_data'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

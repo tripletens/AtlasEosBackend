@@ -53,6 +53,312 @@ class AdminController extends Controller
         ];
     }
 
+    public function edit_vendor_user_data(Request $request)
+    {
+        // process the request
+        $username = $request->username;
+        $email = $request->email;
+        $firstName = $request->firstName;
+        $lastName = $request->lastName;
+        $password = $request->password;
+        $phone = $request->phone;
+        $privilegeVendor = $request->privilegeVendor;
+        $privilegeDealer = $request->privilegeDealer;
+        $role = $request->role;
+        $status = $request->status;
+        $vendor = $request->vendor;
+        $vendorId = $request->vendorId;
+
+        if ($firstName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'first_name' => $firstName,
+            ]);
+        }
+
+        if ($role != '') {
+            if ($role == '1') {
+                $role_name = 'admin';
+            }
+            if ($role == '2') {
+                $role_name = 'branch manager';
+            }
+            if ($role == '3') {
+                $role_name = 'vendor';
+            }
+            if ($role == '4') {
+                $role_name = 'dealer';
+            }
+            if ($role == '5') {
+                $role_name = 'inside sales';
+            }
+            if ($role == '6') {
+                $role_name = 'outside sales';
+            }
+
+            $update = Users::where('id', $vendorId)->update([
+                'role' => $role,
+                'role_name' => $role_name,
+            ]);
+        }
+
+        if ($privilegeDealer != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'privileged_dealers' => $privilegeDealer,
+            ]);
+        }
+
+        if ($privilegeVendor != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'privileged_vendors' => $privilegeVendor,
+            ]);
+        }
+
+        if ($status != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'status' => $status,
+            ]);
+        }
+
+        if ($phone != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'phone' => $phone,
+            ]);
+        }
+
+        if ($password != '') {
+            $hash_password = bcrypt($password);
+
+            $update = Users::where('id', $vendorId)->update([
+                'password' => $hash_password,
+                'password_show' => $password,
+            ]);
+        }
+
+        if ($lastName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'last_name' => $lastName,
+            ]);
+        }
+
+        if ($email != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'email' => $email,
+            ]);
+        }
+
+        if ($vendor != '') {
+            $vendorName = $request->vendorName;
+            $vendorCode = $request->vendorCode;
+            $update = Users::where('id', $vendorId)->update([
+                'vendor_name' => $vendorName,
+                'vendor_code' => $vendorCode,
+            ]);
+        }
+
+        if ($username != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'username' => $username,
+            ]);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor User Updated Successfully';
+        return response()->json($this->result);
+    }
+
+    public function upload_dealers(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealer in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                $dealer_code = $value[0];
+                $dealer_name = $value[1];
+                $role_name = 'dealer';
+                $role_id = '4';
+
+                $save_dealer = Dealer::create([
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'role_name' => $role_name,
+                    'role_id' => $role_id,
+                ]);
+
+                if (!$save_dealer) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
+    public function get_vendor_user($id)
+    {
+        if (Users::where('id', $id)->exists()) {
+            // post with the same slug already exists
+            $user = Users::where('id', $id)
+                ->get()
+                ->first();
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'get vendor users was successful';
+            $this->result->data = $user;
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'Vendor User not found';
+            return response()->json($this->result);
+        }
+    }
+
+    public function activate_vendor_user($id)
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '1',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor User Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_vendor_user($id)
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor User Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function activate_vendor($id)
+    {
+        // update to the db
+        $update = Vendors::where('id', $id)->update([
+            'status' => '1',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_vendor($id)
+    {
+        // update to the db
+        $update = Vendors::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Deactivated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function edit_vendor_data(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorName' => 'required',
+            'vendorCode' => 'required',
+            'vendorId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->vendorName;
+            $code = $request->vendorCode;
+            $id = $request->vendorId;
+
+            // update to the db
+            $update = Vendors::where('id', $id)->update([
+                'vendor_name' => $name,
+                'vendor_code' => $code,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Vendor Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Update failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
     ///// Permission Role Access
     // admin == 1
     // branch manager == 2
@@ -237,20 +543,20 @@ class AdminController extends Controller
                 // `phone`, `status`, `order_status`, `location`, `company_name`,
                 // `last_login`,`login_device`, `place_order_date`, `created_at`,
                 // `updated_at`
-                $dealer_code = $value[0];
-                $vendor_name = $value[1];
+                $vendor_name = $value[0];
+                $username = $value[1];
                 $first_name = $value[2];
-                $last_name = $value[3];
-                $password = bcrypt($value[4]);
-                $password_show = $value[4];
+                $password = bcrypt($value[3]);
+                // $password = bcrypt($value[4]);
+                $password_show = $value[3];
+                $privilege_vendors = $value[4];
                 $email = $value[5];
-                $privilege_vendors = $value[6];
-
+                $vendor_code = $value[7];
                 $role = '3';
                 $role_name = 'vendor';
 
                 $save_users = Users::create([
-                    'full_name' => $first_name . ' ' . $last_name,
+                    'full_name' => $first_name,
                     'first_name' => $first_name,
                     'email' => $email,
                     'password' => $password,
@@ -259,9 +565,10 @@ class AdminController extends Controller
                     'role_name' => $role_name,
                     // 'vendor' => $vendor,
                     'vendor_name' => $vendor_name,
-                    'privileged_vendors' => json_encode($privilege_vendors),
+                    'privileged_vendors' => $privilege_vendors,
                     'username' => $email,
                     'company_name' => $vendor_name,
+                    'vendor_code' => $vendor_code,
                 ]);
 
                 if (!$save_users) {
@@ -349,7 +656,7 @@ class AdminController extends Controller
                 $save_product = Vendors::create([
                     'vendor_name' => $vendor_name,
                     'role_name' => 'vendor',
-                    'vendor_id' => $vendor_id,
+                    'vendor_code' => $vendor_id,
                     'role' => $role,
                 ]);
 

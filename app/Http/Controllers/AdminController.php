@@ -18,7 +18,7 @@ use App\Models\Vendors;
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Imports\ProductsImport;
 // use App\Http\Helpers;
-// use App\Models\Products;
+use App\Models\Products;
 // use App\Models\Category;
 // use Illuminate\Support\Str;
 // use Illuminate\Support\Facades\Storage;
@@ -51,6 +51,126 @@ class AdminController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function upload_product_csv(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            $test = [];
+
+            foreach ($csv_data as $key => $value) {
+                # code...
+
+                $atlas_id = $value[2];
+                $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                if ($check_atlas_id) {
+                    // $booking = $value[8];
+                    // $special = $value[9];
+                    // $condition = $value[10];
+                    // $type = $value[11];
+                    // $grouping = $value[12];
+                    // $desc_spec = $value[6];
+
+                    // $spec_data = [
+                    //     'booking' => floatval($booking),
+                    //     'special' => floatval($special),
+                    //     'cond' => intval($condition),
+                    //     'type' => strtolower($type),
+                    //     'desc' => strtolower($desc_spec),
+                    // ];
+
+                    // if ($special == '') {
+                    //     continue;
+                    // } else {
+                    //     if (!empty($check_atlas_id->spec_data)) {
+                    //         $spec = json_decode(
+                    //             $check_atlas_id->spec_data,
+                    //             true
+                    //         );
+                    //         array_push($spec, $spec_data);
+                    //         $new_spec = json_encode($spec);
+
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'grouping' => $grouping,
+                    //         ]);
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'spec_data' => $new_spec,
+                    //         ]);
+                    //     } else {
+                    //         $data = [];
+                    //         array_push($data, $spec_data);
+                    //         $new_spec = json_encode($data);
+                    //         //$new_spec = $new_spec;
+
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'grouping' => $grouping,
+                    //         ]);
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'spec_data' => $new_spec,
+                    //         ]);
+                    //     }
+                    // }
+                } else {
+                    $spec_arr = [];
+                    $vendor_code = $value[0];
+                    $vendor_name = $value[1];
+                    $atlas_id = $value[2];
+                    $vendor_product_code = $value[3];
+                    $xref = $value[4];
+                    $description = $value[5];
+                    $regular_price = $value[6];
+                    $special_price = $value[7];
+
+                    $save_product = Products::create([
+                        'atlas_id' => $atlas_id,
+                        'description' => $description,
+                        'status' => '1',
+                        'vendor_code' => $vendor_code,
+                        'vendor' => $vendor_code,
+                        'vendor_name' => $vendor_name,
+                        'vendor_product_code' => $vendor_product_code,
+                        'xref' => $xref,
+                        'booking' => $regular_price,
+                        'special' => $special_price,
+                    ]);
+
+                    if (!$save_product) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Products uploaded successfully';
+            return response()->json($this->result);
+            fclose($file);
+        }
     }
 
     public function get_all_dealer_users()

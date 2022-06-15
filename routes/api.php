@@ -85,7 +85,7 @@ Route::group(
             'AdminController@deactivate_dealer_user'
         );
 
-        Route::post('/upload-item', 'AdminController@upload_product_csv');
+        Route::post('/upload-product-csv', 'AdminController@upload_product_csv');
 
         Route::get('/testing', 'AdminController@testing_api');
     }

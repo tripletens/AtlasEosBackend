@@ -44,6 +44,72 @@ Route::group(
             'AdminController@upload_vendor_users'
         ); # working fine
         Route::post('/upload-admin', 'AdminController@upload_admin'); # working fine
+        Route::post('/edit-vendor-data', 'AdminController@edit_vendor_data');
+        Route::get(
+            '/deactivate-vendor/{id}',
+            'AdminController@deactivate_vendor'
+        );
+
+        Route::get('/activate-vendor/{id}', 'AdminController@activate_vendor');
+
+        Route::get(
+            '/deactivate-vendor-user/{id}',
+            'AdminController@deactivate_vendor_user'
+        );
+        Route::get(
+            '/activate-vendor-user/{id}',
+            'AdminController@activate_vendor_user'
+        );
+
+        Route::get('/get-vendor-user/{id}', 'AdminController@get_vendor_user');
+
+        Route::post('/upload-dealers', 'AdminController@upload_dealers');
+
+        Route::post(
+            '/edit-vendor-user',
+            'AdminController@edit_vendor_user_data'
+        );
+
+        Route::post(
+            '/upload-dealer-users',
+            'AdminController@upload_dealer_users'
+        );
+
+        Route::get(
+            '/get-all-dealer-users',
+            'AdminController@get_all_dealer_users'
+        );
+
+        Route::get(
+            '/deactivate-dealer-user/{id}',
+            'AdminController@deactivate_dealer_user'
+        );
+
+        Route::post(
+            '/upload-product-csv',
+            'AdminController@upload_product_csv'
+        );
+
+        Route::get('/all-products', 'AdminController@get_all_products');
+        Route::get(
+            '/deactivate-product/{id}',
+            'AdminController@deactivate_product'
+        );
+
+        Route::get('/get-product/{id}', 'AdminController@get_product');
+        Route::get(
+            '/get-product-atlas-id/{id}',
+            'AdminController@get_product_by_atlas_id'
+        );
+
+        Route::post('/edit-product', 'AdminController@edit_product');
+        Route::post('/add-product', 'AdminController@add_product');
+
+        // Route::get(
+        //     '/deactivate-product/{id}',
+        //     'AdminController@deactivate_product'
+        // );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

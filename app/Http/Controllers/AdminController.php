@@ -18,7 +18,7 @@ use App\Models\Vendors;
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Imports\ProductsImport;
 // use App\Http\Helpers;
-// use App\Models\Products;
+use App\Models\Products;
 // use App\Models\Category;
 // use Illuminate\Support\Str;
 // use Illuminate\Support\Facades\Storage;
@@ -51,6 +51,720 @@ class AdminController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function add_product(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorAccount' => 'required',
+            'atlasId' => 'required',
+            'vendorItemId' => 'required',
+            'description' => 'required',
+            'regular' => 'required',
+            'special' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $atlasId = $request->atlasId;
+            $vendorAccount = $request->vendorAccount;
+            $regular = $request->regular;
+            $special = $request->special;
+            $vendorItemId = $request->vendorItemId;
+            $description = $request->description;
+
+            if (Products::where('atlas_id', $atlasId)->exists()) {
+                $this->result->status = false;
+                $this->result->status_code = 200;
+                $this->result->message =
+                    'product with atlas id ' .
+                    $atlasId .
+                    ' has been add already';
+            } else {
+                $save_product = Products::create([
+                    'atlas_id' => $atlasId,
+                    'description' => $description,
+                    'status' => '1',
+                    'vendor_code' => $vendorAccount,
+                    'vendor' => $vendorAccount,
+                    'vendor_product_code' => $vendorItemId,
+                    'booking' => $regular,
+                    'special' => $special,
+                ]);
+
+                if (!$save_product) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Products registered successfully';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function deactivate_product($id)
+    {
+        if (Products::where('id', $id)->exists()) {
+            $update = Products::where('id', $id)->update([
+                'status' => '0',
+            ]);
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'product deactivated with id';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'product not found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function edit_product(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'atlasId' => 'required',
+            'desc' => 'required',
+            'regular' => 'required',
+            'special' => 'required',
+            'vendor' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $atlasId = $request->atlasId;
+            $desc = $request->desc;
+            $regular = $request->regular;
+            $special = $request->special;
+            $vendor = $request->vendor;
+
+            // update to the db
+            $update = Products::where('atlas_id', $atlasId)->update([
+                'atlas_id' => $atlasId,
+                'description' => $desc,
+                'booking' => $regular,
+                'special' => $special,
+                'vendor' => $vendor,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Products Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Products Update failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function get_product_by_atlas_id($id)
+    {
+        if (Products::where('atlas_id', $id)->exists()) {
+            $item = Products::where('atlas_id', $id)
+                ->get()
+                ->first();
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'get products with atlas id';
+            $this->result->data = $item;
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'product not found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_product($id)
+    {
+        $product = Products::where('id', $id)->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get products was successful';
+        $this->result->data = $product;
+        return response()->json($this->result);
+    }
+
+    // public function deactivate_product($id)
+    // {
+    //     // update to the db
+    //     $update = Products::where('id', $id)->update([
+    //         'status' => '0',
+    //     ]);
+
+    //     if ($update) {
+    //         $this->result->status = true;
+    //         $this->result->status_code = 200;
+    //         $this->result->message = 'Product Deactivated Successfully';
+    //         return response()->json($this->result);
+    //     } else {
+    //         $this->result->status = true;
+    //         $this->result->status_code = 404;
+    //         $this->result->message = 'An Error Ocurred, Dealer Update failed';
+    //         return response()->json($this->result);
+    //     }
+    // }
+
+    public function get_all_products()
+    {
+        $products = Products::where('status', '1')->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all products was successful';
+        $this->result->data = $products;
+        return response()->json($this->result);
+    }
+
+    public function upload_product_csv(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            $test = [];
+
+            foreach ($csv_data as $key => $value) {
+                # code...
+
+                $atlas_id = $value[2];
+                $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                if ($check_atlas_id) {
+                    // $booking = $value[8];
+                    // $special = $value[9];
+                    // $condition = $value[10];
+                    // $type = $value[11];
+                    // $grouping = $value[12];
+                    // $desc_spec = $value[6];
+
+                    // $spec_data = [
+                    //     'booking' => floatval($booking),
+                    //     'special' => floatval($special),
+                    //     'cond' => intval($condition),
+                    //     'type' => strtolower($type),
+                    //     'desc' => strtolower($desc_spec),
+                    // ];
+
+                    // if ($special == '') {
+                    //     continue;
+                    // } else {
+                    //     if (!empty($check_atlas_id->spec_data)) {
+                    //         $spec = json_decode(
+                    //             $check_atlas_id->spec_data,
+                    //             true
+                    //         );
+                    //         array_push($spec, $spec_data);
+                    //         $new_spec = json_encode($spec);
+
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'grouping' => $grouping,
+                    //         ]);
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'spec_data' => $new_spec,
+                    //         ]);
+                    //     } else {
+                    //         $data = [];
+                    //         array_push($data, $spec_data);
+                    //         $new_spec = json_encode($data);
+                    //         //$new_spec = $new_spec;
+
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'grouping' => $grouping,
+                    //         ]);
+                    //         Products::where('atlas_id', $atlas_id)->update([
+                    //             'spec_data' => $new_spec,
+                    //         ]);
+                    //     }
+                    // }
+                } else {
+                    $spec_arr = [];
+                    $vendor_code = $value[0];
+                    $vendor_name = $value[1];
+                    $atlas_id = $value[2];
+                    $vendor_product_code = $value[3];
+                    $xref = $value[4];
+                    $description = $value[5];
+                    $regular_price = $value[6];
+                    $special_price = $value[7];
+
+                    $save_product = Products::create([
+                        'atlas_id' => $atlas_id,
+                        'description' => $description,
+                        'status' => '1',
+                        'vendor_code' => $vendor_code,
+                        'vendor' => $vendor_code,
+                        'vendor_name' => $vendor_name,
+                        'vendor_product_code' => $vendor_product_code,
+                        'xref' => $xref,
+                        'booking' => $regular_price,
+                        'special' => $special_price,
+                    ]);
+
+                    if (!$save_product) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Products uploaded successfully';
+            return response()->json($this->result);
+            fclose($file);
+        }
+    }
+
+    public function get_all_dealer_users()
+    {
+        $vendors = Users::where('status', '1')
+            ->where('role', '4')
+            ->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all dealer users was successful';
+        $this->result->data = $vendors;
+        return response()->json($this->result);
+    }
+
+    public function deactivate_dealer_user($id)
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Dealer User Deactivated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Dealer Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function upload_dealer_users(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealer in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                $dealer_code = $value[0];
+                $dealer_name = $value[1];
+                $first_name = $value[2];
+                $last_name = $value[3];
+                $password = bcrypt($value[4]);
+                $password_show = $value[4];
+
+                $email = $value[5];
+                $privilege_vendors = $value[6];
+                $full_name = $first_name . ' ' . $last_name;
+
+                $role = '4';
+                $role_name = 'dealer';
+
+                $save_dealer = Users::create([
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'full_name' => $full_name,
+                    'email' => $email,
+                    'password' => $password,
+                    'password_show' => $password_show,
+                    'role' => $role,
+                    'role_name' => $role_name,
+                    'dealer_name' => $dealer_name,
+                    'privileged_vendors' => $privilege_vendors,
+                    'account_id' => $dealer_code,
+                    'company_name' => $dealer_name,
+                ]);
+
+                if (!$save_dealer) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
+    public function edit_vendor_user_data(Request $request)
+    {
+        // process the request
+        $username = $request->username;
+        $email = $request->email;
+        $firstName = $request->firstName;
+        $lastName = $request->lastName;
+        $password = $request->password;
+        $phone = $request->phone;
+        $privilegeVendor = $request->privilegeVendor;
+        $privilegeDealer = $request->privilegeDealer;
+        $role = $request->role;
+        $status = $request->status;
+        $vendor = $request->vendor;
+        $vendorId = $request->vendorId;
+
+        if ($firstName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'first_name' => $firstName,
+            ]);
+        }
+
+        if ($role != '') {
+            if ($role == '1') {
+                $role_name = 'admin';
+            }
+            if ($role == '2') {
+                $role_name = 'branch manager';
+            }
+            if ($role == '3') {
+                $role_name = 'vendor';
+            }
+            if ($role == '4') {
+                $role_name = 'dealer';
+            }
+            if ($role == '5') {
+                $role_name = 'inside sales';
+            }
+            if ($role == '6') {
+                $role_name = 'outside sales';
+            }
+
+            $update = Users::where('id', $vendorId)->update([
+                'role' => $role,
+                'role_name' => $role_name,
+            ]);
+        }
+
+        if ($privilegeDealer != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'privileged_dealers' => $privilegeDealer,
+            ]);
+        }
+
+        if ($privilegeVendor != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'privileged_vendors' => $privilegeVendor,
+            ]);
+        }
+
+        if ($status != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'status' => $status,
+            ]);
+        }
+
+        if ($phone != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'phone' => $phone,
+            ]);
+        }
+
+        if ($password != '') {
+            $hash_password = bcrypt($password);
+
+            $update = Users::where('id', $vendorId)->update([
+                'password' => $hash_password,
+                'password_show' => $password,
+            ]);
+        }
+
+        if ($lastName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'last_name' => $lastName,
+            ]);
+        }
+
+        if ($email != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'email' => $email,
+            ]);
+        }
+
+        if ($vendor != '') {
+            $vendorName = $request->vendorName;
+            $vendorCode = $request->vendorCode;
+            $update = Users::where('id', $vendorId)->update([
+                'vendor_name' => $vendorName,
+                'vendor_code' => $vendorCode,
+            ]);
+        }
+
+        if ($username != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'username' => $username,
+            ]);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor User Updated Successfully';
+        return response()->json($this->result);
+    }
+
+    public function upload_dealers(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealer in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                $dealer_code = $value[0];
+                $dealer_name = $value[1];
+                $role_name = 'dealer';
+                $role_id = '4';
+
+                $save_dealer = Dealer::create([
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'role_name' => $role_name,
+                    'role_id' => $role_id,
+                ]);
+
+                if (!$save_dealer) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
+    public function get_vendor_user($id)
+    {
+        if (Users::where('id', $id)->exists()) {
+            // post with the same slug already exists
+            $user = Users::where('id', $id)
+                ->get()
+                ->first();
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'get vendor users was successful';
+            $this->result->data = $user;
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'Vendor User not found';
+            return response()->json($this->result);
+        }
+    }
+
+    public function activate_vendor_user($id)
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '1',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor User Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_vendor_user($id)
+    {
+        // update to the db
+        $update = Users::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor User Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function activate_vendor($id)
+    {
+        // update to the db
+        $update = Vendors::where('id', $id)->update([
+            'status' => '1',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Activated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_vendor($id)
+    {
+        // update to the db
+        $update = Vendors::where('id', $id)->update([
+            'status' => '0',
+        ]);
+
+        if ($update) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Deactivated Successfully';
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 404;
+            $this->result->message = 'An Error Ocurred, Vendor Update failed';
+            return response()->json($this->result);
+        }
+    }
+
+    public function edit_vendor_data(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorName' => 'required',
+            'vendorCode' => 'required',
+            'vendorId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->vendorName;
+            $code = $request->vendorCode;
+            $id = $request->vendorId;
+
+            // update to the db
+            $update = Vendors::where('id', $id)->update([
+                'vendor_name' => $name,
+                'vendor_code' => $code,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Vendor Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Update failed';
+                return response()->json($this->result);
+            }
+        }
     }
 
     ///// Permission Role Access
@@ -237,20 +951,20 @@ class AdminController extends Controller
                 // `phone`, `status`, `order_status`, `location`, `company_name`,
                 // `last_login`,`login_device`, `place_order_date`, `created_at`,
                 // `updated_at`
-                $dealer_code = $value[0];
-                $vendor_name = $value[1];
+                $vendor_name = $value[0];
+                $username = $value[1];
                 $first_name = $value[2];
-                $last_name = $value[3];
-                $password = bcrypt($value[4]);
-                $password_show = $value[4];
+                $password = bcrypt($value[3]);
+                // $password = bcrypt($value[4]);
+                $password_show = $value[3];
+                $privilege_vendors = $value[4];
                 $email = $value[5];
-                $privilege_vendors = $value[6];
-
+                $vendor_code = $value[7];
                 $role = '3';
                 $role_name = 'vendor';
 
                 $save_users = Users::create([
-                    'full_name' => $first_name . ' ' . $last_name,
+                    'full_name' => $first_name,
                     'first_name' => $first_name,
                     'email' => $email,
                     'password' => $password,
@@ -259,9 +973,10 @@ class AdminController extends Controller
                     'role_name' => $role_name,
                     // 'vendor' => $vendor,
                     'vendor_name' => $vendor_name,
-                    'privileged_vendors' => json_encode($privilege_vendors),
+                    'privileged_vendors' => $privilege_vendors,
                     'username' => $email,
                     'company_name' => $vendor_name,
+                    'vendor_code' => $vendor_code,
                 ]);
 
                 if (!$save_users) {
@@ -349,7 +1064,7 @@ class AdminController extends Controller
                 $save_product = Vendors::create([
                     'vendor_name' => $vendor_name,
                     'role_name' => 'vendor',
-                    'vendor_id' => $vendor_id,
+                    'vendor_code' => $vendor_id,
                     'role' => $role,
                 ]);
 

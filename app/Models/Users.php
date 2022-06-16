@@ -31,10 +31,12 @@ class Users extends Authenticatable implements JWTSubject
         'role',
         'role_name',
         'privileged_vendors',
+        'privileged_dealers',
         'placed_order_date',
-        'vendor',
+        'vendor_code',
         'vendor_name',
-        'dealer',
+        'dealer_name',
+        'dealer_code',
     ];
 
     protected $hidden = ['password'];

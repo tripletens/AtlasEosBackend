@@ -78,6 +78,7 @@ class DealerController extends Controller
             $subject = $request->input('subject');
             $description = $request->input('description');
 
+            // subject, description , file_url , ticket_id, created_at, deleted_at, updated_at
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
@@ -168,5 +169,4 @@ class DealerController extends Controller
         return response()->json($this->result);
 
     }
-
 }

@@ -6,10 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Seminar;
 use App\Models\SeminarMembers;
+use App\Models\Users;
 use Carbon\Carbon;
+use DB;
 
 class SeminarController extends Controller
 {
+    protected $SEMINAR_REMINDER_TIME = 5;
     public function __construct()
     {
         // $this->middleware( 'auth:api');
@@ -25,7 +28,7 @@ class SeminarController extends Controller
 
     // create seminar api
     public function create_seminar(Request $request){
-        // `seminar_name`, `vendor_name`, `vendor_id`, `seminar_date`, `seminar_time`, 
+        // `seminar_name`, `vendor_name`, `vendor_id`, `seminar_date`, `seminar_time`,
         // `bookmark`, `status`, `created_at`, `updated_at`, `deleted_at`
         // status => [ 1 => 'scheduled', 2 => 'ongoing', 3 => 'watched']
         $validator = Validator::make($request->all(), [
@@ -98,7 +101,7 @@ class SeminarController extends Controller
         return response()->json($this->result);
     }
 
-    // fetch all scheduled seminars 
+    // fetch all scheduled seminars
     public function fetch_scheduled_seminars(){
         // this is for active seminars
         $fetch_seminars = Seminar::where('status',1)->orderBy('id','desc')->get();
@@ -152,9 +155,9 @@ class SeminarController extends Controller
         return response()->json($this->result);
     }
 
-    // fetched watched seminars 
+    // fetched watched seminars
     public function fetch_watched_seminars(){
-        // this is for active seminars
+        // this is for ended seminars
         $fetch_seminars = Seminar::where('status',0)->orderBy('id','desc')->get();
 
         if(!$fetch_seminars){
@@ -178,12 +181,11 @@ class SeminarController extends Controller
         $this->result->message = 'Watched Seminars fetched Successfully';
         return response()->json($this->result);
     }
-    
-    // bookmark a seminar i.e join a seminar 
-    public function bookmark_seminar(Request $request){
+
+    // bookmark a seminar i.e join a seminar
+    public function join_seminar(Request $request){
         // `seminar_id`, `dealer_id`, `bookmark_status`
-        // ÷ `current_seminar_status`, 
-        // `status`,
+        // `current_seminar_status`, `status`,
         $validator = Validator::make($request->all(), [
             'seminar_id' => 'required|integer',
             'dealer_id' => 'required|integer',
@@ -201,7 +203,7 @@ class SeminarController extends Controller
         } else {
 
             // check if the seminar exists
-            
+
 
             $seminar_id = $request->input('seminar_id');
             $dealer_id = $request->input('dealer_id');
@@ -230,11 +232,67 @@ class SeminarController extends Controller
         }
     }
 
-    // fetch all the dealers that bookmarked the seminar 
+    // fetch all the dealers that joined the seminar
+    public function fetch_all_dealers_in_seminar(){
+        // role 4 is for dealers
+        $fetch_dealers = Users::where('role',4)->join('seminar_members','users.id','=','seminar_members.dealer_id')
+        ->get();
 
-    // fetch all the dealers that didnt bookmark a seminar 
+        if(!$fetch_dealers){
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                'Sorry you cannot fetch the dealers that joined the seminar. Try again later';
+            return response()->json($this->result);
+        }
 
-    // activate seminar cron job 
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_dealers;
+        $this->result->message = 'You have successfully fetched all the dealers that joined the seminar';
+        return response()->json($this->result);
+    }
 
-    // send email to dealer that bookmarked the seminar 15 mins before the seminar time 
+    // fetch all the dealers that didnt bookmark a seminar
+    public function fetch_all_dealers_not_in_seminar(){
+
+        $fetch_dealers = SeminarMembers::all()->join('users','seminar_members.id','!=','users.id')
+        ->get();
+
+        if(!$fetch_dealers){
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                'Sorry you cannot fetch the dealers that joined the seminar. Try again later';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_dealers;
+        $this->result->message = 'You have successfully fetched all the dealers that joined the seminar';
+        return response()->json($this->result);
+    }
+
+    // activate seminar cron job
+
+    // send email to dealer that bookmarked the seminar 15 mins before the seminar time
+
+    public function select_seminars_to_remind(){
+        // selects all the seminars that are 15 mins less than the current time
+        $current_time = Carbon::now();
+        $time_diff = Carbon::diff();
+        $seminar_reminder_time = SEMINAR_REMINDER_TIME;
+        $find_seminars = Seminar::where();
+    }
+
+    public function select_dealers_bookmarked_seminar($seminar_id){
+        // selects all the dealers that bookmarked the individual seminars
+
+    }
+
+    public function send_reminder_email(){
+        // select all the people that bookmarked the individual seminars
+        // send them an email each
+    }
 }

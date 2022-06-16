@@ -24,7 +24,7 @@ use App\Models\Products;
 // use Illuminate\Support\Facades\Storage;
 // use App\Models\Branch;
 // use App\Models\Promotional_ads;
-// use App\Models\Cart;
+use App\Models\Cart;
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -51,6 +51,33 @@ class AdminController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    ///// Permission Role Access
+    // admin == 1
+    // branch manager == 2
+    // vendor == 3
+    // dealer == 4
+    // inside sales == 5
+    // outside == 6
+
+    public function dashboard()
+    {
+        $total_vendors = Users::where('role', '3')->count();
+        $total_dealers = Users::where('role', '4')->count();
+        $total_products = Products::count();
+        $total_order = Cart::where('status', '1')->count();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+
+        $this->result->data->total_vendors = $total_vendors;
+        $this->result->data->total_dealers = $total_dealers;
+        $this->result->data->total_products = $total_products;
+        $this->result->data->total_order = $total_order;
+
+        $this->result->message = 'Admin Dashboard Data';
+        return response()->json($this->result);
     }
 
     public function add_product(Request $request)
@@ -205,7 +232,9 @@ class AdminController extends Controller
 
     public function get_product($id)
     {
-        $product = Products::where('id', $id)->get();
+        $product = Products::where('id', $id)
+            ->get()
+            ->first();
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get products was successful';
@@ -766,14 +795,6 @@ class AdminController extends Controller
             }
         }
     }
-
-    ///// Permission Role Access
-    // admin == 1
-    // branch manager == 2
-    // vendor == 3
-    // dealer == 4
-    // inside sales == 5
-    // outside == 6
 
     public function get_all_vendor_users()
     {

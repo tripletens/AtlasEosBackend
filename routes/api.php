@@ -26,6 +26,12 @@ Route::group(
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
+        Route::get('/admin-dashboard', 'AdminController@dashboard');
+        Route::get(
+            '/get-all-vendor-users',
+            'AdminController@get_all_vendor_users'
+        );
+
         Route::post('/upload-users', 'AdminController@upload_users');
         Route::post('/upload-vendors', 'AdminController@upload_vendors');
         Route::post('/register-vendors', 'AdminController@register_vendors');

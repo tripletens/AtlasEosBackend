@@ -53,6 +53,196 @@ class AdminController extends Controller
         ];
     }
 
+    public function add_product(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorAccount' => 'required',
+            'atlasId' => 'required',
+            'vendorItemId' => 'required',
+            'description' => 'required',
+            'regular' => 'required',
+            'special' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $atlasId = $request->atlasId;
+            $vendorAccount = $request->vendorAccount;
+            $regular = $request->regular;
+            $special = $request->special;
+            $vendorItemId = $request->vendorItemId;
+            $description = $request->description;
+
+            if (Products::where('atlas_id', $atlasId)->exists()) {
+                $this->result->status = false;
+                $this->result->status_code = 200;
+                $this->result->message =
+                    'product with atlas id ' .
+                    $atlasId .
+                    ' has been add already';
+            } else {
+                $save_product = Products::create([
+                    'atlas_id' => $atlasId,
+                    'description' => $description,
+                    'status' => '1',
+                    'vendor_code' => $vendorAccount,
+                    'vendor' => $vendorAccount,
+                    'vendor_product_code' => $vendorItemId,
+                    'booking' => $regular,
+                    'special' => $special,
+                ]);
+
+                if (!$save_product) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Products registered successfully';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function deactivate_product($id)
+    {
+        if (Products::where('id', $id)->exists()) {
+            $update = Products::where('id', $id)->update([
+                'status' => '0',
+            ]);
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'product deactivated with id';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'product not found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function edit_product(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'atlasId' => 'required',
+            'desc' => 'required',
+            'regular' => 'required',
+            'special' => 'required',
+            'vendor' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $atlasId = $request->atlasId;
+            $desc = $request->desc;
+            $regular = $request->regular;
+            $special = $request->special;
+            $vendor = $request->vendor;
+
+            // update to the db
+            $update = Products::where('atlas_id', $atlasId)->update([
+                'atlas_id' => $atlasId,
+                'description' => $desc,
+                'booking' => $regular,
+                'special' => $special,
+                'vendor' => $vendor,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Products Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Products Update failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function get_product_by_atlas_id($id)
+    {
+        if (Products::where('atlas_id', $id)->exists()) {
+            $item = Products::where('atlas_id', $id)
+                ->get()
+                ->first();
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'get products with atlas id';
+            $this->result->data = $item;
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'product not found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_product($id)
+    {
+        $product = Products::where('id', $id)->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get products was successful';
+        $this->result->data = $product;
+        return response()->json($this->result);
+    }
+
+    // public function deactivate_product($id)
+    // {
+    //     // update to the db
+    //     $update = Products::where('id', $id)->update([
+    //         'status' => '0',
+    //     ]);
+
+    //     if ($update) {
+    //         $this->result->status = true;
+    //         $this->result->status_code = 200;
+    //         $this->result->message = 'Product Deactivated Successfully';
+    //         return response()->json($this->result);
+    //     } else {
+    //         $this->result->status = true;
+    //         $this->result->status_code = 404;
+    //         $this->result->message = 'An Error Ocurred, Dealer Update failed';
+    //         return response()->json($this->result);
+    //     }
+    // }
+
+    public function get_all_products()
+    {
+        $products = Products::where('status', '1')->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all products was successful';
+        $this->result->data = $products;
+        return response()->json($this->result);
+    }
+
     public function upload_product_csv(Request $request)
     {
         $csv = $request->file('csv');

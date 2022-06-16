@@ -85,7 +85,30 @@ Route::group(
             'AdminController@deactivate_dealer_user'
         );
 
-        Route::post('/upload-product-csv', 'AdminController@upload_product_csv');
+        Route::post(
+            '/upload-product-csv',
+            'AdminController@upload_product_csv'
+        );
+
+        Route::get('/all-products', 'AdminController@get_all_products');
+        Route::get(
+            '/deactivate-product/{id}',
+            'AdminController@deactivate_product'
+        );
+
+        Route::get('/get-product/{id}', 'AdminController@get_product');
+        Route::get(
+            '/get-product-atlas-id/{id}',
+            'AdminController@get_product_by_atlas_id'
+        );
+
+        Route::post('/edit-product', 'AdminController@edit_product');
+        Route::post('/add-product', 'AdminController@add_product');
+
+        // Route::get(
+        //     '/deactivate-product/{id}',
+        //     'AdminController@deactivate_product'
+        // );
 
         Route::get('/testing', 'AdminController@testing_api');
     }

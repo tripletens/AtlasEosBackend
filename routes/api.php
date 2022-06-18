@@ -26,6 +26,12 @@ Route::group(
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
+        Route::get('/admin-dashboard', 'AdminController@dashboard');
+        Route::get(
+            '/get-all-vendor-users',
+            'AdminController@get_all_vendor_users'
+        );
+
         Route::post('/upload-users', 'AdminController@upload_users');
         Route::post('/upload-vendors', 'AdminController@upload_vendors');
         Route::post('/register-vendors', 'AdminController@register_vendors');
@@ -109,6 +115,9 @@ Route::group(
         //     '/deactivate-product/{id}',
         //     'AdminController@deactivate_product'
         // );
+
+        Route::post('/upload-admin-users', 'AdminController@upload_admin_csv');
+        Route::get('/all-admins', 'AdminController@get_all_admins');
 
         Route::get('/testing', 'AdminController@testing_api');
     }

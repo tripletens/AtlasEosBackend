@@ -24,7 +24,7 @@ use App\Models\Products;
 // use Illuminate\Support\Facades\Storage;
 // use App\Models\Branch;
 // use App\Models\Promotional_ads;
-// use App\Models\Cart;
+use App\Models\Cart;
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -51,6 +51,161 @@ class AdminController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    ///// Permission Role Access
+    // admin == 1
+    // branch manager == 2
+    // vendor == 3
+    // dealer == 4
+    // inside sales == 5
+    // outside == 6
+
+    public function get_all_admins()
+    {
+        $all_admin = Users::orWhere('role', '1')
+            ->orWhere('role', '2')
+            ->orWhere('role', '5')
+            ->orWhere('role', '6')
+            ->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $all_admin;
+        $this->result->message = 'Admin All Admin Data';
+        return response()->json($this->result);
+    }
+
+    public function upload_admin_csv(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealer in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                # code...
+                $name = $value[0];
+                ///  $desgination = $value[1];
+                $email = $value[2];
+                $access_level_first = $value[4];
+                $access_level_second = $value[5];
+                $password = bcrypt($value[6]);
+                $password_show = $value[6];
+                $region = $value[7];
+                $extra_name = explode(' ', $name);
+                $first_name = $extra_name[0];
+                // $last_name = is_empty($extra_name[1]) ? '' : $extra_name[1];
+                $role = 0;
+                $role_name = $value[3];
+
+                if (strtolower($role_name) == 'admin') {
+                    $role = 1;
+                }
+
+                if (strtolower($role_name) == 'branch manager') {
+                    $role = 2;
+                }
+
+                if (strtolower($role_name) == 'vendor') {
+                    $role = 3;
+                }
+
+                if (strtolower($role_name) == 'dealer') {
+                    $role = 4;
+                }
+                if (strtolower($role_name) == 'inside sales') {
+                    $role = 5;
+                }
+
+                if (strtolower($role_name) == 'outside sales') {
+                    $role = 6;
+                }
+
+                if (Post::where('email', $email)->exists()) {
+                    // post with the same slug already exists
+                } else {
+                    $save_product = Users::create([
+                        'first_name' => $first_name,
+                        ////'last_name' => $last_name,
+                        'full_name' => $name,
+                        'designation' => $role_name,
+                        'email' => $email,
+                        'role_name' => $role_name,
+                        'role' => $role,
+                        'access_level_first' => $access_level_first,
+                        'access_level_second' => $access_level_second,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        'region' => $region,
+                    ]);
+                }
+
+                if (!$save_product) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
+    public function dashboard()
+    {
+        $total_vendors = Users::where('role', '3')->count();
+        $total_dealers = Users::where('role', '4')->count();
+        $total_products = Products::count();
+        $total_order = Cart::where('status', '1')->count();
+
+        $logged_in_vendors = Users::where('role', '3')
+            ->where('last_login', '!=', null)
+            ->count();
+
+        $logged_in_dealers = Users::where('role', '4')
+            ->where('last_login', '!=', null)
+            ->count();
+
+        $logged_in_admin = Users::orWhere('role', '1')
+            ->orWhere('role', '5')
+            ->orWhere('role', '2')
+            ->orWhere('role', '6')
+            ->where('last_login', '!=', null)
+            ->count();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+
+        $this->result->data->total_logged_vendors = $logged_in_vendors;
+        $this->result->data->total_logged_admin = $logged_in_admin;
+        $this->result->data->total_logged_dealers = $total_logged_dealers;
+
+        $this->result->data->total_vendors = $total_vendors;
+        $this->result->data->total_dealers = $total_dealers;
+        $this->result->data->total_products = $total_products;
+        $this->result->data->total_order = $total_order;
+
+        $this->result->message = 'Admin Dashboard Data';
+        return response()->json($this->result);
     }
 
     public function add_product(Request $request)
@@ -205,7 +360,9 @@ class AdminController extends Controller
 
     public function get_product($id)
     {
-        $product = Products::where('id', $id)->get();
+        $product = Products::where('id', $id)
+            ->get()
+            ->first();
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get products was successful';
@@ -766,14 +923,6 @@ class AdminController extends Controller
             }
         }
     }
-
-    ///// Permission Role Access
-    // admin == 1
-    // branch manager == 2
-    // vendor == 3
-    // dealer == 4
-    // inside sales == 5
-    // outside == 6
 
     public function get_all_vendor_users()
     {

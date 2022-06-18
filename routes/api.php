@@ -142,6 +142,12 @@ Route::group(
         Route::get('/edit-promotional-flier/{id}', 'PromotionalFlierController@edit_promotional_flier');
         Route::get('/delete-promotional-flier/{id}', 'PromotionalFlierController@delete_promotional_flier');
 
+        // ------------------ new products --------------------//
+        Route::get('/products/new', 'ProductsController@fetch_all_new_products');
+        Route::get('/products/new/vendor_id/{vendor_id}', 'ProductsController@sort_newproduct_by_vendor_id');
+        Route::get('/products/new/atlas_id/{atlas_id}', 'ProductsController@sort_newproduct_by_atlas_id');
+
+
     }
 );
 

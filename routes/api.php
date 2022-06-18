@@ -116,6 +116,9 @@ Route::group(
         //     'AdminController@deactivate_product'
         // );
 
+        Route::post('/upload-admin-users', 'AdminController@upload_admin_csv');
+        Route::get('/all-admins', 'AdminController@get_all_admins');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

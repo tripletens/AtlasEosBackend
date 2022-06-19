@@ -177,27 +177,27 @@ class AdminController extends Controller
         // $total_products = Products::count();
         // $total_order = Cart::where('status', '1')->count();
 
-        $logged_in_vendors = Users::where('role', '3')
-            ->where('last_login', '!=', null)
-            ->count();
+        // $logged_in_vendors = Users::where('role', '3')
+        //     ->where('last_login', '!=', null)
+        //     ->count();
 
-        $logged_in_dealers = Users::where('role', '4')
-            ->where('last_login', '!=', null)
-            ->count();
+        // $logged_in_dealers = Users::where('role', '4')
+        //     ->where('last_login', '!=', null)
+        //     ->count();
 
-        $logged_in_admin = Users::orWhere('role', '1')
-            ->orWhere('role', '5')
-            ->orWhere('role', '2')
-            ->orWhere('role', '6')
-            ->where('last_login', '!=', null)
-            ->count();
+        // $logged_in_admin = Users::orWhere('role', '1')
+        //     ->orWhere('role', '5')
+        //     ->orWhere('role', '2')
+        //     ->orWhere('role', '6')
+        //     ->where('last_login', '!=', null)
+        //     ->count();
 
         $this->result->status = true;
         $this->result->status_code = 200;
 
-        $this->result->data->total_logged_vendors = $logged_in_vendors;
-        $this->result->data->total_logged_admin = $logged_in_admin;
-        $this->result->data->total_logged_dealers = $total_logged_dealers;
+        // $this->result->data->total_logged_vendors = $logged_in_vendors;
+        // $this->result->data->total_logged_admin = $logged_in_admin;
+        // $this->result->data->total_logged_dealers = $total_logged_dealers;
 
         $this->result->data->total_vendors = $total_vendors;
         $this->result->data->total_dealers = $total_dealers;

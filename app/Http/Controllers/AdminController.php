@@ -574,12 +574,11 @@ class AdminController extends Controller
             foreach ($csv_data as $key => $value) {
                 $dealer_code = $value[0];
                 $dealer_name = $value[1];
-                $first_name = $value[2];
-                $last_name = $value[3];
+                $first_name = strtolower($value[2]);
+                $last_name = strtolower($value[3]);
                 $password = bcrypt($value[4]);
                 $password_show = $value[4];
-
-                $email = $value[5];
+                $email = strtolower($value[5]);
                 $privilege_vendors = $value[6];
                 $full_name = $first_name . ' ' . $last_name;
 
@@ -1110,7 +1109,7 @@ class AdminController extends Controller
                 // $password = bcrypt($value[4]);
                 $password_show = $value[3];
                 $privilege_vendors = $value[4];
-                $email = $value[5];
+                $email = strtolower($value[5]);
                 $vendor_code = $value[7];
                 $role = '3';
                 $role_name = 'vendor';

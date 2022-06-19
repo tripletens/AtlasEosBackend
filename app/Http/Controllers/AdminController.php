@@ -174,7 +174,7 @@ class AdminController extends Controller
     {
         $total_vendors = Users::where('role', '3')->count();
         $total_dealers = Users::where('role', '4')->count();
-        // $total_products = Products::count();
+        $total_products = Products::count();
         // $total_order = Cart::where('status', '1')->count();
 
         // $logged_in_vendors = Users::where('role', '3')
@@ -201,7 +201,7 @@ class AdminController extends Controller
 
         $this->result->data->total_vendors = $total_vendors;
         $this->result->data->total_dealers = $total_dealers;
-        // $this->result->data->total_products = $total_products;
+        $this->result->data->total_products = $total_products;
         // $this->result->data->total_order = $total_order;
 
         $this->result->message = 'Admin Dashboard Data';

@@ -586,20 +586,23 @@ class AdminController extends Controller
                 $role = '4';
                 $role_name = 'dealer';
 
-                $save_dealer = Users::create([
-                    'first_name' => $first_name,
-                    'last_name' => $last_name,
-                    'full_name' => $full_name,
-                    'email' => $email,
-                    'password' => $password,
-                    'password_show' => $password_show,
-                    'role' => $role,
-                    'role_name' => $role_name,
-                    'dealer_name' => $dealer_name,
-                    'privileged_vendors' => $privilege_vendors,
-                    'account_id' => $dealer_code,
-                    'company_name' => $dealer_name,
-                ]);
+                if (Users::where('email', $email)->exists()) {
+                } else {
+                    $save_dealer = Users::create([
+                        'first_name' => $first_name,
+                        'last_name' => $last_name,
+                        'full_name' => $full_name,
+                        'email' => $email,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        'role' => $role,
+                        'role_name' => $role_name,
+                        'dealer_name' => $dealer_name,
+                        'privileged_vendors' => $privilege_vendors,
+                        'account_id' => $dealer_code,
+                        'company_name' => $dealer_name,
+                    ]);
+                }
 
                 if (!$save_dealer) {
                     $this->result->status = false;
@@ -1112,21 +1115,24 @@ class AdminController extends Controller
                 $role = '3';
                 $role_name = 'vendor';
 
-                $save_users = Users::create([
-                    'full_name' => $first_name,
-                    'first_name' => $first_name,
-                    'email' => $email,
-                    'password' => $password,
-                    'password_show' => $password_show,
-                    'role' => $role,
-                    'role_name' => $role_name,
-                    // 'vendor' => $vendor,
-                    'vendor_name' => $vendor_name,
-                    'privileged_vendors' => $privilege_vendors,
-                    'username' => $email,
-                    'company_name' => $vendor_name,
-                    'vendor_code' => $vendor_code,
-                ]);
+                if (Users::where('email', $email)->exists()) {
+                } else {
+                    $save_users = Users::create([
+                        'full_name' => $first_name,
+                        'first_name' => $first_name,
+                        'email' => $email,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        'role' => $role,
+                        'role_name' => $role_name,
+                        // 'vendor' => $vendor,
+                        'vendor_name' => $vendor_name,
+                        'privileged_vendors' => $privilege_vendors,
+                        'username' => $email,
+                        'company_name' => $vendor_name,
+                        'vendor_code' => $vendor_code,
+                    ]);
+                }
 
                 if (!$save_users) {
                     $this->result->status = false;
@@ -1274,7 +1280,7 @@ class AdminController extends Controller
                     'password_show' => $password,
                     'full_name' => $full_name,
                     'company_name' => $full_name,
-                    'role' => '2',
+                    'role' => '4',
                 ]);
 
                 if (!$save_product) {

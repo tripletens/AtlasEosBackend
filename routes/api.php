@@ -69,7 +69,7 @@ Route::group(
 
         Route::get('/get-vendor-user/{id}', 'AdminController@get_vendor_user');
 
-        Route::post('/upload-dealers', 'AdminController@upload_dealers');
+        // Route::post('/upload-dealers', 'AdminController@upload_dealers');
 
         Route::post(
             '/edit-vendor-user',
@@ -135,22 +135,54 @@ Route::group(
 
         //---------------------- seminar apis here -------------------- //
         Route::post('/create-seminar', 'SeminarController@create_seminar');
-        Route::get('/fetch-all-seminars', 'SeminarController@fetch_all_seminars');
-        Route::get('/fetch-scheduled-seminars', 'SeminarController@fetch_scheduled_seminars');
-        Route::get('/fetch-ongoing-seminars', 'SeminarController@fetch_ongoing_seminars');
-        Route::get('/fetch-watched-seminars', 'SeminarController@fetch_watched_seminars');
+        Route::get(
+            '/fetch-all-seminars',
+            'SeminarController@fetch_all_seminars'
+        );
+        Route::get(
+            '/fetch-scheduled-seminars',
+            'SeminarController@fetch_scheduled_seminars'
+        );
+        Route::get(
+            '/fetch-ongoing-seminars',
+            'SeminarController@fetch_ongoing_seminars'
+        );
+        Route::get(
+            '/fetch-watched-seminars',
+            'SeminarController@fetch_watched_seminars'
+        );
         Route::post('/join-seminar', 'SeminarController@join_seminar');
 
-        Route::get('/fetch-all-dealers-in-seminar', 'SeminarController@fetch_all_dealers_in_seminar');
-        Route::get('/fetch-all-dealers-not-in-seminar', 'SeminarController@fetch_all_dealers_not_in_seminar');
+        Route::get(
+            '/fetch-all-dealers-in-seminar',
+            'SeminarController@fetch_all_dealers_in_seminar'
+        );
+        Route::get(
+            '/fetch-all-dealers-not-in-seminar',
+            'SeminarController@fetch_all_dealers_not_in_seminar'
+        );
 
         // ------------------promotional flier ------------------//
-        Route::post('/create-promotional-flier', 'PromotionalFlierController@create_promotional_flier');
-        Route::get('/show-all-promotional-fliers', 'PromotionalFlierController@show_all_promotional_fliers');
-        Route::get('/show-promotional-flier-by-id/{id}', 'PromotionalFlierController@show_promotional_flier_by_id');
-        Route::get('/edit-promotional-flier/{id}', 'PromotionalFlierController@edit_promotional_flier');
-        Route::get('/delete-promotional-flier/{id}', 'PromotionalFlierController@delete_promotional_flier');
-
+        Route::post(
+            '/create-promotional-flier',
+            'PromotionalFlierController@create_promotional_flier'
+        );
+        Route::get(
+            '/show-all-promotional-fliers',
+            'PromotionalFlierController@show_all_promotional_fliers'
+        );
+        Route::get(
+            '/show-promotional-flier-by-id/{id}',
+            'PromotionalFlierController@show_promotional_flier_by_id'
+        );
+        Route::get(
+            '/edit-promotional-flier/{id}',
+            'PromotionalFlierController@edit_promotional_flier'
+        );
+        Route::get(
+            '/delete-promotional-flier/{id}',
+            'PromotionalFlierController@delete_promotional_flier'
+        );
     }
 );
 

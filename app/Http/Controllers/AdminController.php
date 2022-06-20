@@ -85,7 +85,6 @@ class AdminController extends Controller
             $description = $request->input('description');
             $link = $request->input('link');
             $role = $request->input('role');
-            // $password = $request->input('password');
 
             $createfaq = Faq::create([
                 'title' => $title ? $title : null,

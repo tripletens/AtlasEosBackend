@@ -15,6 +15,7 @@ use App\Models\Dealer;
 use App\Models\Users;
 use App\Models\Vendors;
 use App\Models\Faq;
+use App\Models\Seminar;
 
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Imports\ProductsImport;
@@ -61,6 +62,144 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function create_seminar(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'seminar_name' => 'required',
+            'vendor_name' => 'required',
+            'vendor_id' => 'required',
+            'seminar_date' => 'required',
+            'seminar_time' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $seminar_name = $request->seminar_name;
+            $vendor_name = $request->vendor_name;
+            $vendor_id = $request->vendor_id;
+            $seminar_date = $request->seminar_date;
+            $seminar_time = $request->seminar_time;
+
+            // update to the db
+            $save = Seminar::create([
+                'seminar_name' => $seminar_name,
+                'vendor_name' => $vendor_name,
+                'vendor_id' => $vendor_id,
+                'seminar_date' => $seminar_date,
+                'seminar_time' => $seminar_time,
+            ]);
+
+            if ($save) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Seminar Added Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Seminar Uploading failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function edit_faq(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'title' => 'required',
+            'subtitle' => 'required',
+            'description' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $id = $request->id;
+            $title = $request->title;
+            $subtitle = $request->subtitle;
+            $description = $request->description;
+            $link = $request->link;
+            $role = $request->role;
+
+            // update to the db
+            $update = Faq::where('id', $id)->update([
+                'title' => $title,
+                'subtitle' => $subtitle,
+                'description' => $description,
+                'link' => $link,
+                'role' => $role,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Faq Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Products Update failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function get_faq_id($id)
+    {
+        if (Faq::where('id', $id)->exists()) {
+            $faq = Faq::where('id', $id)
+                ->get()
+                ->first();
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $faq;
+
+            $this->result->message = 'Faq acquired with id';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Faq not found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function deactivate_faq($id)
+    {
+        if (Faq::where('id', $id)->exists()) {
+            $update = Faq::where('id', $id)->update([
+                'status' => '0',
+            ]);
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Faq deactivated with id';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Faq not found';
+        }
+
+        return response()->json($this->result);
+    }
 
     public function create_faq(Request $request)
     {

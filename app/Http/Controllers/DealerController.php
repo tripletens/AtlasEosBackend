@@ -112,7 +112,9 @@ class DealerController extends Controller
 
     public function fetch_all_faqs()
     {
-        $fetch_faqs = Faq::orderBy('id', 'desc')->get();
+        $fetch_faqs = Faq::orderBy('id', 'desc')
+            ->where('status', 1)
+            ->get();
 
         if (!$fetch_faqs) {
             $this->result->status = true;

@@ -120,6 +120,13 @@ Route::group(
         Route::get('/all-admins', 'AdminController@get_all_admins');
 
         Route::post('/create-faq', 'AdminController@create_faq');
+        Route::post('/edit-faq', 'AdminController@edit_faq');
+
+        Route::post('/create-seminar', 'AdminController@create_seminar');
+
+        Route::get('/deactivate-faq/{id}', 'AdminController@deactivate_faq');
+
+        Route::get('/get-faq-id/{id}', 'AdminController@get_faq_id');
 
         Route::get('/testing', 'AdminController@testing_api');
     }

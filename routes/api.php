@@ -119,6 +119,8 @@ Route::group(
         Route::post('/upload-admin-users', 'AdminController@upload_admin_csv');
         Route::get('/all-admins', 'AdminController@get_all_admins');
 
+        Route::post('/create-faq', 'AdminController@create_faq');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -130,7 +132,6 @@ Route::group(
         Route::post('/login', 'UserController@login');
         Route::get('/get-all-vendors', 'VendorController@get_all_vendors');
         Route::post('/create-report', 'DealerController@create_report');
-        Route::post('/create-faq', 'DealerController@create_faq');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
 
         //---------------------- seminar apis here -------------------- //

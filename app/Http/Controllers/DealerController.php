@@ -47,7 +47,7 @@ class DealerController extends Controller
 
     public function login()
     {
-        echo "login page setup";
+        echo 'login page setup';
     }
 
     public function create_report(Request $request)
@@ -55,7 +55,7 @@ class DealerController extends Controller
         $validator = Validator::make($request->all(), [
             'subject' => 'required',
             'description' => 'required',
-            'photo' => 'mimes:pdf,doc,docx,xls,jpg,jpeg,png,gif'
+            'photo' => 'mimes:pdf,doc,docx,xls,jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {
@@ -66,13 +66,22 @@ class DealerController extends Controller
 
             return response()->json($this->result);
         } else {
-
             if ($request->hasFile('file')) {
-                $filenameWithExt    = $request->file('file')->getClientOriginalName();
-                $filename           = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension          = $request->file('file')->getClientOriginalExtension();
-                $fileNameToStore    = $filename . '_' . time() . '.' . $extension;
-                $filepath               = env('APP_URL') . Storage::url($request->file('file')->storeAs('public/reports', $fileNameToStore));
+                $filenameWithExt = $request
+                    ->file('file')
+                    ->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request
+                    ->file('file')
+                    ->getClientOriginalExtension();
+                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                $filepath =
+                    env('APP_URL') .
+                    Storage::url(
+                        $request
+                            ->file('file')
+                            ->storeAs('public/reports', $fileNameToStore)
+                    );
             }
 
             $subject = $request->input('subject');
@@ -83,7 +92,7 @@ class DealerController extends Controller
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
                 'file_url' => $request->hasFile('file') ? $filepath : null,
-                'ticket_id' => Str::random(8)
+                'ticket_id' => Str::random(8),
             ]);
 
             if (!$create_report) {
@@ -101,64 +110,15 @@ class DealerController extends Controller
         }
     }
 
-    public function create_faq(Request $request)
+    public function fetch_all_faqs()
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required',
-            'subtitle' => 'required',
-            'description' => 'required',
-            'link' => 'required',
-            'username' => 'required',
-            'password' => 'required',
-        ]);
+        $fetch_faqs = Faq::orderBy('id', 'desc')->get();
 
-        if ($validator->fails()) {
-            $response['response'] = $validator->messages();
-            $this->result->status = false;
-            $this->result->status_code = 422;
-            $this->result->message = $response;
-
-            return response()->json($this->result);
-        } else {
-
-            $title = $request->input('title');
-            $subtitle = $request->input('subtitle');
-            $description = $request->input('description');
-            $link = $request->input('link');
-            $username = $request->input('username');
-            $password = $request->input('password');
-
-            $createfaq = Faq::create([
-                'title' => $title ? $title : null,
-                'subtitle' => $subtitle ? $subtitle : null,
-                'description' => $description ? $description : null,
-                'link' => $link ? $link : null,
-                'username' => $username ? $username : null,
-                'password' => $password ? $password : null,
-            ]);
-
-            if (!$createfaq) {
-                $this->result->status = true;
-                $this->result->status_code = 400;
-                $this->result->message =
-                    'An Error Ocurred, Faq Addition failed';
-                return response()->json($this->result);
-            }
-
-            $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->message = 'FAQ Created Successfully';
-            return response()->json($this->result);
-        }
-    }
-
-    public function fetch_all_faqs(){
-        $fetch_faqs = Faq::orderBy('id','desc')->get();
-
-        if(!$fetch_faqs){
+        if (!$fetch_faqs) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the faqs";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the faqs";
             return response()->json($this->result);
         }
 
@@ -167,6 +127,5 @@ class DealerController extends Controller
         $this->result->data = $fetch_faqs;
         $this->result->message = 'FAQs fetched Successfully';
         return response()->json($this->result);
-
     }
 }

@@ -14,6 +14,7 @@ use App\Models\Admin;
 use App\Models\Dealer;
 use App\Models\Users;
 use App\Models\Vendors;
+use App\Models\Faq;
 
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Imports\ProductsImport;
@@ -60,6 +61,54 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function create_faq(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'subtitle' => 'required',
+            'description' => 'required',
+            'link' => 'required',
+            'role' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            $title = $request->input('title');
+            $subtitle = $request->input('subtitle');
+            $description = $request->input('description');
+            $link = $request->input('link');
+            $role = $request->input('role');
+            // $password = $request->input('password');
+
+            $createfaq = Faq::create([
+                'title' => $title ? $title : null,
+                'subtitle' => $subtitle ? $subtitle : null,
+                'description' => $description ? $description : null,
+                'link' => $link ? $link : null,
+                'role' => $role ? $role : null,
+            ]);
+
+            if (!$createfaq) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'An Error Ocurred, Faq Addition failed';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'FAQ Created Successfully';
+            return response()->json($this->result);
+        }
+    }
 
     public function get_all_admins()
     {
@@ -581,7 +630,6 @@ class AdminController extends Controller
                 $email = strtolower($value[5]);
                 $privilege_vendors = $value[6];
                 $full_name = $first_name . ' ' . $last_name;
-
                 $role = '4';
                 $role_name = 'dealer';
 

@@ -68,7 +68,6 @@ class AdminController extends Controller
             'title' => 'required',
             'subtitle' => 'required',
             'description' => 'required',
-            'link' => 'required',
             'role' => 'required',
         ]);
 

@@ -40,6 +40,11 @@ Route::group(
             'AdminController@register_vendor_users'
         );
 
+        Route::post(
+            '/register-dealer-users',
+            'AdminController@register_dealer_users'
+        );
+
         Route::get(
             '/get-all-vendor-users',
             'AdminController@get_all_vendor_users'

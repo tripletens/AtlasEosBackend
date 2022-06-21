@@ -738,6 +738,82 @@ class AdminController extends Controller
         }
     }
 
+    public function register_dealer_users(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'firstName' => 'required',
+            'lastName' => 'required',
+            'location' => 'required',
+            'password' => 'required',
+            'accountId' => 'required',
+            'companyName' => 'required',
+            'companyCode' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $first_name = $request->firstName;
+            $last_name = $request->lastName;
+            $email = $request->email;
+            $location = $request->location;
+            $privilege_vendors = $request->privilegedVendors;
+            $password = bcrypt($request->password);
+            $password_show = $request->password;
+            $company_name = $request->companyName;
+            $company_code = $request->companyCode;
+            $accountId = $request->accountId;
+            $full_name = $first_name . ' ' . $last_name;
+
+            $role = '4';
+            $role_name = 'dealer';
+
+            if (Users::where('email', $email)->exists()) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message =
+                    'Dealer Email has been registered already ';
+                return response()->json($this->result);
+            } else {
+                // save to the db
+                $save_vendor = Users::create([
+                    'full_name' => $full_name,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'email' => $email,
+                    'password' => $password,
+                    'password_show' => $password_show,
+                    'role' => $role,
+                    'role_name' => $role_name,
+                    'privilege_vendors' => $privilege_vendors,
+                    'username' => $email,
+                    'location' => $location,
+                    'company_name' => $company_name,
+                    'company_code' => $company_code,
+                ]);
+            }
+
+            if ($save_vendor) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Dealer User Successfully Added';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Vendor Addition failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
     public function upload_dealer_users(Request $request)
     {
         $csv = $request->file('csv');
@@ -784,6 +860,7 @@ class AdminController extends Controller
                         'dealer_name' => $dealer_name,
                         'privileged_vendors' => $privilege_vendors,
                         'account_id' => $dealer_code,
+                        'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
                     ]);
                 }

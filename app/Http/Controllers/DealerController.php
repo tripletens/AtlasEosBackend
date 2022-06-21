@@ -59,12 +59,15 @@ class DealerController extends Controller
         $new_products = Products::where('check_new', '1')->count();
         $show_total = Cart::where('dealer', $account)->sum('price');
 
+        $order_remaining = Vendors::count();
+
         $this->result->status = true;
         $this->result->status_code = 200;
 
         $this->result->data->completed_orders = $completed_orders;
         $this->result->data->new_products = $new_products;
         $this->result->data->show_total = $show_total;
+        $this->result->data->order_remaining = $order_remaining;
 
         $this->result->message = 'Dealer Dashboard Data';
         return response()->json($this->result);

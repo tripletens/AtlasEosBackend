@@ -24,11 +24,11 @@ use App\Models\Category;
 use App\Models\AtlasLoginLog;
 
 use App\Models\CardedProducts;
-
 use App\Models\ServiceParts;
 use App\Models\Cart;
 use App\Models\Faq;
 use App\Models\Report;
+use App\Models\Vendors;
 
 class DealerController extends Controller
 {
@@ -48,6 +48,45 @@ class DealerController extends Controller
     public function login()
     {
         echo 'login page setup';
+    }
+
+    public function universal_search($search)
+    {
+        $vendor = Vendors::where('vendor_code', $search)->exists();
+        $product = Products::where('atlas_id', $search)->exists();
+
+        switch (true) {
+            case $vendor:
+                $item = Vendors::where('vendor_code', $search)
+                    ->get()
+                    ->first();
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'get products with atlas id';
+                $this->result->data = $item;
+                break;
+
+            case $product:
+                $item = Products::where('atlas_id', $search)
+                    ->get()
+                    ->first();
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'get products with atlas id';
+                $this->result->data = $item;
+                break;
+
+            default:
+                $this->result->status = false;
+                $this->result->status_code = 404;
+                $this->result->message = 'not found';
+
+                break;
+        }
+
+        return response()->json($this->result);
     }
 
     public function create_report(Request $request)

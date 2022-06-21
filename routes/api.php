@@ -142,6 +142,11 @@ Route::group(
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
+        Route::get(
+            '/universal-search/{search}',
+            'DealerController@universal_search'
+        );
+
         //---------------------- seminar apis here -------------------- //
         Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(

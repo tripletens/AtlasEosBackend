@@ -141,16 +141,25 @@ class DealerController extends Controller
 
     public function get_vendor_products($code)
     {
-        $vendor_products = Products::where('vendor', $code)
-            ->where('status', '1')
-            ->get();
+        if (
+            Products::where('vendor', $code)
+                ->where('status', '1')
+                ->exists()
+        ) {
+            $vendor_products = Products::where('vendor', $code)
+                ->where('status', '1')
+                ->get();
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $vendor_products;
+            $this->result->message = 'all Vendor Products Data';
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+            $this->result->message = 'no product found';
+        }
 
-        $this->result->status = true;
-        $this->result->status_code = 200;
-
-        $this->result->data = $vendor_products;
-
-        $this->result->message = 'all Vendor Products Data';
         return response()->json($this->result);
     }
 

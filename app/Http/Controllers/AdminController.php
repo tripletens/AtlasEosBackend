@@ -63,14 +63,26 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_all_seminar()
+    {
+        $seminar = Seminar::all();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $seminar;
+        $this->result->message = 'All Seminar Fetched Successfully';
+        return response()->json($this->result);
+    }
+
     public function create_seminar(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'seminar_name' => 'required',
-            'vendor_name' => 'required',
-            'vendor_id' => 'required',
-            'seminar_date' => 'required',
-            'seminar_time' => 'required',
+            'topic' => 'required',
+            'vendorName' => 'required',
+            'vendorCode' => 'required',
+            'seminarDate' => 'required',
+            'startTime' => 'required',
+            'stopTime' => 'required',
+            'link' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -82,19 +94,24 @@ class AdminController extends Controller
             return response()->json($this->result);
         } else {
             // process the request
-            $seminar_name = $request->seminar_name;
-            $vendor_name = $request->vendor_name;
-            $vendor_id = $request->vendor_id;
-            $seminar_date = $request->seminar_date;
-            $seminar_time = $request->seminar_time;
+            $topic = $request->topic;
+            $vendor_name = $request->vendorName;
+            $vendor_id = $request->vendorCode;
+            $seminar_date = $request->seminarDate;
+            $start_time = $request->startTime;
+            $stop_time = $request->stopTime;
+            $link = $request->link;
 
             // update to the db
             $save = Seminar::create([
-                'seminar_name' => $seminar_name,
+                'topic' => $topic,
                 'vendor_name' => $vendor_name,
                 'vendor_id' => $vendor_id,
                 'seminar_date' => $seminar_date,
-                'seminar_time' => $seminar_time,
+                'start_time' => $start_time,
+                'stop_time' => $stop_time,
+
+                'link' => $link,
             ]);
 
             if ($save) {
@@ -710,6 +727,7 @@ class AdminController extends Controller
     {
         $vendors = Users::where('status', '1')
             ->where('role', '4')
+            ->orderBy('id', 'desc')
             ->get();
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -1190,7 +1208,9 @@ class AdminController extends Controller
 
     public function get_all_vendor_users()
     {
-        $vendor_user = Users::where('role', '3')->get();
+        $vendor_user = Users::where('role', '3')
+            ->orderBy('id', 'desc')
+            ->get();
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get all vendor users was successful';

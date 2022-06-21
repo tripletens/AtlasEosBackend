@@ -50,6 +50,108 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function add_item_cart(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'vendor' => 'required',
+            'atlas_id' => 'required',
+            'product_id' => 'required',
+            'qty' => 'required',
+            'price' => 'required',
+            'unit_price' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+            $product_id = $request->product_id;
+            $qty = $request->qty;
+            $price = $request->price;
+            $unit_price = $request->unit_price;
+
+            // update to the db
+            $save = Cart::create([
+                'uid' => $uid,
+                'atlas_id' => $atlas_id,
+
+                'dealer' => $dealer,
+                'vendor' => $vendor,
+                'product_id' => $product_id,
+                'qty' => $qty,
+                'price' => $price,
+                'unit_price' => $unit_price,
+            ]);
+
+            if ($save) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'item Added to cart';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, item not added to cart';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function quick_order_filter_atlasid($id)
+    {
+        if (Products::where('atlas_id', $id)->exists()) {
+            $item = Products::where('atlas_id', $id)
+                ->get()
+                ->first();
+
+            $vendor_code = $item->vendor_code;
+            $vendor_data = Vendors::where('vendor_code', $vendor_code)
+                ->get()
+                ->first();
+
+            $item->vendor_name = $vendor_data->vendor_name;
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'get products with atlas id';
+            $this->result->data = $item;
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'product not found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_vendor_products($code)
+    {
+        $vendor_products = Products::where('vendor', $code)
+            ->where('status', '1')
+            ->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+
+        $this->result->data = $vendor_products;
+
+        $this->result->message = 'all Vendor Products Data';
+        return response()->json($this->result);
+    }
+
     public function dealer_dashboard($account)
     {
         $completed_orders = Cart::where('dealer', $account)

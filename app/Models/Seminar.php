@@ -10,11 +10,13 @@ class Seminar extends Model
     use HasFactory;
     protected $table = 'seminars';
     protected $fillable = [
-        'seminar_name',
+        'topic',
         'vendor_name',
         'vendor_id',
         'seminar_date',
-        'seminar_time',
+        'start_time',
+        'stop_time',
+        'link',
         'status',
         'created_at',
         'updated_at',

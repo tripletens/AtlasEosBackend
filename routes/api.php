@@ -129,6 +129,8 @@ Route::group(
 
         Route::post('/create-seminar', 'AdminController@create_seminar');
 
+        Route::get('/get-all-seminar', 'AdminController@get_all_seminar');
+
         Route::get('/deactivate-faq/{id}', 'AdminController@deactivate_faq');
 
         Route::get('/get-faq-id/{id}', 'AdminController@get_faq_id');
@@ -149,6 +151,17 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+        Route::get(
+            '/get-vendor-products/{code}',
+            'DealerController@get_vendor_products'
+        );
+
+        Route::get(
+            '/quick-order-filter-atlasid/{id}',
+            'DealerController@quick_order_filter_atlasid'
+        );
+
+        Route::post('/add-item-to-cart', 'DealerController@add_item_cart');
 
         Route::get(
             '/universal-search/{search}',
@@ -161,7 +174,7 @@ Route::group(
         );
 
         //---------------------- seminar apis here -------------------- //
-        Route::post('/create-seminar', 'SeminarController@create_seminar');
+        // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(
             '/fetch-all-seminars',
             'SeminarController@fetch_all_seminars'

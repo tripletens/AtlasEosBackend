@@ -82,31 +82,33 @@ class DealerController extends Controller
             $price = $request->price;
             $unit_price = $request->unit_price;
 
-            // update to the db
-            $save = Cart::create([
-                'uid' => $uid,
-                'atlas_id' => $atlas_id,
+            if (
+                Cart::where('dealer', $dealer)
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
+            ) {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message = 'item has been added already';
+            } else {
+                // update to the db
+                $save = Cart::create([
+                    'uid' => $uid,
+                    'atlas_id' => $atlas_id,
+                    'dealer' => $dealer,
+                    'vendor' => $vendor,
+                    'product_id' => $product_id,
+                    'qty' => $qty,
+                    'price' => $price,
+                    'unit_price' => $unit_price,
+                ]);
 
-                'dealer' => $dealer,
-                'vendor' => $vendor,
-                'product_id' => $product_id,
-                'qty' => $qty,
-                'price' => $price,
-                'unit_price' => $unit_price,
-            ]);
-
-            if ($save) {
                 $this->result->status = true;
                 $this->result->status_code = 200;
                 $this->result->message = 'item Added to cart';
-                return response()->json($this->result);
-            } else {
-                $this->result->status = true;
-                $this->result->status_code = 404;
-                $this->result->message =
-                    'An Error Ocurred, item not added to cart';
-                return response()->json($this->result);
             }
+
+            return response()->json($this->result);
         }
     }
 

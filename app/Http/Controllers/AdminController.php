@@ -225,11 +225,11 @@ class AdminController extends Controller
             $role = $request->input('role');
 
             $createfaq = Faq::create([
-                'title' => $title ? $title : null,
-                'subtitle' => $subtitle ? $subtitle : null,
-                'description' => $description ? $description : null,
-                'link' => $link ? $link : null,
-                'role' => $role ? $role : null,
+                'title' => $title,
+                'subtitle' => $subtitle,
+                'description' => $description,
+                'link' => $link,
+                'role' => $role,
             ]);
 
             if (!$createfaq) {

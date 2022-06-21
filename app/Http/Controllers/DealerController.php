@@ -110,6 +110,28 @@ class DealerController extends Controller
         }
     }
 
+    public function dealer_faq()
+    {
+        $fetch_faqs = Faq::orderBy('id', 'desc')
+            ->where('status', 1)
+            ->where('role', '4')
+            ->get();
+
+        if (!$fetch_faqs) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the faqs";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_faqs;
+        $this->result->message = 'Dealer FAQs fetched Successfully';
+        return response()->json($this->result);
+    }
+
     public function fetch_all_faqs()
     {
         $fetch_faqs = Faq::orderBy('id', 'desc')

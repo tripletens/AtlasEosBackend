@@ -140,6 +140,7 @@ Route::group(
         Route::get('/get-all-vendors', 'VendorController@get_all_vendors');
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
+        Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         //---------------------- seminar apis here -------------------- //
         Route::post('/create-seminar', 'SeminarController@create_seminar');

@@ -134,7 +134,10 @@ Route::group(
 
 ///////////////// Users (DEALERS AND VENDORS) /////////////
 Route::group(
-    ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+    [
+        'namespace' => 'App\Http\Controllers',
+        /////'middleware' => 'cors'
+    ],
     function () {
         Route::post('/login', 'UserController@login');
         Route::get('/get-all-vendors', 'VendorController@get_all_vendors');
@@ -145,6 +148,11 @@ Route::group(
         Route::get(
             '/universal-search/{search}',
             'DealerController@universal_search'
+        );
+
+        Route::get(
+            '/dealer-dashboard/{account}',
+            'DealerController@dealer_dashboard'
         );
 
         //---------------------- seminar apis here -------------------- //

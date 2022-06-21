@@ -50,6 +50,26 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function dealer_dashboard($account)
+    {
+        $completed_orders = Cart::where('dealer', $account)
+            ->where('status', '1')
+            ->count();
+
+        $new_products = Products::where('check_new', '1')->count();
+        $show_total = Cart::where('dealer', $account)->sum('price');
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+
+        $this->result->data->completed_orders = $completed_orders;
+        $this->result->data->new_products = $new_products;
+        $this->result->data->show_total = $show_total;
+
+        $this->result->message = 'Dealer Dashboard Data';
+        return response()->json($this->result);
+    }
+
     public function universal_search($search)
     {
         $vendor = Vendors::where('vendor_code', $search)->exists();

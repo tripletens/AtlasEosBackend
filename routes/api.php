@@ -230,6 +230,10 @@ Route::group(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );
+        Route::get(
+            '/get-product-by-vendor-id/{vendor_id}',
+            'ProductsController@fetch_all_products_by_vendor_id'
+        );
     }
 );
 

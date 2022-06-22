@@ -24,8 +24,7 @@ class VendorController extends Controller
 
     public function get_all_vendors()
     {
-        $vendors = Vendors::all();
-
+        $vendors = Vendors::where('status', '1')->get();
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get all vendors was successful';

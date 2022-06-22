@@ -15,20 +15,10 @@ class Dealer extends Authenticatable implements JWTSubject
     protected $table = 'dealers';
 
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'password',
-        'location',
-        'phone',
-        'account_id',
-        'status',
-        'password_clear',
-        'username',
-        'last_login',
-        'company_name',
-        'full_name',
-        'placed_order_date',
+        'dealer_name',
+        'dealer_code',
+        'role_id',
+        'role_name',
     ];
 
     protected $hidden = ['password'];

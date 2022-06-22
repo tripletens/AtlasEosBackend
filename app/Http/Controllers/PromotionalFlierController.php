@@ -161,6 +161,25 @@ class PromotionalFlierController extends Controller
             return response()->json($this->result);
         }
     }
+
+    public function show_promotional_flier_by_vendor_id($vendor_id)
+    {
+        $one_promotional_flier = PromotionalFlier::where('vendor_id',$vendor_id)->get();
+
+        if (!$one_promotional_flier) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the promotional fliers";
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $one_promotional_flier;
+            $this->result->message = 'Promotional Flier fetched Successfully';
+            return response()->json($this->result);
+        }
+    }
+
     public function delete_promotional_flier($id)
     {
         $promotional_flier = PromotionalFlier::find($id);

@@ -213,6 +213,11 @@ Route::group(
             'PromotionalFlierController@show_promotional_flier_by_id'
         );
         Route::get(
+            '/show-promotional-flier-by-vendor-id/{vendor_id}',
+            'PromotionalFlierController@show_promotional_flier_by_vendor_id'
+        );
+
+        Route::get(
             '/edit-promotional-flier/{id}',
             'PromotionalFlierController@edit_promotional_flier'
         );

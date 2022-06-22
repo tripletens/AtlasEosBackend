@@ -197,12 +197,9 @@ Route::group(
             '/fetch-all-dealers-in-seminar',
             'SeminarController@fetch_all_dealers_in_seminar'
         );
-        Route::get(
-            '/fetch-all-dealers-not-in-seminar',
-            'SeminarController@fetch_all_dealers_not_in_seminar'
-        );
 
         // ------------------promotional flier ------------------//
+
         Route::post(
             '/create-promotional-flier',
             'PromotionalFlierController@create_promotional_flier'
@@ -223,6 +220,10 @@ Route::group(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );
+      // ------------------ new products --------------------//
+        Route::get('/products/new', 'ProductsController@fetch_all_new_products');
+        Route::get('/products/new/vendor_id/{vendor_id}', 'ProductsController@sort_newproduct_by_vendor_id');
+        Route::get('/products/new/atlas_id/{atlas_id}', 'ProductsController@sort_newproduct_by_atlas_id');
     }
 );
 

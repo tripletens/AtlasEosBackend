@@ -188,12 +188,16 @@ class DealerController extends Controller
 
     public function universal_search($search)
     {
-        $vendor = Vendors::where('vendor_code', $search)->exists();
-        $product = Products::where('atlas_id', $search)->exists();
+        $vendor = Vendors::where(
+            'vendor_code',
+            'LIKE',
+            "%{$search}%"
+        )->exists();
+        $product = Products::where('atlas_id', 'LIKE', "%{$search}%")->exists();
 
         switch (true) {
             case $vendor:
-                $item = Vendors::where('vendor_code', $search)
+                $item = Vendors::where('vendor_code', 'LIKE', "%{$search}%")
                     ->get()
                     ->first();
 
@@ -204,7 +208,7 @@ class DealerController extends Controller
                 break;
 
             case $product:
-                $item = Products::where('atlas_id', $search)
+                $item = Products::where('atlas_id', 'LIKE', "%{$search}%")
                     ->get()
                     ->first();
 

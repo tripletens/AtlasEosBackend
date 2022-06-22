@@ -337,10 +337,10 @@ class AdminController extends Controller
                     $role = 6;
                 }
 
-                if (Post::where('email', $email)->exists()) {
+                if (Users::where('email', $email)->exists()) {
                     // post with the same slug already exists
                 } else {
-                    $save_product = Users::create([
+                    $save_admin = Users::create([
                         'first_name' => $first_name,
                         ////'last_name' => $last_name,
                         'full_name' => $name,
@@ -354,21 +354,21 @@ class AdminController extends Controller
                         'password_show' => $password_show,
                         'region' => $region,
                     ]);
-                }
 
-                if (!$save_product) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_admin) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
             }
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Dealer uploaded successfully';
+        $this->result->message = 'Admin Users uploaded successfully';
         return response()->json($this->result);
         fclose($file);
     }

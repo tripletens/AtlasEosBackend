@@ -63,6 +63,104 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function register_admin_users(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'fullName' => 'required',
+            'designation' => 'required',
+            'role' => 'required',
+            'accountAccess' => 'required',
+            'region' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $accountAccess = $request->accountAccess;
+            $full_name = $request->fullName;
+            $designation = $request->designation;
+            $role = $request->role;
+            $region = $request->region;
+            $email = $request->email;
+            $password = $request->password;
+
+            if (strtolower($role) == '1') {
+                $role_name = 'admin';
+            }
+
+            if (strtolower($role) == '2') {
+                $role_name = 'branch manager';
+            }
+
+            if (strtolower($role) == '5') {
+                $role_name = 'inside sales';
+            }
+
+            if (strtolower($role) == '6') {
+                $role_name = 'outside sales';
+            }
+
+            if (Users::where('email', $email)->exists()) {
+                // post with the same slug already exists
+            } else {
+                $save_admin = Users::create([
+                    'first_name' => $full_name,
+                    ////'last_name' => $last_name,
+                    'full_name' => $full_name,
+                    'designation' => $designation,
+                    'email' => $email,
+                    'role_name' => $role_name,
+                    'role' => $role,
+                    'access_level_first' => $accountAccess,
+                    'password' => bcrypt($password),
+                    'password_show' => $password,
+                    'region' => $region,
+                ]);
+
+                if (!$save_admin) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Admin User Added Successfully';
+            }
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function deactivate_admin($id)
+    {
+        if (Users::where('id', $id)->exists()) {
+            $update = Users::where('id', $id)->update([
+                'status' => '0',
+            ]);
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Admin User deactivated with id';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'User not found';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_all_seminar()
     {
         $seminar = Seminar::all();
@@ -765,7 +863,6 @@ class AdminController extends Controller
             'password' => 'required',
             'accountId' => 'required',
             'companyName' => 'required',
-            'companyCode' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -785,7 +882,6 @@ class AdminController extends Controller
             $password = bcrypt($request->password);
             $password_show = $request->password;
             $company_name = $request->companyName;
-            $company_code = $request->companyCode;
             $accountId = $request->accountId;
             $full_name = $first_name . ' ' . $last_name;
 
@@ -813,7 +909,8 @@ class AdminController extends Controller
                     'username' => $email,
                     'location' => $location,
                     'company_name' => $company_name,
-                    'company_code' => $company_code,
+                    'company_code' => $accountId,
+                    'account_id' => $accountId,
                 ]);
             }
 
@@ -1454,7 +1551,7 @@ class AdminController extends Controller
             // save to the db
             $save_vendor = Vendors::create([
                 'vendor_name' => $name,
-                'vendor_id' => $code,
+                'vendor_code' => $code,
                 'role_name' => 'vendor',
                 'role' => '3',
             ]);

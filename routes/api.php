@@ -122,7 +122,17 @@ Route::group(
         // );
 
         Route::post('/upload-admin-users', 'AdminController@upload_admin_csv');
+
+        Route::post(
+            '/register-admin-users',
+            'AdminController@register_admin_users'
+        );
+
         Route::get('/all-admins', 'AdminController@get_all_admins');
+        Route::get(
+            '/deactivate-admin/{id}',
+            'AdminController@deactivate_admin'
+        );
 
         Route::post('/create-faq', 'AdminController@create_faq');
         Route::post('/edit-faq', 'AdminController@edit_faq');
@@ -151,6 +161,7 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
         Route::get(
             '/get-vendor-products/{code}',
             'DealerController@get_vendor_products'

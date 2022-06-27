@@ -145,6 +145,10 @@ Route::group(
 
         Route::get('/get-faq-id/{id}', 'AdminController@get_faq_id');
 
+        Route::post('/save-chat-id', 'AdminController@save_chat_id');
+
+        Route::get('/get-all-users', 'AdminController@get_all_users');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -255,6 +259,11 @@ Route::group(
             '/get-product-by-vendor-id/{vendor_id}',
             'ProductsController@fetch_all_products_by_vendor_id'
         );
+
+        Route::get(
+            '/vendor/get-vendor-coworkers/{code}',
+            'VendorController@get_vendor_coworkers'
+        );
     }
 );
 
@@ -271,5 +280,17 @@ Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/branch-login', 'BranchController@login');
+    }
+);
+
+///////////////// Chat /////////////
+Route::group(
+    ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+    function () {
+        Route::post('/store-chat', 'ChatController@store_chat');
+        Route::get(
+            '/get-user-chat/{sender}/{receiver}',
+            'ChatController@get_user_chat'
+        );
     }
 );

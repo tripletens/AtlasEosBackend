@@ -63,6 +63,57 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_all_users()
+    {
+        $all_users = Users::orderBy('first_name', 'asc')->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $all_users;
+        $this->result->message = 'All Users Data';
+        return response()->json($this->result);
+    }
+
+    public function save_chat_id(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'chatId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $user = $request->id;
+            $chat_id = $request->chatId;
+
+            $chat = Users::where('id', $user)
+                ->where('chat_id', '!=', null)
+                ->get();
+
+            if (!$chat) {
+                // post with the same slug already exists
+                $update = Users::where('id', $user)->update([
+                    'chat_id' => $chat_id,
+                ]);
+
+                $this->result->data = $chat;
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Not Saved';
+                return response()->json($this->result);
+            }
+        }
+    }
+
     public function register_admin_users(Request $request)
     {
         $validator = Validator::make($request->all(), [

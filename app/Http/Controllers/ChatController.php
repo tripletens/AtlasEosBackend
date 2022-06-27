@@ -50,6 +50,11 @@ class ChatController extends Controller
             $sender_data->id .
             $sender_data->first_name;
 
+        // orWhere('unique_id', $phase_one_unique_id)
+        Chat::orWhere('unique_id', $phase_two_unique_id)->update([
+            'status' => '1',
+        ]);
+
         $chat_history = Chat::orWhere('unique_id', $phase_one_unique_id)
             ->orWhere('unique_id', $phase_two_unique_id)
             ->get();

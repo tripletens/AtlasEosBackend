@@ -30,6 +30,7 @@ use App\Models\Faq;
 use App\Models\Report;
 use App\Models\Vendors;
 use App\Models\Users;
+use App\Models\Chat;
 
 class DealerController extends Controller
 {
@@ -51,13 +52,56 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
-    public function get_dealer_coworkers($code)
+    public function get_dealer_coworkers($code, $user)
     {
-        $dealers = Users::where('account_id', $code)->get();
+        $dealers = Users::where('account_id', $code)
+            ->get()
+            ->toArray();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $phase_one_unique_id =
+                    $user_data->id .
+                    $user_data->first_name .
+                    $value['id'] .
+                    $value['first_name'];
+
+                $phase_two_unique_id =
+                    $value['id'] .
+                    $value['first_name'] .
+                    $user_data['id'] .
+                    $user_data['first_name'];
+
+                $count_notification = Chat::orWhere(
+                    'unique_id',
+                    $phase_two_unique_id
+                )
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $value['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get all dealers user coworkers';
-        $this->result->data = $dealers;
+        $this->result->data = $data;
         return response()->json($this->result);
     }
 

@@ -261,12 +261,12 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/get-vendor-coworkers/{code}',
+            '/vendor/get-vendor-coworkers/{code}/{user}',
             'VendorController@get_vendor_coworkers'
         );
 
         Route::get(
-            '/dealer/get-dealer-coworkers/{code}',
+            '/dealer/get-dealer-coworkers/{code}/{user}',
             'DealerController@get_dealer_coworkers'
         );
     }

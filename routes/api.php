@@ -264,6 +264,11 @@ Route::group(
             '/vendor/get-vendor-coworkers/{code}',
             'VendorController@get_vendor_coworkers'
         );
+
+        Route::get(
+            '/dealer/get-dealer-coworkers/{code}',
+            'DealerController@get_dealer_coworkers'
+        );
     }
 );
 

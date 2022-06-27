@@ -29,6 +29,7 @@ use App\Models\Cart;
 use App\Models\Faq;
 use App\Models\Report;
 use App\Models\Vendors;
+use App\Models\Users;
 
 class DealerController extends Controller
 {
@@ -48,6 +49,16 @@ class DealerController extends Controller
     public function login()
     {
         echo 'login page setup';
+    }
+
+    public function get_dealer_coworkers($code)
+    {
+        $dealers = Users::where('account_id', $code)->get();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all dealers user coworkers';
+        $this->result->data = $dealers;
+        return response()->json($this->result);
     }
 
     public function add_item_cart(Request $request)

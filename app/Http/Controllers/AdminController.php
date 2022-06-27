@@ -1561,14 +1561,14 @@ class AdminController extends Controller
                         'company_name' => $vendor_name,
                         'vendor_code' => $vendor_code,
                     ]);
-                }
 
-                if (!$save_users) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_users) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
             }
         }

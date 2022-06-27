@@ -297,5 +297,7 @@ Route::group(
             '/get-user-chat/{sender}/{receiver}',
             'ChatController@get_user_chat'
         );
+
+        Route::get('/testing-chat', 'ChatController@testing_chat');
     }
 );

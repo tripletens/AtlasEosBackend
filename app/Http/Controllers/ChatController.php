@@ -26,6 +26,10 @@ class ChatController extends Controller
         ];
     }
 
+    public function testing_chat()
+    {
+    }
+
     public function get_user_chat($sender, $receiver)
     {
         $sender_data = Users::where('id', $sender)

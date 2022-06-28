@@ -261,7 +261,7 @@ Route::group(
         );
         Route::get(
             '/get-all-new-products',
-            'ProductsController@fetch_all_new_products'
+            'ProductsController@fetch_all_new_products');
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',

@@ -261,7 +261,7 @@ Route::group(
         );
         Route::get(
             '/get-all-new-products',
-            'ProductsController@fetch_all_new_products'
+            'ProductsController@fetch_all_new_products');
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',
@@ -271,6 +271,14 @@ Route::group(
         Route::get(
             '/dealer/get-dealer-coworkers/{code}/{user}',
             'DealerController@get_dealer_coworkers'
+        );
+        Route::get(
+            '/sort-newproduct-by-vendor-id/{vendor_id}',
+            'ProductsController@sort_newproduct_by_vendor_id'
+        );
+        Route::get(
+            '/sort-newproduct-by-atlas-id/{atlas_id}',
+            'ProductsController@sort_newproduct_by_atlas_id'
         );
     }
 );

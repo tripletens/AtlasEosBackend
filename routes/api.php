@@ -234,6 +234,10 @@ Route::group(
             '/get-product-by-vendor-id/{vendor_id}',
             'ProductsController@fetch_all_products_by_vendor_id'
         );
+        Route::get(
+            '/get-all-new-products',
+            'ProductsController@fetch_all_new_products'
+        );
     }
 );
 

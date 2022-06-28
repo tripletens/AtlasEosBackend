@@ -21,7 +21,6 @@ class PromotionalFlierController extends Controller
             'debug' => null,
         ];
     }
-
     public function create_promotional_flier(Request $request)
     {
         // 'vendor_id', 'name', 'pdf_url', 'description', 'image_url',

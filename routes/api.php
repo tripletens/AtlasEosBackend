@@ -122,7 +122,17 @@ Route::group(
         // );
 
         Route::post('/upload-admin-users', 'AdminController@upload_admin_csv');
+
+        Route::post(
+            '/register-admin-users',
+            'AdminController@register_admin_users'
+        );
+
         Route::get('/all-admins', 'AdminController@get_all_admins');
+        Route::get(
+            '/deactivate-admin/{id}',
+            'AdminController@deactivate_admin'
+        );
 
         Route::post('/create-faq', 'AdminController@create_faq');
         Route::post('/edit-faq', 'AdminController@edit_faq');
@@ -134,6 +144,10 @@ Route::group(
         Route::get('/deactivate-faq/{id}', 'AdminController@deactivate_faq');
 
         Route::get('/get-faq-id/{id}', 'AdminController@get_faq_id');
+
+        Route::post('/save-chat-id', 'AdminController@save_chat_id');
+
+        Route::get('/get-all-users', 'AdminController@get_all_users');
 
         Route::get('/testing', 'AdminController@testing_api');
     }
@@ -151,6 +165,7 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
         Route::get(
             '/get-vendor-products/{code}',
             'DealerController@get_vendor_products'
@@ -197,12 +212,9 @@ Route::group(
             '/fetch-all-dealers-in-seminar',
             'SeminarController@fetch_all_dealers_in_seminar'
         );
-        Route::get(
-            '/fetch-all-dealers-not-in-seminar',
-            'SeminarController@fetch_all_dealers_not_in_seminar'
-        );
 
         // ------------------promotional flier ------------------//
+
         Route::post(
             '/create-promotional-flier',
             'PromotionalFlierController@create_promotional_flier'
@@ -230,6 +242,19 @@ Route::group(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );
+        // ------------------ new products --------------------//
+        Route::get(
+            '/products/new',
+            'ProductsController@fetch_all_new_products'
+        );
+        Route::get(
+            '/products/new/vendor_id/{vendor_id}',
+            'ProductsController@sort_newproduct_by_vendor_id'
+        );
+        Route::get(
+            '/products/new/atlas_id/{atlas_id}',
+            'ProductsController@sort_newproduct_by_atlas_id'
+        );
         Route::get(
             '/get-product-by-vendor-id/{vendor_id}',
             'ProductsController@fetch_all_products_by_vendor_id'
@@ -237,6 +262,15 @@ Route::group(
         Route::get(
             '/get-all-new-products',
             'ProductsController@fetch_all_new_products'
+
+        Route::get(
+            '/vendor/get-vendor-coworkers/{code}/{user}',
+            'VendorController@get_vendor_coworkers'
+        );
+
+        Route::get(
+            '/dealer/get-dealer-coworkers/{code}/{user}',
+            'DealerController@get_dealer_coworkers'
         );
     }
 );
@@ -254,5 +288,19 @@ Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/branch-login', 'BranchController@login');
+    }
+);
+
+///////////////// Chat /////////////
+Route::group(
+    ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+    function () {
+        Route::post('/store-chat', 'ChatController@store_chat');
+        Route::get(
+            '/get-user-chat/{sender}/{receiver}',
+            'ChatController@get_user_chat'
+        );
+
+        Route::get('/testing-chat', 'ChatController@testing_chat');
     }
 );

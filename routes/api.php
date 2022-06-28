@@ -238,6 +238,14 @@ Route::group(
             '/get-all-new-products',
             'ProductsController@fetch_all_new_products'
         );
+        Route::get(
+            '/sort-newproduct-by-vendor-id/{vendor_id}',
+            'ProductsController@sort_newproduct_by_vendor_id'
+        );
+        Route::get(
+            '/sort-newproduct-by-atlas-id/{atlas_id}',
+            'ProductsController@sort_newproduct_by_atlas_id'
+        );
     }
 );
 

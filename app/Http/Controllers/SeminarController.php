@@ -282,8 +282,8 @@ class SeminarController extends Controller
         // selects all the seminars that are 15 mins less than the current time
         $current_time = Carbon::now();
         $time_diff = Carbon::diff();
-        $seminar_reminder_time = SEMINAR_REMINDER_TIME;
-        $find_seminars = Seminar::where();
+        // $seminar_reminder_time = SEMINAR_REMINDER_TIME;
+        // $find_seminars = Seminar::where();
     }
 
     public function select_dealers_bookmarked_seminar($seminar_id){

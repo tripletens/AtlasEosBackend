@@ -835,6 +835,55 @@ class AdminController extends Controller
                     }
 
                     if ($type == 'assorted') {
+                        $special = $value[8];
+                        $desc_spec = $value[5];
+                        $cond_data = explode('+', $desc_spec);
+                        $condition = $cond_data[0];
+                        $booking = $value[6];
+                        $grouping = $value[10];
+
+                        $spec_data = [
+                            'booking' => floatval($booking),
+                            'special' => floatval($special),
+                            'cond' => intval($condition),
+                            'type' => strtolower($type),
+                            'desc' => strtolower($desc_spec),
+                        ];
+
+                        if (!empty($check_atlas_id->spec_data)) {
+                            $spec = json_decode(
+                                $check_atlas_id->spec_data,
+                                true
+                            );
+                            array_push($spec, $spec_data);
+                            $new_spec = json_encode($spec);
+
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'cond' => $condition,
+                            ]);
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'grouping' => $grouping,
+                            ]);
+
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'spec_data' => $new_spec,
+                            ]);
+                        } else {
+                            $data = [];
+                            array_push($data, $spec_data);
+                            $new_spec = json_encode($data);
+
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'cond' => $condition,
+                            ]);
+
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'grouping' => $grouping,
+                            ]);
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'spec_data' => $new_spec,
+                            ]);
+                        }
                     }
                 } else {
                     $spec_arr = [];

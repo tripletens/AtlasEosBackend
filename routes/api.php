@@ -149,6 +149,11 @@ Route::group(
 
         Route::get('/get-all-users', 'AdminController@get_all_users');
 
+        Route::get(
+            '/get-all-admin-users/{user}',
+            'AdminController@get_all_admin_users'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -283,6 +288,18 @@ Route::group(
         Route::get(
             '/vendor/get-vendor-unread-msg/{user}',
             'VendorController@get_vendor_unread_msg'
+        );
+
+        Route::get('/dealer/get-vendors', 'DealerController@get_vendor');
+
+        Route::get(
+            '/dealer/get-selected-company-vendor/{code}/{user}',
+            'DealerController@get_company_vendor_users'
+        );
+
+        Route::get(
+            '/dealer/get-dealer-unread-msg/{user}',
+            'DealerController@get_dealer_unread_msg'
         );
     }
 );

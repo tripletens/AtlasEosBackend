@@ -35,6 +35,7 @@ class Products extends Model
         'vendor',
         'full_desc',
         'spec_data',
+        'spec_data',
         'category',
         'short_note',
     ];

@@ -784,52 +784,58 @@ class AdminController extends Controller
                     ->first();
 
                 if ($check_atlas_id) {
-                    // $booking = $value[8];
-                    // $special = $value[9];
-                    // $condition = $value[10];
-                    // $type = $value[11];
-                    // $grouping = $value[12];
-                    // $desc_spec = $value[6];
+                    $type = $value[9];
 
-                    // $spec_data = [
-                    //     'booking' => floatval($booking),
-                    //     'special' => floatval($special),
-                    //     'cond' => intval($condition),
-                    //     'type' => strtolower($type),
-                    //     'desc' => strtolower($desc_spec),
-                    // ];
+                    if ($type == 'special') {
+                        $special = $value[8];
+                        $desc_spec = $value[5];
+                        $cond_data = explode('+', $desc_spec);
+                        $condition = $cond_data[0];
+                        $booking = $value[6];
 
-                    // if ($special == '') {
-                    //     continue;
-                    // } else {
-                    //     if (!empty($check_atlas_id->spec_data)) {
-                    //         $spec = json_decode(
-                    //             $check_atlas_id->spec_data,
-                    //             true
-                    //         );
-                    //         array_push($spec, $spec_data);
-                    //         $new_spec = json_encode($spec);
+                        $spec_data = [
+                            'booking' => floatval($booking),
+                            'special' => floatval($special),
+                            'cond' => intval($condition),
+                            'type' => strtolower($type),
+                            'desc' => strtolower($desc_spec),
+                        ];
 
-                    //         Products::where('atlas_id', $atlas_id)->update([
-                    //             'grouping' => $grouping,
-                    //         ]);
-                    //         Products::where('atlas_id', $atlas_id)->update([
-                    //             'spec_data' => $new_spec,
-                    //         ]);
-                    //     } else {
-                    //         $data = [];
-                    //         array_push($data, $spec_data);
-                    //         $new_spec = json_encode($data);
-                    //         //$new_spec = $new_spec;
+                        if (!empty($check_atlas_id->spec_data)) {
+                            $spec = json_decode(
+                                $check_atlas_id->spec_data,
+                                true
+                            );
+                            array_push($spec, $spec_data);
+                            $new_spec = json_encode($spec);
 
-                    //         Products::where('atlas_id', $atlas_id)->update([
-                    //             'grouping' => $grouping,
-                    //         ]);
-                    //         Products::where('atlas_id', $atlas_id)->update([
-                    //             'spec_data' => $new_spec,
-                    //         ]);
-                    //     }
-                    // }
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'cond' => $condition,
+                            ]);
+
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'spec_data' => $new_spec,
+                            ]);
+                        } else {
+                            $data = [];
+                            array_push($data, $spec_data);
+                            $new_spec = json_encode($data);
+
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'cond' => $condition,
+                            ]);
+
+                            // Products::where('atlas_id', $atlas_id)->update([
+                            //     'grouping' => $grouping,
+                            // ]);
+                            Products::where('atlas_id', $atlas_id)->update([
+                                'spec_data' => $new_spec,
+                            ]);
+                        }
+                    }
+
+                    if ($type == 'assorted') {
+                    }
                 } else {
                     $spec_arr = [];
                     $vendor_code = $value[0];
@@ -840,26 +846,41 @@ class AdminController extends Controller
                     $description = $value[5];
                     $regular_price = $value[6];
                     $special_price = $value[7];
+                    // $type = $value[9] ? $value[9] : '';
 
-                    $save_product = Products::create([
-                        'atlas_id' => $atlas_id,
-                        'description' => $description,
-                        'status' => '1',
-                        'vendor_code' => $vendor_code,
-                        'vendor' => $vendor_code,
-                        'vendor_name' => $vendor_name,
-                        'vendor_product_code' => $vendor_product_code,
-                        'xref' => $xref,
-                        'booking' => $regular_price,
-                        'special' => $special_price,
-                    ]);
+                    $type = array_key_exists('9', $value) ? $value[9] : '';
 
-                    if (!$save_product) {
-                        $this->result->status = false;
-                        $this->result->status_code = 422;
-                        $this->result->message =
-                            'Sorry File could not be uploaded. Try again later.';
-                        return response()->json($this->result);
+                    switch ($type) {
+                        case 'special':
+                            # code...
+                            break;
+
+                        case 'assorted':
+                            # code...
+                            break;
+
+                        default:
+                            $save_product = Products::create([
+                                'atlas_id' => $atlas_id,
+                                'description' => $description,
+                                'status' => '1',
+                                'vendor_code' => $vendor_code,
+                                'vendor' => $vendor_code,
+                                'vendor_name' => $vendor_name,
+                                'vendor_product_code' => $vendor_product_code,
+                                'xref' => $xref,
+                                'booking' => $regular_price,
+                                'special' => $special_price,
+                            ]);
+
+                            if (!$save_product) {
+                                $this->result->status = false;
+                                $this->result->status_code = 422;
+                                $this->result->message =
+                                    'Sorry File could not be uploaded. Try again later.';
+                                return response()->json($this->result);
+                            }
+                            break;
                     }
                 }
             }

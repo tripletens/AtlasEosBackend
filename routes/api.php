@@ -269,6 +269,21 @@ Route::group(
             '/dealer/get-dealer-coworkers/{code}/{user}',
             'DealerController@get_dealer_coworkers'
         );
+
+        Route::get(
+            '/vendor/get-dealers',
+            'VendorController@get_distinct_dealers'
+        );
+
+        Route::get(
+            '/vendor/get-selected-company-dealers/{code}/{user}',
+            'VendorController@get_company_dealer_users'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-unread-msg/{user}',
+            'VendorController@get_vendor_unread_msg'
+        );
     }
 );
 

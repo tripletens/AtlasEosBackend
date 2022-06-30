@@ -42,21 +42,23 @@ class VendorController extends Controller
                     ->get()
                     ->first();
 
-                $count_notification = Chat::where('chat_from', $sender)
-                    ->where('chat_to', $user)
-                    ->where('status', '0')
-                    ->count();
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
 
-                $each_data = [
-                    'id' => $sender_data->id,
-                    'first_name' => $sender_data->first_name,
-                    'last_name' => $sender_data->last_name,
-                    'full_name' => $sender_data->full_name,
-                    'email' => $sender_data->email,
-                    'notification' => $count_notification,
-                ];
+                    $each_data = [
+                        'id' => $sender_data->id,
+                        'first_name' => $sender_data->first_name,
+                        'last_name' => $sender_data->last_name,
+                        'full_name' => $sender_data->full_name,
+                        'email' => $sender_data->email,
+                        'notification' => $count_notification,
+                    ];
 
-                array_push($data, $each_data);
+                    array_push($data, $each_data);
+                }
             }
         }
 
@@ -156,49 +158,42 @@ class VendorController extends Controller
                     ->get()
                     ->first();
 
-                $count_notification = Chat::where('chat_from', $sender)
-                    ->where('chat_to', $user)
-                    ->where('status', '0')
-                    ->count();
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
 
-                // $phase_one_unique_id =
-                //     $user_data->id .
-                //     $user_data->first_name .
-                //     $value['id'] .
-                //     $value['first_name'];
+                    // $phase_one_unique_id =
+                    //     $user_data->id .
+                    //     $user_data->first_name .
+                    //     $value['id'] .
+                    //     $value['first_name'];
 
-                // $phase_two_unique_id =
-                //     $value['id'] .
-                //     $value['first_name'] .
-                //     $user_data['id'] .
-                //     $user_data['first_name'];
+                    // $phase_two_unique_id =
+                    //     $value['id'] .
+                    //     $value['first_name'] .
+                    //     $user_data['id'] .
+                    //     $user_data['first_name'];
 
-                // $count_notification = Chat::orWhere(
-                //     'unique_id',
-                //     $phase_two_unique_id
-                // )
-                //     ->where('status', '0')
-                //     ->count();
+                    // $count_notification = Chat::orWhere(
+                    //     'unique_id',
+                    //     $phase_two_unique_id
+                    // )
+                    //     ->where('status', '0')
+                    //     ->count();
 
-                $each_data = [
-                    'id' => $sender_data['id'],
-                    'first_name' => $value['first_name'],
-                    'last_name' => $value['last_name'],
-                    'full_name' => $value['full_name'],
-                    'email' => $value['email'],
-                    'notification' => $count_notification,
-                ];
+                    $each_data = [
+                        'id' => $sender_data['id'],
+                        'first_name' => $value['first_name'],
+                        'last_name' => $value['last_name'],
+                        'full_name' => $value['full_name'],
+                        'email' => $value['email'],
+                        'notification' => $count_notification,
+                    ];
 
-                // $each_data = [
-                //     'id' => $sender_data->id,
-                //     'first_name' => $sender_data->first_name,
-                //     'last_name' => $sender_data->last_name,
-                //     'full_name' => $sender_data->full_name,
-                //     'email' => $sender_data->email,
-                //     'notification' => $count_notification,
-                // ];
-
-                array_push($data, $each_data);
+                    array_push($data, $each_data);
+                }
             }
         }
 

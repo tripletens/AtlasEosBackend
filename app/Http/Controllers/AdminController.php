@@ -65,6 +65,96 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_dealer_unread_msg($user)
+    {
+        $unread_msg_data = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->get()
+            ->toArray();
+
+        $data = [];
+
+        if ($unread_msg_data) {
+            foreach ($unread_msg_data as $value) {
+                $sender = $value['chat_from'];
+
+                $sender_data = Users::where('id', $sender)
+                    ->where('role', '4')
+                    ->get()
+                    ->first();
+
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
+
+                    $each_data = [
+                        'id' => $sender_data->id,
+                        'first_name' => $sender_data->first_name,
+                        'last_name' => $sender_data->last_name,
+                        'full_name' => $sender_data->full_name,
+                        'email' => $sender_data->email,
+                        'notification' => $count_notification,
+                    ];
+
+                    array_push($data, $each_data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get dealer unread msg';
+        $this->result->data = $data;
+        return response()->json($this->result);
+    }
+
+    public function get_vendor_unread_msg($user)
+    {
+        $unread_msg_data = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->get()
+            ->toArray();
+
+        $data = [];
+
+        if ($unread_msg_data) {
+            foreach ($unread_msg_data as $value) {
+                $sender = $value['chat_from'];
+
+                $sender_data = Users::where('id', $sender)
+                    ->where('role', '3')
+                    ->get()
+                    ->first();
+
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
+
+                    $each_data = [
+                        'id' => $sender_data->id,
+                        'first_name' => $sender_data->first_name,
+                        'last_name' => $sender_data->last_name,
+                        'full_name' => $sender_data->full_name,
+                        'email' => $sender_data->email,
+                        'notification' => $count_notification,
+                    ];
+
+                    array_push($data, $each_data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor unread msg';
+        $this->result->data = $data;
+        return response()->json($this->result);
+    }
+
     public function get_all_admin_users($user)
     {
         $admin_users = Users::where('role', '1')

@@ -154,6 +154,16 @@ Route::group(
             'AdminController@get_all_admin_users'
         );
 
+        Route::get(
+            '/admin/get-vendor-unread-msg/{user}',
+            'AdminController@get_vendor_unread_msg'
+        );
+
+        Route::get(
+            '/admin/get-dealer-unread-msg/{user}',
+            'AdminController@get_dealer_unread_msg'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

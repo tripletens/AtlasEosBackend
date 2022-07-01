@@ -293,7 +293,7 @@ Route::group(
         );
         Route::get(
             '/sort-newproduct-by-atlas-id/{atlas_id}',
-            'ProductsController@sort_newproduct_by_atlas_id'
+            'ProductsController@sort_newproduct_by_atlas_id');
 
         Route::get(
             '/vendor/get-dealers',

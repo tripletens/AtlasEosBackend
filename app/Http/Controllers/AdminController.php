@@ -1195,7 +1195,6 @@ class AdminController extends Controller
             $this->result->message = 'Please upload dealer in csv format';
             return response()->json($this->result);
         }
-
         if ($csv->getSize() > 0) {
             $file = fopen($_FILES['csv']['tmp_name'], 'r');
             $csv_data = [];

@@ -321,6 +321,8 @@ Route::group(
             '/dealer/get-dealer-unread-msg/{user}',
             'DealerController@get_dealer_unread_msg'
         );
+
+        Route::get('/promotional_fliers/vendors', 'PromotionalFlierController@get_all_vendors_with_promotional_fliers');
     }
 );
 

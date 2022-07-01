@@ -164,7 +164,7 @@ Route::group(
             'AdminController@get_dealer_unread_msg'
         );
 
-        Route::get('/testing', 'AdminController@testing_api');
+        Route::get('/testing', 'AdminController@again_test');
     }
 );
 

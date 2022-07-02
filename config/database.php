@@ -44,14 +44,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env(
-                'DB_HOST',
-                'atlas-db-do-user-8327209-0.b.db.ondigitalocean.com'
-            ),
+            'host' =>  env('DB_HOST','atlas-db-do-user-8327209-0.b.db.ondigitalocean.com'),  #'atlas-db-do-user-8327209-0.b.db.ondigitalocean.com',# env('DB_HOST','atlas-db-do-user-8327209-0.b.db.ondigitalocean.com'),
             'port' => env('DB_PORT', '25060'),
-            'database' => env('DB_DATABASE', 'atlas_eos'),
-            'username' => env('DB_USERNAME', 'doadmin'),
-            'password' => env('DB_PASSWORD', 'QL67WU4Hj9Gp3f4M'),
+            'database' => env('DB_DATABASE', 'atlas_eos'), # 'atlas_eos',  ,
+            'username' =>  env('DB_USERNAME', 'doadmin'), #'doadmin', # env('DB_USERNAME', 'doadmin'),
+            'password' => env('DB_PASSWORD', 'QL67WU4Hj9Gp3f4M'), #'QL67WU4Hj9Gp3f4M', # env('DB_PASSWORD', 'QL67WU4Hj9Gp3f4M'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',

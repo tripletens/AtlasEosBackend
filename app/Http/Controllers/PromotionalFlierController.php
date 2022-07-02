@@ -7,6 +7,7 @@ use App\Models\PromotionalFlier;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Vendors;
 
 class PromotionalFlierController extends Controller
 {
@@ -193,7 +194,7 @@ class PromotionalFlierController extends Controller
 
     public function show_promotional_flier_by_vendor_id($vendor_id)
     {
-        $one_promotional_flier = PromotionalFlier::where('vendor_id',$vendor_id)->get();
+        $one_promotional_flier = PromotionalFlier::where('vendor_id', $vendor_id)->get();
 
         if (!$one_promotional_flier) {
             $this->result->status = true;
@@ -234,5 +235,38 @@ class PromotionalFlierController extends Controller
         $this->result->data = $promotional_flier;
         $this->result->message = 'Promotional Flier deleted Successfully';
         return response()->json($this->result);
+    }
+
+    # get all the vendors that have promotional fliers
+
+    public  function get_all_vendors_with_promotional_fliers()
+    {
+        $all_vendors_with_promotional_fliers = PromotionalFlier::select('vendor_id')
+            ->groupBy('vendor_id')
+            ->get();
+
+        if (!$all_vendors_with_promotional_fliers) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch all the vendors";
+            return response()->json($this->result);
+        }
+
+        # get the vendor details
+        $vendors = Vendors::whereIn('id', $all_vendors_with_promotional_fliers)
+            ->get();
+        
+        if (!$vendors) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the vendors";
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $vendors;
+            $this->result->message = 'Vendors fetched Successfully';
+            return response()->json($this->result);
+        }
     }
 }

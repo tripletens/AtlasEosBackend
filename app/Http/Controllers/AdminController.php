@@ -28,6 +28,7 @@ use App\Models\Products;
 // use App\Models\Promotional_ads;
 use App\Models\Cart;
 use App\Models\Chat;
+use App\Models\ProgramCountdown;
 
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
@@ -64,6 +65,90 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_countdown()
+    {
+        $active_countdown = ProgramCountdown::where('status', '1')
+            ->get()
+            ->first();
+
+        $active_date = $active_countdown->countdown_date;
+        $active_time = $active_countdown->countdown_time;
+
+        $to = Carbon::createFromFormat(
+            'Y-m-d H:s:i',
+            $active_date . ' ' . $active_time . ':00'
+        );
+        $from = Carbon::now();
+
+        $years = $to->diffInYears($from);
+        $months = $to->diffInMonths($from);
+        $weeks = $to->diffInWeeks($from);
+        $days = $to->diffInDays($from);
+        $hours = $to->diffInHours($from);
+        $minutes = $to->diffInMinutes($from);
+        $seconds = $to->diffInSeconds($from);
+
+        $this->result->status = true;
+        $this->result->data->years = $years;
+        $this->result->data->months = $months;
+        $this->result->data->weeks = $weeks;
+        $this->result->data->days = $days;
+        $this->result->data->hours = $hours;
+        $this->result->data->minutes = $minutes;
+        $this->result->data->seconds = $seconds;
+
+        $this->result->message = 'Program Count Down Set Successfully';
+
+        return response()->json($this->result);
+    }
+
+    public function save_countdown(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'countdownDate' => 'required',
+            'countdownTime' => 'required',
+            // 'post_med_abbr' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $countdownDate = $request->countdownDate;
+            $countdownTime = $request->countdownTime;
+            // $post_med_abbr = $request->post_med_abbr;
+
+            ProgramCountdown::where('status', '1')->update([
+                'status' => '0',
+            ]);
+
+            $save_countdown = ProgramCountdown::create([
+                'countdown_date' => $countdownDate,
+                'countdown_time' => $countdownTime,
+                // 'post_med_abbr' => $post_med_abbr,
+            ]);
+
+            if (!$save_countdown) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry pro could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Program Count Down Set Successfully';
+
+            return response()->json($this->result);
+        }
+    }
 
     public function get_dealer_unread_msg($user)
     {

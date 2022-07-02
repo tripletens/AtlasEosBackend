@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PromotionalFlier;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PromotionalFlierController extends Controller
 {
@@ -28,7 +30,7 @@ class PromotionalFlierController extends Controller
         $validator = Validator::make($request->all(), [
             'vendor_id' => 'required',
             'name' => 'required|string',
-            'pdf_url' => 'required|string'
+            'pdf' => 'required|mimes:pdf,doc,docx,xls,jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {
@@ -40,21 +42,48 @@ class PromotionalFlierController extends Controller
             return response()->json($this->result);
         } else {
 
+            if ($request->hasFile('pdf')) {
+                $filenameWithExt = $request
+                    ->file('pdf')
+                    ->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request
+                    ->file('pdf')
+                    ->getClientOriginalExtension();
+                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $filepath =
+                    env('APP_URL') .
+                    Storage::url(
+                        $request
+                            ->file('pdf')
+                            ->storeAs('public/pdf', $fileNameToStore)
+                    );
+            }
+
+            // upload the pdf file
+            // $pdf_url = $request->file('pdf');
+            // $pdf_url_name = time() . '.' . $pdf_url->getClientOriginalExtension();
+            // $pdf_url->move(public_path('/pdf'), $pdf_url_name);
+            // $pdf_url = 'pdf/' . $pdf_url_name;
+
+            // return $pdf_url;
+            // exit();
+
             $name = $request->input('name');
-            $pdf_url = $request->input('pdf_url');
+            // $pdf_url = $request->input('pdf_url');
             $vendor_id = $request->input('vendor_id');
             $description = $request->input('description');
             $image_url = $request->input('image_url');
 
-            $createseminar = PromotionalFlier::create([
+            $createPromotionalFlier = PromotionalFlier::create([
                 'name' => $name ? $name : null,
-                'pdf_url' => $pdf_url ? $pdf_url : null,
+                'pdf_url' => $request->hasFile('pdf') ? $filepath : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'description' => $description ? $description : null,
                 'image_url' => $image_url ? $image_url : null
             ]);
 
-            if (!$createseminar) {
+            if (!$createPromotionalFlier) {
                 $this->result->status = true;
                 $this->result->status_code = 400;
                 $this->result->message =

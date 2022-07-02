@@ -427,20 +427,20 @@ class DealerController extends Controller
 
             return response()->json($this->result);
         } else {
-            if ($request->hasFile('file')) {
+            if ($request->hasFile('photo')) {
                 $filenameWithExt = $request
-                    ->file('file')
+                    ->file('photo')
                     ->getClientOriginalName();
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 $extension = $request
-                    ->file('file')
+                    ->file('photo')
                     ->getClientOriginalExtension();
-                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
                 $filepath =
                     env('APP_URL') .
                     Storage::url(
                         $request
-                            ->file('file')
+                            ->file('photo')
                             ->storeAs('public/reports', $fileNameToStore)
                     );
             }
@@ -449,10 +449,12 @@ class DealerController extends Controller
             $description = $request->input('description');
 
             // subject, description , file_url , ticket_id, created_at, deleted_at, updated_at
+
+            // return [$subject,$description,$request->hasFile('photo'),$filepath];
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('file') ? $filepath : null,
+                'file_url' => $request->hasFile('photo') ? $filepath : null,
                 'ticket_id' => Str::random(8),
             ]);
 

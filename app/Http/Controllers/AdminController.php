@@ -927,7 +927,8 @@ class AdminController extends Controller
                         $desc_spec = $value[5];
                         $cond_data = explode('+', $desc_spec);
                         $condition = $cond_data[0];
-                        $booking = $value[6];
+                        $booking = $value[7];
+                        $regular = $value[6];
 
                         $spec_data = [
                             'booking' => floatval($booking),
@@ -975,7 +976,8 @@ class AdminController extends Controller
                         $desc_spec = $value[5];
                         $cond_data = explode('+', $desc_spec);
                         $condition = $cond_data[0];
-                        $booking = $value[6];
+                        $booking = $value[7];
+                        $regular = $value[6];
                         $grouping = $value[10];
 
                         $spec_data = [
@@ -1030,7 +1032,7 @@ class AdminController extends Controller
                     $xref = $value[4];
                     $description = $value[5];
                     $regular_price = $value[6];
-                    $special_price = $value[7];
+                    $booking_price = $value[7];
                     // $type = $value[9] ? $value[9] : '';
 
                     $type = array_key_exists('9', $value) ? $value[9] : '';
@@ -1054,8 +1056,8 @@ class AdminController extends Controller
                                 'vendor_name' => $vendor_name,
                                 'vendor_product_code' => $vendor_product_code,
                                 'xref' => $xref,
-                                'booking' => $regular_price,
-                                'special' => $special_price,
+                                'regular' => $regular_price,
+                                'booking' => $booking_price,
                             ]);
 
                             if (!$save_product) {

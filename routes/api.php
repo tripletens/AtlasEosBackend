@@ -164,6 +164,10 @@ Route::group(
             'AdminController@get_dealer_unread_msg'
         );
 
+        Route::post('/save-countdown', 'AdminController@save_countdown');
+
+        Route::get('/get-countdown', 'AdminController@get_countdown');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

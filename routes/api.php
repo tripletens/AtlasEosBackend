@@ -164,7 +164,11 @@ Route::group(
             'AdminController@get_dealer_unread_msg'
         );
 
-        Route::get('/testing', 'AdminController@again_test');
+        Route::post('/save-countdown', 'AdminController@save_countdown');
+
+        Route::get('/get-countdown', 'AdminController@get_countdown');
+
+        Route::get('/testing', 'AdminController@testing_api');
     }
 );
 
@@ -281,7 +285,8 @@ Route::group(
         );
         Route::get(
             '/get-all-new-products',
-            'ProductsController@fetch_all_new_products');
+            'ProductsController@fetch_all_new_products'
+        );
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',
@@ -298,7 +303,8 @@ Route::group(
         );
         Route::get(
             '/sort-newproduct-by-atlas-id/{atlas_id}',
-            'ProductsController@sort_newproduct_by_atlas_id');
+            'ProductsController@sort_newproduct_by_atlas_id'
+        );
 
         Route::get(
             '/vendor/get-dealers',
@@ -331,9 +337,9 @@ Route::group(
             '/seminars/remind',
             'SeminarController@select_seminars_to_remind'
         );
-
-
-        //
+            '/promotional_fliers/vendors',
+            'PromotionalFlierController@get_all_vendors_with_promotional_fliers'
+        );
     }
 );
 

@@ -337,6 +337,7 @@ Route::group(
             '/seminars/remind',
             'SeminarController@select_seminars_to_remind'
         );
+        Route::get(
             '/promotional_fliers/vendors',
             'PromotionalFlierController@get_all_vendors_with_promotional_fliers'
         );

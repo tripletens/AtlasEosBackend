@@ -447,6 +447,9 @@ class DealerController extends Controller
 
             $subject = $request->input('subject');
             $description = $request->input('description');
+            $dealer_id = $request->input('dealer_id');
+            $vendor_id = $request->input('vendor_id');
+            $role = $request->input('role');
 
             // subject, description , file_url , ticket_id, created_at, deleted_at, updated_at
 
@@ -455,7 +458,10 @@ class DealerController extends Controller
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
                 'file_url' => $request->hasFile('photo') ? $filepath : null,
-                'ticket_id' => Str::random(8),
+                'vendor_id' => $vendor_id ? $vendor_id : null,
+                'dealer_id' => $dealer_id ? $dealer_id : null,
+                'role' => $role ? $role : null,
+                'ticket_id' => Str::random(8)
             ]);
 
             if (!$create_report) {

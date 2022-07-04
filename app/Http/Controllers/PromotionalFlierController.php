@@ -60,15 +60,6 @@ class PromotionalFlierController extends Controller
                     );
             }
 
-            // upload the pdf file
-            // $pdf_url = $request->file('pdf');
-            // $pdf_url_name = time() . '.' . $pdf_url->getClientOriginalExtension();
-            // $pdf_url->move(public_path('/pdf'), $pdf_url_name);
-            // $pdf_url = 'pdf/' . $pdf_url_name;
-
-            // return $pdf_url;
-            // exit();
-
             $name = $request->input('name');
             // $pdf_url = $request->input('pdf_url');
             $vendor_id = $request->input('vendor_id');

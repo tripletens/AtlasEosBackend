@@ -29,6 +29,7 @@ use App\Models\Products;
 use App\Models\Cart;
 use App\Models\Chat;
 use App\Models\ProgramCountdown;
+use DateTime;
 
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
@@ -80,14 +81,25 @@ class AdminController extends Controller
             $active_date . ' ' . $active_time . ':00'
         );
         $from = Carbon::now();
+        $diff_status = $to->gt($from);
 
-        $years = $to->diffInYears($from);
-        $months = $to->diffInMonths($from);
-        $weeks = $to->diffInWeeks($from);
-        $days = $to->diffInDays($from);
-        $hours = $to->diffInHours($from);
-        $minutes = $to->diffInMinutes($from);
-        $seconds = $to->diffInSeconds($from);
+        if ($diff_status) {
+            $years = $to->diffInYears($from);
+            $months = $to->diffInMonths($from);
+            $weeks = $to->diffInWeeks($from);
+            $days = $to->diffInDays($from);
+            $hours = $to->diffInHours($from);
+            $minutes = $to->diffInMinutes($from);
+            $seconds = $to->diffInSeconds($from);
+        } else {
+            $years = 0;
+            $months = 0;
+            $weeks = 0;
+            $days = 0;
+            $hours = 0;
+            $minutes = 0;
+            $seconds = 0;
+        }
 
         $this->result->status = true;
         $this->result->data->years = $years;
@@ -97,7 +109,6 @@ class AdminController extends Controller
         $this->result->data->hours = $hours;
         $this->result->data->minutes = $minutes;
         $this->result->data->seconds = $seconds;
-
         $this->result->message = 'Program Count Down Set Successfully';
 
         return response()->json($this->result);

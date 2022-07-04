@@ -67,7 +67,9 @@ return [
     |
     */
 
-    'timezone' => 'America/Edmonton',
+    // 'timezone' => 'America/Edmonton',
+
+    'timezone' => 'Africa/Lagos',
 
     /*
     |--------------------------------------------------------------------------
@@ -162,7 +164,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
- 
+
 
         /*
          * Package Service Providers...
@@ -178,7 +180,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         // Maatwebsite\Excel\ExcelServiceProvider::class,
- 
+
     ],
 
     /*

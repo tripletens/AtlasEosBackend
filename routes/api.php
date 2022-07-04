@@ -228,8 +228,13 @@ Route::group(
         Route::post('/join-seminar', 'SeminarController@join_seminar');
 
         Route::get(
-            '/fetch-all-dealers-in-seminar',
+            '/fetch-all-dealers-in-seminar/{seminar_id}',
             'SeminarController@fetch_all_dealers_in_seminar'
+        );
+
+        Route::get(
+            '/fetch_only_dealer_emails/{seminar_id}',
+            'SeminarController@fetch_only_dealer_emails'
         );
 
         // ------------------promotional flier ------------------//
@@ -329,6 +334,9 @@ Route::group(
         );
 
         Route::get(
+            '/seminars/remind',
+            'SeminarController@select_seminars_to_remind'
+        );
             '/promotional_fliers/vendors',
             'PromotionalFlierController@get_all_vendors_with_promotional_fliers'
         );

@@ -9,10 +9,10 @@ use App\Models\SeminarMembers;
 use App\Models\Users;
 use Carbon\Carbon;
 use DB;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SeminarEmail;
 class SeminarController extends Controller
 {
-    protected $SEMINAR_REMINDER_TIME = 5;
     public function __construct()
     {
         // $this->middleware( 'auth:api');
@@ -233,9 +233,10 @@ class SeminarController extends Controller
     }
 
     // fetch all the dealers that joined the seminar
-    public function fetch_all_dealers_in_seminar(){
+    public function fetch_all_dealers_in_seminar($seminar_id){
         // role 4 is for dealers
         $fetch_dealers = Users::where('role',4)->join('seminar_members','users.id','=','seminar_members.dealer_id')
+        ->where('seminar_members.seminar_id', $seminar_id)
         ->get();
 
         if(!$fetch_dealers){
@@ -246,18 +247,36 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
 
-        $this->result->status = true;
-        $this->result->status_code = 200;
-        $this->result->data = $fetch_dealers;
-        $this->result->message = 'You have successfully fetched all the dealers that joined the seminar';
-        return response()->json($this->result);
+        return $fetch_dealers;
+
+        // # get all the dealers in
+        // $this->result->status = true;
+        // $this->result->status_code = 200;
+        // $this->result->data = $fetch_dealers;
+        // $this->result->message = 'You have successfully fetched all the dealers that joined the seminar';
+        // return response()->json($this->result);
+    }
+
+
+    public function fetch_only_dealer_emails($seminar_id){
+        $all_dealers = $this->fetch_all_dealers_in_seminar($seminar_id);
+        $dealer_emails = [];
+        foreach($all_dealers as $dealer){
+            array_push($dealer_emails,$dealer->email);
+        }
+        return $dealer_emails;
     }
 
     // fetch all the dealers that didnt bookmark a seminar
     public function fetch_all_dealers_not_in_seminar(){
 
-        $fetch_dealers = SeminarMembers::all()->join('users','seminar_members.id','!=','users.id')
+        # get all the dealers that didnt bookmark a seminar
+        $fetch_dealers = Users::where('role',4)->join('seminar_members','users.id','=','seminar_members.dealer_id')
+        ->where('seminar_members.bookmark_status',0)
         ->get();
+
+        // $fetch_dealers = SeminarMembers::all()->join('users','seminar_members.id','!=','users.id')
+        // ->get();
 
         if(!$fetch_dealers){
             $this->result->status = true;
@@ -280,19 +299,47 @@ class SeminarController extends Controller
 
     public function select_seminars_to_remind(){
         // selects all the seminars that are 15 mins less than the current time
-        $current_time = Carbon::now();
-        $time_diff = Carbon::diff();
-        // $seminar_reminder_time = SEMINAR_REMINDER_TIME;
-        // $find_seminars = Seminar::where();
+        // time difference between current time and seminar time
+        // if the difference is less than 15 mins, send an email to the dealer
+        $current_time = Carbon::now()->format('H:i:s');
+        $current_date = Carbon::now()->format('Y-m-d');
+
+        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today = Seminar::where('status',1)
+        ->where('seminar_date',$current_date)
+        ->get();
+
+        #get the difference between the current time and the seminar time
+        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today->each(function($seminar){
+            $current_time = Carbon::now();
+            $seminar_time = Carbon::parse($seminar->seminar_date . $seminar->seminar_time);
+            $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
+
+            // $difference < -15
+            if($difference < 100 && $difference > 0){
+                // $this->send_email_to_dealer($seminar);
+                $all_dealers_that_joined_seminar = $this->fetch_all_dealers_in_seminar($seminar->id);
+                $all_dealer_emails = $this->fetch_only_dealer_emails($seminar->id);
+
+                // return $seminar->id;
+                // $this->send_reminder_email($all_dealer_emails, $all_dealers_that_joined_seminar);
+            }
+            $seminar->difference = $difference;
+        });
+
+        $all_dealer_emails = $this->fetch_only_dealer_emails(1);
+
+        return Mail::to('tripletens.kc@gmail.com')->send(new SeminarEmail($get_all_seminars_with_seminar_date_and_seminar_time_less_than_today));
+
+        // return $this->send_reminder_email($all_dealer_emails, $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today);
+        // return $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today;
     }
 
-    public function select_dealers_bookmarked_seminar($seminar_id){
-        // selects all the dealers that bookmarked the individual seminars
 
-    }
-
-    public function send_reminder_email(){
+    public function send_reminder_email($emails, $seminar_details){
         // select all the people that bookmarked the individual seminars
         // send them an email each
+        // foreach ($emails as $recipient) {
+            Mail::to('tripletens.kc@gmail.com')->send(new SeminarEmail($seminar_details));
+        // }
     }
 }

@@ -31,6 +31,6 @@ class SeminarEmail extends Mailable
      */
     public function build()
     {
-        return $this->view('mails.seminar_reminder')->with($this->data);
+        return $this->view('mails.seminar_reminder')->with(['data' => $this->data]);
     }
 }

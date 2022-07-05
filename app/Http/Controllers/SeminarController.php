@@ -314,32 +314,38 @@ class SeminarController extends Controller
             $seminar_time = Carbon::parse($seminar->seminar_date . $seminar->seminar_time);
             $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
 
-            // $difference < -15
-            if($difference < 100 && $difference > 0){
+            // $difference < -15  < -15 && $difference < 1
+            if($difference < 1000000000000000){
                 // $this->send_email_to_dealer($seminar);
                 $all_dealers_that_joined_seminar = $this->fetch_all_dealers_in_seminar($seminar->id);
                 $all_dealer_emails = $this->fetch_only_dealer_emails($seminar->id);
 
-                // return $seminar->id;
-                // $this->send_reminder_email($all_dealer_emails, $all_dealers_that_joined_seminar);
+                $mail_data = [
+                    'seminar_data' => $seminar,
+                    'dealer_data' => $all_dealers_that_joined_seminar
+                ];
+
+                $this->send_reminder_email($all_dealer_emails, $mail_data);
             }
             $seminar->difference = $difference;
         });
 
-        $all_dealer_emails = $this->fetch_only_dealer_emails(1);
+        return true;
 
-        return Mail::to('tripletens.kc@gmail.com')->send(new SeminarEmail($get_all_seminars_with_seminar_date_and_seminar_time_less_than_today));
-
-        // return $this->send_reminder_email($all_dealer_emails, $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today);
+        // $this->result->status = true;
+        // $this->result->status_code = 200;
+        // $this->result->data = $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today;
+        // $this->result->message = 'Seminar reminders sent successfully';
+        // return response()->json($this->result);
         // return $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today;
     }
 
 
-    public function send_reminder_email($emails, $seminar_details){
+    public function send_reminder_email($emails, $dealer_and_seminar_data){
         // select all the people that bookmarked the individual seminars
         // send them an email each
-        // foreach ($emails as $recipient) {
-            Mail::to('tripletens.kc@gmail.com')->send(new SeminarEmail($seminar_details));
-        // }
+        foreach ($emails as $recipient) {
+            Mail::to($recipient)->send(new SeminarEmail($dealer_and_seminar_data));
+        }
     }
 }

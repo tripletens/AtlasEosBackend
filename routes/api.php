@@ -334,6 +334,26 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/get-privileged-vendors/{user}/{code}',
+            'VendorController@get_privileged_vendors'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-products/{code}',
+            'VendorController@get_vendors_products'
+        );
+
+        Route::get(
+            '/vendor/get-sales-by-item-summary/{code}',
+            'VendorController@sales_by_item_summary'
+        );
+
+        Route::get(
+            '/vendor/get-purchases-dealers/{code}',
+            'VendorController@get_purchases_dealers'
+        );
+
+        Route::get(
             '/seminars/remind',
             'SeminarController@select_seminars_to_remind'
         );

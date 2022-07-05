@@ -416,7 +416,7 @@ class DealerController extends Controller
         $validator = Validator::make($request->all(), [
             'subject' => 'required',
             'description' => 'required',
-            'photo' => 'mimes:pdf,doc,docx,xls,jpg,jpeg,png,gif',
+            'photo' => 'mimes:image/jpeg,image/png,image/svg+xml,application/xml',
         ]);
 
         if ($validator->fails()) {

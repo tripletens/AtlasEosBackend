@@ -26,6 +26,76 @@ class VendorController extends Controller
         ];
     }
 
+    public function sales_by_item_detailed($code)
+    {
+        $vendor_purchases = Cart::where('vendor', $code)->get();
+        $res_data = [];
+        $atlas_id_data = [];
+
+        if ($vendor_purchases) {
+            foreach ($vendor_purchases as $value) {
+                $user_id = $value->uid;
+                $product_id = $value->product_id;
+                $atlas_id = $value->atlas_id;
+                $vendor_code = $value->vendor_code;
+                $pro_data = Products::where('id', $product_id)
+                    ->get()
+                    ->first();
+                if (!in_array($atlas_id, $atlas_id_data)) {
+                    array_push($atlas_id_data, $atlas_id);
+                }
+
+                $atlas_filter = Cart::where('vendor', $code)
+                    ->where('atlas_id', $atlas_id)
+                    ->get();
+
+                ///return $atlas_filter;
+                $total_atlas_product = 0;
+
+                $dealer_data = [];
+                foreach ($atlas_filter as $value) {
+                    $qty = $value->qty;
+                    $dealer_db = Users::where('id', $user_id)
+                        ->get()
+                        ->first();
+                    $price = $value->price;
+                    $total_atlas_product += $price;
+
+                    $data = [
+                        'dealer_name' => $dealer_db->company_name,
+                        'qty' => $qty,
+                        'account_id' => $dealer_db->account_id,
+                        'user' =>
+                            $dealer_db->first_name .
+                            ' ' .
+                            $dealer_db->last_name,
+                        'total' => $value->price,
+                    ];
+
+                    array_push($dealer_data, $data);
+                }
+
+                $data = [
+                    'vendor' => $code,
+                    'description' => $pro_data->description,
+                    'overall_total' => $total_atlas_product,
+                    'atlas_id' => $atlas_id,
+                    'extra_data' => $dealer_data,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Sales By Detailed';
+        $this->result->data->res = $res_data;
+        $this->result->data->atlas_id = $atlas_id_data;
+
+        return response()->json($this->result);
+    }
+
     public function sales_by_item_summary($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)->get();

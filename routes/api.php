@@ -339,6 +339,11 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/vendor-dashboard/{code}/{user}',
+            'VendorController@vendor_dashboard'
+        );
+
+        Route::get(
             '/vendor/get-vendor-products/{code}',
             'VendorController@get_vendors_products'
         );

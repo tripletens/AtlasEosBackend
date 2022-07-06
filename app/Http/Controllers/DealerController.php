@@ -239,11 +239,15 @@ class DealerController extends Controller
             'dealer' => 'required',
             'vendor' => 'required',
             'atlas_id' => 'required',
-            'product_id' => 'required',
-            'qty' => 'required',
-            'price' => 'required',
-            'unit_price' => 'required',
+            'product_array' => 'required',
         ]);
+
+        // $product = array([
+        //     'product_id' => $product_id,
+        //     'qty' => $quantity,
+        //     'price' => $price,
+        //     'unit_price' => $unit_price,
+        // ], );
 
         if ($validator->fails()) {
             $response['response'] = $validator->messages();
@@ -259,10 +263,11 @@ class DealerController extends Controller
 
             $dealer = $request->dealer;
             $vendor = $request->vendor;
-            $product_id = $request->product_id;
-            $qty = $request->qty;
-            $price = $request->price;
-            $unit_price = $request->unit_price;
+
+            // $product_id = $request->product_id;
+            // $qty = $request->qty;
+            // $price = $request->price;
+            // $unit_price = $request->unit_price;
 
             if (
                 Cart::where('dealer', $dealer)
@@ -273,17 +278,47 @@ class DealerController extends Controller
                 $this->result->status_code = 404;
                 $this->result->message = 'item has been added already';
             } else {
-                // update to the db
-                $save = Cart::create([
-                    'uid' => $uid,
-                    'atlas_id' => $atlas_id,
-                    'dealer' => $dealer,
-                    'vendor' => $vendor,
-                    'product_id' => $product_id,
-                    'qty' => $qty,
-                    'price' => $price,
-                    'unit_price' => $unit_price,
-                ]);
+
+                // lets get the items from the array
+                $product_array = $request->input('product_array');
+
+                // return json_decode($product_array);
+
+                if(count(json_decode($product_array)) > 0 && $product_array){
+                    $decode_product_array = json_decode($product_array);
+
+                    foreach ($decode_product_array as $product){
+                         // update to the db
+                        $save = Cart::create([
+                            'uid' => $uid,
+                            'atlas_id' => $atlas_id,
+                            'dealer' => $dealer,
+                            'vendor' => $vendor,
+                            'product_id' => $product->product_id,
+                            'qty' => $product->qty,
+                            'price' => $product->price,
+                            'unit_price' => $product->unit_price,
+                        ]);
+
+                        if(!$save){
+                            $this->result->status = false;
+                            $this->result->status_code = 500;
+                            $this->result->data = $product;
+                            $this->result->message = 'sorry we could not save this item to cart';
+                        }
+                    }
+                }
+                // // update to the db
+                // $save = Cart::create([
+                //     'uid' => $uid,
+                //     'atlas_id' => $atlas_id,
+                //     'dealer' => $dealer,
+                //     'vendor' => $vendor,
+                //     'product_id' => $product_id,
+                //     'qty' => $qty,
+                //     'price' => $price,
+                //     'unit_price' => $unit_price,
+                // ]);
 
                 $this->result->status = true;
                 $this->result->status_code = 200;

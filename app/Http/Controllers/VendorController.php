@@ -8,6 +8,7 @@ use App\Models\Users;
 use App\Models\Chat;
 use App\Models\Products;
 use App\Models\Cart;
+use App\Models\Dealer;
 
 class VendorController extends Controller
 {
@@ -24,6 +25,68 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function vendor_dashboard($code, $user)
+    {
+        $dealer_data = [];
+        $dealer_sales = [];
+        $dealers = [];
+        $purchasers = [];
+
+        $selected_user = Users::where('id', $user)
+            ->where('vendor_code', $code)
+            ->get()
+            ->first();
+
+        $privilaged_vendors = $selected_user->privileged_vendors;
+        $separator = explode(',', $privilaged_vendors);
+        $total_sales = 0;
+        for ($i = 0; $i < count($separator); $i++) {
+            $code = $separator[$i];
+            $total_sales += Cart::where('vendor', $code)->sum('price');
+
+            $cart_dealer = Cart::where('vendor', $code)->get();
+            foreach ($cart_dealer as $value) {
+                $dealer_id = $value->dealer;
+                if (!in_array($dealer_id, $dealers)) {
+                    array_push($dealers, $dealer_id);
+                }
+            }
+        }
+
+        for ($i = 0; $i < count($dealers); $i++) {
+            $dealer_code = $dealers[$i];
+            $total = Cart::where('dealer', $dealer_code)->sum('price');
+            $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                ->get()
+                ->first();
+
+            $data = [
+                'dealer' => $dealer_code,
+                'dealer_name' => $dealer_data->dealer_name,
+                'sales' => $total,
+            ];
+
+            array_push($purchasers, $data);
+        }
+
+        /////// Sorting //////////
+        usort($purchasers, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor dashboard';
+        // $this->result->data = $res_data;
+        $this->result->data->purchasers = $purchasers;
+        $this->result->data->total_sales = $total_sales;
+        $this->result->data->dealers = $dealers;
+        $this->result->data->orders_received = count($dealers);
+
+        return response()->json($this->result);
     }
 
     public function sales_by_item_detailed($code)

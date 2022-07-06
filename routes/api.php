@@ -349,6 +349,11 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/get-sales-by-item-detailed/{code}',
+            'VendorController@sales_by_item_detailed'
+        );
+
+        Route::get(
             '/vendor/get-purchases-dealers/{code}',
             'VendorController@get_purchases_dealers'
         );

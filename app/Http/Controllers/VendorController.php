@@ -9,6 +9,7 @@ use App\Models\Chat;
 use App\Models\Products;
 use App\Models\Cart;
 use App\Models\Dealer;
+use App\Models\Faq;
 
 class VendorController extends Controller
 {
@@ -25,6 +26,20 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function get_vendor_faq()
+    {
+        $faq = Faq::where('role', '3')
+            ->where('status', '1')
+            ->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor faq';
+        $this->result->data = $faq;
+
+        return response()->json($this->result);
     }
 
     public function vendor_dashboard($code, $user)

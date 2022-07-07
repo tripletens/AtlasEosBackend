@@ -163,13 +163,16 @@ Route::group(
             '/admin/get-dealer-unread-msg/{user}',
             'AdminController@get_dealer_unread_msg'
         );
-
+        
+        Route::get('/get-all-reports', 'AdminController@get_all_reports');
+        // get_all_reports
         Route::post('/save-countdown', 'AdminController@save_countdown');
 
         Route::get('/get-countdown', 'AdminController@get_countdown');
 
         Route::get('/testing', 'AdminController@testing_api');
     }
+
 );
 
 ///////////////// Users (DEALERS AND VENDORS) /////////////

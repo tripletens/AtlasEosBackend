@@ -30,7 +30,7 @@ class ChatController extends Controller
     {
     }
 
-    public function get_user_chat($sender, $receiver)
+    public function get_user_chat($receiver, $sender)
     {
         $sender_data = Users::where('id', $sender)
             ->get()
@@ -51,9 +51,11 @@ class ChatController extends Controller
             $sender_data->first_name;
 
         // orWhere('unique_id', $phase_one_unique_id)
-        Chat::orWhere('unique_id', $phase_two_unique_id)->update([
-            'status' => '1',
-        ]);
+        Chat::where('chat_from', $sender)
+            ->where('chat_to', $receiver)
+            ->update([
+                'status' => '1',
+            ]);
 
         $chat_history = Chat::orWhere('unique_id', $phase_one_unique_id)
             ->orWhere('unique_id', $phase_two_unique_id)

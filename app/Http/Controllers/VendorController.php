@@ -304,6 +304,7 @@ class VendorController extends Controller
     {
         $unread_msg_data = Chat::where('chat_to', $user)
             ->where('status', '0')
+            ->distinct('chat_from')
             ->get()
             ->toArray();
 
@@ -337,6 +338,18 @@ class VendorController extends Controller
                 }
             }
         }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
+
+        // $result = [];
+        // foreach ($data as $value) {
+        //     if (!in_array($value->, $result)) {
+        //         $result[$key] = $value;
+        //     }
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;

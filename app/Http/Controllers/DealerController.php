@@ -70,23 +70,31 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $count_notification = Chat::where('chat_from', $sender)
-                    ->where('chat_to', $user)
-                    ->where('status', '0')
-                    ->count();
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
 
-                $each_data = [
-                    'id' => $sender_data->id,
-                    'first_name' => $sender_data->first_name,
-                    'last_name' => $sender_data->last_name,
-                    'full_name' => $sender_data->full_name,
-                    'email' => $sender_data->email,
-                    'notification' => $count_notification,
-                ];
+                    $each_data = [
+                        'id' => $sender_data->id,
+                        'vendor_name' => $sender_data->vendor_name,
+                        'first_name' => $sender_data->first_name,
+                        'last_name' => $sender_data->last_name,
+                        'full_name' => $sender_data->full_name,
+                        'email' => $sender_data->email,
+                        'notification' => $count_notification,
+                    ];
 
-                array_push($data, $each_data);
+                    array_push($data, $each_data);
+                }
             }
         }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -435,7 +443,12 @@ class DealerController extends Controller
                 $extension = $request
                     ->file('photo')
                     ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $fileNameToStore =
+                    Str::slug($filename, '_', $language = 'en') .
+                    '_' .
+                    time() .
+                    '.' .
+                    $extension;
                 $filepath =
                     env('APP_URL') .
                     Storage::url(
@@ -461,7 +474,7 @@ class DealerController extends Controller
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,
-                'ticket_id' => Str::random(8)
+                'ticket_id' => Str::random(8),
             ]);
 
             if (!$create_report) {

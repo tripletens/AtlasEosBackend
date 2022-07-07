@@ -335,6 +335,13 @@ Route::group(
             'SeminarController@select_seminars_to_remind'
         );
 
+        Route::get(
+            '/cart/all',
+            'DealerController@fetch_all_cart_items'
+        );
+
+
+
 
         //
     }

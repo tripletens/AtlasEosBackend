@@ -237,8 +237,6 @@ class DealerController extends Controller
         $validator = Validator::make($request->all(), [
             'uid' => 'required',
             'dealer' => 'required',
-            'vendor' => 'required',
-            'atlas_id' => 'required',
             'product_array' => 'required',
         ]);
 
@@ -269,38 +267,44 @@ class DealerController extends Controller
             // $price = $request->price;
             // $unit_price = $request->unit_price;
 
-            if (
-                Cart::where('dealer', $dealer)
-                    ->where('atlas_id', $atlas_id)
-                    ->exists()
-            ) {
-                $this->result->status = true;
-                $this->result->status_code = 404;
-                $this->result->message = 'item has been added already';
-            } else {
 
-                // lets get the items from the array
-                $product_array = $request->input('product_array');
 
-                // return json_decode($product_array);
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
 
-                if(count(json_decode($product_array)) > 0 && $product_array){
-                    $decode_product_array = json_decode($product_array);
+            // return json_decode($product_array);
 
-                    foreach ($decode_product_array as $product){
-                         // update to the db
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+                    if (
+                        Cart::where('dealer', $dealer)
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
+                    ) {
+                        $this->result->status = true;
+                        $this->result->status_code = 404;
+                        $this->result->message = 'item has been added already';
+                        break;
+                        // $this->result->status = true;
+                        // $this->result->status_code = 404;
+                        // $this->result->message = 'item has been added already';
+                    } else {
                         $save = Cart::create([
                             'uid' => $uid,
-                            'atlas_id' => $atlas_id,
+                            'atlas_id' => $product->atlas_id,
                             'dealer' => $dealer,
-                            'vendor' => $vendor,
+                            'groupings' => $product->groupings,
+                            'vendor' => $product->vendor_id,
                             'product_id' => $product->product_id,
                             'qty' => $product->qty,
                             'price' => $product->price,
                             'unit_price' => $product->unit_price,
                         ]);
 
-                        if(!$save){
+                        if (!$save) {
                             $this->result->status = false;
                             $this->result->status_code = 500;
                             $this->result->data = $product;
@@ -308,22 +312,11 @@ class DealerController extends Controller
                         }
                     }
                 }
-                // // update to the db
-                // $save = Cart::create([
-                //     'uid' => $uid,
-                //     'atlas_id' => $atlas_id,
-                //     'dealer' => $dealer,
-                //     'vendor' => $vendor,
-                //     'product_id' => $product_id,
-                //     'qty' => $qty,
-                //     'price' => $price,
-                //     'unit_price' => $unit_price,
-                // ]);
-
-                $this->result->status = true;
-                $this->result->status_code = 200;
-                $this->result->message = 'item Added to cart';
             }
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Added to cart';
+            // }
 
             return response()->json($this->result);
         }
@@ -360,8 +353,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-                ->where('status', '1')
-                ->exists()
+            ->where('status', '1')
+            ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -471,7 +464,7 @@ class DealerController extends Controller
                 $extension = $request
                     ->file('photo')
                     ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
                 $filepath =
                     env('APP_URL') .
                     Storage::url(

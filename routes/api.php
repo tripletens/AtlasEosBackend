@@ -363,6 +363,8 @@ Route::group(
             'VendorController@get_purchases_dealers'
         );
 
+        Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
+
         Route::get(
             '/seminars/remind',
             'SeminarController@select_seminars_to_remind'

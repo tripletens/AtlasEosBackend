@@ -28,6 +28,7 @@ use App\Models\Products;
 // use App\Models\Promotional_ads;
 use App\Models\Cart;
 use App\Models\Chat;
+use App\Models\Report;
 
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
@@ -1974,6 +1975,16 @@ class AdminController extends Controller
     public function refresh()
     {
         return $this->respondWithToken(auth()->refresh());
+    }
+
+    public function get_all_reports()
+    {
+        $reports = Report::all();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All reports fetched successfully';
+        $this->result->data = $reports;
+        return response()->json($this->result);
     }
 
     public function testing_api()

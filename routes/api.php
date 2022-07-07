@@ -165,7 +165,10 @@ Route::group(
         );
 
         Route::get('/testing', 'AdminController@again_test');
+        Route::get('/get-all-reports', 'AdminController@get_all_reports');
+        // get_all_reports
     }
+
 );
 
 ///////////////// Users (DEALERS AND VENDORS) /////////////

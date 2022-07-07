@@ -200,6 +200,11 @@ class AdminController extends Controller
             }
         }
 
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get dealer unread msg';
@@ -244,6 +249,11 @@ class AdminController extends Controller
                 }
             }
         }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
 
         $this->result->status = true;
         $this->result->status_code = 200;

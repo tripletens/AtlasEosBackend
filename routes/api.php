@@ -401,7 +401,7 @@ Route::group(
     function () {
         Route::post('/store-chat', 'ChatController@store_chat');
         Route::get(
-            '/get-user-chat/{sender}/{receiver}',
+            '/get-user-chat/{receiver}/{sender}',
             'ChatController@get_user_chat'
         );
 

@@ -1456,7 +1456,7 @@ class AdminController extends Controller
 
         if ($vendor != '') {
             $vendorName = $request->vendor;
-            $vendorCode = $request->vendor_code;
+            $vendorCode = $request->vendorCode;
             $update = Users::where('id', $vendorId)->update([
                 'vendor_name' => $vendorName,
                 'vendor_code' => $vendorCode,

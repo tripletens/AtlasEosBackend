@@ -556,23 +556,23 @@ class DealerController extends Controller
     }
 
     // fetch all cart items
-    public function fetch_all_cart_items()
+    public function fetch_all_cart_items($dealer_id)
     {
-        $fetch_cart_items = Cart::orderby('id', 'desc')
+        $fetch_cart_items = Cart::where('dealer',$dealer_id)->orderby('id', 'desc')
             ->get();
-
+            
         if (!$fetch_cart_items) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
-                "An Error Ocurred, we couldn't fetch all the cart items";
+                "An Error Ocurred, we couldn't fetch dealer's cart items";
             return response()->json($this->result);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $fetch_cart_items;
-        $this->result->message = 'All cart items fetched Successfully';
+        $this->result->message = 'All cart items for dealer fetched Successfully';
         return response()->json($this->result);
     }
 

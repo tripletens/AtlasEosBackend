@@ -336,7 +336,7 @@ Route::group(
         );
 
         Route::get(
-            '/cart/all',
+            '/cart/dealer/{dealer_id}',
             'DealerController@fetch_all_cart_items'
         );
         //

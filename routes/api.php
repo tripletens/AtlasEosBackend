@@ -352,6 +352,10 @@ Route::group(
         );
 
         Route::get(
+            '/cart/all',
+            'DealerController@fetch_all_cart_items'
+        );
+        Route::get(
             '/vendor/get-sales-by-item-summary/{code}',
             'VendorController@sales_by_item_summary'
         );

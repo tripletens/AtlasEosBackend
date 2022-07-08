@@ -339,10 +339,6 @@ Route::group(
             '/cart/all',
             'DealerController@fetch_all_cart_items'
         );
-
-
-
-
         //
     }
 );

@@ -1461,6 +1461,7 @@ class AdminController extends Controller
             $update = Users::where('id', $vendorId)->update([
                 'vendor_name' => $vendorName,
                 'vendor_code' => $vendorCode,
+                'company_name' => $vendorName,
             ]);
         }
 

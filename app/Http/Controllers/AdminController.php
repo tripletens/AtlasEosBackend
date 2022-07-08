@@ -1796,7 +1796,7 @@ class AdminController extends Controller
                 'password_show' => $password_show,
                 'role' => '3',
                 'role_name' => 'vendor',
-                'vendor' => $vendor_code,
+                'vendor_code' => $vendor_code,
                 'vendor_name' => $vendor_name,
                 'privilege_vendors' => $privilege_vendors,
                 'username' => $email,

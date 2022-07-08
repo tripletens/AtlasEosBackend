@@ -451,7 +451,8 @@ class DealerController extends Controller
         $validator = Validator::make($request->all(), [
             'subject' => 'required',
             'description' => 'required',
-            'company_name' => 'required',
+            // 'company_name' => 'required',
+            'user_id' => 'required',
             // 'photo' => ['mimes:pdf,docx,jpeg,jpg']
             // 'photo' => 'mimes:image/jpeg,image/png,image/svg+xml,application/xml',
         ]);
@@ -464,13 +465,13 @@ class DealerController extends Controller
 
             return response()->json($this->result);
         } else {
-            if ($request->hasFile('photo')) {
+            if ($request->hasFile('file')) {
                 $filenameWithExt = $request
-                    ->file('photo')
+                    ->file('file')
                     ->getClientOriginalName();
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 $extension = $request
-                    ->file('photo')
+                    ->file('file')
                     ->getClientOriginalExtension();
                 $fileNameToStore =
                     Str::slug($filename, '_', $language = 'en') .
@@ -482,7 +483,7 @@ class DealerController extends Controller
                     env('APP_URL') .
                     Storage::url(
                         $request
-                            ->file('photo')
+                            ->file('file')
                             ->storeAs('public/reports', $fileNameToStore)
                     );
             }
@@ -493,18 +494,19 @@ class DealerController extends Controller
             $vendor_id = $request->input('vendor_id');
             $role = $request->input('role');
             $company_name = $request->input('company_name');
-
+            $user_id = $request->input('user_id');
             //company_name, role,vendor_id, subject, description , file_url , ticket_id, created_at, deleted_at, updated_at
 
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('photo') ? $filepath : null,
+                'file_url' => $request->hasFile('file') ? $filepath : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,
                 'ticket_id' => Str::random(8),
-                'company_name' => $company_name ? $company_name : null
+                'company_name' => $company_name ? $company_name : null,
+                'user_id' => $user_id ? $user_id : null
             ]);
 
             if (!$create_report) {
@@ -566,23 +568,23 @@ class DealerController extends Controller
     }
 
     // fetch all cart items
-    public function fetch_all_cart_items()
+    public function fetch_all_cart_items($dealer_id)
     {
-        $fetch_cart_items = Cart::orderby('id', 'desc')
+        $fetch_cart_items = Cart::where('dealer',$dealer_id)->orderby('id', 'desc')
             ->get();
-
+            
         if (!$fetch_cart_items) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
-                "An Error Ocurred, we couldn't fetch all the cart items";
+                "An Error Ocurred, we couldn't fetch dealer's cart items";
             return response()->json($this->result);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $fetch_cart_items;
-        $this->result->message = 'All cart items fetched Successfully';
+        $this->result->message = 'All cart items for dealer fetched Successfully';
         return response()->json($this->result);
     }
 

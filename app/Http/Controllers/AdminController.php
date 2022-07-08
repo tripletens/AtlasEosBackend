@@ -1979,7 +1979,12 @@ class AdminController extends Controller
 
     public function get_all_reports()
     {
-        $reports = Report::all();
+        $reports = Report::join('users', 'users.id', '=', 'reports.user_id')
+        ->select('reports.*','users.full_name','users.first_name','users.last_name',
+            'users.email','users.role','users.role_name','users.dealer_name','users.vendor_name')
+        ->orderBy('reports.id','desc')
+        ->get();
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'All reports fetched successfully';

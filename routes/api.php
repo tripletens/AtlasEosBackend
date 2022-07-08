@@ -163,10 +163,14 @@ Route::group(
             '/admin/get-dealer-unread-msg/{user}',
             'AdminController@get_dealer_unread_msg'
         );
-
-        Route::get('/testing', 'AdminController@again_test');
+        
         Route::get('/get-all-reports', 'AdminController@get_all_reports');
         // get_all_reports
+        Route::post('/save-countdown', 'AdminController@save_countdown');
+
+        Route::get('/get-countdown', 'AdminController@get_countdown');
+
+        Route::get('/testing', 'AdminController@testing_api');
     }
 
 );
@@ -284,7 +288,8 @@ Route::group(
         );
         Route::get(
             '/get-all-new-products',
-            'ProductsController@fetch_all_new_products');
+            'ProductsController@fetch_all_new_products'
+        );
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',
@@ -301,7 +306,8 @@ Route::group(
         );
         Route::get(
             '/sort-newproduct-by-atlas-id/{atlas_id}',
-            'ProductsController@sort_newproduct_by_atlas_id');
+            'ProductsController@sort_newproduct_by_atlas_id'
+        );
 
         Route::get(
             '/vendor/get-dealers',
@@ -331,15 +337,49 @@ Route::group(
         );
 
         Route::get(
-            '/seminars/remind',
-            'SeminarController@select_seminars_to_remind'
+            '/vendor/get-privileged-vendors/{user}/{code}',
+            'VendorController@get_privileged_vendors'
+        );
+
+        Route::get(
+            '/vendor/vendor-dashboard/{code}/{user}',
+            'VendorController@vendor_dashboard'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-products/{code}',
+            'VendorController@get_vendors_products'
         );
 
         Route::get(
             '/cart/all',
             'DealerController@fetch_all_cart_items'
         );
-        //
+        Route::get(
+            '/vendor/get-sales-by-item-summary/{code}',
+            'VendorController@sales_by_item_summary'
+        );
+
+        Route::get(
+            '/vendor/get-sales-by-item-detailed/{code}',
+            'VendorController@sales_by_item_detailed'
+        );
+
+        Route::get(
+            '/vendor/get-purchases-dealers/{code}',
+            'VendorController@get_purchases_dealers'
+        );
+
+        Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
+
+        Route::get(
+            '/seminars/remind',
+            'SeminarController@select_seminars_to_remind'
+        );
+        Route::get(
+            '/promotional_fliers/vendors',
+            'PromotionalFlierController@get_all_vendors_with_promotional_fliers'
+        );
     }
 );
 
@@ -365,7 +405,7 @@ Route::group(
     function () {
         Route::post('/store-chat', 'ChatController@store_chat');
         Route::get(
-            '/get-user-chat/{sender}/{receiver}',
+            '/get-user-chat/{receiver}/{sender}',
             'ChatController@get_user_chat'
         );
 

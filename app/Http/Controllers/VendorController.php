@@ -344,13 +344,6 @@ class VendorController extends Controller
             array_unique(array_map('serialize', $data))
         );
 
-        // $result = [];
-        // foreach ($data as $value) {
-        //     if (!in_array($value->, $result)) {
-        //         $result[$key] = $value;
-        //     }
-        // }
-
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor unread msg';

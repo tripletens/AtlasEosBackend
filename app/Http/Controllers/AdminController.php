@@ -30,6 +30,7 @@ use App\Models\Cart;
 use App\Models\Chat;
 use App\Models\Report;
 use App\Models\ProgramCountdown;
+
 use DateTime;
 
 // use App\Models\Catalogue_Order;
@@ -67,6 +68,40 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_report_problem($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)->get();
+
+        $res_data = [];
+
+        if ($selected) {
+            foreach ($selected as $value) {
+                $user_id = $value->user_id;
+                $user_data = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'first_name' => $user_data->first_name,
+                    'last_name' => $user_data->last_name,
+                    'subject' => $value->subject,
+                    'description' => $value->description,
+                    'file_url' => $value->file_url,
+                    'created_at' => $value->created_at,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+
+        $this->result->message = 'Program Count Down Set Successfully';
+
+        return response()->json($this->result);
+    }
 
     public function get_countdown()
     {

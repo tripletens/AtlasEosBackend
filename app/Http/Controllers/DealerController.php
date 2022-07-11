@@ -405,44 +405,37 @@ class DealerController extends Controller
 
     public function universal_search($search)
     {
-        $vendor = Vendors::where(
-            'vendor_code',
-            'LIKE',
-            "%{$search}%"
-        )->exists();
-        $product = Products::where('atlas_id', 'LIKE', "%{$search}%")->exists();
+        $vendor = Vendors::where('vendor_code','LIKE', '%'.$search.'%')->get();
 
-        switch (true) {
-            case $vendor:
-                $item = Vendors::where('vendor_code', 'LIKE', "%{$search}%")
-                    ->get()
-                    ->first();
+        $product = Products::where('atlas_id','LIKE', '%'.$search.'%')->get();
 
-                $this->result->status = true;
-                $this->result->status_code = 200;
-                $this->result->message = 'get products with atlas id';
-                $this->result->data = $item;
-                break;
+        $search_result = [
+            'products' => $product,
+            'vendor' => $vendor
+        ];
 
-            case $product:
-                $item = Products::where('atlas_id', 'LIKE', "%{$search}%")
-                    ->get()
-                    ->first();
+        // switch (true) {
+        //     case $vendor:
+        //         $item = Vendors::where('vendor_code', 'LIKE', "%{$search}%")
+        //             ->get()
+        //             ->first();
+        //         break;
+        //     case $product:
+        //         $item = Products::where('atlas_id', 'LIKE', "%{$search}%")
+        //             ->get()
+        //             ->first();
+        //         break;
+        //     default:
+        //         $this->result->status = false;
+        //         $this->result->status_code = 404;
+        //         $this->result->message = 'not found';
+        //         break;
+        // }
 
-                $this->result->status = true;
-                $this->result->status_code = 200;
-                $this->result->message = 'get products with atlas id';
-                $this->result->data = $item;
-                break;
-
-            default:
-                $this->result->status = false;
-                $this->result->status_code = 404;
-                $this->result->message = 'not found';
-
-                break;
-        }
-
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'search products by vendor code or atlas_id';
+        $this->result->data = $search_result;
         return response()->json($this->result);
     }
 
@@ -570,9 +563,9 @@ class DealerController extends Controller
     // fetch all cart items
     public function fetch_all_cart_items($dealer_id)
     {
-        $fetch_cart_items = Cart::where('dealer',$dealer_id)->orderby('id', 'desc')
+        $fetch_cart_items = Cart::where('dealer', $dealer_id)->orderby('id', 'desc')
             ->get();
-            
+
         if (!$fetch_cart_items) {
             $this->result->status = true;
             $this->result->status_code = 400;
@@ -587,5 +580,4 @@ class DealerController extends Controller
         $this->result->message = 'All cart items for dealer fetched Successfully';
         return response()->json($this->result);
     }
-
 }

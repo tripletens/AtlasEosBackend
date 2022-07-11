@@ -25,7 +25,7 @@ use App\Models\Products;
 // use Illuminate\Support\Str;
 // use Illuminate\Support\Facades\Storage;
 // use App\Models\Branch;
-// use App\Models\Promotional_ads;
+use App\Models\PromotionalFlier;
 use App\Models\Cart;
 use App\Models\Chat;
 use App\Models\Report;
@@ -69,12 +69,89 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
-    public function get_report_problem($ticket)
+    public function get_all_promotional_flyer()
     {
-        $selected = Report::where('ticket_id', $ticket)->get();
+        $promotional = PromotionalFlier::all();
 
         $res_data = [];
 
+        foreach ($promotional as $value) {
+            $vendor_code = $value->vendor_id;
+            $vendor_data = Vendors::where('vendor_code', $vendor_code)
+                ->get()
+                ->first();
+
+            $data = [
+                'id' => $value->id,
+                'name' => $value->name,
+                'vendor_code' => $value->vendor_id,
+                'pdf_url' => $value->pdf_url,
+                'description' => $value->description,
+                'status' => $value->status,
+                'vendor_name' => $vendor_data->vendor_name,
+            ];
+
+            array_push($res_data, $data);
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+
+        $this->result->message = 'All Promotional fliers';
+        return response()->json($this->result);
+    }
+
+    public function admin_reply_report(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'description' => 'required',
+            'role' => 'required',
+            'user' => 'required',
+            'ticket' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $description = $request->description;
+            $role = $request->role;
+            $user = $request->user;
+            $ticket = $request->ticket;
+
+            $save = Report::create([
+                'description' => $description,
+                'role' => $role,
+                'company_name' => 'Atlas',
+                'user_id' => $user,
+                'ticket_id' => $ticket,
+            ]);
+
+            if (!$save) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry pro could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Message sent successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_report_problem($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)->get();
+        $res_data = [];
         if ($selected) {
             foreach ($selected as $value) {
                 $user_id = $value->user_id;
@@ -88,6 +165,7 @@ class AdminController extends Controller
                     'subject' => $value->subject,
                     'description' => $value->description,
                     'file_url' => $value->file_url,
+                    'role' => $value->role,
                     'created_at' => $value->created_at,
                 ];
 
@@ -97,9 +175,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->data = $res_data;
-
         $this->result->message = 'Program Count Down Set Successfully';
-
         return response()->json($this->result);
     }
 
@@ -109,53 +185,92 @@ class AdminController extends Controller
             ->get()
             ->first();
 
-        $active_date = $active_countdown->countdown_date;
-        $active_time = $active_countdown->countdown_time;
+        // $active_date = $active_countdown->start_countdown_date;
+        // $active_time = $active_countdown->start_countdown_time;
 
-        $to = Carbon::createFromFormat(
+        // $to = Carbon::createFromFormat(
+        //     'Y-m-d H:s:i',
+        //     $active_date . ' ' . $active_time . ':00'
+        // );
+        // $from = Carbon::now();
+        // $diff_status = $to->gt($from);
+
+        // if ($diff_status) {
+        //     $years = $to->diffInYears($from);
+        //     $months = $to->diffInMonths($from);
+        //     $weeks = $to->diffInWeeks($from);
+        //     $days = $to->diffInDays($from);
+        //     $hours = $to->diffInHours($from);
+        //     $minutes = $to->diffInMinutes($from);
+        //     $seconds = $to->diffInSeconds($from);
+        // } else {
+        //     $years = 0;
+        //     $months = 0;
+        //     $weeks = 0;
+        //     $days = 0;
+        //     $hours = 0;
+        //     $minutes = 0;
+        //     $seconds = 0;
+        // }
+
+        $start_time = $active_countdown->start_countdown_time;
+        $start_date = $active_countdown->start_countdown_date;
+
+        $start_timer = Carbon::createFromFormat(
             'Y-m-d H:s:i',
-            $active_date . ' ' . $active_time . ':00'
+            $start_date . ' ' . $start_time . ':00'
         );
-        $from = Carbon::now();
-        $diff_status = $to->gt($from);
 
-        if ($diff_status) {
-            $years = $to->diffInYears($from);
-            $months = $to->diffInMonths($from);
-            $weeks = $to->diffInWeeks($from);
-            $days = $to->diffInDays($from);
-            $hours = $to->diffInHours($from);
-            $minutes = $to->diffInMinutes($from);
-            $seconds = $to->diffInSeconds($from);
+        $start_date = $active_countdown->end_countdown_date;
+        $end_time = $active_countdown->end_countdown_time;
+
+        $end_timer = Carbon::createFromFormat(
+            'Y-m-d H:s:i',
+            $start_date . ' ' . $end_time . ':00'
+        );
+        $now = Carbon::now();
+
+        if ($now->lt($start_timer)) {
+            $this->result->data->years = 0;
+            $this->result->data->months = 0;
+            $this->result->data->weeks = 0;
+            $this->result->data->days = 0;
+            $this->result->data->hours = 0;
+            $this->result->data->minutes = 0;
+            $this->result->data->seconds = 0;
         } else {
-            $years = 0;
-            $months = 0;
-            $weeks = 0;
-            $days = 0;
-            $hours = 0;
-            $minutes = 0;
-            $seconds = 0;
+            $years = $end_timer->diffInYears($start_timer);
+            $months = $end_timer->diffInMonths($start_timer);
+            $weeks = $end_timer->diffInWeeks($start_timer);
+            $days = $end_timer->diffInDays($start_timer);
+            $hours = $end_timer->diffInHours($start_timer);
+            $minutes = $end_timer->diffInMinutes($start_timer);
+            $seconds = $end_timer->diffInSeconds($start_timer);
+
+            $this->result->data->years = $years;
+            $this->result->data->months = $months;
+            $this->result->data->weeks = $weeks;
+            $this->result->data->days = $days;
+            $this->result->data->hours = $hours;
+            $this->result->data->minutes = $minutes;
+            $this->result->data->seconds = $seconds;
         }
 
-        $this->result->status = true;
-        $this->result->data->years = $years;
-        $this->result->data->months = $months;
-        $this->result->data->weeks = $weeks;
-        $this->result->data->days = $days;
-        $this->result->data->hours = $hours;
-        $this->result->data->minutes = $minutes;
-        $this->result->data->seconds = $seconds;
-        $this->result->message = 'Program Count Down Set Successfully';
+        // $this->result->data->starter = $start_timer;
+        // $this->result->data->ender = $end_timer;
 
+        $this->result->status = true;
+        $this->result->message = 'Program Count Down Set Successfully';
         return response()->json($this->result);
     }
 
     public function save_countdown(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'countdownDate' => 'required',
-            'countdownTime' => 'required',
-            // 'post_med_abbr' => 'required',
+            'countdownEndDate' => 'required',
+            'countdownEndTime' => 'required',
+            'countdownStartDate' => 'required',
+            'countdownStartTime' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -167,17 +282,22 @@ class AdminController extends Controller
             return response()->json($this->result);
         } else {
             // process the request
-            $countdownDate = $request->countdownDate;
-            $countdownTime = $request->countdownTime;
-            // $post_med_abbr = $request->post_med_abbr;
+            $countdownStartTime = $request->countdownStartTime;
+            $countdownStartDate = $request->countdownStartDate;
+            $countdownEndTime = $request->countdownEndTime;
+            $countdownEndDate = $request->countdownEndDate;
 
             ProgramCountdown::where('status', '1')->update([
                 'status' => '0',
             ]);
 
             $save_countdown = ProgramCountdown::create([
-                'countdown_date' => $countdownDate,
-                'countdown_time' => $countdownTime,
+                'start_countdown_date' => $countdownStartDate,
+                'start_countdown_time' => $countdownStartTime,
+
+                'end_countdown_date' => $countdownEndDate,
+                'end_countdown_time' => $countdownEndTime,
+
                 // 'post_med_abbr' => $post_med_abbr,
             ]);
 

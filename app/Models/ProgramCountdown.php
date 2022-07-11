@@ -11,5 +11,11 @@ class ProgramCountdown extends Model
 
     protected $table = 'program_countdown';
 
-    protected $fillable = ['countdown_date', 'countdown_time', 'post_med_abbr'];
+    protected $fillable = [
+        'start_countdown_date',
+        'start_countdown_time',
+        'end_countdown_time',
+        'end_countdown_date',
+        'post_med_abbr',
+    ];
 }

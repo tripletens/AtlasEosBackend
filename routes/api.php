@@ -175,6 +175,16 @@ Route::group(
             'AdminController@get_report_problem'
         );
 
+        Route::post(
+            '/admin/reply-report',
+            'AdminController@admin_reply_report'
+        );
+
+        Route::get(
+            '/admin/all-promotional-flyer',
+            'AdminController@get_all_promotional_flyer'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

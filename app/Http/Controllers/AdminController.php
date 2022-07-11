@@ -81,22 +81,23 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
-            $data = [
-                'id' => $value->id,
-                'name' => $value->name,
-                'vendor_code' => $value->vendor_id,
-                'pdf_url' => $value->pdf_url,
-                'description' => $value->description,
-                'status' => $value->status,
-                'vendor_name' => $vendor_data->vendor_name,
-            ];
+            if ($vendor_data) {
+                $data = [
+                    'id' => $value->id,
+                    'name' => $value->name,
+                    'vendor_code' => $value->vendor_id,
+                    'pdf_url' => $value->pdf_url,
+                    'description' => $value->description,
+                    'status' => $value->status,
+                    'vendor_name' => $vendor_data->vendor_name,
+                ];
 
-            array_push($res_data, $data);
+                array_push($res_data, $data);
+            }
         }
 
         $this->result->status = true;
         $this->result->data = $res_data;
-
         $this->result->message = 'All Promotional fliers';
         return response()->json($this->result);
     }

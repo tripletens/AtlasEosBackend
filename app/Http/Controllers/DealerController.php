@@ -403,8 +403,8 @@ class DealerController extends Controller
         $product = Products::where('atlas_id','LIKE', '%'.$search.'%')->get();
 
         $search_result = [
-            'products' => $product,
-            'vendor' => $vendor
+            'products' => count($product) > 0 ? $product : null,
+            'vendor' => count($vendor) > 0 ? $vendor : null,
         ];
 
         // switch (true) {

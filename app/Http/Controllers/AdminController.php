@@ -2025,6 +2025,11 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    // dealer dashboard details
+    public function dealer_dashboard(){
+        // no of vendors ordered from / number of total vendors 
+    }
+
     public function testing_api()
     {
         echo 'hello woel';

@@ -169,6 +169,7 @@ Route::group(
         Route::get('/get-all-reports/{user_id}', 'AdminController@fetch_reports_by_user_id');
 
 
+
         // get_all_reports
     }
 
@@ -343,7 +344,11 @@ Route::group(
             'DealerController@fetch_all_cart_items'
         );
 
-        //
+        // adds item to the quick order
+        Route::post(
+            '/quick_order',
+            'DealerController@add_quick_order'
+        );
     }
 );
 

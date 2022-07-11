@@ -31,6 +31,7 @@ use App\Models\Report;
 use App\Models\Vendors;
 use App\Models\Users;
 use App\Models\Chat;
+use App\Models\QuickOrder;
 use App\Models\User;
 
 class DealerController extends Controller
@@ -570,5 +571,77 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    
+    // adds item to the quick order table
+    public function add_quick_order(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+
+            // return json_decode($product_array);
+
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+                    if (
+                        QuickOrder::where('dealer', $dealer)
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
+                    ) {
+                        $this->result->status = true;
+                        $this->result->status_code = 404;
+                        $this->result->message = 'item has been added already';
+                        break;
+                    } else {
+                        $save = QuickOrder::create([
+                            'uid' => $uid,
+                            'atlas_id' => $product->atlas_id,
+                            'dealer' => $dealer,
+                            'groupings' => $product->groupings,
+                            'vendor' => $product->vendor_id,
+                            'product_id' => $product->product_id,
+                            'qty' => $product->qty,
+                            'price' => $product->price,
+                            'unit_price' => $product->unit_price,
+                        ]);
+
+                        if (!$save) {
+                            $this->result->status = false;
+                            $this->result->status_code = 500;
+                            $this->result->data = $product;
+                            $this->result->message = 'sorry we could not save this item to quick order';
+                        }
+                    }
+                }
+            }
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Added to cart';
+            // }
+
+            return response()->json($this->result);
+        }
+    }
 }

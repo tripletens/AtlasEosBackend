@@ -208,6 +208,11 @@ Route::group(
         );
 
         Route::get(
+            '/dealer/get-orders-by-vendor/{code}',
+            'DealerController@get_editable_orders_by_vendor'
+        );
+
+        Route::get(
             '/quick-order-filter-atlasid/{id}',
             'DealerController@quick_order_filter_atlasid'
         );

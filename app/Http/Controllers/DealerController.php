@@ -31,6 +31,7 @@ use App\Models\Report;
 use App\Models\Vendors;
 use App\Models\Users;
 use App\Models\Chat;
+use App\Models\User;
 
 class DealerController extends Controller
 {
@@ -398,9 +399,9 @@ class DealerController extends Controller
 
     public function universal_search($search)
     {
-        $vendor = Vendors::where('vendor_code','LIKE', '%'.$search.'%')->get();
+        $vendor = Vendors::where('vendor_code', 'LIKE', '%' . $search . '%')->get();
 
-        $product = Products::where('atlas_id','LIKE', '%'.$search.'%')->get();
+        $product = Products::where('atlas_id', 'LIKE', '%' . $search . '%')->get();
 
         $search_result = [
             'products' => count($product) > 0 ? $product : null,
@@ -568,4 +569,6 @@ class DealerController extends Controller
         $this->result->message = 'All cart items for dealer fetched Successfully';
         return response()->json($this->result);
     }
+
+    
 }

@@ -166,6 +166,9 @@ Route::group(
 
         Route::get('/testing', 'AdminController@again_test');
         Route::get('/get-all-reports', 'AdminController@get_all_reports');
+        Route::get('/get-all-reports/{user_id}', 'AdminController@fetch_reports_by_user_id');
+
+
         // get_all_reports
     }
 
@@ -339,6 +342,7 @@ Route::group(
             '/cart/dealer/{dealer_id}',
             'DealerController@fetch_all_cart_items'
         );
+
         //
     }
 );

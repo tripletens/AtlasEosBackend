@@ -54,6 +54,31 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function get_editable_orders_by_vendor($code)
+    {
+        $cart = Cart::where('vendor', $code)->get();
+
+        if ($cart) {
+            foreach ($cart as $value) {
+                $pro_id = $value->product_id;
+                $product_data = Products::where('id', $pro_id)
+                    ->get()
+                    ->first();
+                $value->description = $product_data->description;
+                $value->booking = $product_data->booking;
+                $value->vendor_product_code =
+                    $product_data->vendor_product_code;
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $cart;
+        $this->result->message = 'Editable order by vendor';
+
+        return response()->json($this->result);
+    }
+
     public function get_dealer_unread_msg($user)
     {
         $unread_msg_data = Chat::where('chat_to', $user)
@@ -407,9 +432,17 @@ class DealerController extends Controller
 
     public function universal_search($search)
     {
-        $vendor = Vendors::where('vendor_code', 'LIKE', '%' . $search . '%')->get();
+        $vendor = Vendors::where(
+            'vendor_code',
+            'LIKE',
+            '%' . $search . '%'
+        )->get();
 
-        $product = Products::where('atlas_id', 'LIKE', '%' . $search . '%')->get();
+        $product = Products::where(
+            'atlas_id',
+            'LIKE',
+            '%' . $search . '%'
+        )->get();
 
         $search_result = [
             'products' => count($product) > 0 ? $product : null,
@@ -501,7 +534,7 @@ class DealerController extends Controller
                 'role' => $role ? $role : null,
                 'ticket_id' => Str::random(8),
                 'company_name' => $company_name ? $company_name : null,
-                'user_id' => $user_id ? $user_id : null
+                'user_id' => $user_id ? $user_id : null,
             ]);
 
             if (!$create_report) {
@@ -565,7 +598,8 @@ class DealerController extends Controller
     // fetch all cart items
     public function fetch_all_cart_items($dealer_id)
     {
-        $fetch_cart_items = Cart::where('dealer', $dealer_id)->orderby('id', 'desc')
+        $fetch_cart_items = Cart::where('dealer', $dealer_id)
+            ->orderby('id', 'desc')
             ->get();
 
         if (!$fetch_cart_items) {
@@ -579,7 +613,8 @@ class DealerController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $fetch_cart_items;
-        $this->result->message = 'All cart items for dealer fetched Successfully';
+        $this->result->message =
+            'All cart items for dealer fetched Successfully';
         return response()->json($this->result);
     }
 
@@ -619,8 +654,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         QuickOrder::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -643,7 +678,8 @@ class DealerController extends Controller
                             $this->result->status = false;
                             $this->result->status_code = 500;
                             $this->result->data = $product;
-                            $this->result->message = 'sorry we could not save this item to quick order';
+                            $this->result->message =
+                                'sorry we could not save this item to quick order';
                         }
                     }
                 }

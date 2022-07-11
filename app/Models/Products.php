@@ -25,6 +25,7 @@ class Products extends Model
         'vendor_product_code',
         'xref',
         'um',
+        'regular',
         'booking',
         'special',
         'cond',

@@ -25,12 +25,14 @@ use App\Models\Products;
 // use Illuminate\Support\Str;
 // use Illuminate\Support\Facades\Storage;
 // use App\Models\Branch;
-// use App\Models\Promotional_ads;
+use App\Models\PromotionalFlier;
 use App\Models\Cart;
 use App\Models\Chat;
 use App\Models\Report;
 use App\Models\User;
+use App\Models\ProgramCountdown;
 
+use DateTime;
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -66,6 +68,254 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_all_promotional_flyer()
+    {
+        $promotional = PromotionalFlier::all();
+
+        $res_data = [];
+
+        foreach ($promotional as $value) {
+            $vendor_code = $value->vendor_id;
+            $vendor_data = Vendors::where('vendor_code', $vendor_code)
+                ->get()
+                ->first();
+
+            $data = [
+                'id' => $value->id,
+                'name' => $value->name,
+                'vendor_code' => $value->vendor_id,
+                'pdf_url' => $value->pdf_url,
+                'description' => $value->description,
+                'status' => $value->status,
+                'vendor_name' => $vendor_data->vendor_name,
+            ];
+
+            array_push($res_data, $data);
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+
+        $this->result->message = 'All Promotional fliers';
+        return response()->json($this->result);
+    }
+
+    public function admin_reply_report(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'description' => 'required',
+            'role' => 'required',
+            'user' => 'required',
+            'ticket' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $description = $request->description;
+            $role = $request->role;
+            $user = $request->user;
+            $ticket = $request->ticket;
+
+            $save = Report::create([
+                'description' => $description,
+                'role' => $role,
+                'company_name' => 'Atlas',
+                'user_id' => $user,
+                'ticket_id' => $ticket,
+            ]);
+
+            if (!$save) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry pro could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Message sent successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_report_problem($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)->get();
+        $res_data = [];
+        if ($selected) {
+            foreach ($selected as $value) {
+                $user_id = $value->user_id;
+                $user_data = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'first_name' => $user_data->first_name,
+                    'last_name' => $user_data->last_name,
+                    'subject' => $value->subject,
+                    'description' => $value->description,
+                    'file_url' => $value->file_url,
+                    'role' => $value->role,
+                    'created_at' => $value->created_at,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Program Count Down Set Successfully';
+        return response()->json($this->result);
+    }
+
+    public function get_countdown()
+    {
+        $active_countdown = ProgramCountdown::where('status', '1')
+            ->get()
+            ->first();
+
+        // $active_date = $active_countdown->start_countdown_date;
+        // $active_time = $active_countdown->start_countdown_time;
+
+        // $to = Carbon::createFromFormat(
+        //     'Y-m-d H:s:i',
+        //     $active_date . ' ' . $active_time . ':00'
+        // );
+        // $from = Carbon::now();
+        // $diff_status = $to->gt($from);
+
+        // if ($diff_status) {
+        //     $years = $to->diffInYears($from);
+        //     $months = $to->diffInMonths($from);
+        //     $weeks = $to->diffInWeeks($from);
+        //     $days = $to->diffInDays($from);
+        //     $hours = $to->diffInHours($from);
+        //     $minutes = $to->diffInMinutes($from);
+        //     $seconds = $to->diffInSeconds($from);
+        // } else {
+        //     $years = 0;
+        //     $months = 0;
+        //     $weeks = 0;
+        //     $days = 0;
+        //     $hours = 0;
+        //     $minutes = 0;
+        //     $seconds = 0;
+        // }
+
+        $start_time = $active_countdown->start_countdown_time;
+        $start_date = $active_countdown->start_countdown_date;
+
+        $start_timer = Carbon::createFromFormat(
+            'Y-m-d H:s:i',
+            $start_date . ' ' . $start_time . ':00'
+        );
+
+        $start_date = $active_countdown->end_countdown_date;
+        $end_time = $active_countdown->end_countdown_time;
+
+        $end_timer = Carbon::createFromFormat(
+            'Y-m-d H:s:i',
+            $start_date . ' ' . $end_time . ':00'
+        );
+        $now = Carbon::now();
+
+        if ($now->lt($start_timer)) {
+            $this->result->data->years = 0;
+            $this->result->data->months = 0;
+            $this->result->data->weeks = 0;
+            $this->result->data->days = 0;
+            $this->result->data->hours = 0;
+            $this->result->data->minutes = 0;
+            $this->result->data->seconds = 0;
+        } else {
+            $years = $end_timer->diffInYears($start_timer);
+            $months = $end_timer->diffInMonths($start_timer);
+            $weeks = $end_timer->diffInWeeks($start_timer);
+            $days = $end_timer->diffInDays($start_timer);
+            $hours = $end_timer->diffInHours($start_timer);
+            $minutes = $end_timer->diffInMinutes($start_timer);
+            $seconds = $end_timer->diffInSeconds($start_timer);
+
+            $this->result->data->years = $years;
+            $this->result->data->months = $months;
+            $this->result->data->weeks = $weeks;
+            $this->result->data->days = $days;
+            $this->result->data->hours = $hours;
+            $this->result->data->minutes = $minutes;
+            $this->result->data->seconds = $seconds;
+        }
+
+        // $this->result->data->starter = $start_timer;
+        // $this->result->data->ender = $end_timer;
+
+        $this->result->status = true;
+        $this->result->message = 'Program Count Down Set Successfully';
+        return response()->json($this->result);
+    }
+
+    public function save_countdown(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'countdownEndDate' => 'required',
+            'countdownEndTime' => 'required',
+            'countdownStartDate' => 'required',
+            'countdownStartTime' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $countdownStartTime = $request->countdownStartTime;
+            $countdownStartDate = $request->countdownStartDate;
+            $countdownEndTime = $request->countdownEndTime;
+            $countdownEndDate = $request->countdownEndDate;
+
+            ProgramCountdown::where('status', '1')->update([
+                'status' => '0',
+            ]);
+
+            $save_countdown = ProgramCountdown::create([
+                'start_countdown_date' => $countdownStartDate,
+                'start_countdown_time' => $countdownStartTime,
+
+                'end_countdown_date' => $countdownEndDate,
+                'end_countdown_time' => $countdownEndTime,
+
+                // 'post_med_abbr' => $post_med_abbr,
+            ]);
+
+            if (!$save_countdown) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry pro could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Program Count Down Set Successfully';
+
+            return response()->json($this->result);
+        }
+    }
 
     public function get_dealer_unread_msg($user)
     {
@@ -104,6 +354,11 @@ class AdminController extends Controller
                 }
             }
         }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -149,6 +404,11 @@ class AdminController extends Controller
                 }
             }
         }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -929,7 +1189,8 @@ class AdminController extends Controller
                         $desc_spec = $value[5];
                         $cond_data = explode('+', $desc_spec);
                         $condition = $cond_data[0];
-                        $booking = $value[6];
+                        $booking = $value[7];
+                        $regular = $value[6];
 
                         $spec_data = [
                             'booking' => floatval($booking),
@@ -977,7 +1238,8 @@ class AdminController extends Controller
                         $desc_spec = $value[5];
                         $cond_data = explode('+', $desc_spec);
                         $condition = $cond_data[0];
-                        $booking = $value[6];
+                        $booking = $value[7];
+                        $regular = $value[6];
                         $grouping = $value[10];
 
                         $spec_data = [
@@ -1032,7 +1294,7 @@ class AdminController extends Controller
                     $xref = $value[4];
                     $description = $value[5];
                     $regular_price = $value[6];
-                    $special_price = $value[7];
+                    $booking_price = $value[7];
                     // $type = $value[9] ? $value[9] : '';
 
                     $type = array_key_exists('9', $value) ? $value[9] : '';
@@ -1056,8 +1318,8 @@ class AdminController extends Controller
                                 'vendor_name' => $vendor_name,
                                 'vendor_product_code' => $vendor_product_code,
                                 'xref' => $xref,
-                                'booking' => $regular_price,
-                                'special' => $special_price,
+                                'regular' => $regular_price,
+                                'booking' => $booking_price,
                             ]);
 
                             if (!$save_product) {
@@ -1197,7 +1459,6 @@ class AdminController extends Controller
             $this->result->message = 'Please upload dealer in csv format';
             return response()->json($this->result);
         }
-
         if ($csv->getSize() > 0) {
             $file = fopen($_FILES['csv']['tmp_name'], 'r');
             $csv_data = [];
@@ -1350,11 +1611,12 @@ class AdminController extends Controller
         }
 
         if ($vendor != '') {
-            $vendorName = $request->vendorName;
+            $vendorName = $request->vendor;
             $vendorCode = $request->vendorCode;
             $update = Users::where('id', $vendorId)->update([
                 'vendor_name' => $vendorName,
                 'vendor_code' => $vendorCode,
+                'company_name' => $vendorName,
             ]);
         }
 
@@ -1691,7 +1953,7 @@ class AdminController extends Controller
                 'password_show' => $password_show,
                 'role' => '3',
                 'role_name' => 'vendor',
-                'vendor' => $vendor_code,
+                'vendor_code' => $vendor_code,
                 'vendor_name' => $vendor_name,
                 'privilege_vendors' => $privilege_vendors,
                 'username' => $email,
@@ -1981,10 +2243,19 @@ class AdminController extends Controller
     public function get_all_reports()
     {
         $reports = Report::join('users', 'users.id', '=', 'reports.user_id')
-        ->select('reports.*','users.full_name','users.first_name','users.last_name',
-            'users.email','users.role','users.role_name','users.dealer_name','users.vendor_name')
-        ->orderBy('reports.id','desc')
-        ->get();
+            ->select(
+                'reports.*',
+                'users.full_name',
+                'users.first_name',
+                'users.last_name',
+                'users.email',
+                'users.role',
+                'users.role_name',
+                'users.dealer_name',
+                'users.vendor_name'
+            )
+            ->orderBy('reports.id', 'desc')
+            ->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;

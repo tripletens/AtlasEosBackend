@@ -71,23 +71,31 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $count_notification = Chat::where('chat_from', $sender)
-                    ->where('chat_to', $user)
-                    ->where('status', '0')
-                    ->count();
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
 
-                $each_data = [
-                    'id' => $sender_data->id,
-                    'first_name' => $sender_data->first_name,
-                    'last_name' => $sender_data->last_name,
-                    'full_name' => $sender_data->full_name,
-                    'email' => $sender_data->email,
-                    'notification' => $count_notification,
-                ];
+                    $each_data = [
+                        'id' => $sender_data->id,
+                        'vendor_name' => $sender_data->vendor_name,
+                        'first_name' => $sender_data->first_name,
+                        'last_name' => $sender_data->last_name,
+                        'full_name' => $sender_data->full_name,
+                        'email' => $sender_data->email,
+                        'notification' => $count_notification,
+                    ];
 
-                array_push($data, $each_data);
+                    array_push($data, $each_data);
+                }
             }
         }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -268,8 +276,6 @@ class DealerController extends Controller
             // $price = $request->price;
             // $unit_price = $request->unit_price;
 
-
-
             // lets get the items from the array
             $product_array = $request->input('product_array');
 
@@ -282,8 +288,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -309,7 +315,8 @@ class DealerController extends Controller
                             $this->result->status = false;
                             $this->result->status_code = 500;
                             $this->result->data = $product;
-                            $this->result->message = 'sorry we could not save this item to cart';
+                            $this->result->message =
+                                'sorry we could not save this item to cart';
                         }
                     }
                 }
@@ -354,8 +361,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-            ->where('status', '1')
-            ->exists()
+                ->where('status', '1')
+                ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -460,7 +467,12 @@ class DealerController extends Controller
                 $extension = $request
                     ->file('file')
                     ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
+                $fileNameToStore =
+                    Str::slug($filename, '_', $language = 'en') .
+                    '_' .
+                    time() .
+                    '.' .
+                    $extension;
                 $filepath =
                     env('APP_URL') .
                     Storage::url(

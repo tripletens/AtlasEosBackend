@@ -72,11 +72,14 @@ class DealerController extends Controller
 
         for ($i = 0; $i < count($vendor_code); $i++) {
             $vendor = $vendor_code[$i];
+
             $vendor_data = Vendors::where('vendor_code', $vendor)
                 ->get()
                 ->first();
 
-            array_push($res_data, $vendor_data);
+            if ($vendor_data) {
+                array_push($res_data, $vendor_data);
+            }
         }
 
         $this->result->status = true;

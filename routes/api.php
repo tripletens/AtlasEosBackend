@@ -213,6 +213,16 @@ Route::group(
         );
 
         Route::get(
+            '/dealer/get-ordered-vendor/{code}',
+            'DealerController@get_ordered_vendor'
+        );
+
+        Route::post(
+            '/dealer/edit-cart-order',
+            'DealerController@edit_dealer_order'
+        );
+
+        Route::get(
             '/quick-order-filter-atlasid/{id}',
             'DealerController@quick_order_filter_atlasid'
         );

@@ -61,6 +61,13 @@ class ChatController extends Controller
             ->orWhere('unique_id', $phase_two_unique_id)
             ->get();
 
+        foreach ($chat_history as $value) {
+            $value->from_username =
+                $sender_data->first_name . ' ' . $sender_data->last_name;
+            $value->to_username =
+                $receiver_data->first_name . ' ' . $receiver_data->last_name;
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $chat_history;

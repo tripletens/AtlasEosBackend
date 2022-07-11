@@ -54,6 +54,94 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function get_ordered_vendor($code)
+    {
+        $dealer_cart = Cart::where('dealer', $code)->get();
+        $vendor_code = [];
+
+        if ($dealer_cart) {
+            foreach ($dealer_cart as $value) {
+                $vendor = $value->vendor;
+                if (!in_array($vendor, $vendor_code)) {
+                    array_push($vendor_code, $vendor);
+                }
+            }
+        }
+
+        $res_data = [];
+
+        for ($i = 0; $i < count($vendor_code); $i++) {
+            $vendor = $vendor_code[$i];
+            $vendor_data = Vendors::where('vendor_code', $vendor)
+                ->get()
+                ->first();
+
+            array_push($res_data, $vendor_data);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+        $this->result->message = 'ordered vendors';
+
+        return response()->json($this->result);
+    }
+
+    public function edit_dealer_order(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $dealer = $request->dealer;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    $update = Cart::where('uid', $uid)
+                        ->where('dealer', $dealer)
+                        ->where('atlas_id', $product->atlas_id)
+                        ->update([
+                            'qty' => $product->qty,
+                            'price' => $product->price,
+                            'unit_price' => $product->unit_price,
+                        ]);
+
+                    if (!$update) {
+                        $this->result->status = false;
+                        $this->result->status_code = 500;
+                        $this->result->message =
+                            'sorry we could not update this item to cart';
+                    }
+                }
+            }
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Updated to cart';
+            // }
+
+            return response()->json($this->result);
+        }
+    }
+
     public function get_editable_orders_by_vendor($code)
     {
         $cart = Cart::where('vendor', $code)->get();

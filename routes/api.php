@@ -165,6 +165,9 @@ Route::group(
         );
 
         Route::get('/get-all-reports', 'AdminController@get_all_reports');
+        Route::get('/get-all-reports/{user_id}', 'AdminController@fetch_reports_by_user_id');
+
+
         // get_all_reports
         Route::post('/save-countdown', 'AdminController@save_countdown');
 
@@ -369,6 +372,7 @@ Route::group(
             '/cart/dealer/{dealer_id}',
             'DealerController@fetch_all_cart_items'
         );
+
         Route::get(
             '/vendor/get-sales-by-item-summary/{code}',
             'VendorController@sales_by_item_summary'

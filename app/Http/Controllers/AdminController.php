@@ -29,10 +29,10 @@ use App\Models\PromotionalFlier;
 use App\Models\Cart;
 use App\Models\Chat;
 use App\Models\Report;
+use App\Models\User;
 use App\Models\ProgramCountdown;
 
 use DateTime;
-
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -2261,6 +2261,38 @@ class AdminController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'All reports fetched successfully';
         $this->result->data = $reports;
+        return response()->json($this->result);
+    }
+
+    // get all reports by user_id
+    public function fetch_reports_by_user_id($user_id)
+    {
+        $reports = Report::where('user_id',$user_id)->join('users', 'users.id', '=', 'reports.user_id')
+        ->select('reports.*','users.full_name','users.first_name','users.last_name',
+            'users.email','users.role','users.role_name','users.dealer_name','users.vendor_name')
+        ->orderBy('reports.id','desc')
+        ->get();
+
+        if (!$reports) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch report by user id";
+            return response()->json($this->result);
+        }
+
+        if (count($reports) == 0) {
+            $this->result->status = true;
+            $this->result->status_code = 204;
+            $this->result->data = $reports;
+            $this->result->message = "No report found for user id";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $reports;
+        $this->result->message = 'Reports from user id fetched successfully';
         return response()->json($this->result);
     }
 

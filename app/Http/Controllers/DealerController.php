@@ -54,6 +54,35 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function delete_item_cart($dealer, $vendor)
+    {
+        $data = Cart::where('dealer', $dealer)
+            ->where('vendor', $vendor)
+            ->exists();
+
+        if ($data) {
+            $delete = Cart::where('dealer', $dealer)
+                ->where('vendor', $vendor)
+                ->delete();
+            if (!$delete) {
+                $this->result->status = false;
+                $this->result->status_code = 500;
+                $this->result->message =
+                    'sorry we could not delete this item to cart';
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Item deleted successfully';
+            }
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'vendor items not found';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_ordered_vendor($code)
     {
         $dealer_cart = Cart::where('dealer', $code)->get();

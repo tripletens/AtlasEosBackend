@@ -221,6 +221,11 @@ Route::group(
             'DealerController@get_ordered_vendor'
         );
 
+        Route::get(
+            '/dealer/delete-item-cart/{dealer}/{vendor}',
+            'DealerController@delete_item_cart'
+        );
+
         Route::post(
             '/dealer/edit-cart-order',
             'DealerController@edit_dealer_order'

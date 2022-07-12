@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\DealerCart;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SubmitOrderMail;
+use App\Mail\DeleteOrderMail;
 use App\Models\Orders;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -56,11 +57,24 @@ class DealerController extends Controller
 
     public function delete_item_cart($dealer, $vendor)
     {
-        $data = Cart::where('dealer', $dealer)
-            ->where('vendor', $vendor)
-            ->exists();
-
-        if ($data) {
+        $data = Cart::where('cart.dealer', $dealer)
+            ->where('cart.vendor', $vendor);
+        $check_data = $data->exists();
+        $fetch_users_data = $data->join('users', 'users.id', '=', 'cart.uid')
+            ->join('products', 'products.id', '=', 'cart.product_id')
+            ->select(
+                'products.description',
+                'products.img',
+                'products.status as product_status',
+                'products.description as product_description',
+                'products.vendor_code as product_vendor_code',
+                'products.vendor_name as products_vendor_name',
+                'products.vendor_product_code as product_vendor_product_code',
+                'products.xref as product_xref',
+                'cart.*'
+            )
+            ->get();
+        if ($check_data) {
             $delete = Cart::where('dealer', $dealer)
                 ->where('vendor', $vendor)
                 ->delete();
@@ -70,6 +84,11 @@ class DealerController extends Controller
                 $this->result->message =
                     'sorry we could not delete this item to cart';
             } else {
+                // get the dealer details
+                $dealer = User::where('role', 4)->where('id', $dealer)->get()->first();
+
+                Mail::to($dealer->email)->send(new DeleteOrderMail($fetch_users_data));
+
                 $this->result->status = true;
                 $this->result->status_code = 200;
                 $this->result->message = 'Item deleted successfully';
@@ -434,8 +453,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -507,8 +526,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-                ->where('status', '1')
-                ->exists()
+            ->where('status', '1')
+            ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -774,8 +793,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         QuickOrder::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;

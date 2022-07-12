@@ -644,4 +644,111 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
     }
+    // move item to the cart from the quick order
+    public function move_quick_order_to_cart(Request $request)
+    {
+        // validation
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            // 'dealer' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // fetch all items by the uid
+            $uid = $request->input('uid');
+            $dealer = $request->input('dealer');
+
+            $fetch_all_items_by_uid = QuickOrder::where('uid', $uid)->get();
+
+            if (!$fetch_all_items_by_uid) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message = "An Error Ocurred, we couldn't fetch dealer's quick order";
+                return response()->json($this->result);
+            }
+
+            if (count($fetch_all_items_by_uid) == 0) {
+                $this->result->status = true;
+                $this->result->status_code = 402;
+                $this->result->message = "Sorry no item in the quick order for this  user";
+                return response()->json($this->result);
+            }
+
+            // return $fetch_all_items_by_uid;
+            // `id`, `uid`, `dealer`, `vendor`, `atlas_id`, `product_id`,
+            //  `qty`, `price`, `unit_price`, `status`,
+
+            // {
+            //     "atlas_id":"12323","vendor_id":"2121",
+            //     "groupings":"",
+            //     "product_id":"43",
+            //     "qty":"56","price":"789.79",
+            //     "unit_price":"78"
+            // }
+            foreach ($fetch_all_items_by_uid as $item) {
+                $atlas_id = $item->atlas_id;
+                $vendor = $item->vendor;
+                $dealer = $item->dealer;
+                $product_id = $item->product_id;
+                $qty = $item->qty;
+                $price = $item->price;
+                $unit_price = $item->unit_price;
+                $status = $item->status;
+                $groupings = $item->groupings;
+
+                if (
+                    Cart::where('dealer', $dealer)
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
+                ) {
+                    $this->result->status = true;
+                    $this->result->status_code = 404;
+                    $this->result->message = 'item has been added already';
+                    break;
+                } else {
+                    $save = Cart::create([
+                        'uid' => $uid,
+                        'atlas_id' => $atlas_id,
+                        'dealer' => $dealer,
+                        'groupings' => $groupings,
+                        'vendor' => $vendor,
+                        'product_id' => $product_id,
+                        'qty' => $qty,
+                        'price' => $price,
+                        'unit_price' => $unit_price,
+                        'status' => $status
+                    ]);
+
+                    if (!$save) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->data = $item;
+                        $this->result->message = 'sorry we could not save this item to cart';
+                    }
+                }
+                // delete item from quick order
+                $delete_quick_order_item = $item->delete();
+
+                if (!$delete_quick_order_item) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->data = $item;
+                    $this->result->message = 'sorry we could not delete quick order item';
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item moved to cart from quick order';
+
+            return response()->json($this->result);
+        }
+    }
 }

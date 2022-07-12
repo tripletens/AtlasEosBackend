@@ -349,6 +349,13 @@ Route::group(
             '/quick_order',
             'DealerController@add_quick_order'
         );
+
+        // move quick order to cart
+        Route::post(
+            '/move-quick-order',
+            'DealerController@move_quick_order_to_cart'
+        );
+
     }
 );
 

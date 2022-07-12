@@ -22,6 +22,7 @@ class CreateQuickOrderTable extends Migration
             $table->string('vendor')->nullable();
             $table->string('atlas_id')->nullable();
             $table->string('product_id')->nullable();
+            $table->string('groupings')->nullable();
             $table->integer('qty')->nullable();
             $table->integer('price')->nullable();
             $table->integer('unit_price')->nullable();

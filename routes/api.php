@@ -424,6 +424,13 @@ Route::group(
             '/promotional_fliers/vendors',
             'PromotionalFlierController@get_all_vendors_with_promotional_fliers'
         );
+
+        // move quick order to cart
+        Route::post(
+            '/move-quick-order',
+            'DealerController@move_quick_order_to_cart'
+        );
+
     }
 );
 

@@ -69,6 +69,114 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function edit_seminar(Request $request)
+    {
+        // process the request
+        $id = $request->id;
+        $seminarDate = $request->seminarDate;
+        $startTime = $request->startTime;
+        $stopTime = $request->stopTime;
+
+        $topic = $request->topic;
+        $vendorCode = $request->vendorCode;
+        $vendorName = $request->vendorName;
+        $link = $request->link;
+
+        if ($seminarDate != '') {
+            $update = Seminar::where('id', $id)->update([
+                'seminar_date' => $seminarDate,
+            ]);
+        }
+
+        if ($startTime != '') {
+            $update = Seminar::where('id', $id)->update([
+                'start_time' => $startTime,
+            ]);
+        }
+
+        if ($stopTime != '') {
+            $update = Seminar::where('id', $id)->update([
+                'stop_time' => $stopTime,
+            ]);
+        }
+
+        if ($topic != '') {
+            $update = Seminar::where('id', $id)->update([
+                'topic' => $topic,
+            ]);
+        }
+
+        if ($vendorCode != '') {
+            $update = Seminar::where('id', $id)->update([
+                'vendor_id' => $vendorCode,
+            ]);
+        }
+
+        if ($vendorName != '') {
+            $update = Seminar::where('id', $id)->update([
+                'vendor_name' => $vendorName,
+            ]);
+        }
+
+        if ($link != '') {
+            $update = Seminar::where('id', $id)->update([
+                'link' => $link,
+            ]);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Seminar Updated Successfully';
+        return response()->json($this->result);
+    }
+
+    public function get_seminar_by_id($id)
+    {
+        $seminar = Seminar::find($id);
+        if (!$seminar) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the seminar";
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $seminar;
+            $this->result->message = 'Seminar fetched Successfully';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_current_promotional_flier($id)
+    {
+        $one_promotional_flier = PromotionalFlier::find($id);
+
+        if ($one_promotional_flier) {
+            $vendor_code = $one_promotional_flier->vendor_id;
+            $vendor_data = Vendors::where('vendor_code', $vendor_code)
+                ->get()
+                ->first();
+            if ($vendor_data) {
+                $one_promotional_flier->vendor_name = $vendor_data->vendor_name;
+            }
+        }
+
+        if (!$one_promotional_flier) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the promotional fliers";
+            return response()->json($this->result);
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $one_promotional_flier;
+            $this->result->message = 'Promotional Flier fetched Successfully';
+            return response()->json($this->result);
+        }
+    }
+
     public function get_all_promotional_flyer()
     {
         $promotional = PromotionalFlier::all();

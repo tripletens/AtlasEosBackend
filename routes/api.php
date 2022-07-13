@@ -299,11 +299,12 @@ Route::group(
 
         // hshkdksjdsd
         // sdjsjfkjds
-        Route::get(
+        Route::patch(
             '/edit-promotional-flier/{id}',
             'PromotionalFlierController@edit_promotional_flier'
         );
-        Route::get(
+        
+        Route::delete(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );
@@ -393,12 +394,12 @@ Route::group(
             '/cart/dealer/{dealer_id}',
             'DealerController@fetch_all_cart_items'
         );
-        
+
         // adds item to the quick order
         Route::post(
             '/quick_order',
             'DealerController@add_quick_order');
-            
+
         Route::get(
             '/vendor/get-sales-by-item-summary/{code}',
             'VendorController@sales_by_item_summary'

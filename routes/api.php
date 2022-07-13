@@ -189,6 +189,18 @@ Route::group(
             'AdminController@get_all_promotional_flyer'
         );
 
+        Route::get(
+            '/admin/get-promotional-flyer/{id}',
+            'AdminController@get_current_promotional_flier'
+        );
+
+        Route::get(
+            '/admin/get-seminar-id/{id}',
+            'AdminController@get_seminar_by_id'
+        );
+
+        Route::post('/edit-seminar', 'AdminController@edit_seminar');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

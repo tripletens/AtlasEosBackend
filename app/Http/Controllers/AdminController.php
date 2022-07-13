@@ -306,8 +306,8 @@ class AdminController extends Controller
         $end_time = $active_countdown->end_countdown_time;
 
         $end_timer = Carbon::createFromFormat(
-            'Y-m-d H:s:i',
-            $end_date . ' ' . $end_time . ':00'
+            'Y-m-d H:s',
+            $end_date . ' ' . $end_time
         );
         $now = Carbon::now();
 
@@ -345,8 +345,15 @@ class AdminController extends Controller
             $this->result->data->minutes = $minutes;
             $this->result->data->seconds = $seconds;
 
+            $this->result->data->start_timer_timestamp = strtotime(
+                $start_timer
+            );
+
+            $this->result->data->end_timer_timestamp = strtotime($end_timer);
+
             $this->result->data->start_timer = $start_timer;
             $this->result->data->end_timer = $end_timer;
+
             $this->result->data->start_date = $start_date;
             $this->result->data->start_time = $start_time;
 

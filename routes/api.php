@@ -315,8 +315,8 @@ Route::group(
             '/edit-promotional-flier/{id}',
             'PromotionalFlierController@edit_promotional_flier'
         );
-        
-        Route::delete(
+
+        Route::get(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );

@@ -473,6 +473,11 @@ Route::group(
             'ChatController@get_user_chat'
         );
 
+        Route::get(
+            '/chat/count-unread-msg/{user}',
+            'ChatController@count_unread_msg'
+        );
+
         Route::get('/testing-chat', 'ChatController@testing_chat');
     }
 );

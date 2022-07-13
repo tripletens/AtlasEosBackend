@@ -294,34 +294,6 @@ class AdminController extends Controller
             ->get()
             ->first();
 
-        // $active_date = $active_countdown->start_countdown_date;
-        // $active_time = $active_countdown->start_countdown_time;
-
-        // $to = Carbon::createFromFormat(
-        //     'Y-m-d H:s:i',
-        //     $active_date . ' ' . $active_time . ':00'
-        // );
-        // $from = Carbon::now();
-        // $diff_status = $to->gt($from);
-
-        // if ($diff_status) {
-        //     $years = $to->diffInYears($from);
-        //     $months = $to->diffInMonths($from);
-        //     $weeks = $to->diffInWeeks($from);
-        //     $days = $to->diffInDays($from);
-        //     $hours = $to->diffInHours($from);
-        //     $minutes = $to->diffInMinutes($from);
-        //     $seconds = $to->diffInSeconds($from);
-        // } else {
-        //     $years = 0;
-        //     $months = 0;
-        //     $weeks = 0;
-        //     $days = 0;
-        //     $hours = 0;
-        //     $minutes = 0;
-        //     $seconds = 0;
-        // }
-
         $start_time = $active_countdown->start_countdown_time;
         $start_date = $active_countdown->start_countdown_date;
 
@@ -330,14 +302,21 @@ class AdminController extends Controller
             $start_date . ' ' . $start_time . ':00'
         );
 
-        $start_date = $active_countdown->end_countdown_date;
+        $end_date = $active_countdown->end_countdown_date;
         $end_time = $active_countdown->end_countdown_time;
 
         $end_timer = Carbon::createFromFormat(
             'Y-m-d H:s:i',
-            $start_date . ' ' . $end_time . ':00'
+            $end_date . ' ' . $end_time . ':00'
         );
         $now = Carbon::now();
+
+        $first = strtotime($start_timer);
+        $second = strtotime($end_timer);
+
+        $secondsLeft = $second - $first;
+        $days = floor(($secondsLeft / 60) * 60 * 24);
+        $hours = floor((($secondsLeft - $days * 60 * 60 * 24) / 60) * 60);
 
         if ($now->lt($start_timer)) {
             $this->result->data->years = 0;
@@ -356,6 +335,8 @@ class AdminController extends Controller
             $minutes = $end_timer->diffInMinutes($start_timer);
             $seconds = $end_timer->diffInSeconds($start_timer);
 
+            $human = $end_timer->diffForHumans($start_timer);
+
             $this->result->data->years = $years;
             $this->result->data->months = $months;
             $this->result->data->weeks = $weeks;
@@ -363,6 +344,14 @@ class AdminController extends Controller
             $this->result->data->hours = $hours;
             $this->result->data->minutes = $minutes;
             $this->result->data->seconds = $seconds;
+
+            $this->result->data->start_timer = $start_timer;
+            $this->result->data->end_timer = $end_timer;
+            $this->result->data->start_date = $start_date;
+            $this->result->data->start_time = $start_time;
+
+            $this->result->data->end_date = $end_date;
+            $this->result->data->end_time = $end_time;
         }
 
         // $this->result->data->starter = $start_timer;

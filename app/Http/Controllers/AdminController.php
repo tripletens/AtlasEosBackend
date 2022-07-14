@@ -260,8 +260,13 @@ class AdminController extends Controller
     public function get_report_problem($ticket)
     {
         $selected = Report::where('ticket_id', $ticket)->get();
+
         $res_data = [];
         if ($selected) {
+            // post with the same slug already exists
+            Report::where('ticket_id', $ticket)->update([
+                'status' => 2,
+            ]);
             foreach ($selected as $value) {
                 $user_id = $value->user_id;
                 $user_data = Users::where('id', $user_id)
@@ -2385,11 +2390,33 @@ class AdminController extends Controller
     // get all reports by user_id
     public function fetch_reports_by_user_id($user_id)
     {
-        $reports = Report::where('user_id',$user_id)->join('users', 'users.id', '=', 'reports.user_id')
-        ->select('reports.*','users.full_name','users.first_name','users.last_name',
-            'users.email','users.role','users.role_name','users.dealer_name','users.vendor_name')
-        ->orderBy('reports.id','desc')
-        ->get();
+        $reports = Report::where('user_id', $user_id)
+            ->join('users', 'users.id', '=', 'reports.user_id')
+            ->select(
+                'reports.*',
+                'users.full_name',
+                'users.first_name',
+                'users.last_name',
+                'users.email',
+                'users.role',
+                'users.role_name',
+                'users.dealer_name',
+                'users.vendor_name'
+            )
+            ->orderBy('reports.id', 'desc')
+            ->get();
+
+        if ($reports) {
+            foreach ($reports as $value) {
+                $ticket = $value->ticket_id;
+
+                $count_admin_res = Report::where('ticket_id', $ticket)
+                    ->where('company_name', 'atlas')
+                    ->count();
+
+                $value->admin_count = $count_admin_res;
+            }
+        }
 
         if (!$reports) {
             $this->result->status = true;
@@ -2403,7 +2430,7 @@ class AdminController extends Controller
             $this->result->status = true;
             $this->result->status_code = 204;
             $this->result->data = $reports;
-            $this->result->message = "No report found for user id";
+            $this->result->message = 'No report found for user id';
             return response()->json($this->result);
         }
 
@@ -2415,8 +2442,9 @@ class AdminController extends Controller
     }
 
     // dealer dashboard details
-    public function dealer_dashboard(){
-        // no of vendors ordered from / number of total vendors 
+    public function dealer_dashboard()
+    {
+        // no of vendors ordered from / number of total vendors
     }
 
     public function testing_api()

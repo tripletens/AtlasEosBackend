@@ -306,9 +306,17 @@ class AdminController extends Controller
         $end_time = $active_countdown->end_countdown_time;
 
         $end_timer = Carbon::createFromFormat(
-            'Y-m-d H:s',
-            $end_date . ' ' . $end_time
+            'Y-m-d H:s:i',
+            $end_date . ' ' . $end_time . ':00'
         );
+
+        $inital_end_timer = Carbon::parse($end_date . ' ' . $end_time, 'UTC');
+
+        $inital_start_timer = Carbon::parse(
+            $start_date . ' ' . $start_time,
+            'UTC'
+        );
+
         $now = Carbon::now();
 
         $first = strtotime($start_timer);
@@ -318,48 +326,53 @@ class AdminController extends Controller
         $days = floor(($secondsLeft / 60) * 60 * 24);
         $hours = floor((($secondsLeft - $days * 60 * 60 * 24) / 60) * 60);
 
-        if ($now->lt($start_timer)) {
-            $this->result->data->years = 0;
-            $this->result->data->months = 0;
-            $this->result->data->weeks = 0;
-            $this->result->data->days = 0;
-            $this->result->data->hours = 0;
-            $this->result->data->minutes = 0;
-            $this->result->data->seconds = 0;
-        } else {
-            $years = $end_timer->diffInYears($start_timer);
-            $months = $end_timer->diffInMonths($start_timer);
-            $weeks = $end_timer->diffInWeeks($start_timer);
-            $days = $end_timer->diffInDays($start_timer);
-            $hours = $end_timer->diffInHours($start_timer);
-            $minutes = $end_timer->diffInMinutes($start_timer);
-            $seconds = $end_timer->diffInSeconds($start_timer);
+        // if ($now->lt($start_timer)) {
+        //     $this->result->data->years = 0;
+        //     $this->result->data->months = 0;
+        //     $this->result->data->weeks = 0;
+        //     $this->result->data->days = 0;
+        //     $this->result->data->hours = 0;
+        //     $this->result->data->minutes = 0;
+        //     $this->result->data->seconds = 0;
+        // } else {
 
-            $human = $end_timer->diffForHumans($start_timer);
+        // $years = $end_timer->diffInYears($start_timer);
+        // $months = $end_timer->diffInMonths($start_timer);
+        // $weeks = $end_timer->diffInWeeks($start_timer);
+        // $days = $end_timer->diffInDays($start_timer);
+        // $hours = $end_timer->diffInHours($start_timer);
+        // $minutes = $end_timer->diffInMinutes($start_timer);
+        // $seconds = $end_timer->diffInSeconds($start_timer);
 
-            $this->result->data->years = $years;
-            $this->result->data->months = $months;
-            $this->result->data->weeks = $weeks;
-            $this->result->data->days = $days;
-            $this->result->data->hours = $hours;
-            $this->result->data->minutes = $minutes;
-            $this->result->data->seconds = $seconds;
+        // $human = $end_timer->diffForHumans($start_timer);
 
-            $this->result->data->start_timer_timestamp = strtotime(
-                $start_timer
-            );
+        // $this->result->data->years = $years;
+        // $this->result->data->months = $months;
+        // $this->result->data->weeks = $weeks;
+        // $this->result->data->days = $days;
+        // $this->result->data->hours = $hours;
+        // $this->result->data->minutes = $minutes;
+        // $this->result->data->seconds = $seconds;
 
-            $this->result->data->end_timer_timestamp = strtotime($end_timer);
+        $this->result->data->start_timer_timestamp = strtotime($start_timer);
 
-            $this->result->data->start_timer = $start_timer;
-            $this->result->data->end_timer = $end_timer;
+        $this->result->data->end_timer_timestamp = strtotime($end_timer);
 
-            $this->result->data->start_date = $start_date;
-            $this->result->data->start_time = $start_time;
+        $this->result->data->start_timer = $start_timer;
+        $this->result->data->end_timer = $end_timer;
 
-            $this->result->data->end_date = $end_date;
-            $this->result->data->end_time = $end_time;
-        }
+        $this->result->data->start_date = $start_date;
+        $this->result->data->start_time = $start_time;
+
+        $this->result->data->end_date = $end_date;
+        $this->result->data->end_time = $end_time;
+
+        $this->result->data->inital_end_timer = $inital_end_timer;
+
+        $this->result->data->real_start_timer = $inital_start_timer;
+
+        // echo $gameStart;
+        //    }
 
         // $this->result->data->starter = $start_timer;
         // $this->result->data->ender = $end_timer;

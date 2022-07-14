@@ -202,6 +202,21 @@ Route::group(
 
         Route::post('/edit-seminar', 'AdminController@edit_seminar');
 
+        Route::post(
+            '/admin/save-admin-report-reply',
+            'AdminController@save_admin_reply_problem'
+        );
+
+        Route::get(
+            '/admin/get-current-ticket/{ticket}',
+            'AdminController@get_first_ticket'
+        );
+
+        Route::get(
+            '/admin/get-report-reply/{ticket}',
+            'AdminController@get_report_reply'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

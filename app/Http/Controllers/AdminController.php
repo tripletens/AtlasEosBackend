@@ -31,6 +31,7 @@ use App\Models\Chat;
 use App\Models\Report;
 use App\Models\User;
 use App\Models\ProgramCountdown;
+use App\Models\ReportReply;
 
 use DateTime;
 // use App\Models\Catalogue_Order;
@@ -68,6 +69,110 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_report_reply($ticket)
+    {
+        $selected = ReportReply::where('ticket', $ticket)->get();
+
+        $res_data = [];
+        if ($selected) {
+            foreach ($selected as $value) {
+                $user = $value->user;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                if ($user_data) {
+                    $data = [
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'role' => $value->role,
+                        'msg' => $value->reply_msg,
+                        'replied_by' => $value->replied_by,
+                        'ticket' => $ticket,
+                        'status' => $value->status,
+                        'created_at' => $value->created_at,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Report Replies';
+        return response()->json($this->result);
+    }
+
+    public function save_admin_reply_problem(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'replyMsg' => 'required',
+            'userId' => 'required',
+            'role' => 'required',
+            'ticket' => 'required',
+            'replier' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $replyMsg = $request->replyMsg;
+            $userId = $request->userId;
+            $role = $request->role;
+            $ticket = $request->ticket;
+            $replier = $request->replier;
+
+            $save_reply = ReportReply::create([
+                'user' => $userId,
+                'reply_msg' => $replyMsg,
+                'role' => $role,
+                'ticket' => $ticket,
+                'replied_by' => $replier,
+            ]);
+
+            if (!$save_reply) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry File could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Admin User Added Successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_first_ticket($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)
+            ->get()
+            ->first();
+
+        $user_id = $selected->user_id;
+        $user_data = Users::where('id', $user_id)
+            ->get()
+            ->first();
+
+        $selected->first_name = $user_data->first_name;
+        $selected->last_name = $user_data->last_name;
+
+        $this->result->status = true;
+        $this->result->data = $selected;
+        $this->result->message = 'Program Count Down Set Successfully';
+        return response()->json($this->result);
+    }
 
     public function edit_seminar(Request $request)
     {

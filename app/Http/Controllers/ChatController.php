@@ -30,6 +30,19 @@ class ChatController extends Controller
     {
     }
 
+    public function count_unread_msg($user)
+    {
+        $unread_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->count();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $unread_msg;
+        $this->result->message = 'count unread msg chat';
+        return response()->json($this->result);
+    }
+
     public function get_user_chat($receiver, $sender)
     {
         $sender_data = Users::where('id', $sender)

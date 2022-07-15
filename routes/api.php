@@ -165,9 +165,10 @@ Route::group(
         );
 
         Route::get('/get-all-reports', 'AdminController@get_all_reports');
-        Route::get('/get-all-reports/{user_id}', 'AdminController@fetch_reports_by_user_id');
-
-
+        Route::get(
+            '/get-all-reports/{user_id}',
+            'AdminController@fetch_reports_by_user_id'
+        );
 
         // get_all_reports
         Route::post('/save-countdown', 'AdminController@save_countdown');
@@ -201,6 +202,21 @@ Route::group(
 
         Route::post('/edit-seminar', 'AdminController@edit_seminar');
 
+        Route::post(
+            '/admin/save-admin-report-reply',
+            'AdminController@save_admin_reply_problem'
+        );
+
+        Route::get(
+            '/admin/get-current-ticket/{ticket}',
+            'AdminController@get_first_ticket'
+        );
+
+        Route::get(
+            '/admin/get-report-reply/{ticket}',
+            'AdminController@get_report_reply'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -217,6 +233,26 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
+        Route::post(
+            '/dealer/save-dealer-reply',
+            'DealerController@save_dealer_reply_problem'
+        );
+
+        Route::get(
+            '/dealer/get-problem-ticket/{ticket}',
+            'DealerController@get_problem_dealer'
+        );
+
+        Route::get(
+            '/dealer/get-report-replies/{ticket}',
+            'DealerController@get_report_reply'
+        );
+
+        Route::get(
+            '/dealer/get-ticket-first/{ticket}',
+            'DealerController@get_first_ticket'
+        );
 
         Route::get(
             '/get-vendor-products/{code}',
@@ -408,9 +444,7 @@ Route::group(
         );
 
         // adds item to the quick order
-        Route::post(
-            '/quick_order',
-            'DealerController@add_quick_order');
+        Route::post('/quick_order', 'DealerController@add_quick_order');
 
         Route::get(
             '/vendor/get-sales-by-item-summary/{code}',
@@ -443,7 +477,7 @@ Route::group(
             '/move-quick-order',
             'DealerController@move_quick_order_to_cart'
         );
-
+        
         // fetch all the quick order items by dealer_id
         Route::get(
             '/fetch-quick-order-items-dealer-id/{dealer_id}',
@@ -482,6 +516,11 @@ Route::group(
         Route::get(
             '/get-user-chat/{receiver}/{sender}',
             'ChatController@get_user_chat'
+        );
+
+        Route::get(
+            '/chat/count-unread-msg/{user}',
+            'ChatController@count_unread_msg'
         );
 
         Route::get('/testing-chat', 'ChatController@testing_chat');

@@ -31,6 +31,7 @@ use App\Models\Chat;
 use App\Models\Report;
 use App\Models\User;
 use App\Models\ProgramCountdown;
+use App\Models\ReportReply;
 
 use DateTime;
 // use App\Models\Catalogue_Order;
@@ -68,6 +69,110 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_report_reply($ticket)
+    {
+        $selected = ReportReply::where('ticket', $ticket)->get();
+
+        $res_data = [];
+        if ($selected) {
+            foreach ($selected as $value) {
+                $user = $value->user;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                if ($user_data) {
+                    $data = [
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'role' => $value->role,
+                        'msg' => $value->reply_msg,
+                        'replied_by' => $value->replied_by,
+                        'ticket' => $ticket,
+                        'status' => $value->status,
+                        'created_at' => $value->created_at,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Report Replies';
+        return response()->json($this->result);
+    }
+
+    public function save_admin_reply_problem(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'replyMsg' => 'required',
+            'userId' => 'required',
+            'role' => 'required',
+            'ticket' => 'required',
+            'replier' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $replyMsg = $request->replyMsg;
+            $userId = $request->userId;
+            $role = $request->role;
+            $ticket = $request->ticket;
+            $replier = $request->replier;
+
+            $save_reply = ReportReply::create([
+                'user' => $userId,
+                'reply_msg' => $replyMsg,
+                'role' => $role,
+                'ticket' => $ticket,
+                'replied_by' => $replier,
+            ]);
+
+            if (!$save_reply) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry File could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Admin User Added Successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_first_ticket($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)
+            ->get()
+            ->first();
+
+        $user_id = $selected->user_id;
+        $user_data = Users::where('id', $user_id)
+            ->get()
+            ->first();
+
+        $selected->first_name = $user_data->first_name;
+        $selected->last_name = $user_data->last_name;
+
+        $this->result->status = true;
+        $this->result->data = $selected;
+        $this->result->message = 'Program Count Down Set Successfully';
+        return response()->json($this->result);
+    }
 
     public function edit_seminar(Request $request)
     {
@@ -260,8 +365,13 @@ class AdminController extends Controller
     public function get_report_problem($ticket)
     {
         $selected = Report::where('ticket_id', $ticket)->get();
+
         $res_data = [];
         if ($selected) {
+            // post with the same slug already exists
+            Report::where('ticket_id', $ticket)->update([
+                'status' => 2,
+            ]);
             foreach ($selected as $value) {
                 $user_id = $value->user_id;
                 $user_data = Users::where('id', $user_id)
@@ -294,34 +404,6 @@ class AdminController extends Controller
             ->get()
             ->first();
 
-        // $active_date = $active_countdown->start_countdown_date;
-        // $active_time = $active_countdown->start_countdown_time;
-
-        // $to = Carbon::createFromFormat(
-        //     'Y-m-d H:s:i',
-        //     $active_date . ' ' . $active_time . ':00'
-        // );
-        // $from = Carbon::now();
-        // $diff_status = $to->gt($from);
-
-        // if ($diff_status) {
-        //     $years = $to->diffInYears($from);
-        //     $months = $to->diffInMonths($from);
-        //     $weeks = $to->diffInWeeks($from);
-        //     $days = $to->diffInDays($from);
-        //     $hours = $to->diffInHours($from);
-        //     $minutes = $to->diffInMinutes($from);
-        //     $seconds = $to->diffInSeconds($from);
-        // } else {
-        //     $years = 0;
-        //     $months = 0;
-        //     $weeks = 0;
-        //     $days = 0;
-        //     $hours = 0;
-        //     $minutes = 0;
-        //     $seconds = 0;
-        // }
-
         $start_time = $active_countdown->start_countdown_time;
         $start_date = $active_countdown->start_countdown_date;
 
@@ -330,40 +412,77 @@ class AdminController extends Controller
             $start_date . ' ' . $start_time . ':00'
         );
 
-        $start_date = $active_countdown->end_countdown_date;
+        $end_date = $active_countdown->end_countdown_date;
         $end_time = $active_countdown->end_countdown_time;
 
         $end_timer = Carbon::createFromFormat(
             'Y-m-d H:s:i',
-            $start_date . ' ' . $end_time . ':00'
+            $end_date . ' ' . $end_time . ':00'
         );
+
+        $inital_end_timer = Carbon::parse($end_date . ' ' . $end_time, 'UTC');
+
+        $inital_start_timer = Carbon::parse(
+            $start_date . ' ' . $start_time,
+            'UTC'
+        );
+
         $now = Carbon::now();
 
-        if ($now->lt($start_timer)) {
-            $this->result->data->years = 0;
-            $this->result->data->months = 0;
-            $this->result->data->weeks = 0;
-            $this->result->data->days = 0;
-            $this->result->data->hours = 0;
-            $this->result->data->minutes = 0;
-            $this->result->data->seconds = 0;
-        } else {
-            $years = $end_timer->diffInYears($start_timer);
-            $months = $end_timer->diffInMonths($start_timer);
-            $weeks = $end_timer->diffInWeeks($start_timer);
-            $days = $end_timer->diffInDays($start_timer);
-            $hours = $end_timer->diffInHours($start_timer);
-            $minutes = $end_timer->diffInMinutes($start_timer);
-            $seconds = $end_timer->diffInSeconds($start_timer);
+        $first = strtotime($start_timer);
+        $second = strtotime($end_timer);
 
-            $this->result->data->years = $years;
-            $this->result->data->months = $months;
-            $this->result->data->weeks = $weeks;
-            $this->result->data->days = $days;
-            $this->result->data->hours = $hours;
-            $this->result->data->minutes = $minutes;
-            $this->result->data->seconds = $seconds;
-        }
+        $secondsLeft = $second - $first;
+        $days = floor(($secondsLeft / 60) * 60 * 24);
+        $hours = floor((($secondsLeft - $days * 60 * 60 * 24) / 60) * 60);
+
+        // if ($now->lt($start_timer)) {
+        //     $this->result->data->years = 0;
+        //     $this->result->data->months = 0;
+        //     $this->result->data->weeks = 0;
+        //     $this->result->data->days = 0;
+        //     $this->result->data->hours = 0;
+        //     $this->result->data->minutes = 0;
+        //     $this->result->data->seconds = 0;
+        // } else {
+
+        // $years = $end_timer->diffInYears($start_timer);
+        // $months = $end_timer->diffInMonths($start_timer);
+        // $weeks = $end_timer->diffInWeeks($start_timer);
+        // $days = $end_timer->diffInDays($start_timer);
+        // $hours = $end_timer->diffInHours($start_timer);
+        // $minutes = $end_timer->diffInMinutes($start_timer);
+        // $seconds = $end_timer->diffInSeconds($start_timer);
+
+        // $human = $end_timer->diffForHumans($start_timer);
+
+        // $this->result->data->years = $years;
+        // $this->result->data->months = $months;
+        // $this->result->data->weeks = $weeks;
+        // $this->result->data->days = $days;
+        // $this->result->data->hours = $hours;
+        // $this->result->data->minutes = $minutes;
+        // $this->result->data->seconds = $seconds;
+
+        $this->result->data->start_timer_timestamp = strtotime($start_timer);
+
+        $this->result->data->end_timer_timestamp = strtotime($end_timer);
+
+        $this->result->data->start_timer = $start_timer;
+        $this->result->data->end_timer = $end_timer;
+
+        $this->result->data->start_date = $start_date;
+        $this->result->data->start_time = $start_time;
+
+        $this->result->data->end_date = $end_date;
+        $this->result->data->end_time = $end_time;
+
+        $this->result->data->inital_end_timer = $inital_end_timer;
+
+        $this->result->data->real_start_timer = $inital_start_timer;
+
+        // echo $gameStart;
+        //    }
 
         // $this->result->data->starter = $start_timer;
         // $this->result->data->ender = $end_timer;
@@ -2376,11 +2495,33 @@ class AdminController extends Controller
     // get all reports by user_id
     public function fetch_reports_by_user_id($user_id)
     {
-        $reports = Report::where('user_id',$user_id)->join('users', 'users.id', '=', 'reports.user_id')
-        ->select('reports.*','users.full_name','users.first_name','users.last_name',
-            'users.email','users.role','users.role_name','users.dealer_name','users.vendor_name')
-        ->orderBy('reports.id','desc')
-        ->get();
+        $reports = Report::where('user_id', $user_id)
+            ->join('users', 'users.id', '=', 'reports.user_id')
+            ->select(
+                'reports.*',
+                'users.full_name',
+                'users.first_name',
+                'users.last_name',
+                'users.email',
+                'users.role',
+                'users.role_name',
+                'users.dealer_name',
+                'users.vendor_name'
+            )
+            ->orderBy('reports.id', 'desc')
+            ->get();
+
+        if ($reports) {
+            foreach ($reports as $value) {
+                $ticket = $value->ticket_id;
+
+                $count_admin_res = Report::where('ticket_id', $ticket)
+                    ->where('company_name', 'atlas')
+                    ->count();
+
+                $value->admin_count = $count_admin_res;
+            }
+        }
 
         if (!$reports) {
             $this->result->status = true;
@@ -2394,7 +2535,7 @@ class AdminController extends Controller
             $this->result->status = true;
             $this->result->status_code = 204;
             $this->result->data = $reports;
-            $this->result->message = "No report found for user id";
+            $this->result->message = 'No report found for user id';
             return response()->json($this->result);
         }
 
@@ -2406,8 +2547,9 @@ class AdminController extends Controller
     }
 
     // dealer dashboard details
-    public function dealer_dashboard(){
-        // no of vendors ordered from / number of total vendors 
+    public function dealer_dashboard()
+    {
+        // no of vendors ordered from / number of total vendors
     }
 
     public function testing_api()

@@ -34,6 +34,7 @@ use App\Models\Users;
 use App\Models\Chat;
 use App\Models\QuickOrder;
 use App\Models\User;
+use App\Models\ReportReply;
 
 class DealerController extends Controller
 {
@@ -55,12 +56,157 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function get_report_reply($ticket)
+    {
+        $selected = ReportReply::where('ticket', $ticket)->get();
+
+        $res_data = [];
+        if ($selected) {
+            foreach ($selected as $value) {
+                $user = $value->user;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                if ($user_data) {
+                    $data = [
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'role' => $value->role,
+                        'msg' => $value->reply_msg,
+                        'replied_by' => $value->replied_by,
+                        'ticket' => $ticket,
+                        'status' => $value->status,
+                        'created_at' => $value->created_at,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Report Replies';
+        return response()->json($this->result);
+    }
+
+    public function save_dealer_reply_problem(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'replyMsg' => 'required',
+            'userId' => 'required',
+            'role' => 'required',
+            'ticket' => 'required',
+            'replier' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $replyMsg = $request->replyMsg;
+            $userId = $request->userId;
+            $role = $request->role;
+            $ticket = $request->ticket;
+            $replier = $request->replier;
+
+            $save_reply = ReportReply::create([
+                'user' => $userId,
+                'reply_msg' => $replyMsg,
+                'role' => $role,
+                'ticket' => $ticket,
+                'replied_by' => $replier,
+            ]);
+
+            if (!$save_reply) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry File could not be uploaded. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Admin User Added Successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_first_ticket($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)
+            ->get()
+            ->first();
+
+        $user_id = $selected->user_id;
+        $user_data = Users::where('id', $user_id)
+            ->get()
+            ->first();
+
+        $selected->first_name = $user_data->first_name;
+        $selected->last_name = $user_data->last_name;
+
+        $this->result->status = true;
+        $this->result->data = $selected;
+        $this->result->message = 'Program Count Down Set Successfully';
+        return response()->json($this->result);
+    }
+
+    public function get_problem_dealer($ticket)
+    {
+        $selected = Report::where('ticket_id', $ticket)->get();
+
+        $res_data = [];
+        if ($selected) {
+            // post with the same slug already exists
+            // Report::where('ticket_id', $ticket)->update([
+            //     'status' => 2,
+            // ]);
+            foreach ($selected as $value) {
+                $user_id = $value->user_id;
+                $user_data = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'first_name' => $user_data->first_name,
+                    'last_name' => $user_data->last_name,
+                    'subject' => $value->subject,
+                    'description' => $value->description,
+                    'file_url' => $value->file_url,
+                    'role' => $value->role,
+                    'created_at' => $value->created_at,
+                ];
+
+                array_push($res_data, $data);
+            }
+
+            array_shift($res_data);
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Program Count Down Set Successfully';
+        return response()->json($this->result);
+    }
+
     public function delete_item_cart($dealer, $vendor)
     {
-        $data = Cart::where('cart.dealer', $dealer)
-            ->where('cart.vendor', $vendor);
+        $data = Cart::where('cart.dealer', $dealer)->where(
+            'cart.vendor',
+            $vendor
+        );
         $check_data = $data->exists();
-        $fetch_users_data = $data->join('users', 'users.id', '=', 'cart.uid')
+        $fetch_users_data = $data
+            ->join('users', 'users.id', '=', 'cart.uid')
             ->join('products', 'products.id', '=', 'cart.product_id')
             ->select(
                 'products.description',
@@ -85,9 +231,14 @@ class DealerController extends Controller
                     'sorry we could not delete this item to cart';
             } else {
                 // get the dealer details
-                $dealer = User::where('role', 4)->where('id', $dealer)->get()->first();
+                $dealer = User::where('role', 4)
+                    ->where('id', $dealer)
+                    ->get()
+                    ->first();
 
-                Mail::to($dealer->email)->send(new DeleteOrderMail($fetch_users_data));
+                Mail::to($dealer->email)->send(
+                    new DeleteOrderMail($fetch_users_data)
+                );
 
                 $this->result->status = true;
                 $this->result->status_code = 200;
@@ -453,8 +604,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -526,8 +677,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-            ->where('status', '1')
-            ->exists()
+                ->where('status', '1')
+                ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -793,8 +944,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         QuickOrder::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -857,14 +1008,16 @@ class DealerController extends Controller
             if (!$fetch_all_items_by_uid) {
                 $this->result->status = true;
                 $this->result->status_code = 400;
-                $this->result->message = "An Error Ocurred, we couldn't fetch dealer's quick order";
+                $this->result->message =
+                    "An Error Ocurred, we couldn't fetch dealer's quick order";
                 return response()->json($this->result);
             }
 
             if (count($fetch_all_items_by_uid) == 0) {
                 $this->result->status = true;
                 $this->result->status_code = 402;
-                $this->result->message = "Sorry no item in the quick order for this  user";
+                $this->result->message =
+                    'Sorry no item in the quick order for this  user';
                 return response()->json($this->result);
             }
 
@@ -892,8 +1045,8 @@ class DealerController extends Controller
 
                 if (
                     Cart::where('dealer', $dealer)
-                    ->where('atlas_id', $atlas_id)
-                    ->exists()
+                        ->where('atlas_id', $atlas_id)
+                        ->exists()
                 ) {
                     $this->result->status = true;
                     $this->result->status_code = 404;
@@ -910,14 +1063,15 @@ class DealerController extends Controller
                         'qty' => $qty,
                         'price' => $price,
                         'unit_price' => $unit_price,
-                        'status' => $status
+                        'status' => $status,
                     ]);
 
                     if (!$save) {
                         $this->result->status = false;
                         $this->result->status_code = 422;
                         $this->result->data = $item;
-                        $this->result->message = 'sorry we could not save this item to cart';
+                        $this->result->message =
+                            'sorry we could not save this item to cart';
                     }
                 }
                 // delete item from quick order
@@ -927,7 +1081,8 @@ class DealerController extends Controller
                     $this->result->status = false;
                     $this->result->status_code = 422;
                     $this->result->data = $item;
-                    $this->result->message = 'sorry we could not delete quick order item';
+                    $this->result->message =
+                        'sorry we could not delete quick order item';
                 }
             }
 

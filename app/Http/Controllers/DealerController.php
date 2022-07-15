@@ -1139,4 +1139,72 @@ class DealerController extends Controller
             'All quick order items for user fetched Successfully';
         return response()->json($this->result);
     }
+
+    // delete quick order items by user_id
+    public function delete_quick_order_items_user_id($user_id)
+    {
+        $fetch_cart_items = QuickOrder::where('uid', $user_id)
+            ->orderby('id', 'desc')
+            ->get();
+
+        if (!$fetch_cart_items) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch dealer's quick order items by user id";
+            return response()->json($this->result);
+        }
+
+        if (count($fetch_cart_items) == 0) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "Sorry no quick order items found for user";
+            return response()->json($this->result);
+        }
+
+        foreach($fetch_cart_items as $item){
+            $delete_item =  $item->delete();
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message =
+            'All quick order items for user deleted Successfully';
+        return response()->json($this->result);
+    }
+
+    // delete_quick_order_items_dealer_id
+    public function delete_quick_order_items_dealer_id($dealer_id)
+    {
+        $fetch_cart_items = QuickOrder::where('dealer', $dealer_id)
+            ->orderby('id', 'desc')
+            ->get();
+
+        if (!$fetch_cart_items) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch dealer's quick order items by user id";
+            return response()->json($this->result);
+        }
+
+        if (count($fetch_cart_items) == 0) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "Sorry no quick order items found for dealer";
+            return response()->json($this->result);
+        }
+
+        foreach($fetch_cart_items as $item){
+            $delete_item =  $item->delete();
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message =
+            'All quick order items for dealer deleted Successfully';
+        return response()->json($this->result);
+    }
 }

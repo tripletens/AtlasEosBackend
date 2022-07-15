@@ -489,6 +489,18 @@ Route::group(
             '/fetch-quick-order-items-user-id/{user_id}',
             'DealerController@fetch_quick_order_items_user_id'
         );
+
+        // delete all the quick order items by user_id
+        Route::get(
+            '/delete-quick-order-items-user-id/{user_id}',
+            'DealerController@delete_quick_order_items_user_id'
+        );
+
+        // delete all the quick order items by dealer_id
+        Route::get(
+            '/delete-quick-order-items-dealer-id/{dealer_id}',
+            'DealerController@delete_quick_order_items_dealer_id'
+        );
     }
 );
 

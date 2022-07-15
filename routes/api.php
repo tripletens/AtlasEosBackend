@@ -477,7 +477,7 @@ Route::group(
             '/move-quick-order',
             'DealerController@move_quick_order_to_cart'
         );
-        
+
         // fetch all the quick order items by dealer_id
         Route::get(
             '/fetch-quick-order-items-dealer-id/{dealer_id}',

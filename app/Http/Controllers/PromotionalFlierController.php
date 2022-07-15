@@ -232,9 +232,14 @@ class PromotionalFlierController extends Controller
 
     public  function get_all_vendors_with_promotional_fliers()
     {
-        $all_vendors_with_promotional_fliers = PromotionalFlier::select('vendor_id')
-            ->groupBy('vendor_id')
-            ->get();
+        $all_vendors_with_promotional_fliers = PromotionalFlier::all()
+            // distinct('vendor_id')
+            // ->select('vendor_id')
+            // ->groupBy('vendor_id')
+            // ->distinct()
+            // ->get();
+
+        return $all_vendors_with_promotional_fliers;
 
         if (!$all_vendors_with_promotional_fliers) {
             $this->result->status = true;
@@ -246,7 +251,7 @@ class PromotionalFlierController extends Controller
         # get the vendor details
         $vendors = Vendors::whereIn('id', $all_vendors_with_promotional_fliers)
             ->get();
-        
+
         if (!$vendors) {
             $this->result->status = true;
             $this->result->status_code = 400;

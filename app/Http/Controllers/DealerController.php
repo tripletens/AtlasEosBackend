@@ -938,4 +938,50 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
     }
+
+    // fetch all the quick order items by dealer id
+    public function fetch_quick_order_items_dealer_id($dealer_id)
+    {
+        $fetch_cart_items = QuickOrder::where('dealer', $dealer_id)
+            ->orderby('id', 'desc')
+            ->get();
+
+        if (!$fetch_cart_items) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch dealer's quick order items";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_cart_items;
+        $this->result->message =
+            'All quick order items for dealer fetched Successfully';
+        return response()->json($this->result);
+    }
+
+    // fetch all the quick order by user_id
+    public function fetch_quick_order_items_user_id($user_id)
+    {
+        $fetch_cart_items = QuickOrder::where('uid', $user_id)
+            ->orderby('id', 'desc')
+            ->get();
+
+        if (!$fetch_cart_items) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch dealer's quick order items by user id";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_cart_items;
+        $this->result->message =
+            'All quick order items for user fetched Successfully';
+        return response()->json($this->result);
+    }
 }

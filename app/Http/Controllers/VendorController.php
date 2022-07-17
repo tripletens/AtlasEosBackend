@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Vendors;
 use App\Models\Users;
@@ -10,6 +11,7 @@ use App\Models\Products;
 use App\Models\Cart;
 use App\Models\Dealer;
 use App\Models\Faq;
+use App\Models\ProgramNotes;
 
 class VendorController extends Controller
 {
@@ -26,6 +28,124 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function save_atlas_notes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorCode' => 'required',
+            'vendorRepName' => 'required',
+            'vendorUid' => 'required',
+            'dealerCode' => 'required',
+            'dealerRepName' => 'required',
+            'dealerUid' => 'required',
+            'notes' => 'required',
+            'role' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $vendor_code = $request->vendorCode;
+            $vendor_repname = $request->vendorRepName;
+            $role = $request->role;
+            $notes = $request->notes;
+            $dealer_code = $request->dealerCode;
+            $dealer_rep = $request->dealerRepName;
+
+            $dealer_uid = $request->dealerUid;
+            $vendor_uid = $request->vendorUid;
+
+            $save_note = ProgramNotes::create([
+                'vendor_code' => $vendor_code,
+                'vendor_rep' => $vendor_repname,
+                'role' => $role,
+                'dealer_code' => $dealer_code,
+                'dealer_rep' => $dealer_rep,
+                'notes' => $notes,
+                'dealer_uid' => $dealer_uid,
+                'vendor_uid' => $vendor_uid,
+            ]);
+
+            if (!$save_note) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry Note was not saved. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Atlas Note saved Successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function save_vendor_notes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorCode' => 'required',
+            'vendorRepName' => 'required',
+            'vendorUid' => 'required',
+            'dealerCode' => 'required',
+            'dealerRepName' => 'required',
+            'dealerUid' => 'required',
+            'notes' => 'required',
+            'role' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $vendor_code = $request->vendorCode;
+            $vendor_repname = $request->vendorRepName;
+            $role = $request->role;
+            $notes = $request->notes;
+            $dealer_code = $request->dealerCode;
+            $dealer_rep = $request->dealerRepName;
+
+            $dealer_uid = $request->dealerUid;
+            $vendor_uid = $request->vendorUid;
+
+            $save_note = ProgramNotes::create([
+                'vendor_code' => $vendor_code,
+                'vendor_rep' => $vendor_repname,
+                'role' => $role,
+                'dealer_code' => $dealer_code,
+                'dealer_rep' => $dealer_rep,
+                'notes' => $notes,
+                'dealer_uid' => $dealer_uid,
+                'vendor_uid' => $vendor_uid,
+            ]);
+
+            if (!$save_note) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry Note was not saved. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Note saved Successfully';
+
+            return response()->json($this->result);
+        }
     }
 
     public function get_vendor_faq()

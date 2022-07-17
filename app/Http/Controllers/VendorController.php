@@ -30,6 +30,50 @@ class VendorController extends Controller
         ];
     }
 
+    public function get_privileged_dealers($code)
+    {
+        $dealers = Users::where('role', '4')->get();
+
+        $access_dealers = [];
+
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $privileged_vendors = $value->privileged_vendors;
+
+                if ($privileged_vendors != '') {
+                    $expand = explode(',', $privileged_vendors);
+
+                    if (\in_array($code, $expand)) {
+                        $account_id = $value->account_id;
+                        $dealer_data = Dealer::where('dealer_code', $account_id)
+                            ->get()
+                            ->first();
+
+                        array_push($access_dealers, $dealer_data);
+                    }
+                }
+            }
+        }
+
+        $access_dealers = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $access_dealers))
+        );
+
+        $filter_array = [];
+
+        foreach ($access_dealers as $value) {
+            array_push($filter_array, $value);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'privileged dealers ';
+        $this->result->data = $filter_array;
+
+        return response()->json($this->result);
+    }
+
     public function save_atlas_notes(Request $request)
     {
         $validator = Validator::make($request->all(), [

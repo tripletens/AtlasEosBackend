@@ -239,6 +239,16 @@ Route::group(
             'DealerController@save_dealer_reply_problem'
         );
 
+        Route::post(
+            '/vendor/save-vendor-notes',
+            'VendorController@save_vendor_notes'
+        );
+
+        Route::post(
+            '/vendor/save-atlas-notes',
+            'VendorController@save_atlas_notes'
+        );
+
         Route::get(
             '/dealer/get-problem-ticket/{ticket}',
             'DealerController@get_problem_dealer'

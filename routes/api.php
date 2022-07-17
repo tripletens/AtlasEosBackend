@@ -248,6 +248,11 @@ Route::group(
             'VendorController@save_vendor_notes'
         );
 
+        Route::get(
+            '/vendor/get-privileged-dealers/{code}',
+            'VendorController@get_privileged_dealers'
+        );
+
         Route::post(
             '/vendor/save-atlas-notes',
             'VendorController@save_atlas_notes'

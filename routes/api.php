@@ -217,6 +217,10 @@ Route::group(
             'AdminController@get_report_reply'
         );
 
+        Route::get('/admin/vendor-notes', 'AdminController@get_vendor_notes');
+
+        Route::get('/admin/atlas-notes', 'AdminController@get_atlas_notes');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

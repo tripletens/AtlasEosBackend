@@ -43,13 +43,15 @@ class VendorController extends Controller
                 if ($privileged_vendors != '') {
                     $expand = explode(',', $privileged_vendors);
 
-                    if (\in_array($code, $expand)) {
+                    if (in_array($code, $expand)) {
                         $account_id = $value->account_id;
                         $dealer_data = Dealer::where('dealer_code', $account_id)
                             ->get()
                             ->first();
 
-                        array_push($access_dealers, $dealer_data);
+                        if ($dealer_data) {
+                            array_push($access_dealers, $dealer_data);
+                        }
                     }
                 }
             }

@@ -32,6 +32,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Models\ProgramCountdown;
 use App\Models\ReportReply;
+use App\Models\ProgramNotes;
 
 use DateTime;
 // use App\Models\Catalogue_Order;
@@ -69,6 +70,78 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_atlas_notes()
+    {
+        $notes = ProgramNotes::where('role', '1')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $res_data = [];
+
+        if ($notes) {
+            foreach ($notes as $value) {
+                $dealer = $value->dealer_uid;
+                $vendor = $value->vendor_uid;
+
+                $dealer_data = Users::where('id', $dealer)
+                    ->get()
+                    ->first();
+
+                $vendor_data = Users::where('id', $vendor)
+                    ->get()
+                    ->first();
+
+                $value->dealership_name = $dealer_data->company_name;
+                $value->vendorship_name = $vendor_data->company_name;
+                // $value->dealer_rep =
+                // $dealer_data->first_name . ' ' . $dealer_data->last_name;
+
+                ///array_push($res_data, $vendor_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $notes;
+        $this->result->message = 'Atlas Notes';
+        return response()->json($this->result);
+    }
+
+    public function get_vendor_notes()
+    {
+        $notes = ProgramNotes::where('role', '3')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $res_data = [];
+
+        if ($notes) {
+            foreach ($notes as $value) {
+                $dealer = $value->dealer_uid;
+                $vendor = $value->vendor_uid;
+
+                $dealer_data = Users::where('id', $dealer)
+                    ->get()
+                    ->first();
+
+                $vendor_data = Users::where('id', $vendor)
+                    ->get()
+                    ->first();
+
+                $value->dealership_name = $dealer_data->company_name;
+                $value->vendorship_name = $vendor_data->company_name;
+                // $value->dealer_rep =
+                // $dealer_data->first_name . ' ' . $dealer_data->last_name;
+
+                ///array_push($res_data, $vendor_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $notes;
+        $this->result->message = 'Vendor Notes';
+        return response()->json($this->result);
+    }
 
     public function get_report_reply($ticket)
     {

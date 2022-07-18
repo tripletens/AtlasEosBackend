@@ -1191,7 +1191,7 @@ class DealerController extends Controller
     {
         $fetch_cart_items = QuickOrder::where('atlas_id', $atlas_id)
             ->where('uid',$user_id)
-            ->get()->first();
+            ->get();
 
         // return $fetch_cart_items;
         if (!$fetch_cart_items) {
@@ -1202,14 +1202,18 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
 
-        $delete_item = $fetch_cart_items->delete();
+        foreach($fetch_cart_items as $item){
+            $delete_item =  $item->delete();
+            // $delete_item = $fetch_cart_items->delete();
 
-        if (!$delete_item) {
-            $this->result->status = true;
-            $this->result->status_code = 400;
-            $this->result->message = "Sorry we could not delete the item from the quick order";
-            return response()->json($this->result);
+            if (!$delete_item) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message = "Sorry we could not delete the item from the quick order";
+                return response()->json($this->result);
+            }
         }
+
 
         $this->result->status = true;
         $this->result->status_code = 200;

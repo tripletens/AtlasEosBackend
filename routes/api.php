@@ -480,6 +480,21 @@ Route::group(
             'VendorController@get_purchases_dealers'
         );
 
+        Route::get(
+            '/vendor/get-vendor-notes/{dealer}/{vendor}',
+            'VendorController@get_vendor_note'
+        );
+
+        Route::get(
+            '/vendor/get-atlas-notes/{dealer}/{vendor}',
+            'VendorController@get_atlas_note'
+        );
+
+        Route::get(
+            '/vendor/view-dealer-summary/{user}/{dealer}/{vendor}',
+            'VendorController@view_dealer_summary'
+        );
+
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
 
         Route::get(

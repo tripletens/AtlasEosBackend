@@ -635,13 +635,13 @@ class DealerController extends Controller
                             $this->result->message =
                                 'sorry we could not save this item to cart';
                         }
+
+                        $this->result->status = true;
+                        $this->result->status_code = 200;
+                        $this->result->message = 'item Added to cart';
                     }
                 }
             }
-            $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->message = 'item Added to cart';
-            // }
 
             return response()->json($this->result);
         }

@@ -1188,9 +1188,10 @@ class DealerController extends Controller
     }
 
     // delete quick order items by atlas_id
-    public function delete_quick_order_items_atlas_id($atlas_id)
+    public function delete_quick_order_items_atlas_id($user_id,$atlas_id)
     {
         $fetch_cart_items = QuickOrder::where('atlas_id', $atlas_id)
+            ->where('uid',$user_id)
             ->get()->first();
 
         // return $fetch_cart_items;

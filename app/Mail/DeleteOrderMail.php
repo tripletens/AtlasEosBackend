@@ -31,7 +31,6 @@ class DeleteOrderMail extends Mailable
     public function build()
     {
         $data = ['data' => $this->data];
-        return $data;
         return $this->view('mails.delete_order')->with($data);
     }
 }

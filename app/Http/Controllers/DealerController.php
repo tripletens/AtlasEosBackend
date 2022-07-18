@@ -205,6 +205,9 @@ class DealerController extends Controller
             'cart.vendor',
             $vendor
         );
+
+        // return $data->get();
+
         $check_data = $data->exists();
         $fetch_users_data = $data
             ->join('users', 'users.id', '=', 'cart.uid')
@@ -1122,6 +1125,15 @@ class DealerController extends Controller
     public function fetch_quick_order_items_user_id($user_id)
     {
         $fetch_cart_items = QuickOrder::where('uid', $user_id)
+            ->join('products', 'products.id', '=', 'quick_order.product_id')
+            ->select('products.*','quick_order.id as quick_order_id',
+                'quick_order.uid as quick_order_uid','quick_order.dealer as quick_order_dealer',
+                'quick_order.vendor as quick_order_vendor','quick_order.atlas_id as quick_order_atlas_id',
+                'quick_order.product_id as quick_order_product_id','quick_order.groupings as quick_order_groupings',
+                'quick_order.qty as quick_order_qty','quick_order.price as quick_order_price',
+                'quick_order.unit_price as quick_order_unit_price', 'quick_order.status as quick_order_status',
+                'quick_order.created_at as quick_order_created_at', 'quick_order.updated_at as quick_order_updated_at',
+                'quick_order.deleted_at as quick_order_deleted_at')
             ->orderby('id', 'desc')
             ->get();
 

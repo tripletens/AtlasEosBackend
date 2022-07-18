@@ -240,9 +240,9 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                Mail::to($dealer->email)->send(
-                    new DeleteOrderMail($fetch_users_data)
-                );
+                // Mail::to($dealer->email)->send(
+                //     new DeleteOrderMail($fetch_users_data)
+                // );
 
                 $this->result->status = true;
                 $this->result->status_code = 200;

@@ -515,6 +515,12 @@ Route::group(
             'DealerController@delete_quick_order_items_user_id'
         );
 
+        // delete all the quick order items by atlas_id
+        Route::get(
+            '/delete-quick-order-items-atlas-id/{atlas_id}',
+            'DealerController@delete_quick_order_items_atlas_id'
+        );
+
         // delete all the quick order items by dealer_id
         Route::get(
             '/delete-quick-order-items-dealer-id/{dealer_id}',

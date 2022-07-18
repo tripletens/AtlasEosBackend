@@ -1187,6 +1187,39 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    // delete quick order items by atlas_id
+    public function delete_quick_order_items_atlas_id($atlas_id)
+    {
+        $fetch_cart_items = QuickOrder::where('atlas_id', $atlas_id)
+            ->get()->first();
+
+        // return $fetch_cart_items;
+        if (!$fetch_cart_items) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch dealer's quick order items by atlas id";
+            return response()->json($this->result);
+        }
+
+        $delete_item = $fetch_cart_items->delete();
+
+        if (!$delete_item) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "Sorry we could not delete the item from the quick order";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message =
+            'All quick order items for user deleted Successfully';
+        return response()->json($this->result);
+    }
+
+
+
     // delete_quick_order_items_dealer_id
     public function delete_quick_order_items_dealer_id($dealer_id)
     {

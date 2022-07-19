@@ -986,6 +986,7 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
     }
+
     // move item to the cart from the quick order
     public function move_quick_order_to_cart(Request $request)
     {
@@ -1222,8 +1223,6 @@ class DealerController extends Controller
             'All quick order items for user deleted Successfully';
         return response()->json($this->result);
     }
-
-
 
     // delete_quick_order_items_dealer_id
     public function delete_quick_order_items_dealer_id($dealer_id)

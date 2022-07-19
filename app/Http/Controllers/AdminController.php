@@ -71,6 +71,43 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_price_override_item($dealer, $atlas_id)
+    {
+        if (
+            Cart::where('dealer', $dealer)
+                ->where('atlas_id', $atlas_id)
+                ->exists()
+        ) {
+            $cart_data = Cart::where('dealer', $dealer)
+                ->where('atlas_id', $atlas_id)
+                ->get()
+                ->first();
+
+            $pro_data = Products::where('atlas_id', $atlas_id)
+                ->get()
+                ->first();
+
+            $data = [
+                'qty' => $cart_data->qty,
+                'atlas_id' => $atlas_id,
+                'vendor' => $pro_data->vendor_code,
+                'description' => $pro_data->description,
+                'price' => $cart_data->price,
+                'dealer' => $dealer,
+            ];
+
+            $this->result->status = true;
+            $this->result->data = $data;
+            $this->result->message = 'Selected Cart Item';
+        } else {
+            $this->result->status = true;
+            $this->result->data = [];
+            $this->result->message = 'no Item found';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_atlas_notes()
     {
         $notes = ProgramNotes::where('role', '1')

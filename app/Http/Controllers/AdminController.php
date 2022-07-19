@@ -34,6 +34,8 @@ use App\Models\ProgramCountdown;
 use App\Models\ReportReply;
 use App\Models\ProgramNotes;
 
+use App\Models\PriceOverideReport;
+
 use DateTime;
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
@@ -70,6 +72,111 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function get_price_overide_report()
+    {
+        $all_report = PriceOverideReport::all();
+        $res_data = [];
+
+        if ($all_report) {
+            foreach ($all_report as $value) {
+                $user_id = $value->authorised_by;
+                $user_data = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+                $dealer_code = $value->dealer_code;
+                $vendor_code = $value->vendor_code;
+                $vendor_data = Vendors::where('vendor_code', $vendor_code)
+                    ->get()
+                    ->first();
+                $atlas_id = $value->atlas_id;
+                $product_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+                $qty = $value->qty;
+                $new_qty = $value->new_qty;
+                $regular = $value->regular;
+                $show = $value->show_price;
+                $overide_price = $value->overide_price;
+
+                $data = [
+                    'dealer_code' => $dealer_code,
+                    'vendor_name' => $vendor_data->vendor_name,
+                    'atlas_id' => $atlas_id,
+                    'vendor_product_code' => $product_data->vendor_product_code,
+                    'qty' => $qty,
+                    'new_qty' => $new_qty,
+                    'regular' => $regular,
+                    'show' => $show,
+                    'overide_price' => $overide_price,
+                    'authorized_by' =>
+                        $user_data->first_name . ' ' . $user_data->last_name,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Price overide report';
+        return response()->json($this->result);
+    }
+
+    public function save_price_override(Request $request)
+    {
+        $dealer_code = $request->dealerCode;
+        $atlas_code = $request->atlasCode;
+        $new_qty = $request->newQty;
+        $new_price = $request->newPrice;
+
+        $current_cart_data = Cart::where('dealer', $dealer_code)
+            ->where('atlas_id', $atlas_code)
+            ->get()
+            ->first();
+
+        $old_qty = $current_cart_data->qty;
+        $old_price = $current_cart_data->price;
+        $unit_price = $current_cart_data->unit_price;
+        $vendor = $current_cart_data->vendor;
+        $authorised_by = $request->authorizer;
+        $product_data = Products::where('atlas_id', $atlas_code)
+            ->get()
+            ->first();
+
+        PriceOverideReport::create([
+            'dealer_code' => $dealer_code,
+            'vendor_code' => $vendor,
+            'atlas_id' => $atlas_code,
+            'qty' => $old_qty,
+            'new_qty' => $new_qty != '' ? $new_qty : $old_qty,
+            'regular' => $product_data->regular,
+            'show_price' => $old_price,
+            'overide_price' => $new_price,
+            'authorised_by' => $authorised_by,
+        ]);
+
+        if ($new_price != '') {
+            $update = Cart::where('dealer', $dealer_code)
+                ->where('atlas_id', $atlas_code)
+                ->update([
+                    'price' => $new_price,
+                ]);
+        }
+
+        if ($new_qty != '') {
+            $update = Cart::where('dealer', $dealer_code)
+                ->where('atlas_id', $atlas_code)
+                ->update([
+                    'qty' => $new_qty,
+                ]);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Price override was Successfully';
+        return response()->json($this->result);
+    }
 
     public function get_price_override_item($dealer, $atlas_id)
     {

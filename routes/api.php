@@ -221,9 +221,19 @@ Route::group(
 
         Route::get('/admin/atlas-notes', 'AdminController@get_atlas_notes');
 
+        Route::post(
+            '/admin/save-price-override',
+            'AdminController@save_price_override'
+        );
+
         Route::get(
             '/admin/get-price-override/{dealer}/{atlas_id}',
             'AdminController@get_price_override_item'
+        );
+
+        Route::get(
+            '/admin/get-price-override-report',
+            'AdminController@get_price_overide_report'
         );
 
         Route::get('/testing', 'AdminController@testing_api');

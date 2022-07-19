@@ -507,6 +507,15 @@ Route::group(
             '/delete-quick-order-items-dealer-id/{dealer_id}',
             'DealerController@delete_quick_order_items_dealer_id'
         );
+
+        //fetch quick order items by vendor no and atlas_id
+        Route::get(
+            '/fetch-quick-order-items-atlas-id-vendor-no/{atlas_id}/{vendor_no}',
+            'DealerController@fetch_quick_order_items_atlas_id_vendor_no'
+        );
+
+
+
     }
 );
 

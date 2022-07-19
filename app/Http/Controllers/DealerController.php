@@ -1262,7 +1262,7 @@ class DealerController extends Controller
     public function fetch_quick_order_items_atlas_id_vendor_no($atlas_id,$vendor_no)
     {
         $fetch_cart_items = QuickOrder::where('atlas_id', $atlas_id)
-            ->where('uid',$user_id)
+            ->where('vendor_no',$vendor_no)
             ->get();
 
         // return $fetch_cart_items;
@@ -1274,23 +1274,12 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
 
-        foreach($fetch_cart_items as $item){
-            $delete_item =  $item->delete();
-            // $delete_item = $fetch_cart_items->delete();
-
-            if (!$delete_item) {
-                $this->result->status = true;
-                $this->result->status_code = 400;
-                $this->result->message = "Sorry we could not delete the item from the quick order";
-                return response()->json($this->result);
-            }
-        }
-
 
         $this->result->status = true;
         $this->result->status_code = 200;
+        $this->result->data = $fetch_cart_items;
         $this->result->message =
-            'All quick order items for user deleted Successfully';
+            'All quick order items with atlas id and vendor no fetched successfully';
         return response()->json($this->result);
     }
 }

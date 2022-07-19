@@ -265,4 +265,5 @@ class PromotionalFlierController extends Controller
             return response()->json($this->result);
         }
     }
+    
 }

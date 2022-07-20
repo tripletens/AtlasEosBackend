@@ -1283,4 +1283,29 @@ class DealerController extends Controller
             'All quick order items with atlas id and vendor no fetched successfully';
         return response()->json($this->result);
     }
+
+     // fetch all the cart order items by atlas_id and vendor id
+     public function fetch_order_items_atlas_id_vendor_id($atlas_id,$vendor_id)
+     {
+         $fetch_cart_items = Cart::where('atlas_id', $atlas_id)
+             ->where('vendor',$vendor_id)
+             ->get();
+
+         // return $fetch_cart_items;
+         if (!$fetch_cart_items) {
+             $this->result->status = true;
+             $this->result->status_code = 400;
+             $this->result->message =
+                 "An Error Ocurred, we couldn't fetch dealer's order items by atlas id / vendor id";
+             return response()->json($this->result);
+         }
+
+
+         $this->result->status = true;
+         $this->result->status_code = 200;
+         $this->result->data = $fetch_cart_items;
+         $this->result->message =
+             'All dealer\'s order items with atlas id and vendor id fetched successfully';
+         return response()->json($this->result);
+     }
 }

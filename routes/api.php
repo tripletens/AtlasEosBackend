@@ -564,6 +564,12 @@ Route::group(
         );
 
 
+        // fetch dealer cart order by atlas_id and vendor_id
+        Route::get(
+            '/fetch-order-items-atlas-id-vendor-id/{atlas_id}/{vendor_id}',
+            'DealerController@fetch_order_items_atlas_id_vendor_id'
+        );
+
 
     }
 );

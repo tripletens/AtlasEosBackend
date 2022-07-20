@@ -274,9 +274,9 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function delete_item_cart_atlas_id_dealer_id($dealer_id, $atlas_id)
+    public function delete_item_cart_atlas_id_dealer_id($dealer, $atlas_id)
     {
-        $data = Cart::where('cart.dealer', $dealer_id)->where(
+        $data = Cart::where('cart.dealer', $dealer)->where(
             'cart.atlas_id',
             $atlas_id
         );
@@ -318,7 +318,7 @@ class DealerController extends Controller
             ->get();
         if ($check_data) {
             $delete = Cart::where('dealer', $dealer)
-                ->where('vendor', $vendor)
+                ->where('atlas_id', $atlas_id)
                 ->delete();
             if (!$delete) {
                 $this->result->status = false;

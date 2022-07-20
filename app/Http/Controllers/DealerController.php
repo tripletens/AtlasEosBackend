@@ -599,22 +599,32 @@ class DealerController extends Controller
             // lets get the items from the array
             $product_array = $request->input('product_array');
 
+            // return gettype(json_decode($product_array));
             // return json_decode($product_array);
 
             if (count(json_decode($product_array)) > 0 && $product_array) {
                 $decode_product_array = json_decode($product_array);
 
+                // return count($decode_product_array);
+
+                $array_check = [];
+
                 foreach ($decode_product_array as $product) {
                     // update to the db
+                    array_push($array_check,Cart::where('dealer', $dealer)
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists());
                     if (
                         Cart::where('dealer', $dealer)
                         ->where('atlas_id', $product->atlas_id)
                         ->exists()
                     ) {
+
                         $this->result->status = true;
                         $this->result->status_code = 404;
                         $this->result->message = 'item has been added already';
-                        break;
+                        return response()->json($this->result);
+                        // break;
                         // $this->result->status = true;
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
@@ -645,9 +655,12 @@ class DealerController extends Controller
                         $this->result->message = 'item Added to cart';
                     }
                 }
+                
+                return response()->json($this->result);
+                // return $array_check;
             }
 
-            return response()->json($this->result);
+
         }
     }
 

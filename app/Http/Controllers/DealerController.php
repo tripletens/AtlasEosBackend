@@ -894,8 +894,26 @@ class DealerController extends Controller
     public function fetch_all_cart_items($dealer_id)
     {
         $fetch_cart_items = Cart::where('dealer', $dealer_id)
-            ->orderby('id', 'desc')
-            ->get();
+        ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+        ->join('products', 'products.id', '=', 'cart.product_id')
+        ->select(
+            'vendors.vendor_code as vendor_code',
+            'vendors.vendor_name as vendor_name',
+            'vendors.role as vendor_role',
+            'vendors.role_name as vendor_role_name',
+            'vendors.status as vendor_role_name',
+            'vendors.created_at as vendor_created_at',
+            'vendors.updated_at as vendor_updated_at',
+            'products.img as product_img',
+            'products.status as product_status',
+            'products.description as product_description',
+            'products.vendor_code as product_vendor_code',
+            'products.vendor_name as products_vendor_name',
+            'products.vendor_product_code as product_vendor_product_code',
+            'products.xref as product_xref',
+            'cart.*')
+        ->orderby('cart.id', 'desc')
+        ->get();
 
         if (!$fetch_cart_items) {
             $this->result->status = true;

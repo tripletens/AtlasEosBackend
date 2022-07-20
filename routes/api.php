@@ -331,6 +331,11 @@ Route::group(
 
         Route::post('/add-item-to-cart', 'DealerController@add_item_cart');
 
+        Route::post(
+            '/daler/save-item-to-cart',
+            'DealerController@save_item_cart'
+        );
+
         Route::get(
             '/universal-search/{search}',
             'DealerController@universal_search'

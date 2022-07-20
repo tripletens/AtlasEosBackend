@@ -57,6 +57,47 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function save_item_cart(Request $request)
+    {
+        $uid = $request->uid;
+        $dealer = $request->dealer;
+        $vendor = $request->vendor;
+        $atlas_id = $request->atlasId;
+        $pro_id = $request->proId;
+        $qty = $request->qty;
+        $unit_price = $request->uPrice;
+        $price = $request->price;
+
+        if (intval($qty) > 0) {
+            $check = Cart::where('dealer', '=', $dealer)
+                ->where('atlas_id', '=', $atlas_id)
+                ->exists();
+
+            if ($check) {
+                $create_carded_product = Cart::create([
+                    'dealer' => $dealer,
+                    'uid' => $uid,
+                    'atlas_id' => $atlas_id,
+                    'qty' => $qty,
+                    'price' => $price,
+                    'unit_price' => $unit_price,
+                    'vendor' => $vendor,
+                    'product_id' => $pro_id,
+                ]);
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Carded Product created successfully';
+            } else {
+                $this->result->status = false;
+                $this->result->status_code = 404;
+                $this->result->message = 'Item Already Added to the cart';
+            }
+
+            return response()->json($this->result);
+        }
+    }
+
     public function get_report_reply($ticket)
     {
         $selected = ReportReply::where('ticket', $ticket)->get();

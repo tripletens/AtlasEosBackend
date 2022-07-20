@@ -212,14 +212,31 @@ class DealerController extends Controller
             ->join('users', 'users.id', '=', 'cart.uid')
             ->join('products', 'products.id', '=', 'cart.product_id')
             ->select(
-                'products.description',
-                'products.img',
+                'products.img as product_img',
                 'products.status as product_status',
                 'products.description as product_description',
                 'products.vendor_code as product_vendor_code',
                 'products.vendor_name as products_vendor_name',
                 'products.vendor_product_code as product_vendor_product_code',
                 'products.xref as product_xref',
+                'products.vendor as product_vendor',
+                'products.id as product_id',
+                'products.atlas_id as product_atlas_id',
+                'products.vendor_logo as product_vendor_logo',
+                'products.um as product_um',
+                'products.regular as product_regular',
+                'products.booking as product_booking',
+                'products.special as product_special',
+                'products.cond as product_cond',
+                'products.type as product_type',
+                'products.grouping as product_grouping',
+                'products.full_desc as product_full_desc',
+                'products.spec_data as product_spec_data',
+                'products.check_new as product_check_new',
+                'products.short_note as product_short_note',
+                'products.short_note_url as product_short_note_url',
+                'products.created_at as product_created_at',
+                'products.updated_at as product_updated_at',
                 'cart.*'
             )
             ->get();
@@ -924,6 +941,24 @@ class DealerController extends Controller
             'products.vendor_name as products_vendor_name',
             'products.vendor_product_code as product_vendor_product_code',
             'products.xref as product_xref',
+            'products.vendor as product_vendor',
+            'products.id as product_id',
+            'products.atlas_id as product_atlas_id',
+            'products.vendor_logo as product_vendor_logo',
+            'products.um as product_um',
+            'products.regular as product_regular',
+            'products.booking as product_booking',
+            'products.special as product_special',
+            'products.cond as product_cond',
+            'products.type as product_type',
+            'products.grouping as product_grouping',
+            'products.full_desc as product_full_desc',
+            'products.spec_data as product_spec_data',
+            'products.check_new as product_check_new',
+            'products.short_note as product_short_note',
+            'products.short_note_url as product_short_note_url',
+            'products.created_at as product_created_at',
+            'products.updated_at as product_updated_at',
             'cart.*')
         ->orderby('cart.id', 'desc')
         ->get();

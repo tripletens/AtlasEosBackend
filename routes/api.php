@@ -294,6 +294,11 @@ Route::group(
         );
 
         Route::get(
+            '/dealer/get-vendor-products/{code}',
+            'DealerController@dealer_get_vendor_products'
+        );
+
+        Route::get(
             '/dealer/get-orders-by-vendor/{code}',
             'DealerController@get_editable_orders_by_vendor'
         );

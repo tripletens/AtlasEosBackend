@@ -677,6 +677,35 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function dealer_get_vendor_products($code)
+    {
+        if (
+            Products::where('vendor', $code)
+                ->where('status', '1')
+                ->exists()
+        ) {
+            $vendor_products = Products::where('vendor', $code)
+                ->where('status', '1')
+                ->get();
+
+            foreach ($vendor_products as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $vendor_products;
+            $this->result->message = 'all Vendor Products Data';
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+            $this->result->message = 'no product found';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_vendor_products($code)
     {
         if (
@@ -1126,14 +1155,23 @@ class DealerController extends Controller
     {
         $fetch_cart_items = QuickOrder::where('uid', $user_id)
             ->join('products', 'products.id', '=', 'quick_order.product_id')
-            ->select('products.*','quick_order.id as quick_order_id',
-                'quick_order.uid as quick_order_uid','quick_order.dealer as quick_order_dealer',
-                'quick_order.vendor as quick_order_vendor','quick_order.atlas_id as quick_order_atlas_id',
-                'quick_order.product_id as quick_order_product_id','quick_order.groupings as quick_order_groupings',
-                'quick_order.qty as quick_order_qty','quick_order.price as quick_order_price',
-                'quick_order.unit_price as quick_order_unit_price', 'quick_order.status as quick_order_status',
-                'quick_order.created_at as quick_order_created_at', 'quick_order.updated_at as quick_order_updated_at',
-                'quick_order.deleted_at as quick_order_deleted_at')
+            ->select(
+                'products.*',
+                'quick_order.id as quick_order_id',
+                'quick_order.uid as quick_order_uid',
+                'quick_order.dealer as quick_order_dealer',
+                'quick_order.vendor as quick_order_vendor',
+                'quick_order.atlas_id as quick_order_atlas_id',
+                'quick_order.product_id as quick_order_product_id',
+                'quick_order.groupings as quick_order_groupings',
+                'quick_order.qty as quick_order_qty',
+                'quick_order.price as quick_order_price',
+                'quick_order.unit_price as quick_order_unit_price',
+                'quick_order.status as quick_order_status',
+                'quick_order.created_at as quick_order_created_at',
+                'quick_order.updated_at as quick_order_updated_at',
+                'quick_order.deleted_at as quick_order_deleted_at'
+            )
             ->orderby('id', 'desc')
             ->get();
 
@@ -1172,12 +1210,12 @@ class DealerController extends Controller
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
-                "Sorry no quick order items found for user";
+                'Sorry no quick order items found for user';
             return response()->json($this->result);
         }
 
-        foreach($fetch_cart_items as $item){
-            $delete_item =  $item->delete();
+        foreach ($fetch_cart_items as $item) {
+            $delete_item = $item->delete();
         }
 
         $this->result->status = true;
@@ -1188,10 +1226,10 @@ class DealerController extends Controller
     }
 
     // delete quick order items by atlas_id
-    public function delete_quick_order_items_atlas_id($user_id,$atlas_id)
+    public function delete_quick_order_items_atlas_id($user_id, $atlas_id)
     {
         $fetch_cart_items = QuickOrder::where('atlas_id', $atlas_id)
-            ->where('uid',$user_id)
+            ->where('uid', $user_id)
             ->get();
 
         // return $fetch_cart_items;
@@ -1203,18 +1241,18 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
 
-        foreach($fetch_cart_items as $item){
-            $delete_item =  $item->delete();
+        foreach ($fetch_cart_items as $item) {
+            $delete_item = $item->delete();
             // $delete_item = $fetch_cart_items->delete();
 
             if (!$delete_item) {
                 $this->result->status = true;
                 $this->result->status_code = 400;
-                $this->result->message = "Sorry we could not delete the item from the quick order";
+                $this->result->message =
+                    'Sorry we could not delete the item from the quick order';
                 return response()->json($this->result);
             }
         }
-
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -1222,8 +1260,6 @@ class DealerController extends Controller
             'All quick order items for user deleted Successfully';
         return response()->json($this->result);
     }
-
-
 
     // delete_quick_order_items_dealer_id
     public function delete_quick_order_items_dealer_id($dealer_id)
@@ -1244,12 +1280,12 @@ class DealerController extends Controller
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
-                "Sorry no quick order items found for dealer";
+                'Sorry no quick order items found for dealer';
             return response()->json($this->result);
         }
 
-        foreach($fetch_cart_items as $item){
-            $delete_item =  $item->delete();
+        foreach ($fetch_cart_items as $item) {
+            $delete_item = $item->delete();
         }
 
         $this->result->status = true;

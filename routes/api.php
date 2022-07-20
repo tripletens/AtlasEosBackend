@@ -274,6 +274,12 @@ Route::group(
             'DealerController@delete_item_cart'
         );
 
+        // delete cart item by atlas_id and dealer_id
+        Route::get(
+            '/dealer/delete-item-cart/{dealer_id}/{atlas_id}',
+            'DealerController@delete_item_cart_atlas_id_dealer_id'
+        );
+
         Route::post(
             '/dealer/edit-cart-order',
             'DealerController@edit_dealer_order'

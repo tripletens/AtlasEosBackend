@@ -274,6 +274,82 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function delete_item_cart_atlas_id_dealer_id($dealer_id, $atlas_id)
+    {
+        $data = Cart::where('cart.dealer', $dealer_id)->where(
+            'cart.atlas_id',
+            $atlas_id
+        );
+
+        // return $data->get();
+
+        $check_data = $data->exists();
+        $fetch_users_data = $data
+            ->join('users', 'users.id', '=', 'cart.uid')
+            ->join('products', 'products.id', '=', 'cart.product_id')
+            ->select(
+                'products.img as product_img',
+                'products.status as product_status',
+                'products.description as product_description',
+                'products.vendor_code as product_vendor_code',
+                'products.vendor_name as products_vendor_name',
+                'products.vendor_product_code as product_vendor_product_code',
+                'products.xref as product_xref',
+                'products.vendor as product_vendor',
+                'products.id as product_id',
+                'products.atlas_id as product_atlas_id',
+                'products.vendor_logo as product_vendor_logo',
+                'products.um as product_um',
+                'products.regular as product_regular',
+                'products.booking as product_booking',
+                'products.special as product_special',
+                'products.cond as product_cond',
+                'products.type as product_type',
+                'products.grouping as product_grouping',
+                'products.full_desc as product_full_desc',
+                'products.spec_data as product_spec_data',
+                'products.check_new as product_check_new',
+                'products.short_note as product_short_note',
+                'products.short_note_url as product_short_note_url',
+                'products.created_at as product_created_at',
+                'products.updated_at as product_updated_at',
+                'cart.*'
+            )
+            ->get();
+        if ($check_data) {
+            $delete = Cart::where('dealer', $dealer)
+                ->where('vendor', $vendor)
+                ->delete();
+            if (!$delete) {
+                $this->result->status = false;
+                $this->result->status_code = 500;
+                $this->result->message =
+                    'sorry we could not delete this item to cart';
+            } else {
+                // get the dealer details
+                $dealer = User::where('role', 4)
+                    ->where('id', $dealer)
+                    ->get()
+                    ->first();
+
+                // Mail::to($dealer->email)->send(
+                //     new DeleteOrderMail($fetch_users_data)
+                // );
+
+                $this->result->status = true;
+                $this->result->data = $fetch_users_data;
+                $this->result->status_code = 200;
+                $this->result->message = 'Item deleted successfully';
+            }
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'vendor items not found';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_ordered_vendor($code)
     {
         $dealer_cart = Cart::where('dealer', $code)->get();
@@ -628,7 +704,7 @@ class DealerController extends Controller
 
                 foreach ($decode_product_array as $product) {
                     // update to the db
-                    array_push($array_check,Cart::where('dealer', $dealer)
+                    array_push($array_check, Cart::where('dealer', $dealer)
                         ->where('atlas_id', $product->atlas_id)
                         ->exists());
                     if (
@@ -676,8 +752,6 @@ class DealerController extends Controller
                 return response()->json($this->result);
                 // return $array_check;
             }
-
-
         }
     }
 
@@ -924,44 +998,45 @@ class DealerController extends Controller
     public function fetch_all_cart_items($dealer_id)
     {
         $fetch_cart_items = Cart::where('dealer', $dealer_id)
-        ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
-        ->join('products', 'products.id', '=', 'cart.product_id')
-        ->select(
-            'vendors.vendor_code as vendor_code',
-            'vendors.vendor_name as vendor_name',
-            'vendors.role as vendor_role',
-            'vendors.role_name as vendor_role_name',
-            'vendors.status as vendor_role_name',
-            'vendors.created_at as vendor_created_at',
-            'vendors.updated_at as vendor_updated_at',
-            'products.img as product_img',
-            'products.status as product_status',
-            'products.description as product_description',
-            'products.vendor_code as product_vendor_code',
-            'products.vendor_name as products_vendor_name',
-            'products.vendor_product_code as product_vendor_product_code',
-            'products.xref as product_xref',
-            'products.vendor as product_vendor',
-            'products.id as product_id',
-            'products.atlas_id as product_atlas_id',
-            'products.vendor_logo as product_vendor_logo',
-            'products.um as product_um',
-            'products.regular as product_regular',
-            'products.booking as product_booking',
-            'products.special as product_special',
-            'products.cond as product_cond',
-            'products.type as product_type',
-            'products.grouping as product_grouping',
-            'products.full_desc as product_full_desc',
-            'products.spec_data as product_spec_data',
-            'products.check_new as product_check_new',
-            'products.short_note as product_short_note',
-            'products.short_note_url as product_short_note_url',
-            'products.created_at as product_created_at',
-            'products.updated_at as product_updated_at',
-            'cart.*')
-        ->orderby('cart.id', 'desc')
-        ->get();
+            ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+            ->join('products', 'products.id', '=', 'cart.product_id')
+            ->select(
+                'vendors.vendor_code as vendor_code',
+                'vendors.vendor_name as vendor_name',
+                'vendors.role as vendor_role',
+                'vendors.role_name as vendor_role_name',
+                'vendors.status as vendor_role_name',
+                'vendors.created_at as vendor_created_at',
+                'vendors.updated_at as vendor_updated_at',
+                'products.img as product_img',
+                'products.status as product_status',
+                'products.description as product_description',
+                'products.vendor_code as product_vendor_code',
+                'products.vendor_name as products_vendor_name',
+                'products.vendor_product_code as product_vendor_product_code',
+                'products.xref as product_xref',
+                'products.vendor as product_vendor',
+                'products.id as product_id',
+                'products.atlas_id as product_atlas_id',
+                'products.vendor_logo as product_vendor_logo',
+                'products.um as product_um',
+                'products.regular as product_regular',
+                'products.booking as product_booking',
+                'products.special as product_special',
+                'products.cond as product_cond',
+                'products.type as product_type',
+                'products.grouping as product_grouping',
+                'products.full_desc as product_full_desc',
+                'products.spec_data as product_spec_data',
+                'products.check_new as product_check_new',
+                'products.short_note as product_short_note',
+                'products.short_note_url as product_short_note_url',
+                'products.created_at as product_created_at',
+                'products.updated_at as product_updated_at',
+                'cart.*'
+            )
+            ->orderby('cart.id', 'desc')
+            ->get();
 
         if (!$fetch_cart_items) {
             $this->result->status = true;

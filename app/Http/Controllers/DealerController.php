@@ -630,6 +630,7 @@ class DealerController extends Controller
                             'qty' => $product->qty,
                             'price' => $product->price,
                             'unit_price' => $product->unit_price,
+                            'type' => $product->type,
                         ]);
 
                         if (!$save) {
@@ -968,6 +969,7 @@ class DealerController extends Controller
                             'price' => $product->price,
                             'unit_price' => $product->unit_price,
                             'vendor_no' => $product->vendor_no,
+                            'type' => $product->type,
                         ]);
 
                         if (!$save) {

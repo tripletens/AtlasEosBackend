@@ -310,7 +310,7 @@ Route::group(
 
         // delete cart item by atlas_id and dealer_id
         Route::get(
-            '/dealer/delete-item-cart/{dealer_id}/{atlas_id}',
+            '/dealer/delete-item-cart-dealer-id-atlas-id/{dealer_id}/{atlas_id}',
             'DealerController@delete_item_cart_atlas_id_dealer_id'
         );
 

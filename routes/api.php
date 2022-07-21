@@ -586,7 +586,11 @@ Route::group(
             'DealerController@fetch_order_items_atlas_id_vendor_id'
         );
 
-
+        // delete order by atlas id and user_id
+        Route::get(
+            '/delete-order-items-atlas-id-user-id/{atlas_id}/{user_id}',
+            'DealerController@delete_order_items_atlas_id_user_id'
+        );
     }
 );
 

@@ -1605,4 +1605,40 @@ class DealerController extends Controller
             'All dealer\'s order items with atlas id and vendor id fetched successfully';
         return response()->json($this->result);
     }
+
+    // delete quick order items by atlas_id
+    public function delete_order_items_atlas_id_user_id($atlas_id,$user_id)
+    {
+        // return $user_id . " => " . $atlas_id;
+
+        $fetch_cart_items = Cart::where('atlas_id', $atlas_id)
+        ->where('uid', $user_id)->get();
+
+        if (!$fetch_cart_items) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch dealer's order items by atlas id and user id";
+            return response()->json($this->result);
+        }
+
+        foreach ($fetch_cart_items as $item) {
+            $delete_item =  $item->delete();
+            // $delete_item = $fetch_cart_items->delete();
+
+            if (!$delete_item) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+
+                $this->result->data = $item;
+                $this->result->message = "Sorry we could not delete the item from the order";
+                return response()->json($this->result);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All order items for user deleted Successfully';
+        return response()->json($this->result);
+    }
 }

@@ -532,6 +532,18 @@ Route::group(
             '/delete-order-items-atlas-id-user-id/{atlas_id}/{user_id}',
             'DealerController@delete_order_items_atlas_id_user_id'
         );
+
+        //------------------- special orders starts here ---------------- //
+
+        // add a special order item
+        Route::post(
+            '/special-orders/add',
+            'SpecialOrderController@add_special_orders'
+        );
+
+        //------------------- special orders ends here ------------------ //
+
+
     }
 );
 

@@ -37,6 +37,8 @@ use App\Models\User;
 use App\Models\ReportReply;
 use App\Models\ProgramNotes;
 
+use App\Models\DealerQuickOrder;
+
 class DealerController extends Controller
 {
     public function __construct()
@@ -55,6 +57,116 @@ class DealerController extends Controller
     public function login()
     {
         echo 'login page setup';
+    }
+
+    // adds item to the quick order table
+    public function submit_quick_order(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        Cart::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        $this->result->status = true;
+                        $this->result->status_code = 404;
+                        $this->result->message = 'item has been added already';
+                        return response()->json($this->result);
+                    } else {
+                        if (
+                            DealerQuickOrder::where('dealer', $dealer)
+                                ->where('atlas_id', $product->atlas_id)
+                                ->exists()
+                        ) {
+                            $this->result->status = true;
+                            $this->result->status_code = 404;
+                            $this->result->message =
+                                'item has been added already';
+                            return response()->json($this->result);
+                        } else {
+                            $save = QuickOrder::create([
+                                'uid' => $uid,
+                                'atlas_id' => $product->atlas_id,
+                                'dealer' => $dealer,
+                                'groupings' => $product->groupings,
+                                'vendor' => $product->vendor_id,
+                                'product_id' => $product->product_id,
+                                'qty' => $product->qty,
+                                'price' => $product->price,
+                                'unit_price' => $product->unit_price,
+                                'vendor_no' => $product->vendor_no,
+                                'type' => $product->type,
+                            ]);
+                            $this->result->status = true;
+                            $this->result->status_code = 200;
+                            $this->result->message = 'item Added to cart';
+                        }
+                    }
+                }
+            }
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_fetch_by_vendor_atlas($code)
+    {
+        $filtered_item = Products::orWhere('atlas_id', $code)
+            ->orWhere('vendor_product_code', $code)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($filtered_item) {
+            $filtered_item->spec_data = json_decode($filtered_item->spec_data);
+            $vendor = $filtered_item->vendor_code;
+            $vendor_data = Vendors::where('vendor_code', $vendor)
+                ->get()
+                ->first();
+            if ($vendor_data) {
+                $filtered_item->vendor_data = $vendor_data;
+            }
+
+            array_push($data, $filtered_item);
+
+            $check_assorted = $filtered_item->grouping != null ? true : false;
+            $this->result->data->assorted = $check_assorted;
+        } else {
+            $filtered_item = [];
+        }
+
+        $this->result->status = true;
+        $this->result->data->filtered_data = $data;
+        $this->result->message = 'filtered data';
+        return response()->json($this->result);
     }
 
     public function save_item_cart(Request $request)

@@ -254,6 +254,11 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::post(
+            '/dealer/submit-quick-order',
+            'DealerController@submit_quick_order'
+        );
+
+        Route::post(
             '/dealer/save-dealer-reply',
             'DealerController@save_dealer_reply_problem'
         );
@@ -334,6 +339,11 @@ Route::group(
         Route::post(
             '/dealer/save-item-to-cart',
             'DealerController@save_item_cart'
+        );
+
+        Route::get(
+            '/dealer/get-item-by-atlas-vendor-code/{code}',
+            'DealerController@get_fetch_by_vendor_atlas'
         );
 
         Route::get(

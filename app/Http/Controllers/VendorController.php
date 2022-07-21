@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Vendors;
 use App\Models\Users;
@@ -10,6 +11,7 @@ use App\Models\Products;
 use App\Models\Cart;
 use App\Models\Dealer;
 use App\Models\Faq;
+use App\Models\ProgramNotes;
 
 class VendorController extends Controller
 {
@@ -26,6 +28,234 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function get_vendor_note($dealer, $vendor)
+    {
+        $altas_notes = ProgramNotes::where('dealer_code', $dealer)
+            ->where('vendor_code', $vendor)
+            ->where('role', '3')
+            ->get();
+        $res_data = [];
+        if ($altas_notes) {
+            foreach ($altas_notes as $value) {
+                $user = $value->dealer_uid;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'note' => $value->notes,
+                    'rep_name' =>
+                        $user_data->first_name . ' ' . $user_data->last_name,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor Notes';
+        $this->result->data = $res_data;
+
+        return response()->json($this->result);
+    }
+
+    public function get_atlas_note($dealer, $vendor)
+    {
+        $altas_notes = ProgramNotes::where('dealer_code', $dealer)
+            ->where('vendor_code', $vendor)
+            ->where('role', '1')
+            ->get();
+        $res_data = [];
+        if ($altas_notes) {
+            foreach ($altas_notes as $value) {
+                $user = $value->dealer_uid;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'note' => $value->notes,
+                    'rep_name' =>
+                        $user_data->first_name . ' ' . $user_data->last_name,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Atlas Notes  ';
+        $this->result->data = $res_data;
+
+        return response()->json($this->result);
+    }
+
+    public function get_privileged_dealers($code)
+    {
+        $dealers = Users::where('role', '4')->get();
+
+        $access_dealers = [];
+
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $privileged_vendors = $value->privileged_vendors;
+
+                if ($privileged_vendors != '') {
+                    $expand = explode(',', $privileged_vendors);
+
+                    if (in_array($code, $expand)) {
+                        $account_id = $value->account_id;
+                        $dealer_data = Dealer::where('dealer_code', $account_id)
+                            ->get()
+                            ->first();
+
+                        if ($dealer_data) {
+                            array_push($access_dealers, $dealer_data);
+                        }
+                    }
+                }
+            }
+        }
+
+        $access_dealers = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $access_dealers))
+        );
+
+        $filter_array = [];
+
+        foreach ($access_dealers as $value) {
+            array_push($filter_array, $value);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'privileged dealers ';
+        $this->result->data = $filter_array;
+
+        return response()->json($this->result);
+    }
+
+    public function save_atlas_notes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorCode' => 'required',
+            'vendorRepName' => 'required',
+            'vendorUid' => 'required',
+            'dealerCode' => 'required',
+            'dealerRepName' => 'required',
+            'dealerUid' => 'required',
+            'notes' => 'required',
+            'role' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $vendor_code = $request->vendorCode;
+            $vendor_repname = $request->vendorRepName;
+            $role = $request->role;
+            $notes = $request->notes;
+            $dealer_code = $request->dealerCode;
+            $dealer_rep = $request->dealerRepName;
+
+            $dealer_uid = $request->dealerUid;
+            $vendor_uid = $request->vendorUid;
+
+            $save_note = ProgramNotes::create([
+                'vendor_code' => $vendor_code,
+                'vendor_rep' => $vendor_repname,
+                'role' => $role,
+                'dealer_code' => $dealer_code,
+                'dealer_rep' => $dealer_rep,
+                'notes' => $notes,
+                'dealer_uid' => $dealer_uid,
+                'vendor_uid' => $vendor_uid,
+            ]);
+
+            if (!$save_note) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry Note was not saved. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Atlas Note saved Successfully';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function save_vendor_notes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorCode' => 'required',
+            'vendorRepName' => 'required',
+            'vendorUid' => 'required',
+            'dealerCode' => 'required',
+            'dealerRepName' => 'required',
+            'dealerUid' => 'required',
+            'notes' => 'required',
+            'role' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $vendor_code = $request->vendorCode;
+            $vendor_repname = $request->vendorRepName;
+            $role = $request->role;
+            $notes = $request->notes;
+            $dealer_code = $request->dealerCode;
+            $dealer_rep = $request->dealerRepName;
+
+            $dealer_uid = $request->dealerUid;
+            $vendor_uid = $request->vendorUid;
+
+            $save_note = ProgramNotes::create([
+                'vendor_code' => $vendor_code,
+                'vendor_rep' => $vendor_repname,
+                'role' => $role,
+                'dealer_code' => $dealer_code,
+                'dealer_rep' => $dealer_rep,
+                'notes' => $notes,
+                'dealer_uid' => $dealer_uid,
+                'vendor_uid' => $vendor_uid,
+            ]);
+
+            if (!$save_note) {
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message =
+                    'Sorry Note was not saved. Try again later.';
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor Note saved Successfully';
+
+            return response()->json($this->result);
+        }
     }
 
     public function get_vendor_faq()
@@ -230,6 +460,56 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
+    public function view_dealer_summary($user, $dealer, $vendor)
+    {
+        $dealer_cart = Cart::where('uid', $user)
+            ->where('vendor', $vendor)
+            ->get();
+
+        $res_data = [];
+
+        $vendor_data = Vendors::where('vendor_code', $vendor)
+            ->get()
+            ->first();
+        $dealer_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        if ($dealer_cart) {
+            foreach ($dealer_cart as $value) {
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'dealer_rep_name' =>
+                        $dealer_data->first_name .
+                        ' ' .
+                        $dealer_data->last_name,
+                    'user_id' => $user,
+                    'qty' => $value->qty,
+                    'atlas_id' => $atlas_id,
+                    'vendor_product_code' => $pro_data->vendor_product_code,
+                    'special' => $pro_data->booking,
+                    'desc' => $pro_data->description,
+                    'total' => $value->price,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'View Dealer Summary';
+        $this->result->data->summary = $res_data;
+        $this->result->data->vendor = $vendor_data;
+        $this->result->data->dealer = $dealer_data;
+
+        return response()->json($this->result);
+    }
+
     public function get_purchases_dealers($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)->get();
@@ -248,6 +528,8 @@ class VendorController extends Controller
             $data = [
                 'account_id' => $user->account_id,
                 'dealer_name' => $user->company_name,
+                'user' => $user_id,
+                'vendor_code' => $code,
                 'purchaser_name' => $user->first_name . ' ' . $user->last_name,
                 'amount' => $value->price,
             ];

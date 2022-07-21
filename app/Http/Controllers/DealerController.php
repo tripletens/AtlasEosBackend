@@ -35,6 +35,7 @@ use App\Models\Chat;
 use App\Models\QuickOrder;
 use App\Models\User;
 use App\Models\ReportReply;
+use App\Models\ProgramNotes;
 
 class DealerController extends Controller
 {
@@ -54,6 +55,87 @@ class DealerController extends Controller
     public function login()
     {
         echo 'login page setup';
+    }
+
+    public function save_item_cart(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+
+            $item_already_added = 0;
+            $item_added = 0;
+            $item_details = '';
+
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        Cart::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        $item_already_added += 1;
+                        $item_details .= $product->atlas_id . ',';
+                        // break;
+                        /// break;
+                        // $this->result->status = true;
+                        // $this->result->status_code = 404;
+                        // $this->result->message = 'item has been added already';
+                    } else {
+                        $save = Cart::create([
+                            'uid' => $uid,
+                            'atlas_id' => $product->atlas_id,
+                            'dealer' => $dealer,
+                            'groupings' => $product->groupings,
+                            'vendor' => $product->vendor_id,
+                            'product_id' => $product->product_id,
+                            'qty' => $product->qty,
+                            'price' => $product->price,
+                            'unit_price' => $product->unit_price,
+                            'type' => $product->type,
+                        ]);
+
+                        if ($save) {
+                            $item_added += 1;
+                        }
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Added to cart';
+            $this->result->data->item_added = $item_added;
+            $this->result->data->item_already_added = $item_already_added;
+
+            $this->result->data->item_details = $item_details;
+
+            return response()->json($this->result);
+            // return $array_check;
+        }
     }
 
     public function get_report_reply($ticket)
@@ -680,7 +762,6 @@ class DealerController extends Controller
             // process the request
             $uid = $request->uid;
             $atlas_id = $request->atlas_id;
-
             $dealer = $request->dealer;
             $vendor = $request->vendor;
 
@@ -704,20 +785,23 @@ class DealerController extends Controller
 
                 foreach ($decode_product_array as $product) {
                     // update to the db
-                    array_push($array_check, Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists());
+                    array_push(
+                        $array_check,
+                        Cart::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    );
                     if (
                         Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                     ) {
-
                         $this->result->status = true;
                         $this->result->status_code = 404;
                         $this->result->message = 'item has been added already';
                         return response()->json($this->result);
                         // break;
+                        /// break;
                         // $this->result->status = true;
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
@@ -782,12 +866,41 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function dealer_get_vendor_products($code)
+    {
+        if (
+            Products::where('vendor', $code)
+                ->where('status', '1')
+                ->exists()
+        ) {
+            $vendor_products = Products::where('vendor', $code)
+                ->where('status', '1')
+                ->get();
+
+            foreach ($vendor_products as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $vendor_products;
+            $this->result->message = 'all Vendor Products Data';
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+            $this->result->message = 'no product found';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_vendor_products($code)
     {
         if (
             Products::where('vendor', $code)
-            ->where('status', '1')
-            ->exists()
+                ->where('status', '1')
+                ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -1090,8 +1203,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         QuickOrder::where('dealer', $dealer)
-                        ->where('atlas_id', $product->atlas_id)
-                        ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -1194,8 +1307,8 @@ class DealerController extends Controller
 
                 if (
                     Cart::where('dealer', $dealer)
-                    ->where('atlas_id', $atlas_id)
-                    ->exists()
+                        ->where('atlas_id', $atlas_id)
+                        ->exists()
                 ) {
                     $this->result->status = true;
                     $this->result->status_code = 404;
@@ -1326,12 +1439,12 @@ class DealerController extends Controller
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
-                "Sorry no quick order items found for user";
+                'Sorry no quick order items found for user';
             return response()->json($this->result);
         }
 
         foreach ($fetch_cart_items as $item) {
-            $delete_item =  $item->delete();
+            $delete_item = $item->delete();
         }
 
         $this->result->status = true;
@@ -1358,17 +1471,17 @@ class DealerController extends Controller
         }
 
         foreach ($fetch_cart_items as $item) {
-            $delete_item =  $item->delete();
+            $delete_item = $item->delete();
             // $delete_item = $fetch_cart_items->delete();
 
             if (!$delete_item) {
                 $this->result->status = true;
                 $this->result->status_code = 400;
-                $this->result->message = "Sorry we could not delete the item from the quick order";
+                $this->result->message =
+                    'Sorry we could not delete the item from the quick order';
                 return response()->json($this->result);
             }
         }
-
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -1396,12 +1509,12 @@ class DealerController extends Controller
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
-                "Sorry no quick order items found for dealer";
+                'Sorry no quick order items found for dealer';
             return response()->json($this->result);
         }
 
         foreach ($fetch_cart_items as $item) {
-            $delete_item =  $item->delete();
+            $delete_item = $item->delete();
         }
 
         $this->result->status = true;
@@ -1412,10 +1525,10 @@ class DealerController extends Controller
     }
 
     // fetch all the quick order items by atlas_id and vendor no
+
     public function fetch_quick_order_items_atlas_id_vendor_no($atlas_id, $vendor_no)
     {
         // return $atlas_id .  " => " . $vendor_no;
-
         $fetch_cart_items = QuickOrder::where('quick_order.atlas_id', $atlas_id)
             ->where('quick_order.vendor_no', $vendor_no)
             ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')
@@ -1465,7 +1578,6 @@ class DealerController extends Controller
                 "An Error Ocurred, we couldn't fetch dealer's quick order items by atlas id";
             return response()->json($this->result);
         }
-
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -1528,7 +1640,6 @@ class DealerController extends Controller
             return response()->json($this->result);
         }
 
-
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $fetch_cart_items;
@@ -1538,12 +1649,13 @@ class DealerController extends Controller
     }
 
     // delete quick order items by atlas_id
-    public function delete_order_items_atlas_id_user_id($atlas_id,$user_id)
+    public function delete_order_items_atlas_id_user_id($atlas_id, $user_id)
     {
         // return $user_id . " => " . $atlas_id;
 
         $fetch_cart_items = Cart::where('atlas_id', $atlas_id)
-        ->where('uid', $user_id)->get();
+            ->where('uid', $user_id)
+            ->get();
 
         if (!$fetch_cart_items) {
             $this->result->status = true;
@@ -1554,7 +1666,7 @@ class DealerController extends Controller
         }
 
         foreach ($fetch_cart_items as $item) {
-            $delete_item =  $item->delete();
+            $delete_item = $item->delete();
             // $delete_item = $fetch_cart_items->delete();
 
             if (!$delete_item) {
@@ -1562,14 +1674,16 @@ class DealerController extends Controller
                 $this->result->status_code = 400;
 
                 $this->result->data = $item;
-                $this->result->message = "Sorry we could not delete the item from the order";
+                $this->result->message =
+                    'Sorry we could not delete the item from the order';
                 return response()->json($this->result);
             }
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'All order items for user deleted Successfully';
+        $this->result->message =
+            'All order items for user deleted Successfully';
         return response()->json($this->result);
     }
 }

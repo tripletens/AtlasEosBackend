@@ -605,6 +605,12 @@ Route::group(
             'SpecialOrderController@edit_special_orders'
         );
 
+        // delete special order
+        Route::get(
+            '/special-orders/delete/{id}',
+            'SpecialOrderController@delete_special_order'
+        );
+
         //------------------- special orders ends here ------------------ //
 
 

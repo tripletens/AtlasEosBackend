@@ -188,7 +188,7 @@ class SeminarController extends Controller
         // `current_seminar_status`, `status`,
         $validator = Validator::make($request->all(), [
             'seminar_id' => 'required|integer',
-            'dealer_id' => 'required|integer',
+            'dealer_id' => 'required',
             'bookmark_status' => 'required|integer',
             'current_seminar_status' => 'required|integer'
         ]);

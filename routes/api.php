@@ -332,7 +332,7 @@ Route::group(
         Route::post('/add-item-to-cart', 'DealerController@add_item_cart');
 
         Route::post(
-            '/daler/save-item-to-cart',
+            '/dealer/save-item-to-cart',
             'DealerController@save_item_cart'
         );
 
@@ -578,7 +578,6 @@ Route::group(
             '/fetch-quick-order-items-atlas-id-vendor-no/{atlas_id}/{vendor_no}',
             'DealerController@fetch_quick_order_items_atlas_id_vendor_no'
         );
-
 
         // fetch dealer cart order by atlas_id and vendor_id
         Route::get(

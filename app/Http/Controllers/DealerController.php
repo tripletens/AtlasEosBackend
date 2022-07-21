@@ -59,42 +59,84 @@ class DealerController extends Controller
 
     public function save_item_cart(Request $request)
     {
-        $uid = $request->uid;
-        $dealer = $request->dealer;
-        $vendor = $request->vendor;
-        $atlas_id = $request->atlasId;
-        $pro_id = $request->proId;
-        $qty = $request->qty;
-        $unit_price = $request->uPrice;
-        $price = $request->price;
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
 
-        if (intval($qty) > 0) {
-            $check = Cart::where('dealer', '=', $dealer)
-                ->where('atlas_id', '=', $atlas_id)
-                ->exists();
-
-            if ($check) {
-                $create_carded_product = Cart::create([
-                    'dealer' => $dealer,
-                    'uid' => $uid,
-                    'atlas_id' => $atlas_id,
-                    'qty' => $qty,
-                    'price' => $price,
-                    'unit_price' => $unit_price,
-                    'vendor' => $vendor,
-                    'product_id' => $pro_id,
-                ]);
-
-                $this->result->status = true;
-                $this->result->status_code = 200;
-                $this->result->message = 'Carded Product created successfully';
-            } else {
-                $this->result->status = false;
-                $this->result->status_code = 404;
-                $this->result->message = 'Item Already Added to the cart';
-            }
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
 
             return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+
+            $item_already_added = 0;
+            $item_added = 0;
+            $item_details = ''
+
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        Cart::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        $item_already_added += 1;
+                        $item_details. $product->atlas_id . ',';
+                        // break;
+                        /// break;
+                        // $this->result->status = true;
+                        // $this->result->status_code = 404;
+                        // $this->result->message = 'item has been added already';
+                    } else {
+                        $save = Cart::create([
+                            'uid' => $uid,
+                            'atlas_id' => $product->atlas_id,
+                            'dealer' => $dealer,
+                            'groupings' => $product->groupings,
+                            'vendor' => $product->vendor_id,
+                            'product_id' => $product->product_id,
+                            'qty' => $product->qty,
+                            'price' => $product->price,
+                            'unit_price' => $product->unit_price,
+                            'type' => $product->type,
+                        ]);
+
+                        if ($save) {
+                            $item_added += 1;
+                        }
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Added to cart';
+            $this->result->data->item_added = $item_added;
+            $this->result->data->item_already_added = $item_already_added;
+
+            $this->result->data->item_details = $item_details;
+
+
+            
+            return response()->json($this->result);
+            // return $array_check;
         }
     }
 

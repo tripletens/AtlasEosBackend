@@ -722,7 +722,6 @@ class DealerController extends Controller
             // process the request
             $uid = $request->uid;
             $atlas_id = $request->atlas_id;
-
             $dealer = $request->dealer;
             $vendor = $request->vendor;
 
@@ -762,6 +761,7 @@ class DealerController extends Controller
                         $this->result->message = 'item has been added already';
                         return response()->json($this->result);
                         // break;
+                        /// break;
                         // $this->result->status = true;
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
@@ -1485,8 +1485,10 @@ class DealerController extends Controller
     }
 
     // fetch all the quick order items by atlas_id and vendor no
-    public function fetch_quick_order_items_atlas_id_vendor_no($atlas_id, $vendor_no)
-    {
+    public function fetch_quick_order_items_atlas_id_vendor_no(
+        $atlas_id,
+        $vendor_no
+    ) {
         $fetch_cart_items = QuickOrder::where('quick_order.atlas_id', $atlas_id)
             ->where('quick_order.vendor_no', $vendor_no)
             ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')
@@ -1607,12 +1609,13 @@ class DealerController extends Controller
     }
 
     // delete quick order items by atlas_id
-    public function delete_order_items_atlas_id_user_id($atlas_id,$user_id)
+    public function delete_order_items_atlas_id_user_id($atlas_id, $user_id)
     {
         // return $user_id . " => " . $atlas_id;
 
         $fetch_cart_items = Cart::where('atlas_id', $atlas_id)
-        ->where('uid', $user_id)->get();
+            ->where('uid', $user_id)
+            ->get();
 
         if (!$fetch_cart_items) {
             $this->result->status = true;
@@ -1623,7 +1626,7 @@ class DealerController extends Controller
         }
 
         foreach ($fetch_cart_items as $item) {
-            $delete_item =  $item->delete();
+            $delete_item = $item->delete();
             // $delete_item = $fetch_cart_items->delete();
 
             if (!$delete_item) {
@@ -1631,14 +1634,16 @@ class DealerController extends Controller
                 $this->result->status_code = 400;
 
                 $this->result->data = $item;
-                $this->result->message = "Sorry we could not delete the item from the order";
+                $this->result->message =
+                    'Sorry we could not delete the item from the order';
                 return response()->json($this->result);
             }
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'All order items for user deleted Successfully';
+        $this->result->message =
+            'All order items for user deleted Successfully';
         return response()->json($this->result);
     }
 }

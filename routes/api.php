@@ -599,6 +599,12 @@ Route::group(
             'SpecialOrderController@add_special_orders'
         );
 
+        // edit special orders
+        Route::post(
+            '/special-orders/edit',
+            'SpecialOrderController@edit_special_orders'
+        );
+
         //------------------- special orders ends here ------------------ //
 
 

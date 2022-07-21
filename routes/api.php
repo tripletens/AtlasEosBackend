@@ -217,6 +217,25 @@ Route::group(
             'AdminController@get_report_reply'
         );
 
+        Route::get('/admin/vendor-notes', 'AdminController@get_vendor_notes');
+
+        Route::get('/admin/atlas-notes', 'AdminController@get_atlas_notes');
+
+        Route::post(
+            '/admin/save-price-override',
+            'AdminController@save_price_override'
+        );
+
+        Route::get(
+            '/admin/get-price-override/{dealer}/{atlas_id}',
+            'AdminController@get_price_override_item'
+        );
+
+        Route::get(
+            '/admin/get-price-override-report',
+            'AdminController@get_price_overide_report'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -239,6 +258,21 @@ Route::group(
             'DealerController@save_dealer_reply_problem'
         );
 
+        Route::post(
+            '/vendor/save-vendor-notes',
+            'VendorController@save_vendor_notes'
+        );
+
+        Route::get(
+            '/vendor/get-privileged-dealers/{code}',
+            'VendorController@get_privileged_dealers'
+        );
+
+        Route::post(
+            '/vendor/save-atlas-notes',
+            'VendorController@save_atlas_notes'
+        );
+
         Route::get(
             '/dealer/get-problem-ticket/{ticket}',
             'DealerController@get_problem_dealer'
@@ -257,6 +291,11 @@ Route::group(
         Route::get(
             '/get-vendor-products/{code}',
             'DealerController@get_vendor_products'
+        );
+
+        Route::get(
+            '/dealer/get-vendor-products/{code}',
+            'DealerController@dealer_get_vendor_products'
         );
 
         Route::get(
@@ -291,6 +330,11 @@ Route::group(
         );
 
         Route::post('/add-item-to-cart', 'DealerController@add_item_cart');
+
+        Route::post(
+            '/daler/save-item-to-cart',
+            'DealerController@save_item_cart'
+        );
 
         Route::get(
             '/universal-search/{search}',
@@ -465,6 +509,21 @@ Route::group(
         Route::get(
             '/vendor/get-purchases-dealers/{code}',
             'VendorController@get_purchases_dealers'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-notes/{dealer}/{vendor}',
+            'VendorController@get_vendor_note'
+        );
+
+        Route::get(
+            '/vendor/get-atlas-notes/{dealer}/{vendor}',
+            'VendorController@get_atlas_note'
+        );
+
+        Route::get(
+            '/vendor/view-dealer-summary/{user}/{dealer}/{vendor}',
+            'VendorController@view_dealer_summary'
         );
 
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');

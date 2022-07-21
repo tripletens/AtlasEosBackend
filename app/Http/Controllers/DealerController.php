@@ -628,7 +628,6 @@ class DealerController extends Controller
             // process the request
             $uid = $request->uid;
             $atlas_id = $request->atlas_id;
-
             $dealer = $request->dealer;
             $vendor = $request->vendor;
 
@@ -655,7 +654,7 @@ class DealerController extends Controller
                         $this->result->status = true;
                         $this->result->status_code = 404;
                         $this->result->message = 'item has been added already';
-                        break;
+                        /// break;
                         // $this->result->status = true;
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';

@@ -1414,8 +1414,45 @@ class DealerController extends Controller
     // fetch all the quick order items by atlas_id and vendor no
     public function fetch_quick_order_items_atlas_id_vendor_no($atlas_id, $vendor_no)
     {
-        $fetch_cart_items = QuickOrder::where('atlas_id', $atlas_id)
-            ->where('vendor_no', $vendor_no)
+        $fetch_cart_items = QuickOrder::where('quick_order.atlas_id', $atlas_id)
+            ->where('quick_order.vendor_no', $vendor_no)
+            ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')
+            ->join('products', 'products.id', '=', 'quick_order.product_id')
+            ->select(
+                'vendors.vendor_code as vendor_code',
+                'vendors.vendor_name as vendor_name',
+                'vendors.role as vendor_role',
+                'vendors.role_name as vendor_role_name',
+                'vendors.status as vendor_role_name',
+                'vendors.created_at as vendor_created_at',
+                'vendors.updated_at as vendor_updated_at',
+                'products.img as product_img',
+                'products.status as product_status',
+                'products.description as product_description',
+                'products.vendor_code as product_vendor_code',
+                'products.vendor_name as products_vendor_name',
+                'products.vendor_product_code as product_vendor_product_code',
+                'products.xref as product_xref',
+                'products.vendor as product_vendor',
+                'products.id as product_id',
+                'products.atlas_id as product_atlas_id',
+                'products.vendor_logo as product_vendor_logo',
+                'products.um as product_um',
+                'products.regular as product_regular',
+                'products.booking as product_booking',
+                'products.special as product_special',
+                'products.cond as product_cond',
+                'products.type as product_type',
+                'products.grouping as product_grouping',
+                'products.full_desc as product_full_desc',
+                'products.spec_data as product_spec_data',
+                'products.check_new as product_check_new',
+                'products.short_note as product_short_note',
+                'products.short_note_url as product_short_note_url',
+                'products.created_at as product_created_at',
+                'products.updated_at as product_updated_at',
+                'quick_order.*'
+            )
             ->get();
 
         // return $fetch_cart_items;

@@ -135,6 +135,31 @@ class SpecialOrderController extends Controller
         }
     }
 
+    // delete special order by id
+    public function delete_special_order($id){
+        $check_order = SpecialOrder::find($id);
 
+        // oops we couldnt find the special order
+        if(!$check_order){
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = "sorry special order item could not be found";
+        }
 
+        // delete the special order
+        $delete_special_order = $check_order->delete();
+
+        // oops we could not delete the order
+        if(!$check_order){
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = "sorry special order item could not be deleted";
+        }
+
+        // return success response
+        $this->result->status = false;
+        $this->result->status_code = 422;
+        $this->result->message = "Special order item deleted successfully";
+        return response()->json($this->result);
+    }
 }

@@ -84,7 +84,7 @@ class DealerController extends Controller
 
             $item_already_added = 0;
             $item_added = 0;
-            $item_details = ''
+            $item_details = '';
 
             if (count(json_decode($product_array)) > 0 && $product_array) {
                 $decode_product_array = json_decode($product_array);
@@ -98,7 +98,7 @@ class DealerController extends Controller
                             ->exists()
                     ) {
                         $item_already_added += 1;
-                        $item_details. $product->atlas_id . ',';
+                        $item_details .= $product->atlas_id . ',';
                         // break;
                         /// break;
                         // $this->result->status = true;
@@ -133,8 +133,6 @@ class DealerController extends Controller
 
             $this->result->data->item_details = $item_details;
 
-
-            
             return response()->json($this->result);
             // return $array_check;
         }

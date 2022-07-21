@@ -1525,10 +1525,10 @@ class DealerController extends Controller
     }
 
     // fetch all the quick order items by atlas_id and vendor no
-    public function fetch_quick_order_items_atlas_id_vendor_no(
-        $atlas_id,
-        $vendor_no
-    ) {
+
+    public function fetch_quick_order_items_atlas_id_vendor_no($atlas_id, $vendor_no)
+    {
+        // return $atlas_id .  " => " . $vendor_no;
         $fetch_cart_items = QuickOrder::where('quick_order.atlas_id', $atlas_id)
             ->where('quick_order.vendor_no', $vendor_no)
             ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')

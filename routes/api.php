@@ -647,7 +647,7 @@ Route::group(
 
         // delete special order
         Route::get(
-            '/special-orders/delete/{dealer_id}',
+            '/special-orders/delete/{dealer_id}/{id}',
             'SpecialOrderController@delete_special_order'
         );
 

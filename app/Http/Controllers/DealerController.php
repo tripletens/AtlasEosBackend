@@ -2023,6 +2023,10 @@ class DealerController extends Controller
             )
             ->get();
 
+        foreach ($fetch_cart_items as $value) {
+            $value->product_spec_data = json_decode($value->product_spec_data);
+        }
+
         // return $fetch_cart_items;
         if (!$fetch_cart_items) {
             $this->result->status = true;

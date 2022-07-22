@@ -10,5 +10,5 @@ class SpecialOrder extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public $fillable = ['id', 'uid', 'quantity', 'vendor_id', 'description', 'created_at', 'updated_at', 'deleted_at','dealer_id'];
+    public $fillable = ['id', 'uid', 'quantity', 'vendor_id', 'description', 'created_at', 'updated_at', 'deleted_at','dealer_id','vendor_code'];
 }

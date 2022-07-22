@@ -55,7 +55,7 @@ class SpecialOrderController extends Controller
                     $add_items = SpecialOrder::create([
                         "uid" => $user_id,
                         "quantity" => $product->quantity,
-                        "vendor_id" => $product->vendor_id,
+                        "vendor_code" => $product->vendor_code,
                         "description" => $product->description,
                         "dealer_id" => $dealer_id
                     ]);
@@ -121,7 +121,7 @@ class SpecialOrderController extends Controller
                     $update_special_order = $check_item->update([
                         "uid" => $user_id,
                         "quantity" => $product->quantity,
-                        "vendor_id" => $product->vendor_id,
+                        "vendor_code" => $product->vendor_code,
                         "description" => $product->description
                     ]);
                 }
@@ -176,7 +176,7 @@ class SpecialOrderController extends Controller
     public function fetch_special_order_by_dealer_id($dealer_id)
     {
         $check_special_order = SpecialOrder::where('special_orders.dealer_id', $dealer_id)
-                join('vendors', 'vendors.id', '=', 'special_orders.vendor_id')
+                join('vendors', 'vendors.vendor_code', '=', 'special_orders.vendor_code')
 //             ->join('users', 'users.account_id', '=', 'special_orders.dealer_id')
              
                 ->select(

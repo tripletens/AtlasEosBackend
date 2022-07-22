@@ -258,6 +258,26 @@ Route::group(
             'DealerController@submit_quick_order'
         );
 
+        Route::get(
+            '/dealer/get-dealer-quick-orders/{dealer}/{uid}',
+            'DealerController@get_dealer_quick_orders'
+        );
+
+        Route::get(
+            '/dealer/delete-quick-order-item/{user}/{atlas_id}',
+            'DealerController@delete_quick_order_item'
+        );
+
+        Route::get(
+            '/dealer/get-item-group/{group}',
+            'DealerController@get_item_grouping'
+        );
+
+        Route::post(
+            '/dealer/submit-assorted-quick-order',
+            'DealerController@submit_assorted_quick_order'
+        );
+
         Route::post(
             '/dealer/save-dealer-reply',
             'DealerController@save_dealer_reply_problem'

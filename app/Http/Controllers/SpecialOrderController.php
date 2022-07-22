@@ -176,23 +176,21 @@ class SpecialOrderController extends Controller
     public function fetch_special_order_by_dealer_id($dealer_id)
     {
         $check_special_order = SpecialOrder::where('special_orders.dealer_id', $dealer_id)
-//                 join('vendors', 'vendors.id', '=', 'special_orders.vendor_id')
+                join('vendors', 'vendors.id', '=', 'special_orders.vendor_id')
 //             ->join('users', 'users.account_id', '=', 'special_orders.dealer_id')
              
                 ->select(
-//                 'vendors.vendor_code as vendor_code',
-//                 'vendors.vendor_name as vendor_name',
-//                 'vendors.role as vendor_role',
-//                 'vendors.role_name as vendor_role_name',
-//                 'vendors.status as vendor_role_name',
-//                 'vendors.created_at as vendor_created_at',
-//                 'vendors.updated_at as vendor_updated_at',
+                'vendors.vendor_code as vendor_code',
+                'vendors.vendor_name as vendor_name',
+                'vendors.role as vendor_role',
+                'vendors.role_name as vendor_role_name',
+                'vendors.status as vendor_role_name',
+                'vendors.created_at as vendor_created_at',
+                'vendors.updated_at as vendor_updated_at',
                 'special_orders.*',
 //                 'users.*'
             )
             ->get();
-        
-//         $users = [];
         
         // oops we couldnt find the special order
         if (!$check_special_order || count($check_special_order) == 0) {
@@ -201,7 +199,13 @@ class SpecialOrderController extends Controller
             $this->result->message = "sorry special order item could not be found";
             return response()->json($this->result);
         }
-       
+        
+        if(count($check_special_order) > 0){
+            foreach ($check_special_order as $item){
+                $get_dealer_users = Users::where('account_id', $dealer_id)->get();
+                $item->users = $get_dealer_users;
+            }   
+        }
 
         // return success response
         $this->result->status = false;

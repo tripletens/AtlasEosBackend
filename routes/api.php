@@ -254,6 +254,11 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::post(
+            '/dealer/move-dealer-quick-order',
+            'DealerController@move_dealer_quick_order_to_cart'
+        );
+
+        Route::post(
             '/dealer/submit-quick-order',
             'DealerController@submit_quick_order'
         );
@@ -266,6 +271,11 @@ Route::group(
         Route::get(
             '/dealer/delete-quick-order-item/{user}/{atlas_id}',
             'DealerController@delete_quick_order_item'
+        );
+
+        Route::get(
+            '/dealer/remove-all-user-order/{user}',
+            'DealerController@remove_all_quick_order'
         );
 
         Route::get(
@@ -642,8 +652,6 @@ Route::group(
         );
 
         //------------------- special orders ends here ------------------ //
-
-
     }
 );
 

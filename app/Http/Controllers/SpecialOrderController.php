@@ -156,7 +156,7 @@ class SpecialOrderController extends Controller
         $delete_special_order = $check_order->delete();
 
         // oops we could not delete the order
-        if (!$check_order) {
+        if (!$delete_special_order) {
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->message = "sorry special order item could not be deleted";

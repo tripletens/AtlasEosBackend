@@ -553,6 +553,12 @@ Route::group(
             'SpecialOrderController@delete_special_order'
         );
 
+        // fetch special order by uid
+        Route::get(
+            '/special-orders/{uid}',
+            'SpecialOrderController@fetch_special_order_by_uid'
+        );
+
         //------------------- special orders ends here ------------------ //
 
 

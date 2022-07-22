@@ -187,6 +187,8 @@ class SpecialOrderController extends Controller
                 'users.*'
             )->get();
 
+        return $check_special_order;
+        
         // oops we couldnt find the special order
         if (!$check_special_order) {
             $this->result->status = false;

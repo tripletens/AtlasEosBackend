@@ -57,6 +57,7 @@ class SpecialOrderController extends Controller
                         "quantity" => $product->quantity,
                         "vendor_code" => $product->vendor_code,
                         "description" => $product->description,
+                        "vendor_no" => $product->vendor_no,
                         "dealer_id" => $dealer_id
                     ]);
 

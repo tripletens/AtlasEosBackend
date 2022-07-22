@@ -271,7 +271,9 @@ class DealerController extends Controller
             $atlas_id = $request->atlas_id;
             $dealer = $request->dealer;
             $vendor = $request->vendor;
-            $message = '';
+            $existing_already_in_order = '';
+            $newly_added = 0;
+            $existing_already_in_quick_order = '';
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -286,12 +288,15 @@ class DealerController extends Controller
                             ->where('atlas_id', $product->atlas_id)
                             ->exists()
                     ) {
+                        $existing_already_in_order .= $product->atlas_id . ', ';
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
                                 ->where('atlas_id', $product->atlas_id)
                                 ->exists()
                         ) {
+                            $existing_already_in_quick_order .=
+                                $product->atlas_id . ', ';
                         } else {
                             $save = QuickOrder::create([
                                 'uid' => $uid,
@@ -306,15 +311,21 @@ class DealerController extends Controller
                                 'vendor_no' => $product->vendor_no,
                                 'type' => $product->type,
                             ]);
+
+                            $newly_added++;
                             $this->result->status = true;
                             $this->result->status_code = 200;
-                            $this->result->message = 'item Added to cart';
+                            $this->result->message = 'item Submitted';
                         }
                     }
 
                     $this->result->status = true;
+                    $this->result->data->existing_already_in_order = $existing_already_in_order;
+                    $this->result->data->newly_added = $newly_added;
+                    $this->result->data->existing_already_in_quick_order = $existing_already_in_quick_order;
+
                     $this->result->status_code = 200;
-                    $this->result->message = 'item Added ';
+                    $this->result->message = 'item Added';
                 }
             }
 
@@ -345,6 +356,10 @@ class DealerController extends Controller
             $dealer = $request->dealer;
             $vendor = $request->vendor;
 
+            $existing_already_in_order = '';
+            $newly_added = 0;
+            $existing_already_in_quick_order = '';
+
             // lets get the items from the array
             $product_array = $request->input('product_array');
             if (count(json_decode($product_array)) > 0 && $product_array) {
@@ -358,21 +373,15 @@ class DealerController extends Controller
                             ->where('atlas_id', $product->atlas_id)
                             ->exists()
                     ) {
-                        $this->result->status = true;
-                        $this->result->status_code = 404;
-                        $this->result->message = 'item has been added already';
-                        return response()->json($this->result);
+                        $existing_already_in_order .= $product->atlas_id . ', ';
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
                                 ->where('atlas_id', $product->atlas_id)
                                 ->exists()
                         ) {
-                            $this->result->status = true;
-                            $this->result->status_code = 404;
-                            $this->result->message =
-                                'item has been added already';
-                            return response()->json($this->result);
+                            $existing_already_in_quick_order .=
+                                $product->atlas_id . ', ';
                         } else {
                             $save = QuickOrder::create([
                                 'uid' => $uid,
@@ -387,13 +396,19 @@ class DealerController extends Controller
                                 'vendor_no' => $product->vendor_no,
                                 'type' => $product->type,
                             ]);
-                            $this->result->status = true;
-                            $this->result->status_code = 200;
-                            $this->result->message = 'item Added to cart';
+
+                            $newly_added++;
                         }
                     }
                 }
             }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Added to cart';
+            $this->result->data->existing_already_in_order = $existing_already_in_order;
+            $this->result->data->newly_added = $newly_added;
+            $this->result->data->existing_already_in_quick_order = $existing_already_in_quick_order;
 
             return response()->json($this->result);
         }

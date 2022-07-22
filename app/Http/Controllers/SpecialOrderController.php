@@ -6,6 +6,7 @@ use App\Models\SpecialOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
+use App\Models\Users;
 class SpecialOrderController extends Controller
 {
     //

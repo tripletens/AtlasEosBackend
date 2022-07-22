@@ -27,6 +27,7 @@ class SpecialOrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'uid' => 'required',
+            'dealer_id' => 'required',
             'product_array' => 'required',
         ]);
 
@@ -39,6 +40,7 @@ class SpecialOrderController extends Controller
             return response()->json($this->result);
         } else {
             $user_id = $request->input('uid');
+            $dealer_id = $request->input('dealer_id');
             // lets get the items from the array
             $product_array = $request->input('product_array');
 
@@ -54,7 +56,8 @@ class SpecialOrderController extends Controller
                         "uid" => $user_id,
                         "quantity" => $product->quantity,
                         "vendor_id" => $product->vendor_id,
-                        "description" => $product->description
+                        "description" => $product->description,
+                        "dealer_id" => $dealer_id
                     ]);
 
                     if (!$add_items) {
@@ -138,9 +141,9 @@ class SpecialOrderController extends Controller
     }
 
     // delete special order by id
-    public function delete_special_order($id)
+    public function delete_special_order($dealer_id)
     {
-        $check_order = SpecialOrder::find($id);
+        $check_order = SpecialOrder::find('dealer_id',$dealer_id);
 
         // oops we couldnt find the special order
         if (!$check_order) {

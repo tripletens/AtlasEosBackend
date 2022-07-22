@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SpecialOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use DB;
 class SpecialOrderController extends Controller
 {
     //
@@ -175,8 +175,9 @@ class SpecialOrderController extends Controller
     // fetch special order by uid
     public function fetch_special_order_by_dealer_id($dealer_id)
     {
-        $check_special_order = SpecialOrder::join('vendors','vendors.vendor_code','=','special_orders.vendor_code')
-            ->where('special_orders.dealer_id',$dealer_id)->select('vendors.*','special_orders.*')
+        $check_special_order =  DB::table('special_orders')->join('vendors','vendors.vendor_code','=','special_orders.vendor_code')
+            ->where('special_orders.dealer_id',$dealer_id)->select('vendors.*','special_orders.*')->get();
+//         $check_special_order = SpecialOrder::
 //                 'vendors.vendor_code as vendor_code',
 //                 'vendors.vendor_name as vendor_name',
 //                 'vendors.role as vendor_role',
@@ -184,8 +185,6 @@ class SpecialOrderController extends Controller
 //                 'vendors.status as vendor_role_name',
 //                 'vendors.created_at as vendor_created_at',
 //                 'vendors.updated_at as vendor_updated_at',
-                
-            ->get();
         
         // oops we couldnt find the special order
         if (!$check_special_order || count($check_special_order) == 0) {

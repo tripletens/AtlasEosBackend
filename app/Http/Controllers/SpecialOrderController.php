@@ -150,6 +150,7 @@ class SpecialOrderController extends Controller
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->message = "sorry special order item could not be found";
+            return response()->json($this->result);
         }
 
         if($check_order != null){
@@ -161,6 +162,7 @@ class SpecialOrderController extends Controller
                 $this->result->status = false;
                 $this->result->status_code = 422;
                 $this->result->message = "sorry special order item could not be deleted";
+                return response()->json($this->result);
             }
         }
         
@@ -196,7 +198,9 @@ class SpecialOrderController extends Controller
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->message = "sorry special order item could not be found";
+            return response()->json($this->result);
         }
+       
 
         // return success response
         $this->result->status = false;

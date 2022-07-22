@@ -59,6 +59,138 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function delete_quick_order_item($user, $atlas_id)
+    {
+        if (
+            DealerQuickOrder::where('uid', $user)
+                ->where('atlas_id', $atlas_id)
+                ->exists()
+        ) {
+            $delete = DealerQuickOrder::where('uid', $user)
+                ->where('atlas_id', $atlas_id)
+                ->delete();
+            if ($delete) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'item removal was successful ';
+            } else {
+                $this->result->status = false;
+                $this->result->status_code = 404;
+                $this->result->message = 'item removal was not successful';
+            }
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function get_item_grouping($group)
+    {
+        $product_data = Products::where('grouping', $group)->get();
+
+        foreach ($product_data as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
+
+        $this->result->status = true;
+        $this->result->data = $product_data;
+        $this->result->message = 'Grouped Products';
+        return response()->json($this->result);
+    }
+
+    public function get_dealer_quick_orders($dealer, $uid)
+    {
+        $quick_orders = DealerQuickOrder::where('uid', $uid)
+            ->where('dealer', $dealer)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        foreach ($quick_orders as $value) {
+            $altas_id = $value->atlas_id;
+            $product_data = Products::where('atlas_id', $altas_id)
+                ->get()
+                ->first();
+
+            $value->desc = $product_data->description;
+            $value->booking = $product_data->booking;
+            $value->regular = $product_data->regular;
+
+            $value->spec_data = json_decode($product_data->spec_data);
+        }
+
+        $this->result->status = true;
+        $this->result->data = $quick_orders;
+        $this->result->message = 'dealer quick orders';
+        return response()->json($this->result);
+    }
+
+    // adds item to the quick order table
+    public function submit_assorted_quick_order(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        Cart::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                    } else {
+                        if (
+                            DealerQuickOrder::where('dealer', $dealer)
+                                ->where('atlas_id', $product->atlas_id)
+                                ->exists()
+                        ) {
+                        } else {
+                            $save = QuickOrder::create([
+                                'uid' => $uid,
+                                'atlas_id' => $product->atlas_id,
+                                'dealer' => $dealer,
+                                'groupings' => $product->groupings,
+                                'vendor' => $product->vendor_id,
+                                'product_id' => $product->product_id,
+                                'qty' => $product->qty,
+                                'price' => $product->price,
+                                'unit_price' => $product->unit_price,
+                                'vendor_no' => $product->vendor_no,
+                                'type' => $product->type,
+                            ]);
+                            $this->result->status = true;
+                            $this->result->status_code = 200;
+                            $this->result->message = 'item Added to cart';
+                        }
+                    }
+                }
+            }
+
+            return response()->json($this->result);
+        }
+    }
+
     // adds item to the quick order table
     public function submit_quick_order(Request $request)
     {

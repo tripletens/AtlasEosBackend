@@ -141,9 +141,9 @@ class SpecialOrderController extends Controller
     }
 
     // delete special order by id
-    public function delete_special_order($dealer_id)
+    public function delete_special_order($dealer_id, $id)
     {
-        $check_order = SpecialOrder::where('dealer_id',$dealer_id)->first();
+        $check_order = SpecialOrder::where('dealer_id',$dealer_id)->where('id',$id)->first();
 
         // oops we couldnt find the special order
         if ($check_order == null) {

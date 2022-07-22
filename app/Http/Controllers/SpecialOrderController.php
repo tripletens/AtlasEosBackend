@@ -63,7 +63,7 @@ class SpecialOrderController extends Controller
                     if (!$add_items) {
                         $this->result->status = false;
                         $this->result->status_code = 422;
-                        $this->result->data = $product;
+//                         $this->result->data = $product;
                         $this->result->message = "sorry special order item could not be added";
                     }
                 }
@@ -115,7 +115,6 @@ class SpecialOrderController extends Controller
                     if (!$check_item) {
                         $this->result->status = false;
                         $this->result->status_code = 422;
-                        $this->result->data = $product;
                         $this->result->message = "sorry special order item could not be added";
                     }
 

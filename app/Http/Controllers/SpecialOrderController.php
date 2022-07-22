@@ -27,6 +27,7 @@ class SpecialOrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'uid' => 'required',
+            'dealer_id' => 'required',
             'product_array' => 'required',
         ]);
 
@@ -39,6 +40,7 @@ class SpecialOrderController extends Controller
             return response()->json($this->result);
         } else {
             $user_id = $request->input('uid');
+            $dealer_id = $request->input('dealer_id');
             // lets get the items from the array
             $product_array = $request->input('product_array');
 
@@ -54,7 +56,8 @@ class SpecialOrderController extends Controller
                         "uid" => $user_id,
                         "quantity" => $product->quantity,
                         "vendor_id" => $product->vendor_id,
-                        "description" => $product->description
+                        "description" => $product->description,
+                        "dealer_id" => $dealer_id
                     ]);
 
                     if (!$add_items) {
@@ -138,9 +141,9 @@ class SpecialOrderController extends Controller
     }
 
     // delete special order by id
-    public function delete_special_order($id)
+    public function delete_special_order($dealer_id)
     {
-        $check_order = SpecialOrder::find($id);
+        $check_order = SpecialOrder::find('dealer_id',$dealer_id);
 
         // oops we couldnt find the special order
         if (!$check_order) {
@@ -167,9 +170,10 @@ class SpecialOrderController extends Controller
     }
 
     // fetch special order by uid
-    public function fetch_special_order_by_uid($uid)
+    public function fetch_special_order_by_dealer_id($dealer_id)
     {
-        $check_special_order = SpecialOrder::where('special_orders.uid', $uid)
+        $check_special_order = SpecialOrder::where('special_orders.dealer_id', $dealer_id)
+            ->join('users', 'users.account_id', '=', 'special_orders.dealer_id')
             ->join('vendors', 'vendors.id', '=', 'special_orders.vendor_id')
             ->select(
                 'vendors.vendor_code as vendor_code',
@@ -179,7 +183,8 @@ class SpecialOrderController extends Controller
                 'vendors.status as vendor_role_name',
                 'vendors.created_at as vendor_created_at',
                 'vendors.updated_at as vendor_updated_at',
-                'special_orders.*'
+                'special_orders.*',
+                'users.*'
             )->get();
 
         // oops we couldnt find the special order

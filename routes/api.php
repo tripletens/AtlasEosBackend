@@ -647,14 +647,14 @@ Route::group(
 
         // delete special order
         Route::get(
-            '/special-orders/delete/{id}',
+            '/special-orders/delete/{dealer_id}',
             'SpecialOrderController@delete_special_order'
         );
 
         // fetch special order by uid
         Route::get(
-            '/special-orders/{uid}',
-            'SpecialOrderController@fetch_special_order_by_uid'
+            '/special-orders/{dealer_id}',
+            'SpecialOrderController@fetch_special_order_by_dealer_id'
         );
 
         //------------------- special orders ends here ------------------ //

@@ -176,7 +176,7 @@ class SpecialOrderController extends Controller
     public function fetch_special_order_by_dealer_id($dealer_id)
     {
         $check_special_order = SpecialOrder::where('special_orders.dealer_id', $dealer_id)
-                join('vendors', 'vendors.vendor_code', '=', 'special_orders.vendor_code')
+               ->join('vendors', 'vendors.vendor_code', '=', 'special_orders.vendor_code')
 //             ->join('users', 'users.account_id', '=', 'special_orders.dealer_id')
              
                 ->select(

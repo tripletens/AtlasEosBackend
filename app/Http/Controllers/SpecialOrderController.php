@@ -190,6 +190,7 @@ class SpecialOrderController extends Controller
         if (!$check_special_order || count($check_special_order) == 0) {
             $this->result->status = false;
             $this->result->status_code = 422;
+            $this->result->data = $check_special_order;
             $this->result->message = "sorry special order item could not be found";
             return response()->json($this->result);
         }

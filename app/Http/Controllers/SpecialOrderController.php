@@ -146,7 +146,7 @@ class SpecialOrderController extends Controller
         $check_order = SpecialOrder::where('dealer_id',$dealer_id)->first();
 
         // oops we couldnt find the special order
-        if (!$check_order) {
+        if ($check_order == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->message = "sorry special order item could not be found";

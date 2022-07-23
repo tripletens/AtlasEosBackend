@@ -180,7 +180,17 @@ class SpecialOrderController extends Controller
     public function fetch_special_order_by_dealer_id($dealer_id)
     {
         
-        $check_
+        $check_special_order_exists = SpecialOrder::where("dealer_id",$dealer_id)->get();
+        
+        // oops we couldnt find the special order
+        if (!$check_special_order || count($check_special_order) == 0) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->data = $check_special_order;
+            $this->result->message = "sorry special order item could not be found";
+            return response()->json($this->result);
+        }
+        
         $check_special_order =  DB::table('special_orders')->join('vendors','vendors.vendor_code','=','special_orders.vendor_code')
             ->where('special_orders.dealer_id',$dealer_id)->select('vendors.*','special_orders.*')->get();
 //         $check_special_order = SpecialOrder::
@@ -191,15 +201,7 @@ class SpecialOrderController extends Controller
 //                 'vendors.status as vendor_role_name',
 //                 'vendors.created_at as vendor_created_at',
 //                 'vendors.updated_at as vendor_updated_at',
-        
-        // oops we couldnt find the special order
-        if (!$check_special_order || count($check_special_order) == 0) {
-            $this->result->status = false;
-            $this->result->status_code = 422;
-            $this->result->data = $check_special_order;
-            $this->result->message = "sorry special order item could not be found";
-            return response()->json($this->result);
-        }
+       
         
         if(count($check_special_order) > 0){
             foreach ($check_special_order as $item){

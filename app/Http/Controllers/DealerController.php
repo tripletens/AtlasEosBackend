@@ -59,6 +59,48 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function get_user_vendor_order($dealer, $vendor)
+    {
+        $order = Cart::where('vendor', $vendor)
+            ->where('dealer', $dealer)
+            ->get();
+
+        $res_data = [];
+
+        if ($order) {
+            foreach ($order as $value) {
+                $atlas_id = $value->atlas_id;
+                $product_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'id' => $product_data->id,
+                    'desc' => $product_data->description,
+                    'spec_data' => $product_data->spec_data
+                        ? json_decode($product_data->spec_data)
+                        : null,
+                    'grouping' => $product_data->grouping,
+                    'vendor' => $product_data->vendor,
+                    'atlas_id' => $product_data->atlas_id,
+                    'regular' => $product_data->regular,
+                    'booking' => $product_data->booking,
+                    'price' => $value->price,
+                    'unit_price' => $value->unit_price,
+                    'qty' => $value->qty,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+        $this->result->message = 'get user vendor order';
+        return response()->json($this->result);
+    }
+
     // move item to the cart from the quick order
     public function move_dealer_quick_order_to_cart(Request $request)
     {

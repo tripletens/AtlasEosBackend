@@ -36,6 +36,7 @@ class SpecialOrderController extends Controller
             $response['response'] = $validator->messages();
             $this->result->status = false;
             $this->result->status_code = 422;
+            $this->result->data = [];
             $this->result->message = $response;
 
             return response()->json($this->result);
@@ -65,18 +66,20 @@ class SpecialOrderController extends Controller
                     if (!$add_items) {
                         $this->result->status = false;
                         $this->result->status_code = 422;
-//                         $this->result->data = $product;
+                        $this->result->data = [];
                         $this->result->message = "sorry special order item could not be added";
                     }
                 }
 
                 $this->result->status = true;
                 $this->result->status_code = 200;
+                $this->result->data = [];
                 $this->result->message = "Quick order items added successfully";
                 return response()->json($this->result);
             } else {
                 $this->result->status = false;
                 $this->result->status_code = 422;
+                $this->result->data = [];
                 $this->result->message = "please add an item to the product array";
                 return response()->json($this->result);
             }
@@ -169,6 +172,7 @@ class SpecialOrderController extends Controller
             if (!$delete_special_order) {
                 $this->result->status = false;
                 $this->result->status_code = 422;
+                $this->result->data = [];
                 $this->result->message = "sorry special order item could not be deleted";
                 return response()->json($this->result);
             }
@@ -192,7 +196,7 @@ class SpecialOrderController extends Controller
         if (!$check_special_order_exists || count($check_special_order_exists) == 0) {
             $this->result->status = false;
             $this->result->status_code = 422;
-//             $this->result->data = $check_special_order;
+            $this->result->data = [];
             $this->result->message = "sorry special order item could not be found";
             return response()->json($this->result);
         }

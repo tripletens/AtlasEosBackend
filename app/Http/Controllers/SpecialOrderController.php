@@ -169,7 +169,7 @@ class SpecialOrderController extends Controller
             }
             
             // return success response
-            $this->result->status = false;
+            $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->result = [];
             $this->result->message = "Special order item deleted successfully";
@@ -212,7 +212,7 @@ class SpecialOrderController extends Controller
         }
 
         // return success response
-        $this->result->status = false;
+        $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $check_special_order;
         $this->result->message = "Special order item fetched successfully";

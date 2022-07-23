@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SpecialOrder extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory; 
+    
+//     use SoftDeletes;
 
     public $fillable = ['id', 'uid', 'quantity', 'vendor_id', 'description', 'created_at', 'updated_at', 'deleted_at','dealer_id','vendor_code','vendor_no'];
 }

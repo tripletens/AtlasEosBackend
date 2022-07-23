@@ -65,7 +65,7 @@ class SpecialOrderController extends Controller
 
                     if (!$add_items) {
                         $this->result->status = false;
-                        $this->result->status_code = 422;
+                        $this->result->status_code = 200;
                         $this->result->data = [];
                         $this->result->message = "sorry special order item could not be added";
                     }
@@ -78,7 +78,7 @@ class SpecialOrderController extends Controller
                 return response()->json($this->result);
             } else {
                 $this->result->status = false;
-                $this->result->status_code = 422;
+                $this->result->status_code = 200;
                 $this->result->data = [];
                 $this->result->message = "please add an item to the product array";
                 return response()->json($this->result);
@@ -141,7 +141,7 @@ class SpecialOrderController extends Controller
                 $this->result->message = "Quick order items updated successfully";
                 return response()->json($this->result);
             } else {
-                $this->result->status = false;
+                $this->result->status = true;
                 $this->result->status_code = 422;
                 $this->result->data = [];
                 $this->result->message = "please add an item to the product array";
@@ -194,8 +194,8 @@ class SpecialOrderController extends Controller
         
         // oops we couldnt find the special order
         if (!$check_special_order_exists || count($check_special_order_exists) == 0) {
-            $this->result->status = false;
-            $this->result->status_code = 422;
+            $this->result->status = true;
+            $this->result->status_code = 200;
             $this->result->data = [];
             $this->result->message = "sorry special order item could not be found";
             return response()->json($this->result);

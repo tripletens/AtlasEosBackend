@@ -118,13 +118,15 @@ class SpecialOrderController extends Controller
                         $this->result->status = false;
                         $this->result->status_code = 422;
                         $this->result->message = "sorry special order item could not be added";
+                        return response()->json($this->result);
                     }
 
                     $update_special_order = $check_item->update([
                         "uid" => $user_id,
                         "quantity" => $product->quantity,
                         "vendor_code" => $product->vendor_code,
-                        "description" => $product->description
+                        "description" => $product->description,
+                        "vendor_no" => $product->vendor_no,
                     ]);
                 }
 
@@ -165,18 +167,20 @@ class SpecialOrderController extends Controller
                 $this->result->message = "sorry special order item could not be deleted";
                 return response()->json($this->result);
             }
+            
+            // return success response
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = "Special order item deleted successfully";
+            return response()->json($this->result);
         }
-        
-        // return success response
-        $this->result->status = false;
-        $this->result->status_code = 200;
-        $this->result->message = "Special order item deleted successfully";
-        return response()->json($this->result);
     }
 
     // fetch special order by uid
     public function fetch_special_order_by_dealer_id($dealer_id)
     {
+        
+        $check_
         $check_special_order =  DB::table('special_orders')->join('vendors','vendors.vendor_code','=','special_orders.vendor_code')
             ->where('special_orders.dealer_id',$dealer_id)->select('vendors.*','special_orders.*')->get();
 //         $check_special_order = SpecialOrder::

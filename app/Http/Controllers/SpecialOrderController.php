@@ -183,7 +183,7 @@ class SpecialOrderController extends Controller
         $check_special_order_exists = SpecialOrder::where("dealer_id",$dealer_id)->get();
         
         // oops we couldnt find the special order
-        if (!$check_special_order || count($check_special_order) == 0) {
+        if (!$check_special_order_exists || count($check_special_order_exists) == 0) {
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->data = $check_special_order;

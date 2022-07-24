@@ -59,6 +59,197 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function save_edited_user_order(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+            $newly_added = 0;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        Cart::where('dealer', $product->dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        Cart::where('dealer', $product->dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->update([
+                                'unit_price' => $product->unit_price,
+                                'price' => $product->price,
+                                'qty' => $product->qty,
+                            ]);
+                    } else {
+                    }
+                }
+            }
+
+            $order = Cart::where('vendor', $vendor)
+                ->where('dealer', $dealer)
+                ->get();
+
+            $res_data = [];
+
+            if ($order) {
+                foreach ($order as $value) {
+                    $atlas_id = $value->atlas_id;
+                    $product_data = Products::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
+
+                    $data = [
+                        'id' => $product_data->id,
+                        'desc' => $product_data->description,
+                        'spec_data' => $product_data->spec_data
+                            ? json_decode($product_data->spec_data)
+                            : null,
+                        'grouping' => $product_data->grouping,
+                        'vendor' => $product_data->vendor,
+                        'atlas_id' => $product_data->atlas_id,
+                        'regular' => $product_data->regular,
+                        'booking' => $product_data->booking,
+                        'price' => $value->price,
+                        'unit_price' => $value->unit_price,
+                        'qty' => $value->qty,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->data = $res_data;
+            $this->result->status_code = 200;
+            $this->result->message = 'item Added';
+
+            return response()->json($this->result);
+        }
+    }
+
+    public function remove_dealer_order_item(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlasId;
+            $dealer = $request->dealer;
+            $vendor = $request->vendor;
+            $newly_added = 0;
+
+            if (
+                Cart::where('dealer', $dealer)
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
+            ) {
+                Cart::where('dealer', $dealer)
+                    ->where('atlas_id', $atlas_id)
+                    ->delete();
+            }
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        Cart::where('dealer', $product->dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        Cart::where('dealer', $product->dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->update([
+                                'unit_price' => $product->unit_price,
+                                'price' => $product->price,
+                                'qty' => $product->qty,
+                            ]);
+                    } else {
+                    }
+                }
+            }
+
+            $order = Cart::where('vendor', $vendor)
+                ->where('dealer', $dealer)
+                ->get();
+
+            $res_data = [];
+
+            if ($order) {
+                foreach ($order as $value) {
+                    $atlas_id = $value->atlas_id;
+                    $product_data = Products::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
+
+                    $data = [
+                        'id' => $product_data->id,
+                        'desc' => $product_data->description,
+                        'spec_data' => $product_data->spec_data
+                            ? json_decode($product_data->spec_data)
+                            : null,
+                        'grouping' => $product_data->grouping,
+                        'vendor' => $product_data->vendor,
+                        'atlas_id' => $product_data->atlas_id,
+                        'regular' => $product_data->regular,
+                        'booking' => $product_data->booking,
+                        'price' => $value->price,
+                        'unit_price' => $value->unit_price,
+                        'qty' => $value->qty,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+
+            $this->result->status = true;
+            // $this->result->data->order = $order;
+            $this->result->data = $res_data;
+
+            $this->result->status_code = 200;
+            $this->result->message = 'item Removed';
+
+            return response()->json($this->result);
+        }
+    }
+
     public function get_user_vendor_order($dealer, $vendor)
     {
         $order = Cart::where('vendor', $vendor)
@@ -121,7 +312,6 @@ class DealerController extends Controller
             // fetch all items by the uid
             $uid = $request->input('uid');
             $dealer = $request->input('dealer');
-
             $fetch_all_items_by_uid = DealerQuickOrder::where(
                 'uid',
                 $uid
@@ -254,7 +444,6 @@ class DealerController extends Controller
     public function get_item_grouping($group)
     {
         $product_data = Products::where('grouping', $group)->get();
-
         foreach ($product_data as $value) {
             $value->spec_data = json_decode($value->spec_data);
         }

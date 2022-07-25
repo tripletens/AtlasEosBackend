@@ -73,6 +73,10 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_special_orders()
+    {
+    }
+
     public function get_price_overide_report()
     {
         $all_report = PriceOverideReport::all();

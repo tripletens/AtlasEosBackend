@@ -236,6 +236,11 @@ Route::group(
             'AdminController@get_price_overide_report'
         );
 
+        Route::get(
+            '/admin/get-special-orders',
+            'AdminController@get_special_orders'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

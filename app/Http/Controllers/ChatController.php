@@ -30,6 +30,33 @@ class ChatController extends Controller
     {
     }
 
+    public function count_unread_msg_role($user)
+    {
+        $unread_dealer_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '4')
+            ->count();
+
+        $unread_vendor_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '3')
+            ->count();
+
+        $unread_admin_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '1')
+            ->count();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->dealer = $unread_dealer_msg;
+        $this->result->data->vendor = $unread_vendor_msg;
+        $this->result->data->admin = $unread_admin_msg;
+
+        $this->result->message = 'count unread msg chat based on their role';
+        return response()->json($this->result);
+    }
+
     public function count_unread_msg($user)
     {
         $unread_msg = Chat::where('chat_to', $user)
@@ -114,6 +141,7 @@ class ChatController extends Controller
             $msg = $request->msg;
             $chat_user = $request->chatUser;
             $unique_id = $request->uniqueId;
+            $role = $request->role;
 
             $store_chat = Chat::create([
                 'chat_from' => $chat_from,
@@ -121,6 +149,7 @@ class ChatController extends Controller
                 'msg' => $msg,
                 'user' => $chat_user,
                 'unique_id' => $unique_id,
+                'role' => $role,
             ]);
 
             if (!$store_chat) {

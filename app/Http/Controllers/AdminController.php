@@ -35,6 +35,7 @@ use App\Models\ReportReply;
 use App\Models\ProgramNotes;
 
 use App\Models\PriceOverideReport;
+use App\Models\SpecialOrder;
 
 use DateTime;
 // use App\Models\Catalogue_Order;
@@ -75,6 +76,41 @@ class AdminController extends Controller
 
     public function get_special_orders()
     {
+        $orders = SpecialOrder::orderBy('created_at', 'desc')->get();
+
+        $res_data = [];
+
+        foreach ($orders as $value) {
+            $vendor = $value->vendor_code;
+            $user = $value->uid;
+
+            $vendor_data = Vendors::where('vendor_code', $vendor)
+                ->get()
+                ->first();
+            $user_data = Users::where('id', $user)
+                ->get()
+                ->first();
+
+            $data = [
+                'qty' => $value->quantity,
+                'description' => $value->description,
+                'vendor_name' => $vendor_data->vendor_name
+                    ? $vendor_data->vendor_name
+                    : null,
+                'account' => $user_data->account_id,
+                'dealer_name' => $user_data->company_name,
+                'rep_name' =>
+                    $user_data->first_name . ' ' . $user_data->last_name,
+                'vendor_no' => null,
+            ];
+
+            array_push($res_data, $data);
+        }
+
+        $this->result->status = true;
+        $this->result->data = $res_data;
+        $this->result->message = 'Price overide report';
+        return response()->json($this->result);
     }
 
     public function get_price_overide_report()

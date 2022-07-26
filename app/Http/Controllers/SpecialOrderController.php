@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Products;
 use App\Models\SpecialOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -54,6 +55,19 @@ class SpecialOrderController extends Controller
                     // insert them to the db
                     // `id`, `uid`, `quantity`, `vendor_id`, `description`,
                     //  `created_at`, `updated_at`, `deleted_at`
+
+
+                    // check if the item already exists in the db
+                    $check_atlas_id = Products::where('atlas_id', $product->vendor_no)->first();
+
+                    if($check_atlas_id){
+                        $this->result->status = false;
+                        $this->result->status_code = 200;
+                        $this->result->data = [];
+                        $this->result->message =
+                            'sorry item with atlas id: '.$product->vendor_no.' already exists in the database';
+                    }
+
                     $add_items = SpecialOrder::create([
                         'uid' => $user_id,
                         'quantity' => $product->quantity,

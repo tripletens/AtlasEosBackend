@@ -1056,6 +1056,10 @@ class DealerController extends Controller
     public function get_ordered_vendor($code)
     {
         $dealer_cart = Cart::where('dealer', $code)->get();
+        $dealer_details = User::where('role', 4)
+            ->where('id', $code)
+            ->get()
+            ->first();
         $vendor_code = [];
 
         if ($dealer_cart) {
@@ -1076,7 +1080,9 @@ class DealerController extends Controller
                 ->get()
                 ->first();
 
+            
             if ($vendor_data) {
+                $vendor_data->dealer = $dealer_details;
                 array_push($res_data, $vendor_data);
             }
         }

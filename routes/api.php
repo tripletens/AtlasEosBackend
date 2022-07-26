@@ -678,6 +678,17 @@ Route::group(
         );
 
         //------------------- special orders ends here ------------------ //
+
+
+        // ------------------ Product summary --------------------------- //
+
+        // fetch product summary by dealer_id
+        Route::get(
+            '/product-summary/{dealer_id}',
+            'SummaryController@product_summary'
+        );
+
+        // ------------------ Product summary ends here ----------------- //
     }
 );
 

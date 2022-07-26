@@ -1731,9 +1731,11 @@ class DealerController extends Controller
     // fetch all cart items
     public function fetch_all_cart_items($dealer_id)
     {
+        // return $dealer_id;
         $fetch_cart_items = Cart::where('dealer', $dealer_id)
             ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
             ->join('products', 'products.id', '=', 'cart.product_id')
+            ->join('users', 'users.id', '=', 'cart.uid')
             ->select(
                 'vendors.vendor_code as vendor_code',
                 'vendors.vendor_name as vendor_name',
@@ -1767,7 +1769,22 @@ class DealerController extends Controller
                 'products.short_note_url as product_short_note_url',
                 'products.created_at as product_created_at',
                 'products.updated_at as product_updated_at',
-                'cart.*'
+                'cart.*',
+                'users.full_name as dealer_full_name',
+                'users.email as dealer_email',
+                'users.role as dealer_role',
+                'users.role_name as dealer_role_name',
+                'users.privileged_vendors as dealer_privileged_vendors',
+                'users.username as dealer_username',
+                'users.account_id as dealer_account_id',
+                'users.phone as dealer_phone',
+                'users.regular as dealer_regular',
+                'users.order_status as dealer_order_status',
+                'users.location as dealer_location',
+                'users.company_name as dealer_company_name',
+                'users.last_login as dealer_last_login',
+                'users.login_device as dealer_login_device',
+                'users.place_order_date as dealer_place_order_date',
             )
             ->orderby('cart.id', 'desc')
             ->get();

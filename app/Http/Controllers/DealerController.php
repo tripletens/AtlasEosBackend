@@ -75,7 +75,9 @@ class DealerController extends Controller
             $value->spec_data = json_decode($value->spec_data);
         }
 
-        if ($item->grouping) {
+        $check_assorted = $item->grouping != null ? true : false;
+
+        if ($check_assorted) {
             $assorted_status = true;
             $assorted_data = Products::where(
                 'grouping',
@@ -1120,7 +1122,6 @@ class DealerController extends Controller
                 ->get()
                 ->first();
 
-            
             if ($vendor_data) {
                 $vendor_data->dealer = $dealer_details;
                 array_push($res_data, $vendor_data);
@@ -1830,7 +1831,7 @@ class DealerController extends Controller
                 'users.company_name as dealer_company_name',
                 'users.last_login as dealer_last_login',
                 'users.login_device as dealer_login_device',
-                'users.place_order_date as dealer_place_order_date',
+                'users.place_order_date as dealer_place_order_date'
             )
             ->orderby('cart.id', 'desc')
             ->get();

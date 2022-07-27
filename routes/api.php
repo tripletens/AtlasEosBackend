@@ -258,6 +258,11 @@ Route::group(
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
+        Route::get(
+            '/dealer/get-vendor-item/{vendor}/{atlas}',
+            'DealerController@get_vendor_item'
+        );
+
         Route::post(
             '/dealer/save-edited-user-order',
             'DealerController@save_edited_user_order'

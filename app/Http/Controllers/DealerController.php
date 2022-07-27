@@ -75,7 +75,7 @@ class DealerController extends Controller
             $value->spec_data = json_decode($value->spec_data);
         }
 
-        if ($item->grouping != null) {
+        if ($item->grouping) {
             $assorted_status = true;
             $assorted_data = Products::where(
                 'grouping',

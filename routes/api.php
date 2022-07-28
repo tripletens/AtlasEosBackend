@@ -447,10 +447,12 @@ Route::group(
             '/create-promotional-flier',
             'PromotionalFlierController@create_promotional_flier'
         );
+
         Route::get(
             '/show-all-promotional-fliers',
             'PromotionalFlierController@show_all_promotional_fliers'
         );
+        
         Route::get(
             '/show-promotional-flier-by-id/{id}',
             'PromotionalFlierController@show_promotional_flier_by_id'

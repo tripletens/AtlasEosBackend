@@ -165,6 +165,7 @@ class PromotionalFlierController extends Controller
             }
         }
     }
+
     public function show_promotional_flier_by_id($id)
     {
         $one_promotional_flier = PromotionalFlier::find($id);
@@ -249,7 +250,7 @@ class PromotionalFlierController extends Controller
         }
 
         # get the vendor details
-        $vendors = Vendors::whereIn('id', $all_vendors_with_promotional_fliers)
+        $vendors = Vendors::whereIn('vendor_code', $all_vendors_with_promotional_fliers)
             ->get();
 
         if (!$vendors) {

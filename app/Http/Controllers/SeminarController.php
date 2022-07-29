@@ -168,7 +168,7 @@ class SeminarController extends Controller
     // fetched watched seminars
     public function fetch_watched_seminars(){
         // this is for ended seminars
-        $fetch_seminars = Seminar::where('status',0)->orderBy('id','desc')->get();
+        $fetch_seminars = Seminar::where('status',3)->orderBy('id','desc')->get();
 
         if(!$fetch_seminars){
             $this->result->status = true;

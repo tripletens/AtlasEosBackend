@@ -96,7 +96,7 @@ class SeminarReminderCron extends Command
         #get the difference between the current time and the seminar time
         $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today->each(function ($seminar) {
             $current_time = Carbon::now();
-            $seminar_time = Carbon::parse($seminar->seminar_date . $seminar->seminar_time);
+            $seminar_time = Carbon::parse($seminar->seminar_date . $seminar->start_time);
             $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
 
             // $difference < -15  < -15 && $difference < 1

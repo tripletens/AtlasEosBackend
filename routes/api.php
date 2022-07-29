@@ -409,21 +409,23 @@ Route::group(
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(
-            '/fetch-all-seminars',
+            '/fetch-all-seminars/{dealer_id}',
             'SeminarController@fetch_all_seminars'
         );
         Route::get(
-            '/fetch-scheduled-seminars',
+            '/fetch-scheduled-seminars/{dealer_id}',
             'SeminarController@fetch_scheduled_seminars'
         );
         Route::get(
-            '/fetch-ongoing-seminars',
+            '/fetch-ongoing-seminars/{dealer_id}',
             'SeminarController@fetch_ongoing_seminars'
         );
+        
         Route::get(
-            '/fetch-watched-seminars',
+            '/fetch-watched-seminars/{dealer_id}',
             'SeminarController@fetch_watched_seminars'
         );
+
         Route::post('/join-seminar', 'SeminarController@join_seminar');
 
         Route::get(

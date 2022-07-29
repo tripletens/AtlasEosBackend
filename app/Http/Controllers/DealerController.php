@@ -38,6 +38,7 @@ use App\Models\ReportReply;
 use App\Models\ProgramNotes;
 
 use App\Models\DealerQuickOrder;
+use App\Models\PromotionalFlier;
 
 class DealerController extends Controller
 {
@@ -1055,7 +1056,7 @@ class DealerController extends Controller
 
     public function get_ordered_vendor($code)
     {
-        $dealer_cart = Cart::where('dealer', $code)->orderBy('id','desc')->get();
+        $dealer_cart = Cart::where('dealer', $code)->orderBy('id','desc');
         $dealer_details = User::where('role', 4)
             ->where('id', $code)
             ->get()
@@ -1302,7 +1303,16 @@ class DealerController extends Controller
 
     public function get_vendor()
     {
+        // $vendors = Vendors::join('promotional_fliers', 'promotional_fliers.vendor_id', '=', 'vendors.vendor_code')
+        //     // ->join('products', 'products.id', '=', 'cart.product_id');
+        //     ->select('vendors.*', 'promotional_fliers.*')->get();
+            
         $vendors = Vendors::all();
+
+        foreach($vendors as $vendor){
+            $vendor->promotional_flier = PromotionalFlier::where('vendor_id', $vendor->vendor_code)->get();
+        }
+        
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $vendors;

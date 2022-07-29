@@ -28,12 +28,18 @@ class SeminarController extends Controller
         ];
     }
 
-    public function check_seminar_status($seminar_time,$seminar_date){
+    public function check_seminar_status($seminar_date,$start_time,$stop_time){
         $seminar_time = 
         $current_time = Carbon::now();
         $seminar_time = Carbon::parse($seminar_date . $seminar_time);
+        
+        $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
 
-        return $seminar_time;
+        // check for scheduled =  1
+        // check for ongoing = 2 
+        // check for completed = 3
+
+        return $difference;
         // $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
     }
     // create seminar api

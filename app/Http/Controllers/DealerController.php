@@ -1055,15 +1055,16 @@ class DealerController extends Controller
 
     public function get_ordered_vendor($code)
     {
-        $dealer_cart = Cart::where('dealer', $code)->get();
+        $dealer_cart = Cart::where('dealer', $code)->orderBy('id','desc')->get();
         $dealer_details = User::where('role', 4)
             ->where('id', $code)
             ->get()
             ->first();
+
         $vendor_code = [];
 
         if ($dealer_cart) {
-            foreach ($dealer_cart as $value) {
+            foreach ($dealer_cart as $key => $value) {
                 $vendor = $value->vendor;
                 if (!in_array($vendor, $vendor_code)) {
                     array_push($vendor_code, $vendor);

@@ -1105,6 +1105,10 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public function check_status($seminar_date,$start_time,$stop_time){
+        echo $seminar_date . ' => ' . $start_time . ' => ' . $stop_time; 
+    }
+
     public function create_seminar(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1134,6 +1138,8 @@ class AdminController extends Controller
             $stop_time = $request->stopTime;
             $link = $request->link;
 
+            // return $this->check_status($seminar_date,$start_time,$stop_time);
+
             // update to the db
             $save = Seminar::create([
                 'topic' => $topic,
@@ -1143,6 +1149,7 @@ class AdminController extends Controller
                 'start_time' => $start_time,
                 'stop_time' => $stop_time,
                 'link' => $link,
+                'status' => '1' // 1 means scheduled, 2 means ongoing, 3 means completed
             ]);
 
             if ($save) {

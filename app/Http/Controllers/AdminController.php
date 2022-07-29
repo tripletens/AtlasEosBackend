@@ -1142,7 +1142,6 @@ class AdminController extends Controller
                 'seminar_date' => $seminar_date,
                 'start_time' => $start_time,
                 'stop_time' => $stop_time,
-
                 'link' => $link,
             ]);
 

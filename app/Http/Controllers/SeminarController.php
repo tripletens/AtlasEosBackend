@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SeminarEmail;
+use App\Models\Dealer;
+
 class SeminarController extends Controller
 {
     public function __construct()
@@ -94,14 +96,27 @@ class SeminarController extends Controller
     }
 
     // fetch all the seminars
-    public function fetch_all_seminars(){
+    public function fetch_all_seminars($dealer_id){
         $fetch_seminars = Seminar::orderBy('id','desc')->get();
+        // $check_bookmarked = [];
 
         if(!$fetch_seminars){
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't fetch all the Seminars";
             return response()->json($this->result);
+        }
+
+        // check if the user has bookmarked the seminar
+
+        foreach($fetch_seminars as $seminar){
+            $check_bookmarked = 
+                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
+            if($check_bookmarked){
+                $seminar->bookmarked = true;
+            }else{
+                $seminar->bookmarked = false;
+            }
         }
 
         $this->result->status = true;
@@ -112,7 +127,7 @@ class SeminarController extends Controller
     }
 
     // fetch all scheduled seminars
-    public function fetch_scheduled_seminars(){
+    public function fetch_scheduled_seminars($dealer_id){
         // this is for active seminars
         $fetch_seminars = Seminar::where('status',1)->orderBy('id','desc')->get();
 
@@ -131,6 +146,16 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
 
+        foreach($fetch_seminars as $seminar){
+            $check_bookmarked = 
+                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
+            if($check_bookmarked){
+                $seminar->bookmarked = true;
+            }else{
+                $seminar->bookmarked = false;
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $fetch_seminars;
@@ -139,7 +164,7 @@ class SeminarController extends Controller
     }
 
     // fetch all ongoing seminars
-    public function fetch_ongoing_seminars(){
+    public function fetch_ongoing_seminars($dealer_id){
         // this is for active seminars
         $fetch_seminars = Seminar::where('status',2)->orderBy('id','desc')->get();
 
@@ -156,6 +181,16 @@ class SeminarController extends Controller
             $this->result->data = $fetch_seminars;
             $this->result->message = "Sorry no Ongoing Seminar now";
             return response()->json($this->result);
+        }
+
+        foreach($fetch_seminars as $seminar){
+            $check_bookmarked = 
+                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
+            if($check_bookmarked){
+                $seminar->bookmarked = true;
+            }else{
+                $seminar->bookmarked = false;
+            }
         }
 
         $this->result->status = true;
@@ -176,13 +211,23 @@ class SeminarController extends Controller
             $this->result->message = "An Error Ocurred, we couldn't fetch all the watched Seminars";
             return response()->json($this->result);
         }
-
+        
         if(count($fetch_seminars) == 0){
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->data = $fetch_seminars;
             $this->result->message = "Sorry no watched Seminar now";
             return response()->json($this->result);
+        }
+
+        foreach($fetch_seminars as $seminar){
+            $check_bookmarked = 
+                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
+            if($check_bookmarked){
+                $seminar->bookmarked = true;
+            }else{
+                $seminar->bookmarked = false;
+            }
         }
 
         $this->result->status = true;

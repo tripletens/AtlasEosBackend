@@ -220,6 +220,7 @@ class PromotionalFlierController extends Controller
         }
     }
 
+    // delete the promotional flier 
     public function delete_promotional_flier($id)
     {
         $promotional_flier = PromotionalFlier::find($id);
@@ -248,7 +249,6 @@ class PromotionalFlierController extends Controller
     }
 
     # get all the vendors that have promotional fliers
-
     public  function get_all_vendors_with_promotional_fliers()
     {
         $all_vendors_with_promotional_fliers =
@@ -284,5 +284,4 @@ class PromotionalFlierController extends Controller
             return response()->json($this->result);
         }
     }
-    
 }

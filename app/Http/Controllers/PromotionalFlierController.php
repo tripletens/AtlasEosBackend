@@ -122,7 +122,7 @@ class PromotionalFlierController extends Controller
             $validator = Validator::make($request->all(), [
                 'vendor_id' => 'required',
                 'name' => 'required|string',
-                'pdf_url' => 'required|string'
+                'pdf' => 'required|mimes:pdf,doc,docx,xls,jpg,jpeg,png,gif',
             ]);
 
             if ($validator->fails()) {
@@ -137,14 +137,32 @@ class PromotionalFlierController extends Controller
                 //  'status', 'created_at', 'updated_at', 'deleted_at'
 
                 $name = $request->input('name');
-                $pdf_url = $request->input('pdf_url');
+                $pdf = $request->file('pdf');
                 $vendor_id = $request->input('vendor_id');
                 $description = $request->input('description');
                 $image_url = $request->input('image_url');
 
+                if ($request->hasFile('pdf')) {
+                    $filenameWithExt = $request
+                        ->file('pdf')
+                        ->getClientOriginalName();
+                    $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                    $extension = $request
+                        ->file('pdf')
+                        ->getClientOriginalExtension();
+                    $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                    $filepath =
+                        env('APP_URL') .
+                        Storage::url(
+                            $request
+                                ->file('pdf')
+                                ->storeAs('public/pdf', $fileNameToStore)
+                        );
+                }
+
                 $update_promotional_flier = $one_promotional_flier->update([
                     'name' => $name ? $name : null,
-                    'pdf_url' => $pdf_url ? $pdf_url : null,
+                    'pdf_url' => $request->hasFile('pdf') ? $filepath : null,
                     'vendor_id' => $vendor_id ? $vendor_id : null,
                     'description' => $description ? $description : null,
                     'image_url' => $image_url ? $image_url : null

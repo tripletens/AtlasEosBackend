@@ -447,7 +447,7 @@ Route::group(
             '/show-all-promotional-fliers',
             'PromotionalFlierController@show_all_promotional_fliers'
         );
-        
+
         Route::get(
             '/show-promotional-flier-by-id/{id}',
             'PromotionalFlierController@show_promotional_flier_by_id'
@@ -459,7 +459,7 @@ Route::group(
 
         // hshkdksjdsd
         // sdjsjfkjds
-        Route::patch(
+        Route::post(
             '/edit-promotional-flier/{id}',
             'PromotionalFlierController@edit_promotional_flier'
         );

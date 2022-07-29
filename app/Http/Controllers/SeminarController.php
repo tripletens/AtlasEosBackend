@@ -26,6 +26,14 @@ class SeminarController extends Controller
         ];
     }
 
+    public function check_seminar_status($seminar_time,$seminar_date){
+        $seminar_time = 
+        $current_time = Carbon::now();
+        $seminar_time = Carbon::parse($seminar_date . $seminar_time);
+
+        return $seminar_time;
+        // $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
+    }
     // create seminar api
     public function create_seminar(Request $request){
         // `seminar_name`, `vendor_name`, `vendor_id`, `seminar_date`, `seminar_time`,
@@ -56,7 +64,9 @@ class SeminarController extends Controller
             $seminar_date = Carbon::parse($request->input('seminar_date'))->format('Y-m-d H:i');
             $seminar_time = Carbon::parse($request->input('seminar_time'))->format('H:i:s');
             $bookmark = $request->input('bookmark');
-            $status = $request->input('status');
+            // $status = $request->input('status');
+
+            return $this->check_seminar_status($seminar_time,$seminar_date);
 
             $createseminar = Seminar::create([
                 'seminar_name' => $seminar_name ? $seminar_name : null,
@@ -65,7 +75,7 @@ class SeminarController extends Controller
                 'seminar_date' => $seminar_date ? $seminar_date : null,
                 'seminar_time' => $seminar_time ? $seminar_time : null,
                 'bookmark' => $bookmark ? $bookmark : null,
-                'status' => $status ? $status : null,
+                // 'status' => $status ? $status : null,
             ]);
 
             if (!$createseminar) {

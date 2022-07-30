@@ -632,6 +632,7 @@ class DealerController extends Controller
             $existing_already_in_order = '';
             $newly_added = 0;
             $existing_already_in_quick_order = '';
+            $existing_status = false;
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -647,6 +648,7 @@ class DealerController extends Controller
                             ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
+                        $existing_status = true;
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
@@ -679,6 +681,8 @@ class DealerController extends Controller
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->message = 'item Added to cart';
+            $this->result->data->existing_status = $existing_status;
+
             $this->result->data->existing_already_in_order = $existing_already_in_order;
             $this->result->data->newly_added = $newly_added;
             $this->result->data->existing_already_in_quick_order = $existing_already_in_quick_order;
@@ -1097,7 +1101,9 @@ class DealerController extends Controller
 
     public function get_ordered_vendor($code)
     {
-        $dealer_cart = Cart::where('dealer', $code)->orderBy('id','desc')->get();
+        $dealer_cart = Cart::where('dealer', $code)
+            ->orderBy('id', 'desc')
+            ->get();
         $dealer_details = User::where('role', 4)
             ->where('id', $code)
             ->get()

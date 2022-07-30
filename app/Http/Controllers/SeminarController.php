@@ -28,22 +28,42 @@ class SeminarController extends Controller
         ];
     }
 
-    public function check_seminar_status($seminar_date,$start_time,$stop_time){
-        $seminar_time = 
+    public function check_seminar_status($seminar_id, $seminar_date, $start_time, $stop_time)
+    {
+
+        // return $seminar_date . 'start_time => ' . $start_time . ' stop_time => ' . $stop_time;
         $current_time = Carbon::now();
-        $seminar_time = Carbon::parse($seminar_date . $seminar_time);
-        
-        $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
+        $seminar_time = Carbon::parse($seminar_date . $start_time);
+        $seminar_stop_time = Carbon::parse($seminar_date . $stop_time);
 
-        // check for scheduled =  1
-        // check for ongoing = 2 
-        // check for completed = 3
+        $seminar_duration = $seminar_stop_time->diffInMinutes($seminar_time, $absolute = false);
+        $start_difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
+        $stop_difference = $seminar_stop_time->diffInMinutes($current_time, $absolute = false);
 
-        return $difference;
-        // $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
+        // return [
+        //     'seminar_duration' => $seminar_duration,
+        //     'start_difference' => $start_difference,
+        //     'stop_difference' => $stop_difference,
+        //     'seminar_time' => $seminar_time,
+        //     'seminar_stop_time' => $seminar_stop_time,
+        //     'current_time' => $current_time,
+        // ];
+
+        if ($stop_difference > 0) {
+            // update the seminar_status to '3' (seminar is over)
+            $seminar = Seminar::find($seminar_id);
+            $seminar->status = 3;
+            $seminar->save();
+        } else {
+            // update the seminar_status to '2' (seminar is running)
+            $seminar = Seminar::find($seminar_id);
+            $seminar->status = 2;
+            $seminar->save();
+        }
     }
     // create seminar api
-    public function create_seminar(Request $request){
+    public function create_seminar(Request $request)
+    {
         // `seminar_name`, `vendor_name`, `vendor_id`, `seminar_date`, `seminar_time`,
         // `bookmark`, `status`, `created_at`, `updated_at`, `deleted_at`
         // status => [ 1 => 'scheduled', 2 => 'ongoing', 3 => 'watched']
@@ -74,7 +94,7 @@ class SeminarController extends Controller
             $bookmark = $request->input('bookmark');
             // $status = $request->input('status');
 
-            return $this->check_seminar_status($seminar_time,$seminar_date);
+            return $this->check_seminar_status($seminar_time, $seminar_date);
 
             $createseminar = Seminar::create([
                 'seminar_name' => $seminar_name ? $seminar_name : null,
@@ -102,11 +122,12 @@ class SeminarController extends Controller
     }
 
     // fetch all the seminars
-    public function fetch_all_seminars($dealer_id){
-        $fetch_seminars = Seminar::orderBy('id','desc')->get();
+    public function fetch_all_seminars($dealer_id)
+    {
+        $fetch_seminars = Seminar::orderBy('id', 'desc')->get();
         // $check_bookmarked = [];
 
-        if(!$fetch_seminars){
+        if (!$fetch_seminars) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't fetch all the Seminars";
@@ -115,14 +136,16 @@ class SeminarController extends Controller
 
         // check if the user has bookmarked the seminar
 
-        foreach($fetch_seminars as $seminar){
-            $check_bookmarked = 
-                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
-            if($check_bookmarked){
+        foreach ($fetch_seminars as $seminar) {
+            $check_bookmarked =
+                SeminarMembers::where('seminar_id', $seminar->id)->where('dealer_id', $dealer_id)->first();
+            if ($check_bookmarked) {
                 $seminar->bookmarked = true;
-            }else{
+            } else {
                 $seminar->bookmarked = false;
             }
+
+            $this->check_seminar_status($seminar->id, $seminar->seminar_date, $seminar->start_time, $seminar->stop_time);
         }
 
         $this->result->status = true;
@@ -133,18 +156,19 @@ class SeminarController extends Controller
     }
 
     // fetch all scheduled seminars
-    public function fetch_scheduled_seminars($dealer_id){
+    public function fetch_scheduled_seminars($dealer_id)
+    {
         // this is for active seminars
-        $fetch_seminars = Seminar::where('status',1)->orderBy('id','desc')->get();
+        $fetch_seminars = Seminar::where('status', 1)->orderBy('id', 'desc')->get();
 
-        if(!$fetch_seminars){
+        if (!$fetch_seminars) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't fetch all the scheduled/active Seminars";
             return response()->json($this->result);
         }
 
-        if(count($fetch_seminars) == 0){
+        if (count($fetch_seminars) == 0) {
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->data = $fetch_seminars;
@@ -152,14 +176,16 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
 
-        foreach($fetch_seminars as $seminar){
-            $check_bookmarked = 
-                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
-            if($check_bookmarked){
+        foreach ($fetch_seminars as $seminar) {
+            $check_bookmarked =
+                SeminarMembers::where('seminar_id', $seminar->id)->where('dealer_id', $dealer_id)->first();
+            if ($check_bookmarked) {
                 $seminar->bookmarked = true;
-            }else{
+            } else {
                 $seminar->bookmarked = false;
             }
+            // check the status of the ongoing seminar
+            $this->check_seminar_status($seminar->id, $seminar->seminar_date, $seminar->start_time, $seminar->stop_time);
         }
 
         $this->result->status = true;
@@ -170,18 +196,19 @@ class SeminarController extends Controller
     }
 
     // fetch all ongoing seminars
-    public function fetch_ongoing_seminars($dealer_id){
+    public function fetch_ongoing_seminars($dealer_id)
+    {
         // this is for active seminars
-        $fetch_seminars = Seminar::where('status',2)->orderBy('id','desc')->get();
+        $fetch_seminars = Seminar::where('status', 2)->orderBy('id', 'desc')->get();
 
-        if(!$fetch_seminars){
+        if (!$fetch_seminars) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't fetch all the ongoing Seminars";
             return response()->json($this->result);
         }
 
-        if(count($fetch_seminars) == 0){
+        if (count($fetch_seminars) == 0) {
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->data = $fetch_seminars;
@@ -189,14 +216,16 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
 
-        foreach($fetch_seminars as $seminar){
-            $check_bookmarked = 
-                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
-            if($check_bookmarked){
+        foreach ($fetch_seminars as $seminar) {
+            $check_bookmarked =
+                SeminarMembers::where('seminar_id', $seminar->id)->where('dealer_id', $dealer_id)->first();
+            if ($check_bookmarked) {
                 $seminar->bookmarked = true;
-            }else{
+            } else {
                 $seminar->bookmarked = false;
             }
+            // check the status of the ongoing seminar
+            $this->check_seminar_status($seminar->id, $seminar->seminar_date, $seminar->start_time, $seminar->stop_time);
         }
 
         $this->result->status = true;
@@ -207,18 +236,19 @@ class SeminarController extends Controller
     }
 
     // fetched watched seminars
-    public function fetch_watched_seminars(){
+    public function fetch_watched_seminars($dealer_id)
+    {
         // this is for ended seminars
-        $fetch_seminars = Seminar::where('status',3)->orderBy('id','desc')->get();
+        $fetch_seminars = Seminar::where('status', 3)->orderBy('id', 'desc')->get();
 
-        if(!$fetch_seminars){
+        if (!$fetch_seminars) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't fetch all the watched Seminars";
             return response()->json($this->result);
         }
-        
-        if(count($fetch_seminars) == 0){
+
+        if (count($fetch_seminars) == 0) {
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->data = $fetch_seminars;
@@ -226,14 +256,16 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
 
-        foreach($fetch_seminars as $seminar){
-            $check_bookmarked = 
-                SeminarMembers::where('seminar_id',$seminar->id)->where('dealer_id',$dealer_id)->first();
-            if($check_bookmarked){
+        foreach ($fetch_seminars as $seminar) {
+            $check_bookmarked =
+                SeminarMembers::where('seminar_id', $seminar->id)->where('dealer_id', $dealer_id)->first();
+            if ($check_bookmarked) {
                 $seminar->bookmarked = true;
-            }else{
+            } else {
                 $seminar->bookmarked = false;
             }
+            // check the status of the ongoing seminar
+            $this->check_seminar_status($seminar->id, $seminar->seminar_date, $seminar->start_time, $seminar->stop_time);
         }
 
         $this->result->status = true;
@@ -244,7 +276,8 @@ class SeminarController extends Controller
     }
 
     // bookmark a seminar i.e join a seminar
-    public function join_seminar(Request $request){
+    public function join_seminar(Request $request)
+    {
         // `seminar_id`, `dealer_id`, `bookmark_status`
         // `current_seminar_status`, `status`,
         $validator = Validator::make($request->all(), [
@@ -294,13 +327,14 @@ class SeminarController extends Controller
     }
 
     // fetch all the dealers that joined the seminar
-    public function fetch_all_dealers_in_seminar($seminar_id){
+    public function fetch_all_dealers_in_seminar($seminar_id)
+    {
         // role 4 is for dealers
-        $fetch_dealers = Users::where('role',4)->join('seminar_members','users.id','=','seminar_members.dealer_id')
-        ->where('seminar_members.seminar_id', $seminar_id)
-        ->get();
+        $fetch_dealers = Users::where('role', 4)->join('seminar_members', 'users.id', '=', 'seminar_members.dealer_id')
+            ->where('seminar_members.seminar_id', $seminar_id)
+            ->get();
 
-        if(!$fetch_dealers){
+        if (!$fetch_dealers) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
@@ -319,27 +353,29 @@ class SeminarController extends Controller
     }
 
 
-    public function fetch_only_dealer_emails($seminar_id){
+    public function fetch_only_dealer_emails($seminar_id)
+    {
         $all_dealers = $this->fetch_all_dealers_in_seminar($seminar_id);
         $dealer_emails = [];
-        foreach($all_dealers as $dealer){
-            array_push($dealer_emails,$dealer->email);
+        foreach ($all_dealers as $dealer) {
+            array_push($dealer_emails, $dealer->email);
         }
         return $dealer_emails;
     }
 
     // fetch all the dealers that didnt bookmark a seminar
-    public function fetch_all_dealers_not_in_seminar(){
+    public function fetch_all_dealers_not_in_seminar()
+    {
 
         # get all the dealers that didnt bookmark a seminar
-        $fetch_dealers = Users::where('role',4)->join('seminar_members','users.id','=','seminar_members.dealer_id')
-        ->where('seminar_members.bookmark_status',0)
-        ->get();
+        $fetch_dealers = Users::where('role', 4)->join('seminar_members', 'users.id', '=', 'seminar_members.dealer_id')
+            ->where('seminar_members.bookmark_status', 0)
+            ->get();
 
         // $fetch_dealers = SeminarMembers::all()->join('users','seminar_members.id','!=','users.id')
         // ->get();
 
-        if(!$fetch_dealers){
+        if (!$fetch_dealers) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message =
@@ -358,25 +394,26 @@ class SeminarController extends Controller
 
     // send email to dealer that bookmarked the seminar 15 mins before the seminar time
 
-    public function select_seminars_to_remind(){
+    public function select_seminars_to_remind()
+    {
         // selects all the seminars that are 15 mins less than the current time
         // time difference between current time and seminar time
         // if the difference is less than 15 mins, send an email to the dealer
         $current_time = Carbon::now()->format('H:i:s');
         $current_date = Carbon::now()->format('Y-m-d');
 
-        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today = Seminar::where('status',1)
-        ->where('seminar_date',$current_date)
-        ->get();
+        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today = Seminar::where('status', 1)
+            ->where('seminar_date', $current_date)
+            ->get();
 
         #get the difference between the current time and the seminar time
-        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today->each(function($seminar){
+        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today->each(function ($seminar) {
             $current_time = Carbon::now();
             $seminar_time = Carbon::parse($seminar->seminar_date . $seminar->seminar_time);
             $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
 
             // $difference < -15  < -15 && $difference < 1
-            if($difference < 1000000000000000){
+            if ($difference < 1000000000000000) {
                 // $this->send_email_to_dealer($seminar);
                 $all_dealers_that_joined_seminar = $this->fetch_all_dealers_in_seminar($seminar->id);
                 $all_dealer_emails = $this->fetch_only_dealer_emails($seminar->id);
@@ -402,7 +439,8 @@ class SeminarController extends Controller
     }
 
 
-    public function send_reminder_email($emails, $dealer_and_seminar_data){
+    public function send_reminder_email($emails, $dealer_and_seminar_data)
+    {
         // select all the people that bookmarked the individual seminars
         // send them an email each
         foreach ($emails as $recipient) {

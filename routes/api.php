@@ -699,7 +699,7 @@ Route::group(
 
         // check_seminar_status
         Route::get(
-            '/check_seminar_status',
+            '/check_seminar_status/{seminar_date}/{start_time}/{stop_time}',
             'SeminarController@check_seminar_status'
         );
         // ------------------ test apis ends here ----------------- //

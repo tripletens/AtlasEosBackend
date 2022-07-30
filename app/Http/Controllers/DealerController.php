@@ -1098,7 +1098,7 @@ class DealerController extends Controller
 
     public function get_ordered_vendor($code)
     {
-        $dealer_cart = Cart::where('dealer', $code)->orderBy('id','desc');
+        $dealer_cart = Cart::where('dealer', $code)->get();
         $dealer_details = User::where('role', 4)
             ->where('id', $code)
             ->get()
@@ -1107,7 +1107,7 @@ class DealerController extends Controller
         $vendor_code = [];
 
         if ($dealer_cart) {
-            foreach ($dealer_cart as $key => $value) {
+            foreach ($dealer_cart as $value) {
                 $vendor = $value->vendor;
                 if (!in_array($vendor, $vendor_code)) {
                     array_push($vendor_code, $vendor);
@@ -1123,7 +1123,6 @@ class DealerController extends Controller
             $vendor_data = Vendors::where('vendor_code', $vendor)
                 ->get()
                 ->first();
-
             if ($vendor_data) {
                 $vendor_data->dealer = $dealer_details;
                 array_push($res_data, $vendor_data);
@@ -1347,13 +1346,13 @@ class DealerController extends Controller
         // $vendors = Vendors::join('promotional_fliers', 'promotional_fliers.vendor_id', '=', 'vendors.vendor_code')
         //     // ->join('products', 'products.id', '=', 'cart.product_id');
         //     ->select('vendors.*', 'promotional_fliers.*')->get();
-            
+
         $vendors = Vendors::all();
 
         foreach($vendors as $vendor){
             $vendor->promotional_flier = PromotionalFlier::where('vendor_id', $vendor->vendor_code)->get();
         }
-        
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $vendors;

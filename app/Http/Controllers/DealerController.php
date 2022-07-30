@@ -60,6 +60,48 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function get_vendor_item($vendor, $atlas)
+    {
+        $item = Products::where('vendor', $vendor)
+            ->where('atlas_id', $atlas)
+            ->get()
+            ->first();
+        $current = Products::where('vendor', $vendor)
+            ->where('atlas_id', $atlas)
+            ->get();
+        $assorted_status = false;
+        $assorted_data = [];
+
+        foreach ($current as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
+
+        $check_assorted = $item->grouping != null ? true : false;
+
+        if ($check_assorted) {
+            $assorted_status = true;
+            $assorted_data = Products::where(
+                'grouping',
+                $item->grouping
+            )->get();
+
+            foreach ($assorted_data as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+        }
+
+        // if ($item) {
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->assorted_state = $assorted_status;
+        $this->result->data->item = $current;
+        $this->result->data->assorted_data = $assorted_data;
+        $this->result->message = 'get user vendor item';
+        // }
+
+        return response()->json($this->result);
+    }
+
     public function save_edited_user_order(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1081,8 +1123,6 @@ class DealerController extends Controller
             $vendor_data = Vendors::where('vendor_code', $vendor)
                 ->get()
                 ->first();
-
-
             if ($vendor_data) {
                 $vendor_data->dealer = $dealer_details;
                 array_push($res_data, $vendor_data);
@@ -1801,7 +1841,7 @@ class DealerController extends Controller
                 'users.company_name as dealer_company_name',
                 'users.last_login as dealer_last_login',
                 'users.login_device as dealer_login_device',
-                'users.place_order_date as dealer_place_order_date',
+                'users.place_order_date as dealer_place_order_date'
             )
             ->orderby('cart.id', 'desc')
             ->get();

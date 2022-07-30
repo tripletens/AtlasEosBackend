@@ -417,6 +417,7 @@ Route::group(
             '/fetch-scheduled-seminars/{dealer_id}',
             'SeminarController@fetch_scheduled_seminars'
         );
+        
         Route::get(
             '/fetch-ongoing-seminars/{dealer_id}',
             'SeminarController@fetch_ongoing_seminars'

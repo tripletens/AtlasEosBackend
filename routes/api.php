@@ -417,6 +417,7 @@ Route::group(
             '/fetch-all-seminars/{dealer_id}',
             'SeminarController@fetch_all_seminars'
         );
+
         Route::get(
             '/fetch-scheduled-seminars/{dealer_id}',
             'SeminarController@fetch_scheduled_seminars'
@@ -425,7 +426,7 @@ Route::group(
             '/fetch-ongoing-seminars/{dealer_id}',
             'SeminarController@fetch_ongoing_seminars'
         );
-        
+
         Route::get(
             '/fetch-watched-seminars/{dealer_id}',
             'SeminarController@fetch_watched_seminars'
@@ -698,6 +699,15 @@ Route::group(
         );
 
         // ------------------ Product summary ends here ----------------- //
+
+        // ------------------ test apis --------------------------- //
+
+        // check_seminar_status
+        Route::get(
+            '/check_seminar_status/{seminar_date}/{start_time}/{stop_time}',
+            'SeminarController@check_seminar_status'
+        );
+        // ------------------ test apis ends here ----------------- //
     }
 );
 

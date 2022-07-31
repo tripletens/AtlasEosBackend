@@ -1433,9 +1433,86 @@ class AdminController extends Controller
             ->where('last_login', '!=', null)
             ->count();
 
+        $cart_data = Cart::all();
+        $cart_total = 0;
+        $total_item_ordered = 0;
+
+        if ($cart_data) {
+            foreach ($cart_data as $value) {
+                $price = $value->price;
+                $qty = $value->qty;
+                $cart_total += floatval($price);
+                $total_item_ordered += intval($qty);
+            }
+        }
+
+        /////////// Most sales By Vendor /////////
+        $most_sales_vendor = [];
+        $all_vendors_data = Vendors::all();
+
+        if ($all_vendors_data) {
+            foreach ($all_vendors_data as $value) {
+                $vendor_code = $value->vendor_code;
+                $vendor_name = $value->vendor_name;
+                $total_sales = Cart::where('vendor', $vendor_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'vendor_name' => $vendor_name,
+                    'vendor_code' => $vendor_code,
+                    'vendor_sales' => $total_sales,
+                    'trend' => '0%',
+                ];
+
+                array_push($most_sales_vendor, $data);
+            }
+        }
+
+        /// 0903 164 6427
+
+        /////// Sorting //////////
+        usort($most_sales_vendor, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['vendor_sales'] > $b['vendor_sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $most_sales_vendor = array_slice($most_sales_vendor, 0, 6);
+
+        ///// Most orders Dealers ///////
+
+        $most_sale_dealer = [];
+
+        $all_dealer_users = Users::where('role', '4')->get();
+
+        if ($all_dealer_users) {
+            foreach ($all_dealer_users as $value) {
+                $user_id = $value->id;
+                $total_sales = Cart::where('uid', $user_id)->sum('price');
+
+                $data = [
+                    'account_id' => $value->account_id,
+                    'full_name' => $value->first_name . ' ' . $value->last_name,
+                    'total_sales' => $total_sales,
+                    'trend' => '0%',
+                ];
+
+                array_push($most_sale_dealer, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($most_sale_dealer, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['total_sales'] > $b['total_sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $most_sale_dealer = array_slice($most_sale_dealer, 0, 6);
+
         $this->result->status = true;
         $this->result->status_code = 200;
-
+        $this->result->data->most_sale_dealer = $most_sale_dealer;
+        $this->result->data->most_sales_vendor = $most_sales_vendor;
         $this->result->data->total_logged_vendors = $logged_vendors;
         $this->result->data->total_logged_admin = $logged_admin;
         $this->result->data->total_logged_dealers = $logged_dealers;
@@ -1443,7 +1520,8 @@ class AdminController extends Controller
         $this->result->data->total_vendors = $total_vendors;
         $this->result->data->total_dealers = $total_dealers;
         $this->result->data->total_products = $total_products;
-        $this->result->data->total_order = $total_order;
+        $this->result->data->total_amount = $cart_total;
+        $this->result->data->total_item_ordered = $total_item_ordered;
 
         $this->result->message = 'Admin Dashboard Data';
         return response()->json($this->result);

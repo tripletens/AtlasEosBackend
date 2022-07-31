@@ -74,7 +74,7 @@ Route::group(
 
         Route::get('/get-vendor-user/{id}', 'AdminController@get_vendor_user');
 
-        // Route::post('/upload-dealers', 'AdminController@upload_dealers');
+        Route::post('/upload-dealers', 'AdminController@upload_dealers');
 
         Route::post(
             '/edit-vendor-user',
@@ -258,6 +258,11 @@ Route::group(
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
+        Route::get(
+            '/dealer/get-vendor-item/{vendor}/{atlas}',
+            'DealerController@get_vendor_item'
+        );
+
         Route::post(
             '/dealer/save-edited-user-order',
             'DealerController@save_edited_user_order'
@@ -417,7 +422,7 @@ Route::group(
             '/fetch-scheduled-seminars/{dealer_id}',
             'SeminarController@fetch_scheduled_seminars'
         );
-        
+
         Route::get(
             '/fetch-ongoing-seminars/{dealer_id}',
             'SeminarController@fetch_ongoing_seminars'
@@ -684,7 +689,6 @@ Route::group(
         );
 
         //------------------- special orders ends here ------------------ //
-
 
         // ------------------ Product summary --------------------------- //
 

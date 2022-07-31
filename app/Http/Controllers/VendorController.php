@@ -104,7 +104,7 @@ class VendorController extends Controller
             foreach ($dealers as $value) {
                 $privileged_vendors = $value->privileged_vendors;
 
-                if ($privileged_vendors != '') {
+                if ($privileged_vendors != null) {
                     $expand = explode(',', $privileged_vendors);
 
                     if (in_array($code, $expand)) {

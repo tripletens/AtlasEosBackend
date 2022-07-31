@@ -1139,6 +1139,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    // 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
     public function get_ordered_vendor($code)
     {
         $dealer_cart = Cart::where('dealer', $code)->get();
@@ -1391,13 +1392,10 @@ class DealerController extends Controller
         //     ->select('vendors.*', 'promotional_fliers.*')->get();
 
         $vendors = Vendors::all();
-
-        foreach ($vendors as $vendor) {
-            $vendor->promotional_flier = PromotionalFlier::where(
-                'vendor_id',
-                $vendor->vendor_code
-            )->get();
-        }
+        
+        // foreach($vendors as $vendor){
+        //     $vendor->promotional_flier = PromotionalFlier::where('vendor_id', $vendor->vendor_code)->get();
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;

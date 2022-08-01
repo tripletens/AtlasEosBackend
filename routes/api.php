@@ -241,6 +241,13 @@ Route::group(
             'AdminController@get_special_orders'
         );
 
+        Route::get('/admin/get-all-vendors', 'AdminController@get_all_vendor');
+
+        Route::get(
+            '/admin/get-vendor-products/{code}',
+            'AdminController@get_vendor_products'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

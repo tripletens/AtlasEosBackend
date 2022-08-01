@@ -74,6 +74,41 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_vendor_products($code)
+    {
+        if (Products::where('vendor', $code)->exists()) {
+            $vendor_products = Products::where('vendor', $code)
+                ->where('status', '1')
+                ->get();
+
+            foreach ($vendor_products as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $vendor_products;
+            $this->result->message = 'all Vendor Products Data';
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+            $this->result->message = 'no product found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_all_vendor()
+    {
+        $vendors = Vendors::all();
+
+        $this->result->status = true;
+        $this->result->data = $vendors;
+        $this->result->message = 'All Vendor';
+        return response()->json($this->result);
+    }
+
     public function get_special_orders()
     {
         $orders = SpecialOrder::orderBy('created_at', 'desc')->get();
@@ -1105,8 +1140,9 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
-    public function check_status($seminar_date,$start_time,$stop_time){
-        echo $seminar_date . ' => ' . $start_time . ' => ' . $stop_time; 
+    public function check_status($seminar_date, $start_time, $stop_time)
+    {
+        echo $seminar_date . ' => ' . $start_time . ' => ' . $stop_time;
     }
 
     public function create_seminar(Request $request)
@@ -1149,7 +1185,7 @@ class AdminController extends Controller
                 'start_time' => $start_time,
                 'stop_time' => $stop_time,
                 'link' => $link,
-                'status' => '1' // 1 means scheduled, 2 means ongoing, 3 means completed
+                'status' => '1', // 1 means scheduled, 2 means ongoing, 3 means completed
             ]);
 
             if ($save) {
@@ -2226,12 +2262,14 @@ class AdminController extends Controller
                 $role_name = 'dealer';
                 $role_id = '4';
 
-                $save_dealer = Dealer::create([
-                    'dealer_name' => $dealer_name,
-                    'dealer_code' => $dealer_code,
-                    'role_name' => $role_name,
-                    'role_id' => $role_id,
-                ]);
+                if (!Dealer::where('dealer_code', $dealer_code)->exists()) {
+                    $save_dealer = Dealer::create([
+                        'dealer_name' => $dealer_name,
+                        'dealer_code' => $dealer_code,
+                        'role_name' => $role_name,
+                        'role_id' => $role_id,
+                    ]);
+                }
 
                 if (!$save_dealer) {
                     $this->result->status = false;

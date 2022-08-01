@@ -2269,14 +2269,14 @@ class AdminController extends Controller
                         'role_name' => $role_name,
                         'role_id' => $role_id,
                     ]);
-                }
 
-                if (!$save_dealer) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_dealer) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
             }
         }

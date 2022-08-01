@@ -248,6 +248,8 @@ Route::group(
             'AdminController@get_vendor_products'
         );
 
+        Route::get('/admin/dealer-summary', 'AdminController@dealer_summary');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

@@ -74,6 +74,50 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function dealer_summary()
+    {
+        $dealers = Dealer::all();
+        $dealer_count = Dealer::count();
+
+        $total_sales = 0;
+
+        $res_data = [];
+
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $dealer_code = $value->dealer_code;
+                $dealer_name = $value->dealer_name;
+                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'sales' => $dealer_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($res_data, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+
+        $this->result->message = 'Dealer Summary';
+        return response()->json($this->result);
+    }
+
     public function get_vendor_products($code)
     {
         if (Products::where('vendor', $code)->exists()) {

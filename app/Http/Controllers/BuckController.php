@@ -151,10 +151,83 @@ class BuckController extends Controller
             $this->result->message = 'Promotional Flier fetched Successfully';
             return response()->json($this->result);
         }
+    }
 
-      
-        
-        
-        return $fetch_show_bucks;
+    public function edit_buck(Request $request){
+        $validator = Validator::make($request->all(), [
+            'vendor_name' => 'required',
+            'vendor_code' => 'required|string',
+            'title' => 'required|string',
+            'description' => 'required',
+            'status' => 'required|boolean',
+            'file' => 'required|mimes:pdf,doc,docx,xls,jpg,jpeg,Jpeg,png,gif',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+
+            $vendor_code = $request->input('vendor_code');
+            $vendor_name = $request->input('vendor_name');
+            $title = $request->input('title');
+            $description = $request->input('description');
+            $status = $request->input('status');
+            $file =   $request->hasFile('file');
+
+            $check_buck = Bucks::where('vendor_code',$vendor_code)->get()->first();
+
+            if (!$check_buck) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message = "An Error Ocurred, we couldn't fetch the show bucks with that vendor code";
+                return response()->json($this->result);
+            }
+
+            if ($request->hasFile('file')) {
+                $filenameWithExt = $request
+                    ->file('file')
+                    ->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request
+                    ->file('file')
+                    ->getClientOriginalExtension();
+                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $filepath =
+                    env('APP_URL') .
+                    Storage::url(
+                        $request
+                            ->file('file')
+                            ->storeAs('public/bucks', $fileNameToStore)
+                    );
+            }
+
+            $check_buck->vendor_name = $vendor_name ? $vendor_name : null;
+            $check_buck->vendor_code = $vendor_code ? $vendor_code : null;
+            $check_buck->title = $title ? $title : null;
+            $check_buck->description = $description ? $description : null;
+            $check_buck->status = $status ? $status : null;
+            $check_buck->img_url = $file ? $filepath : null;
+
+
+            $update_buck = $check_buck->save();
+
+            if (!$update_buck) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message = "An Error Ocurred, we couldn't update the show bucks with that vendor code";
+                return response()->json($this->result);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $update_buck;
+            $this->result->message = 'Show Buck updated Successfully';
+            return response()->json($this->result);
+        }
     }
 }

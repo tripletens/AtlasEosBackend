@@ -25,7 +25,11 @@ class BuckController extends Controller
             'debug' => null,
         ];
     }
+    // upload file 
 
+    public function upload_file(){
+        
+    }
     // add show bucks 
     public function create_buck(Request $request)
     {
@@ -38,7 +42,8 @@ class BuckController extends Controller
             'title' => 'required|string',
             'description' => 'required',
             'status' => 'required|boolean',
-            'file' => 'required|mimes:pdf,doc,docx,xls,jpg,jpeg,png,gif',
+            'pdf' => 'required|mimes:pdf,doc,docx',
+            'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {
@@ -50,26 +55,44 @@ class BuckController extends Controller
             return response()->json($this->result);
         } else {
 
-            if ($request->hasFile('file')) {
-                $filenameWithExt = $request
-                    ->file('file')
+            if ($request->hasFile('image')) {
+                $image_filenameWithExt = $request
+                    ->file('image')
                     ->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request
-                    ->file('file')
+                $image_filename = pathinfo($image_filenameWithExt, PATHINFO_FILENAME);
+                $image_extension = $request
+                    ->file('image')
                     ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
-                $filepath =
+                $image_fileNameToStore = Str::slug($image_filename,'_',$language='en') . '_' . time() . '.' . $image_extension;
+                $img_filepath =
                     env('APP_URL') .
                     Storage::url(
                         $request
-                            ->file('file')
+                            ->file('image')
+                            ->storeAs('public/bucks', $image_fileNameToStore)
+                    );
+            }
+
+            if ($request->hasFile('pdf')) {
+                $filenameWithExt = $request
+                    ->file('pdf')
+                    ->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request
+                    ->file('pdf')
+                    ->getClientOriginalExtension();
+                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $pdf_filepath =
+                    env('APP_URL') .
+                    Storage::url(
+                        $request
+                            ->file('pdf')
                             ->storeAs('public/bucks', $fileNameToStore)
                     );
             }
 
-             // `vendor_name`, `vendor_code`,`title`, `description`, `img_url`,
-        //  `status`,
+            // `vendor_name`, `vendor_code`,`title`, `description`, `img_url`,
+            //  `status`,
 
             $vendor_name = $request->input('vendor_name');
             $vendor_code = $request->input('vendor_code');
@@ -84,7 +107,8 @@ class BuckController extends Controller
                 'title' => $title ? $title : null,
                 'description' => $description ? $description : null,
                 'status' => $status ? $status : null,
-                'img_url' => $request->hasFile('file') ? $filepath : null
+                'img_url' => $request->hasFile('image') ? $img_filepath : null,
+                'pdf_url' => $request->hasFile('pdf') ? $pdf_filepath : null
             ]);
 
             if (!$createBuck) {

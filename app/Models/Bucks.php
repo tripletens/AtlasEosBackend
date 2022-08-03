@@ -9,5 +9,5 @@ class Bucks extends Model
 {
     use HasFactory;
     protected $table = "show_buck";
-    protected $fillable = ['title','vendor_name', 'vendor_code', 'description', 'img_url', 'status', 'created_at', 'updated_at'];
+    protected $fillable = ['title','vendor_name', 'vendor_code', 'description', 'img_url','pdf_url', 'status', 'created_at', 'updated_at'];
 }

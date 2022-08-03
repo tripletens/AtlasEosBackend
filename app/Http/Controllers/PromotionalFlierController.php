@@ -194,11 +194,7 @@ class PromotionalFlierController extends Controller
             $this->result->message = "An Error Ocurred, we couldn't fetch the promotional fliers";
             return response()->json($this->result);
         } else {
-            $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->data = $one_promotional_flier;
-            $this->result->message = 'Promotional Flier fetched Successfully';
-            return response()->json($this->result);
+             
         }
     }
 

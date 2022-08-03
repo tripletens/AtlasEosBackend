@@ -716,6 +716,13 @@ Route::group(
             'BuckController@create_buck'
         );
 
+        Route::get(
+            '/fetch_show_buck_promotional_flier/{vendor_code}',
+            'BuckController@fetch_show_buck_promotional_flier'
+        );
+
+
+        
         // ------------------- show bucks ends here  ------------------ //
 
         // ------------------ test apis --------------------------- //
@@ -725,6 +732,8 @@ Route::group(
             '/check_seminar_status/{seminar_date}/{start_time}/{stop_time}',
             'SeminarController@check_seminar_status'
         );
+        
+        // fetch_show_buck_promotional_flier
         // ------------------ test apis ends here ----------------- //
     }
 );

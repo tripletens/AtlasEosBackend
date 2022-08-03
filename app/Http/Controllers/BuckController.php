@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bucks;
+use App\Models\PromotionalFlier;
+use App\Models\Vendors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -24,6 +26,7 @@ class BuckController extends Controller
         ];
     }
 
+    // add show bucks 
     public function create_buck(Request $request)
     {
         // `vendor_name`, `vendor_code`,`title`, `description`, `img_url`,
@@ -97,5 +100,61 @@ class BuckController extends Controller
             $this->result->message = 'Show Bucks added successfully';
             return response()->json($this->result);
         }
+    }
+
+    // fetch show bucks and promotional flier by vendor code 
+
+    public function fetch_show_buck_promotional_flier($vendor_code){
+
+        $fetch_vendor_details = Vendors::where('vendor_code',$vendor_code)->get()->first();
+
+        if (!$fetch_vendor_details) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the vendor with that vendor code";
+            return response()->json($this->result);
+        } 
+
+        $fetch_show_bucks = Bucks::where('vendor_code',$vendor_code)->get();
+
+        if (!$fetch_show_bucks) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the show bucks with that vendor code";
+            return response()->json($this->result);
+        } else {
+
+            // check for promotional fliers with vendor code 
+            $fetch_promotional_flier = PromotionalFlier::where('vendor_id',$vendor_code)->get();
+            
+            if (!$fetch_promotional_flier) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message = "An Error Ocurred, we couldn't fetch the promotional flier with that vendor code";
+                return response()->json($this->result);
+            }
+            // send details to you
+            $vendor_name = $fetch_vendor_details->vendor_name;
+            $vendor_code = $fetch_vendor_details->vendor_code;
+            $vendor_status = $fetch_vendor_details->status == 1 ? true : false;
+            $data = [
+                "vendor_name" => $vendor_name,
+                "vendor_code" => $vendor_code,
+                "vendor_status" => $vendor_status,
+                "bucks" => $fetch_show_bucks,
+                "promotional_fliers" => $fetch_promotional_flier
+            ];
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $data;
+            $this->result->message = 'Promotional Flier fetched Successfully';
+            return response()->json($this->result);
+        }
+
+      
+        
+        
+        return $fetch_show_bucks;
     }
 }

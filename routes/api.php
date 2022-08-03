@@ -696,6 +696,15 @@ Route::group(
 
         // ------------------ Product summary ends here ----------------- //
 
+        // ------------------- show bucks starts here  ------------------ //
+        
+        Route::post(
+            '/add_showbucks',
+            'BuckController@create_buck'
+        );
+
+        // ------------------- show bucks ends here  ------------------ //
+
         // ------------------ test apis --------------------------- //
 
         // check_seminar_status

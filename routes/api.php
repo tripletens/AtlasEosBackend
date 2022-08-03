@@ -493,6 +493,15 @@ Route::group(
             '/get-all-new-products',
             'ProductsController@fetch_all_new_products'
         );
+        Route::get(
+            '/fetch-all-products-by-vendor-code/{vendor_code}',
+            'ProductsController@fetch_all_products_by_vendor_code'
+        );
+
+        
+
+
+        //----------------------------- new products ends here ------------------// 
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',
@@ -708,6 +717,12 @@ Route::group(
             'BuckController@fetch_show_buck_promotional_flier'
         );
 
+        Route::post(
+            '/edit_buck',
+            'BuckController@edit_buck'
+        );
+
+        
 
         
         // ------------------- show bucks ends here  ------------------ //

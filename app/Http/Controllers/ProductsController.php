@@ -107,4 +107,27 @@ class ProductsController extends Controller
         $this->result->message = 'All products for vendor fetched successfully';
         return response()->json($this->result);
     }
+
+    // fetch all the new products by vendor code 
+    public function fetch_all_products_by_vendor_code($vendor_code)
+    {
+        $fetch_all_products_by_vendor_code = Products::where('vendor_code', $vendor_code)
+            ->orderby('id', 'desc')
+            ->get();
+
+        if (!$fetch_all_products_by_vendor_code) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the products for the vendor";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_all_products_by_vendor_code;
+        $this->result->message = 'All products for vendor code fetched successfully';
+        return response()->json($this->result);
+    }
+
 }

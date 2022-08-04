@@ -152,9 +152,9 @@
                 <h2 class="dealer-name">Dealer Account #: {{ $dealer->dealer_code }}</h2>
                 {{-- <h2 class="dealer-name">Order Date: {{ $dealer_updated_at }} MST</h2> --}}
             </div>
-            <div class="mt-3">
+            {{-- <div class="mt-3">
                 <img src="https://atlasbookingprogram.com/assets/new-atlas-logo.png" class="com-logo" alt="">
-            </div>
+            </div> --}}
         </div>
     </div>
 

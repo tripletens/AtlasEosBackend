@@ -60,6 +60,74 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function generate_pdf($dealer)
+    {
+        $data = [
+            'title' => 'Welcome to Tutsmake.com',
+            'date' => date('m/d/Y'),
+        ];
+
+        $vendors = [];
+        $res_data = [];
+        $grand_total = 0;
+
+        $dealer_data = Cart::where('dealer', $dealer)->get();
+        $dealer_ship = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
+        foreach ($dealer_data as $value) {
+            $vendor_code = $value->vendor;
+            if (!\in_array($vendor_code, $vendors)) {
+                array_push($vendors, $vendor_code);
+            }
+        }
+
+        foreach ($vendors as $value) {
+            $vendor_data = Vendors::where('vendor_code', $value)
+                ->get()
+                ->first();
+            $cart_data = Cart::where('vendor', $value)
+                ->where('dealer', $dealer)
+                ->get();
+
+            $total = 0;
+
+            foreach ($cart_data as $value) {
+                $total += $value->price;
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->description = $pro_data->description;
+                $value->vendor_product_code = $pro_data->vendor_product_code;
+            }
+
+            $data = [
+                'vendor_code' => $vendor_data->vendor_code,
+                'vendor_name' => $vendor_data->vendor_name,
+                'total' => floatval($total),
+                'data' => $cart_data,
+            ];
+
+            $grand_total += $total;
+
+            array_push($res_data, $data);
+        }
+
+        //return $res_data;
+
+        $pdf_data = [
+            'data' => $res_data,
+            'dealer' => $dealer_ship,
+            'grand_total' => $grand_total,
+        ];
+
+        $pdf = PDF::loadView('dealership-pdf', $pdf_data);
+        return $pdf->download('dealership.pdf');
+    }
+
     public function get_vendor_item($vendor, $atlas)
     {
         $item = Products::where('vendor', $vendor)

@@ -710,6 +710,14 @@ Route::group(
             'DealerController@fetch_vendors_new_products'
         );
 
+        // fetch the dealer purchases per day
+        Route::get(
+            '/fetch-all-orders-per-day',
+            'DealerController@fetch_all_orders_per_day'
+        );
+
+
+
         //------------------- special orders starts here ---------------- //
 
         // add a special order item

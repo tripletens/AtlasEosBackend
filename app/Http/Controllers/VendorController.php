@@ -304,20 +304,43 @@ class VendorController extends Controller
             $separator = explode(',', $privilaged_vendors);
             $total_sales = 0;
             $total_orders = 0;
-            for ($i = 0; $i < count($separator); $i++) {
-                $code = $separator[$i];
-                // array_push($vend, $code);
-                $total_sales += Cart::where('vendor', $code)->sum('price');
-                $total_orders += Cart::where('vendor', $code)->sum('qty');
-                $cart_dealer = Cart::where('vendor', $code)->get();
 
-                foreach ($cart_dealer as $value) {
-                    $dealer_id = $value->dealer;
-                    if (!in_array($dealer_id, $dealers)) {
-                        array_push($dealers, $dealer_id);
+            $all_vendor_data = Vendors::all();
+
+            foreach ($all_vendor_data as $value) {
+                $vendor_code = $value->vendor_code;
+                if (\in_array($vendor_code, $separator)) {
+                    // array_push($vend, $code);
+                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                        'price'
+                    );
+                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
+                        'qty'
+                    );
+                    $cart_dealer = Cart::where('vendor', $vendor_code)->get();
+                    foreach ($cart_dealer as $value) {
+                        $dealer_id = $value->dealer;
+                        if (!in_array($dealer_id, $dealers)) {
+                            array_push($dealers, $dealer_id);
+                        }
                     }
                 }
             }
+
+            // for ($i = 0; $i < count($separator); $i++) {
+            //     $code = $separator[$i];
+            //     // array_push($vend, $code);
+            //     $total_sales += Cart::where('vendor', $code)->sum('price');
+            //     $total_orders += Cart::where('vendor', $code)->sum('qty');
+            //     $cart_dealer = Cart::where('vendor', $code)->get();
+
+            //     foreach ($cart_dealer as $value) {
+            //         $dealer_id = $value->dealer;
+            //         if (!in_array($dealer_id, $dealers)) {
+            //             array_push($dealers, $dealer_id);
+            //         }
+            //     }
+            // }
 
             for ($i = 0; $i < count($dealers); $i++) {
                 $dealer_code = $dealers[$i];

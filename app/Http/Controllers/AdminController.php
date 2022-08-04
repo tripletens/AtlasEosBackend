@@ -74,6 +74,85 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function dealer_summary()
+    {
+        $dealers = Dealer::all();
+        $dealer_count = Dealer::count();
+
+        $total_sales = 0;
+
+        $res_data = [];
+
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $dealer_code = $value->dealer_code;
+                $dealer_name = $value->dealer_name;
+                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'sales' => $dealer_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($res_data, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+
+        $this->result->message = 'Dealer Summary';
+        return response()->json($this->result);
+    }
+
+    public function get_vendor_products($code)
+    {
+        if (Products::where('vendor', $code)->exists()) {
+            $vendor_products = Products::where('vendor', $code)
+                ->where('status', '1')
+                ->get();
+
+            foreach ($vendor_products as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $vendor_products;
+            $this->result->message = 'all Vendor Products Data';
+        } else {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+            $this->result->message = 'no product found';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_all_vendor()
+    {
+        $vendors = Vendors::all();
+
+        $this->result->status = true;
+        $this->result->data = $vendors;
+        $this->result->message = 'All Vendor';
+        return response()->json($this->result);
+    }
+
     public function get_special_orders()
     {
         $orders = SpecialOrder::orderBy('created_at', 'desc')->get();
@@ -1105,8 +1184,9 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
-    public function check_status($seminar_date,$start_time,$stop_time){
-        echo $seminar_date . ' => ' . $start_time . ' => ' . $stop_time; 
+    public function check_status($seminar_date, $start_time, $stop_time)
+    {
+        echo $seminar_date . ' => ' . $start_time . ' => ' . $stop_time;
     }
 
     public function create_seminar(Request $request)
@@ -1149,7 +1229,7 @@ class AdminController extends Controller
                 'start_time' => $start_time,
                 'stop_time' => $stop_time,
                 'link' => $link,
-                'status' => '1' // 1 means scheduled, 2 means ongoing, 3 means completed
+                'status' => '1', // 1 means scheduled, 2 means ongoing, 3 means completed
             ]);
 
             if ($save) {
@@ -1433,9 +1513,86 @@ class AdminController extends Controller
             ->where('last_login', '!=', null)
             ->count();
 
+        $cart_data = Cart::all();
+        $cart_total = 0;
+        $total_item_ordered = 0;
+
+        if ($cart_data) {
+            foreach ($cart_data as $value) {
+                $price = $value->price;
+                $qty = $value->qty;
+                $cart_total += floatval($price);
+                $total_item_ordered += intval($qty);
+            }
+        }
+
+        /////////// Most sales By Vendor /////////
+        $most_sales_vendor = [];
+        $all_vendors_data = Vendors::all();
+
+        if ($all_vendors_data) {
+            foreach ($all_vendors_data as $value) {
+                $vendor_code = $value->vendor_code;
+                $vendor_name = $value->vendor_name;
+                $total_sales = Cart::where('vendor', $vendor_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'vendor_name' => $vendor_name,
+                    'vendor_code' => $vendor_code,
+                    'vendor_sales' => $total_sales,
+                    'trend' => '0%',
+                ];
+
+                array_push($most_sales_vendor, $data);
+            }
+        }
+
+        /// 0903 164 6427
+
+        /////// Sorting //////////
+        usort($most_sales_vendor, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['vendor_sales'] > $b['vendor_sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $most_sales_vendor = array_slice($most_sales_vendor, 0, 6);
+
+        ///// Most orders Dealers ///////
+
+        $most_sale_dealer = [];
+
+        $all_dealer_users = Users::where('role', '4')->get();
+
+        if ($all_dealer_users) {
+            foreach ($all_dealer_users as $value) {
+                $user_id = $value->id;
+                $total_sales = Cart::where('uid', $user_id)->sum('price');
+
+                $data = [
+                    'account_id' => $value->account_id,
+                    'full_name' => $value->first_name . ' ' . $value->last_name,
+                    'total_sales' => $total_sales,
+                    'trend' => '0%',
+                ];
+
+                array_push($most_sale_dealer, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($most_sale_dealer, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['total_sales'] > $b['total_sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $most_sale_dealer = array_slice($most_sale_dealer, 0, 6);
+
         $this->result->status = true;
         $this->result->status_code = 200;
-
+        $this->result->data->most_sale_dealer = $most_sale_dealer;
+        $this->result->data->most_sales_vendor = $most_sales_vendor;
         $this->result->data->total_logged_vendors = $logged_vendors;
         $this->result->data->total_logged_admin = $logged_admin;
         $this->result->data->total_logged_dealers = $logged_dealers;
@@ -1443,7 +1600,8 @@ class AdminController extends Controller
         $this->result->data->total_vendors = $total_vendors;
         $this->result->data->total_dealers = $total_dealers;
         $this->result->data->total_products = $total_products;
-        $this->result->data->total_order = $total_order;
+        $this->result->data->total_amount = $cart_total;
+        $this->result->data->total_item_ordered = $total_item_ordered;
 
         $this->result->message = 'Admin Dashboard Data';
         return response()->json($this->result);
@@ -2102,11 +2260,11 @@ class AdminController extends Controller
         }
 
         if ($vendor != '') {
-            $vendorName = $request->vendor;
-            $vendorCode = $request->vendorCode;
+            $vendor = $request->vendor;
+            $vendorName = $request->vendorName;
             $update = Users::where('id', $vendorId)->update([
                 'vendor_name' => $vendorName,
-                'vendor_code' => $vendorCode,
+                'vendor_code' => $vendor,
                 'company_name' => $vendorName,
             ]);
         }
@@ -2148,19 +2306,21 @@ class AdminController extends Controller
                 $role_name = 'dealer';
                 $role_id = '4';
 
-                $save_dealer = Dealer::create([
-                    'dealer_name' => $dealer_name,
-                    'dealer_code' => $dealer_code,
-                    'role_name' => $role_name,
-                    'role_id' => $role_id,
-                ]);
+                if (!Dealer::where('dealer_code', $dealer_code)->exists()) {
+                    $save_dealer = Dealer::create([
+                        'dealer_name' => $dealer_name,
+                        'dealer_code' => $dealer_code,
+                        'role_name' => $role_name,
+                        'role_id' => $role_id,
+                    ]);
 
-                if (!$save_dealer) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_dealer) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
             }
         }

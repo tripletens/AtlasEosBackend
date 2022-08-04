@@ -60,6 +60,116 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function generate_pdf($dealer)
+    {
+        $data = [
+            'title' => 'Welcome to Tutsmake.com',
+            'date' => date('m/d/Y'),
+        ];
+
+        $vendors = [];
+        $res_data = [];
+        $grand_total = 0;
+
+        $dealer_data = Cart::where('dealer', $dealer)->get();
+        $dealer_ship = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
+        foreach ($dealer_data as $value) {
+            $vendor_code = $value->vendor;
+            if (!\in_array($vendor_code, $vendors)) {
+                array_push($vendors, $vendor_code);
+            }
+        }
+
+        foreach ($vendors as $value) {
+            $vendor_data = Vendors::where('vendor_code', $value)
+                ->get()
+                ->first();
+            $cart_data = Cart::where('vendor', $value)
+                ->where('dealer', $dealer)
+                ->get();
+
+            $total = 0;
+
+            foreach ($cart_data as $value) {
+                $total += $value->price;
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->description = $pro_data->description;
+                $value->vendor_product_code = $pro_data->vendor_product_code;
+            }
+
+            $data = [
+                'vendor_code' => $vendor_data->vendor_code,
+                'vendor_name' => $vendor_data->vendor_name,
+                'total' => floatval($total),
+                'data' => $cart_data,
+            ];
+
+            $grand_total += $total;
+
+            array_push($res_data, $data);
+        }
+
+        //return $res_data;
+
+        $pdf_data = [
+            'data' => $res_data,
+            'dealer' => $dealer_ship,
+            'grand_total' => $grand_total,
+        ];
+
+        $pdf = PDF::loadView('dealership-pdf', $pdf_data);
+        return $pdf->download('dealership.pdf');
+    }
+
+    public function get_vendor_item($vendor, $atlas)
+    {
+        $item = Products::where('vendor', $vendor)
+            ->where('atlas_id', $atlas)
+            ->get()
+            ->first();
+        $current = Products::where('vendor', $vendor)
+            ->where('atlas_id', $atlas)
+            ->get();
+        $assorted_status = false;
+        $assorted_data = [];
+
+        foreach ($current as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
+
+        $check_assorted = $item->grouping != null ? true : false;
+
+        if ($check_assorted) {
+            $assorted_status = true;
+            $assorted_data = Products::where(
+                'grouping',
+                $item->grouping
+            )->get();
+
+            foreach ($assorted_data as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+        }
+
+        // if ($item) {
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->assorted_state = $assorted_status;
+        $this->result->data->item = $current;
+        $this->result->data->assorted_data = $assorted_data;
+        $this->result->message = 'get user vendor item';
+        // }
+
+        return response()->json($this->result);
+    }
+
     public function save_edited_user_order(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -506,6 +616,8 @@ class DealerController extends Controller
             $existing_already_in_order = '';
             $newly_added = 0;
             $existing_already_in_quick_order = '';
+            $current_vendor = '';
+            $submitted_status = false;
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -521,6 +633,7 @@ class DealerController extends Controller
                             ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
+                        $current_vendor = $product->vendor_id;
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
@@ -530,6 +643,7 @@ class DealerController extends Controller
                             $existing_already_in_quick_order .=
                                 $product->atlas_id . ', ';
                         } else {
+                            $submitted_status = true;
                             $save = QuickOrder::create([
                                 'uid' => $uid,
                                 'atlas_id' => $product->atlas_id,
@@ -555,6 +669,9 @@ class DealerController extends Controller
                     $this->result->data->existing_already_in_order = $existing_already_in_order;
                     $this->result->data->newly_added = $newly_added;
                     $this->result->data->existing_already_in_quick_order = $existing_already_in_quick_order;
+                    $this->result->data->current_vendor = $current_vendor;
+
+                    $this->result->data->submitted_status = $submitted_status;
 
                     $this->result->status_code = 200;
                     $this->result->message = 'item Added';
@@ -591,6 +708,10 @@ class DealerController extends Controller
             $existing_already_in_order = '';
             $newly_added = 0;
             $existing_already_in_quick_order = '';
+            $existing_status = false;
+            $existing_quick_order_status = false;
+            $current_vendor = '';
+            $submitted_status = false;
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -606,6 +727,8 @@ class DealerController extends Controller
                             ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
+                        $existing_status = true;
+                        $current_vendor = $product->vendor_id;
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
@@ -614,7 +737,9 @@ class DealerController extends Controller
                         ) {
                             $existing_already_in_quick_order .=
                                 $product->atlas_id . ', ';
+                            $existing_quick_order_status = true;
                         } else {
+                            $submitted_status = true;
                             $save = QuickOrder::create([
                                 'uid' => $uid,
                                 'atlas_id' => $product->atlas_id,
@@ -638,9 +763,14 @@ class DealerController extends Controller
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->message = 'item Added to cart';
+            $this->result->data->existing_status = $existing_status;
+            $this->result->data->current_vendor = $current_vendor;
+            $this->result->data->existing_quick_order_status = $existing_quick_order_status;
             $this->result->data->existing_already_in_order = $existing_already_in_order;
             $this->result->data->newly_added = $newly_added;
             $this->result->data->existing_already_in_quick_order = $existing_already_in_quick_order;
+
+            $this->result->data->submitted_status = $submitted_status;
 
             return response()->json($this->result);
         }
@@ -707,6 +837,8 @@ class DealerController extends Controller
             $item_already_added = 0;
             $item_added = 0;
             $item_details = '';
+            $current_vendor = '';
+            $submitted_status = false;
 
             if (count(json_decode($product_array)) > 0 && $product_array) {
                 $decode_product_array = json_decode($product_array);
@@ -727,6 +859,8 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
+                        $current_vendor = $product->vendor_id;
+                        $submitted_status = true;
                         $save = Cart::create([
                             'uid' => $uid,
                             'atlas_id' => $product->atlas_id,
@@ -747,6 +881,21 @@ class DealerController extends Controller
                 }
             }
 
+            $vendors_chat = [];
+
+            if ($current_vendor != '') {
+                $vendors = Users::where('vendor_code', $current_vendor)->get();
+
+                if ($vendors) {
+                    foreach ($vendors as $value) {
+                        $id = $value->id;
+                        $first_name = $value->first_name;
+                        $chat_id = $id . $first_name;
+                        array_push($vendors_chat, $chat_id);
+                    }
+                }
+            }
+
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->message = 'item Added to cart';
@@ -754,6 +903,10 @@ class DealerController extends Controller
             $this->result->data->item_already_added = $item_already_added;
 
             $this->result->data->item_details = $item_details;
+            $this->result->data->submitted_status = $submitted_status;
+            $this->result->data->current_vendor = $current_vendor;
+
+            $this->result->data->chat_data = $vendors_chat;
 
             return response()->json($this->result);
             // return $array_check;
@@ -1082,8 +1235,6 @@ class DealerController extends Controller
             $vendor_data = Vendors::where('vendor_code', $vendor)
                 ->get()
                 ->first();
-
-
             if ($vendor_data) {
                 $vendor_data->dealer = $dealer_details;
                 array_push($res_data, $vendor_data);
@@ -1818,7 +1969,7 @@ class DealerController extends Controller
                 'users.company_name as dealer_company_name',
                 'users.last_login as dealer_last_login',
                 'users.login_device as dealer_login_device',
-                'users.place_order_date as dealer_place_order_date',
+                'users.place_order_date as dealer_place_order_date'
             )
             ->orderby('cart.id', 'desc')
             ->get();
@@ -1995,8 +2146,8 @@ class DealerController extends Controller
                         'vendor' => $vendor,
                         'product_id' => $product_id,
                         'qty' => $qty,
-                        'price' => $price,
-                        'unit_price' => $unit_price,
+                        'price' => trim($price),
+                        'unit_price' => trim($unit_price),
                         'status' => $status,
                     ]);
 

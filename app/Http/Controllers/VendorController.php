@@ -30,6 +30,20 @@ class VendorController extends Controller
         ];
     }
 
+    public function get_vendor_data($code)
+    {
+        $data = Vendors::where('vendor_code', $code)
+            ->get()
+            ->first();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor Data';
+        $this->result->data = $data;
+
+        return response()->json($this->result);
+    }
+
     public function get_vendor_note($dealer, $vendor)
     {
         $altas_notes = ProgramNotes::where('dealer_code', $dealer)
@@ -104,7 +118,7 @@ class VendorController extends Controller
             foreach ($dealers as $value) {
                 $privileged_vendors = $value->privileged_vendors;
 
-                if ($privileged_vendors != '') {
+                if ($privileged_vendors != null) {
                     $expand = explode(',', $privileged_vendors);
 
                     if (in_array($code, $expand)) {
@@ -278,6 +292,7 @@ class VendorController extends Controller
         $dealer_sales = [];
         $dealers = [];
         $purchasers = [];
+        $vend = [];
 
         $selected_user = Users::where('id', $user)
             ->where('vendor_code', $code)
@@ -285,42 +300,47 @@ class VendorController extends Controller
             ->first();
 
         $privilaged_vendors = $selected_user->privileged_vendors;
-        $separator = explode(',', $privilaged_vendors);
-        $total_sales = 0;
-        for ($i = 0; $i < count($separator); $i++) {
-            $code = $separator[$i];
-            $total_sales += Cart::where('vendor', $code)->sum('price');
+        if ($privilaged_vendors != null) {
+            $separator = explode(',', $privilaged_vendors);
+            $total_sales = 0;
+            $total_orders = 0;
+            for ($i = 0; $i < count($separator); $i++) {
+                $code = $separator[$i];
+                // array_push($vend, $code);
+                $total_sales += Cart::where('vendor', $code)->sum('price');
+                $total_orders += Cart::where('vendor', $code)->sum('qty');
+                $cart_dealer = Cart::where('vendor', $code)->get();
 
-            $cart_dealer = Cart::where('vendor', $code)->get();
-            foreach ($cart_dealer as $value) {
-                $dealer_id = $value->dealer;
-                if (!in_array($dealer_id, $dealers)) {
-                    array_push($dealers, $dealer_id);
+                foreach ($cart_dealer as $value) {
+                    $dealer_id = $value->dealer;
+                    if (!in_array($dealer_id, $dealers)) {
+                        array_push($dealers, $dealer_id);
+                    }
                 }
             }
+
+            for ($i = 0; $i < count($dealers); $i++) {
+                $dealer_code = $dealers[$i];
+                $total = Cart::where('dealer', $dealer_code)->sum('price');
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'dealer' => $dealer_code,
+                    'dealer_name' => $dealer_data->dealer_name,
+                    'sales' => $total,
+                ];
+
+                array_push($purchasers, $data);
+            }
+
+            /////// Sorting //////////
+            usort($purchasers, function ($a, $b) {
+                //Sort the array using a user defined function
+                return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+            });
         }
-
-        for ($i = 0; $i < count($dealers); $i++) {
-            $dealer_code = $dealers[$i];
-            $total = Cart::where('dealer', $dealer_code)->sum('price');
-            $dealer_data = Dealer::where('dealer_code', $dealer_code)
-                ->get()
-                ->first();
-
-            $data = [
-                'dealer' => $dealer_code,
-                'dealer_name' => $dealer_data->dealer_name,
-                'sales' => $total,
-            ];
-
-            array_push($purchasers, $data);
-        }
-
-        /////// Sorting //////////
-        usort($purchasers, function ($a, $b) {
-            //Sort the array using a user defined function
-            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
-        });
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -328,8 +348,10 @@ class VendorController extends Controller
         // $this->result->data = $res_data;
         $this->result->data->purchasers = $purchasers;
         $this->result->data->total_sales = $total_sales;
+        $this->result->data->total_orders = $total_orders;
+
         $this->result->data->dealers = $dealers;
-        $this->result->data->orders_received = count($dealers);
+        // $this->result->data->ven = $vend;
 
         return response()->json($this->result);
     }

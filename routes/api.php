@@ -712,7 +712,7 @@ Route::group(
 
         // fetch the dealer purchases per day
         Route::get(
-            '/fetch-all-orders-per-day',
+            '/fetch-all-orders-per-day/{account_id}',
             'DealerController@fetch_all_orders_per_day'
         );
 

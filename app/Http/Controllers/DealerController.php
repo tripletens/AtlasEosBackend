@@ -1392,7 +1392,7 @@ class DealerController extends Controller
         //     ->select('vendors.*', 'promotional_fliers.*')->get();
 
         $vendors = Vendors::all();
-        
+
         // foreach($vendors as $vendor){
         //     $vendor->promotional_flier = PromotionalFlier::where('vendor_id', $vendor->vendor_code)->get();
         // }
@@ -2062,8 +2062,8 @@ class DealerController extends Controller
                         'vendor' => $vendor,
                         'product_id' => $product_id,
                         'qty' => $qty,
-                        'price' => $price,
-                        'unit_price' => $unit_price,
+                        'price' => trim($price),
+                        'unit_price' => trim($unit_price),
                         'status' => $status,
                     ]);
 

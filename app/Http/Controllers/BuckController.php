@@ -28,7 +28,7 @@ class BuckController extends Controller
     // upload file 
 
     public function upload_file(){
-        
+
     }
     // add show bucks 
     public function create_buck(Request $request)
@@ -179,12 +179,13 @@ class BuckController extends Controller
 
     public function edit_buck(Request $request){
         $validator = Validator::make($request->all(), [
-            'vendor_name' => 'required',
+           'vendor_name' => 'required',
             'vendor_code' => 'required|string',
             'title' => 'required|string',
             'description' => 'required',
             'status' => 'required|boolean',
-            'file' => 'required|mimes:pdf,doc,docx,xls,jpg,jpeg,Jpeg,png,gif',
+            'pdf' => 'required|mimes:pdf,doc,docx',
+            'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {
@@ -201,8 +202,9 @@ class BuckController extends Controller
             $title = $request->input('title');
             $description = $request->input('description');
             $status = $request->input('status');
-            $file =   $request->hasFile('file');
-
+            $image =   $request->hasFile('image');
+            $pdf =   $request->hasFile('pdf');
+            
             $check_buck = Bucks::where('vendor_code',$vendor_code)->get()->first();
 
             if (!$check_buck) {
@@ -212,20 +214,40 @@ class BuckController extends Controller
                 return response()->json($this->result);
             }
 
-            if ($request->hasFile('file')) {
-                $filenameWithExt = $request
-                    ->file('file')
+            // upload show buck image 
+            if ($request->hasFile('image')) {
+                $image_filenameWithExt = $request
+                    ->file('image')
                     ->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request
-                    ->file('file')
+                $image_filename = pathinfo($image_filenameWithExt, PATHINFO_FILENAME);
+                $image_extension = $request
+                    ->file('image')
                     ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
-                $filepath =
+                $image_fileNameToStore = Str::slug($image_filename,'_',$language='en') . '_' . time() . '.' . $image_extension;
+                $img_filepath =
                     env('APP_URL') .
                     Storage::url(
                         $request
-                            ->file('file')
+                            ->file('image')
+                            ->storeAs('public/bucks', $image_fileNameToStore)
+                    );
+            }
+
+            // upload show buck pdf 
+            if ($request->hasFile('pdf')) {
+                $filenameWithExt = $request
+                    ->file('pdf')
+                    ->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $extension = $request
+                    ->file('pdf')
+                    ->getClientOriginalExtension();
+                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $pdf_filepath =
+                    env('APP_URL') .
+                    Storage::url(
+                        $request
+                            ->file('pdf')
                             ->storeAs('public/bucks', $fileNameToStore)
                     );
             }
@@ -235,8 +257,9 @@ class BuckController extends Controller
             $check_buck->title = $title ? $title : null;
             $check_buck->description = $description ? $description : null;
             $check_buck->status = $status ? $status : null;
-            $check_buck->img_url = $file ? $filepath : null;
-
+            $check_buck->img_url = $image ? $img_filepath : null;
+            $check_buck->pdf_url = $pdf ? $pdf_filepath : null;
+            
 
             $update_buck = $check_buck->save();
 

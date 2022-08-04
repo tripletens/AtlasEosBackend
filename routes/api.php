@@ -268,6 +268,11 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::get(
+            '/dealer/get-vendor-data/{code}',
+            'VendorController@get_vendor_data'
+        );
+
+        Route::get(
             '/dealer/get-vendor-item/{vendor}/{atlas}',
             'DealerController@get_vendor_item'
         );
@@ -512,10 +517,7 @@ Route::group(
             'ProductsController@fetch_all_products_by_vendor_code'
         );
 
-        
-
-
-        //----------------------------- new products ends here ------------------// 
+        //----------------------------- new products ends here ------------------//
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',
@@ -719,25 +721,16 @@ Route::group(
         // ------------------ Product summary ends here ----------------- //
 
         // ------------------- show bucks starts here  ------------------ //
-        
-        Route::post(
-            '/add_showbucks',
-            'BuckController@create_buck'
-        );
+
+        Route::post('/add_showbucks', 'BuckController@create_buck');
 
         Route::get(
             '/fetch_show_buck_promotional_flier/{vendor_code}',
             'BuckController@fetch_show_buck_promotional_flier'
         );
 
-        Route::post(
-            '/edit_buck',
-            'BuckController@edit_buck'
-        );
+        Route::post('/edit_buck', 'BuckController@edit_buck');
 
-        
-
-        
         // ------------------- show bucks ends here  ------------------ //
 
         // ------------------ test apis --------------------------- //
@@ -747,7 +740,7 @@ Route::group(
             '/check_seminar_status/{seminar_date}/{start_time}/{stop_time}',
             'SeminarController@check_seminar_status'
         );
-        
+
         // fetch_show_buck_promotional_flier
         // ------------------ test apis ends here ----------------- //
     }

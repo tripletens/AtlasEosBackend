@@ -30,6 +30,20 @@ class VendorController extends Controller
         ];
     }
 
+    public function get_vendor_data($code)
+    {
+        $data = Vendors::where('vendor_code', $code)
+            ->get()
+            ->first();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor Data';
+        $this->result->data = $data;
+
+        return response()->json($this->result);
+    }
+
     public function get_vendor_note($dealer, $vendor)
     {
         $altas_notes = ProgramNotes::where('dealer_code', $dealer)

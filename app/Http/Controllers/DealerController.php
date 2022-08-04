@@ -1621,6 +1621,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+
     // fetch all the vendors that have new products
     public function fetch_vendors_new_products()
     {
@@ -1656,6 +1657,17 @@ class DealerController extends Controller
         $this->result->data->vendors = $all_vendors_with_new_products;
         $this->result->message = 'Vendors with new products fetched successfully';
         return response()->json($this->result);
+    }
+
+    // fetch the orders per dealer per day
+    public function fetch_all_orders_per_day(){
+        // fetch all the orders
+        // function ($item) {
+        //     return $item->created_at->format('Y-m-d');
+        // }
+        $all_orders = Cart::where('status', '1')->groupby('created_at')->get();
+
+        return $all_orders;
     }
 
     public function universal_search($search)

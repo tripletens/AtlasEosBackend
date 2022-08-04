@@ -44,7 +44,7 @@ class ProductsController extends Controller
     // sort new products by vendor id
     public function sort_newproduct_by_vendor_id($vendor_id)
     {
-        $fetch_new_products_by_vendor = Products::where('vendor', $vendor_id)
+        $fetch_new_products_by_vendor = Products::where('check_new','1')->where('vendor', $vendor_id)
             ->orderby('id', 'desc')
             ->get();
 
@@ -108,7 +108,7 @@ class ProductsController extends Controller
         return response()->json($this->result);
     }
 
-    // fetch all the new products by vendor code 
+    // fetch all the new products by vendor code
     public function fetch_all_products_by_vendor_code($vendor_code)
     {
         $fetch_all_products_by_vendor_code = Products::where('vendor_code', $vendor_code)

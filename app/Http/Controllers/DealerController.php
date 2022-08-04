@@ -202,8 +202,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $product->dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         Cart::where('dealer', $product->dealer)
                             ->where('atlas_id', $product->atlas_id)
@@ -284,8 +284,8 @@ class DealerController extends Controller
 
             if (
                 Cart::where('dealer', $dealer)
-                    ->where('atlas_id', $atlas_id)
-                    ->exists()
+                ->where('atlas_id', $atlas_id)
+                ->exists()
             ) {
                 Cart::where('dealer', $dealer)
                     ->where('atlas_id', $atlas_id)
@@ -302,8 +302,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $product->dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         Cart::where('dealer', $product->dealer)
                             ->where('atlas_id', $product->atlas_id)
@@ -457,8 +457,8 @@ class DealerController extends Controller
 
                 if (
                     Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $atlas_id)
-                        ->exists()
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
                 ) {
                     $this->result->status = true;
                     $this->result->status_code = 404;
@@ -532,8 +532,8 @@ class DealerController extends Controller
     {
         if (
             DealerQuickOrder::where('uid', $user)
-                ->where('atlas_id', $atlas_id)
-                ->exists()
+            ->where('atlas_id', $atlas_id)
+            ->exists()
         ) {
             $delete = DealerQuickOrder::where('uid', $user)
                 ->where('atlas_id', $atlas_id)
@@ -629,16 +629,16 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
                         $current_vendor = $product->vendor_id;
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
-                                ->where('atlas_id', $product->atlas_id)
-                                ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                         ) {
                             $existing_already_in_quick_order .=
                                 $product->atlas_id . ', ';
@@ -723,8 +723,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
                         $existing_status = true;
@@ -732,8 +732,8 @@ class DealerController extends Controller
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
-                                ->where('atlas_id', $product->atlas_id)
-                                ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                         ) {
                             $existing_already_in_quick_order .=
                                 $product->atlas_id . ', ';
@@ -848,8 +848,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $item_already_added += 1;
                         $item_details .= $product->atlas_id . ',';
@@ -1583,8 +1583,8 @@ class DealerController extends Controller
                     );
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -1660,8 +1660,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-                ->where('status', '1')
-                ->exists()
+            ->where('status', '1')
+            ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -1689,8 +1689,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-                ->where('status', '1')
-                ->exists()
+            ->where('status', '1')
+            ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -1713,16 +1713,15 @@ class DealerController extends Controller
     {
         // completed orders are the list of vendors that you have ordered from
 
-        // return $account;
         // fetch all vendors
         $all_vendors = Vendors::all();
 
-        $fetch_all_vendor_codes = $all_vendors->pluck( 'vendor_code' )->toArray();
+        $fetch_all_vendor_codes = $all_vendors->pluck('vendor_code')->toArray();
 
         // fetch all the orders
         $completed_orders_vendors = Cart::where('dealer', $account)->where('status', 1)->groupBy('vendor')->pluck('vendor')->toArray();
 
-        $all_uncompleted_orders_vendors = DB::table('vendors')->whereNotIn( 'vendor_code', $completed_orders_vendors )->where( 'status', 1 )->pluck( 'vendor_code' )->toArray();
+        $all_uncompleted_orders_vendors = DB::table('vendors')->whereNotIn('vendor_code', $completed_orders_vendors)->where('status', 1)->pluck('vendor_code')->toArray();
 
         // return count($all_uncompleted_orders_vendors) . " => completed => " . count($completed_orders_vendors);
 
@@ -1749,7 +1748,8 @@ class DealerController extends Controller
     }
 
     // talks about the vendors that dealer has not ordered from
-    public function fetch_orders_remaining($account){
+    public function fetch_orders_remaining($account)
+    {
         $all_vendors = Vendors::all();
 
         if (!$all_vendors) {
@@ -1762,13 +1762,50 @@ class DealerController extends Controller
 
         $completed_orders_vendors = Cart::where('dealer', $account)->where('status', 1)->groupBy('vendor')->pluck('vendor')->toArray();
 
-        $all_uncompleted_orders_vendors = DB::table('vendors')->whereNotIn( 'vendor_code', $completed_orders_vendors )->where( 'status', 1 )->get();
+        $all_uncompleted_orders_vendors = DB::table('vendors')->whereNotIn('vendor_code', $completed_orders_vendors)->where('status', 1)->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data->count = count($all_uncompleted_orders_vendors);
         $this->result->data->order_remaining = $all_uncompleted_orders_vendors;
-        $this->result->message = 'Dealer Dashboard Data';
+        $this->result->message = 'Orders Remaining fetched successfully';
+        return response()->json($this->result);
+    }
+
+    // fetch all the vendors that have new products
+    public function fetch_vendors_new_products()
+    {
+        // fetch all the vendors
+        $all_vendors = Vendors::all();
+
+        if (!$all_vendors) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the vendors";
+            return response()->json($this->result);
+        }
+
+        $fetch_all_vendor_codes = $all_vendors->pluck('vendor_code')->toArray();
+
+        // fetch all the new products
+        $fetch_new_products = Products::where('check_new', '1')
+            ->groupby('products.vendor_code')
+            ->pluck('vendor_code')->toArray();
+        // ->join('vendors', 'vendors.vendor_code', '=', 'products.vendor_code')
+        // ->groupby('vendors.vendor_code')
+        // ->select('vendors.*')->get();
+        // return $fetch_new_products;
+
+        $all_vendors_with_new_products = DB::table('vendors')
+            ->whereIn('vendor_code', $fetch_new_products)
+            ->where('status', 1)->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->count = count($all_vendors_with_new_products);
+        $this->result->data->vendors = $all_vendors_with_new_products;
+        $this->result->message = 'Vendors with new products fetched successfully';
         return response()->json($this->result);
     }
 
@@ -1997,7 +2034,7 @@ class DealerController extends Controller
             )
             ->orderby('cart.id', 'desc')
             ->get();
-                    
+
         if (!$fetch_cart_items) {
             $this->result->status = true;
             $this->result->status_code = 400;
@@ -2050,8 +2087,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         QuickOrder::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -2154,8 +2191,8 @@ class DealerController extends Controller
 
                 if (
                     Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $atlas_id)
-                        ->exists()
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
                 ) {
                     $this->result->status = true;
                     $this->result->status_code = 404;
@@ -2478,7 +2515,7 @@ class DealerController extends Controller
                 'products.updated_at as product_updated_at',
                 'cart.*'
             )
-            ->orderby('cart.atlas_id','desc')
+            ->orderby('cart.atlas_id', 'desc')
             ->get();
 
         foreach ($fetch_cart_items as $value) {

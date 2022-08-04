@@ -446,7 +446,7 @@ Route::group(
             'DealerController@fetch_orders_remaining'
         );
 
-        
+
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(
@@ -702,6 +702,12 @@ Route::group(
         Route::get(
             '/delete-order-items-atlas-id-user-id/{atlas_id}/{user_id}',
             'DealerController@delete_order_items_atlas_id_user_id'
+        );
+
+        // fetch all the vendors that have new products
+        Route::get(
+            '/fetch-vendors-new-products',
+            'DealerController@fetch_vendors_new_products'
         );
 
         //------------------- special orders starts here ---------------- //

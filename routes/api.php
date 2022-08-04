@@ -417,7 +417,7 @@ Route::group(
             '/fetch-scheduled-seminars/{dealer_id}',
             'SeminarController@fetch_scheduled_seminars'
         );
-        
+
         Route::get(
             '/fetch-ongoing-seminars/{dealer_id}',
             'SeminarController@fetch_ongoing_seminars'
@@ -498,10 +498,10 @@ Route::group(
             'ProductsController@fetch_all_products_by_vendor_code'
         );
 
-        
 
 
-        //----------------------------- new products ends here ------------------// 
+
+        //----------------------------- new products ends here ------------------//
 
         Route::get(
             '/vendor/get-vendor-coworkers/{code}/{user}',
@@ -706,7 +706,7 @@ Route::group(
         // ------------------ Product summary ends here ----------------- //
 
         // ------------------- show bucks starts here  ------------------ //
-        
+
         Route::post(
             '/add_showbucks',
             'BuckController@create_buck'
@@ -722,9 +722,9 @@ Route::group(
             'BuckController@edit_buck'
         );
 
-        
 
-        
+
+
         // ------------------- show bucks ends here  ------------------ //
 
         // ------------------ test apis --------------------------- //
@@ -734,7 +734,7 @@ Route::group(
             '/check_seminar_status/{seminar_date}/{start_time}/{stop_time}',
             'SeminarController@check_seminar_status'
         );
-        
+
         // fetch_show_buck_promotional_flier
         // ------------------ test apis ends here ----------------- //
     }

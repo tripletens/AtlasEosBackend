@@ -1711,24 +1711,40 @@ class DealerController extends Controller
 
     public function dealer_dashboard($account)
     {
+        // completed orders are the list of vendors that you have ordered from
+
+        // return $account;
+        // fetch all vendors
+        $all_vendors = Vendors::all();
+
+        $fetch_all_vendor_codes = $all_vendors->pluck( 'vendor_code' )->toArray();
+
+        // fetch all the orders
+        $completed_orders_vendors = Cart::where('dealer', $account)->where('status', 1)->groupBy('vendor')->pluck('vendor')->toArray();
+
+        $all_uncompleted_orders_vendors = DB::table('vendors')->whereNotIn( 'vendor_code', $completed_orders_vendors )->where( 'status', 1 )->pluck( 'vendor_code' )->toArray();
+
+        // return count($all_uncompleted_orders_vendors) . " => completed => " . count($completed_orders_vendors);
+
+        // group them by vendor
         $completed_orders = Cart::where('dealer', $account)
             ->where('status', '1')
             ->count();
 
         $new_products = Products::where('check_new', '1')->count();
-        $show_total = Cart::where('dealer', $account)->sum('price');
+        $show_total = Cart::where('dealer', $account)->where('status', 1)->sum('price');
 
         $order_remaining = Vendors::count();
 
         $this->result->status = true;
         $this->result->status_code = 200;
 
-        $this->result->data->completed_orders = $completed_orders;
+        $this->result->data->completed_orders = count($completed_orders_vendors);
         $this->result->data->new_products = $new_products;
         $this->result->data->show_total = $show_total;
-        $this->result->data->order_remaining = $order_remaining;
-
+        $this->result->data->order_remaining = count($all_uncompleted_orders_vendors);
         $this->result->message = 'Dealer Dashboard Data';
+
         return response()->json($this->result);
     }
 

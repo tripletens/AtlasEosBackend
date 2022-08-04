@@ -1597,6 +1597,30 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    // talks about the vendors that dealer has not ordered from
+    public function fetch_orders_remaining($account){
+        $all_vendors = Vendors::all();
+
+        if (!$all_vendors) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the vendors";
+            return response()->json($this->result);
+        }
+
+        $completed_orders_vendors = Cart::where('dealer', $account)->where('status', 1)->groupBy('vendor')->pluck('vendor')->toArray();
+
+        $all_uncompleted_orders_vendors = DB::table('vendors')->whereNotIn( 'vendor_code', $completed_orders_vendors )->where( 'status', 1 )->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->count = count($all_uncompleted_orders_vendors);
+        $this->result->data->order_remaining = $all_uncompleted_orders_vendors;
+        $this->result->message = 'Dealer Dashboard Data';
+        return response()->json($this->result);
+    }
+
     public function universal_search($search)
     {
         $vendor = Vendors::where(

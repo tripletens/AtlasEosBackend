@@ -26,7 +26,22 @@ Route::group(
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
-        Route::get('/admin-dashboard', 'AdminController@dashboard');
+
+        Route::get(
+            '/admin/analysis-admin-dashboard',
+            'AdminController@admin_dashboard_analysis'
+        );
+
+        Route::get(
+            '/admin/most-sales-dealers-admin-dashboard',
+            'AdminController@most_sales_dealer_admin_dashboard'
+        );
+
+        Route::get(
+            '/admin/most-sales-vendor-admin-dashboard',
+            'AdminController@most_sales_vendors_admin_dashboard'
+        );
+
         Route::get(
             '/get-all-vendor-users',
             'AdminController@get_all_vendor_users'

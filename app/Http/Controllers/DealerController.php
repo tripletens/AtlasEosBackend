@@ -1811,12 +1811,9 @@ class DealerController extends Controller
     }
 
     // fetch the sum of order price per dealer per day
-    public function fetch_all_orders_per_day(){
+    public function fetch_all_orders_per_day($account){
         // fetch all the orders
-        // function ($item) {
-        //     return $item->created_at->format('Y-m-d');
-        // }
-        $all_orders = Cart::where('status', '1')->get();
+        $all_orders = Cart::where('dealer',$account)->where('status', '1')->get();
         $all_order_per_day_sum_price = $all_orders->groupBy(function ($item) {
             return $item->created_at->format('Y-m-d');
         })->map(function ($item) {

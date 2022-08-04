@@ -1846,7 +1846,7 @@ class DealerController extends Controller
             )
             ->orderby('cart.id', 'desc')
             ->get();
-
+                    
         if (!$fetch_cart_items) {
             $this->result->status = true;
             $this->result->status_code = 400;
@@ -2327,6 +2327,7 @@ class DealerController extends Controller
                 'products.updated_at as product_updated_at',
                 'cart.*'
             )
+            ->orderby('cart.atlas_id','desc')
             ->get();
 
         foreach ($fetch_cart_items as $value) {

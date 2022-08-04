@@ -407,12 +407,12 @@ Route::group(
         );
 
         // fetch all remaining orders - vendors that dealer didnt order from
-
         Route::get(
             '/fetch-orders-remaining/{account}',
             'DealerController@fetch_orders_remaining'
         );
 
+        
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(

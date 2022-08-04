@@ -67,9 +67,9 @@ return [
     |
     */
 
-    // 'timezone' => 'America/Edmonton',
+    'timezone' => 'America/Edmonton',
 
-    'timezone' => 'Africa/Lagos',
+    // 'timezone' => 'Africa/Lagos',
 
     /*
     |--------------------------------------------------------------------------

@@ -2260,11 +2260,11 @@ class AdminController extends Controller
         }
 
         if ($vendor != '') {
-            $vendorName = $request->vendor;
-            $vendorCode = $request->vendorCode;
+            $vendor = $request->vendor;
+            $vendorName = $request->vendorName;
             $update = Users::where('id', $vendorId)->update([
                 'vendor_name' => $vendorName,
-                'vendor_code' => $vendorCode,
+                'vendor_code' => $vendor,
                 'company_name' => $vendorName,
             ]);
         }

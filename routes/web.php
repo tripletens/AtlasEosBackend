@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\DealerController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,3 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route::get('/generate-pdf/{code}', 'DealerController@generate_pdf');
+
+Route::get('/generate-pdf/{dealer}', [DealerController::class, 'generate_pdf']);

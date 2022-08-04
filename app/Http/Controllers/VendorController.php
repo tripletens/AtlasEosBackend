@@ -586,16 +586,27 @@ class VendorController extends Controller
 
         $privilaged_vendors = $selected_user->privileged_vendors;
         $separator = explode(',', $privilaged_vendors);
+
+        $all_vendors_data = Vendors::all();
         $res_data = [];
-        for ($i = 0; $i < count($separator); $i++) {
-            $code = $separator[$i];
-            $each = Vendors::where('vendor_code', $code)
-                ->get()
-                ->first();
-            if ($each) {
-                array_push($res_data, $each);
+
+        foreach ($all_vendors_data as $value) {
+            $vendor_code = $value->vendor_code;
+            if (in_array($vendor_code, $separator)) {
+                array_push($res_data, $value);
             }
         }
+
+        // $res_data = [];
+        // for ($i = 0; $i < count($separator); $i++) {
+        //     $code = $separator[$i];
+        //     $each = Vendors::where('vendor_code', $code)
+        //         ->get()
+        //         ->first();
+        //     if ($each) {
+        //         array_push($res_data, $each);
+        //     }
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;

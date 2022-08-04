@@ -1659,15 +1659,28 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    // fetch the orders per dealer per day
+    // fetch the sum of order price per dealer per day
     public function fetch_all_orders_per_day(){
         // fetch all the orders
         // function ($item) {
         //     return $item->created_at->format('Y-m-d');
         // }
-        $all_orders = Cart::where('status', '1')->groupby('created_at')->get();
+        $all_orders = Cart::where('status', '1')->get();
+        $all_order_per_day_sum_price = $all_orders->groupBy(function ($item) {
+            return $item->created_at->format('Y-m-d');
+        })->map(function ($item) {
+            return $item->sum('price');
+        });
 
-        return $all_orders;
+        // $all_orders_per_day = $all_orders->groupBy(function ($item) {
+        //     return $item->created_at->format('Y-m-d');
+        // });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $all_order_per_day_sum_price;
+        $this->result->message = 'All Orders per day fetched successfully';
+        return response()->json($this->result);
     }
 
     public function universal_search($search)

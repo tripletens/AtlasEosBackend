@@ -286,7 +286,7 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
-    public function vendor_dashboard($code, $user)
+    public function vendor_dashboard_most_purchaser($code, $user)
     {
         $dealer_data = [];
         $dealer_sales = [];
@@ -309,14 +309,7 @@ class VendorController extends Controller
 
             foreach ($all_vendor_data as $value) {
                 $vendor_code = $value->vendor_code;
-                if (\in_array($vendor_code, $separator)) {
-                    // array_push($vend, $code);
-                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
-                        'price'
-                    );
-                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
-                        'qty'
-                    );
+                if (in_array($vendor_code, $separator)) {
                     $cart_dealer = Cart::where('vendor', $vendor_code)->get();
                     foreach ($cart_dealer as $value) {
                         $dealer_id = $value->dealer;
@@ -326,21 +319,6 @@ class VendorController extends Controller
                     }
                 }
             }
-
-            // for ($i = 0; $i < count($separator); $i++) {
-            //     $code = $separator[$i];
-            //     // array_push($vend, $code);
-            //     $total_sales += Cart::where('vendor', $code)->sum('price');
-            //     $total_orders += Cart::where('vendor', $code)->sum('qty');
-            //     $cart_dealer = Cart::where('vendor', $code)->get();
-
-            //     foreach ($cart_dealer as $value) {
-            //         $dealer_id = $value->dealer;
-            //         if (!in_array($dealer_id, $dealers)) {
-            //             array_push($dealers, $dealer_id);
-            //         }
-            //     }
-            // }
 
             for ($i = 0; $i < count($dealers); $i++) {
                 $dealer_code = $dealers[$i];
@@ -368,14 +346,44 @@ class VendorController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';
-        // $this->result->data = $res_data;
-        $this->result->data->purchasers = $purchasers;
+        $this->result->data = $purchasers;
+
+        return response()->json($this->result);
+    }
+
+    public function vendor_dashboard_analysis($code, $user)
+    {
+        $selected_user = Users::where('id', $user)
+            ->where('vendor_code', $code)
+            ->get()
+            ->first();
+
+        $privilaged_vendors = $selected_user->privileged_vendors;
+        if ($privilaged_vendors != null) {
+            $separator = explode(',', $privilaged_vendors);
+            $total_sales = 0;
+            $total_orders = 0;
+
+            $all_vendor_data = Vendors::all();
+
+            foreach ($all_vendor_data as $value) {
+                $vendor_code = $value->vendor_code;
+                if (in_array($vendor_code, $separator)) {
+                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                        'price'
+                    );
+                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
+                        'qty'
+                    );
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor dashboard analysis';
         $this->result->data->total_sales = $total_sales;
         $this->result->data->total_orders = $total_orders;
-
-        $this->result->data->dealers = $dealers;
-        // $this->result->data->ven = $vend;
-
         return response()->json($this->result);
     }
 
@@ -472,7 +480,9 @@ class VendorController extends Controller
 
     public function sales_by_item_summary($code)
     {
-        $vendor_purchases = Cart::where('vendor', $code)->get();
+        $vendor_purchases = Cart::where('vendor', $code)
+            ->orderBy('atlas_id', 'asc')
+            ->get();
         $res_data = [];
         foreach ($vendor_purchases as $value) {
             $user_id = $value->uid;
@@ -592,6 +602,13 @@ class VendorController extends Controller
     public function get_vendors_products($code)
     {
         $res_data = Products::where('vendor_code', $code)->get();
+
+        foreach ($res_data as $value) {
+            $spec_data = $value->spec_data;
+            if ($spec_data) {
+                $value->spec_data = json_decode($spec_data);
+            }
+        }
 
         $this->result->status = true;
         $this->result->status_code = 200;

@@ -125,7 +125,8 @@ class DealerController extends Controller
         ];
 
         $pdf = PDF::loadView('dealership-pdf', $pdf_data);
-        return $pdf->download('dealership.pdf');
+        return $pdf->stream('dealership.pdf');
+        // return $pdf->download('dealership.pdf');
     }
 
     public function get_vendor_item($vendor, $atlas)

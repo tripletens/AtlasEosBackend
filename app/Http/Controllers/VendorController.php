@@ -617,6 +617,23 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_vendor_orders($code)
+    {
+        // $vendor_data = Vendors::where('vendor_code', $code)
+        //     ->get()
+        //     ->first();
+
+        $vendor_products = Products::where('vendor_code', $code)->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor data';
+        // $this->result->data->vendor_data = $res_data;
+        $this->result->data = $vendor_products;
+
+        return response()->json($this->result);
+    }
+
     public function get_privileged_vendors($user, $code)
     {
         $selected_user = Users::where('id', $user)
@@ -624,11 +641,13 @@ class VendorController extends Controller
             ->get()
             ->first();
 
+        ///  $privilage_status = false;
         $privilaged_vendors = $selected_user->privileged_vendors;
-        $separator = explode(',', $privilaged_vendors);
-
-        $all_vendors_data = Vendors::all();
         $res_data = [];
+
+        $privilage_status = true;
+        $separator = explode(',', $privilaged_vendors);
+        $all_vendors_data = Vendors::all();
 
         foreach ($all_vendors_data as $value) {
             $vendor_code = $value->vendor_code;
@@ -637,20 +656,10 @@ class VendorController extends Controller
             }
         }
 
-        // $res_data = [];
-        // for ($i = 0; $i < count($separator); $i++) {
-        //     $code = $separator[$i];
-        //     $each = Vendors::where('vendor_code', $code)
-        //         ->get()
-        //         ->first();
-        //     if ($each) {
-        //         array_push($res_data, $each);
-        //     }
-        // }
-
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor unread msg';
+
         $this->result->data = $res_data;
         return response()->json($this->result);
     }

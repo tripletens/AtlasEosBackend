@@ -592,6 +592,11 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/get-vendor-order-data/{code}',
+            'VendorController@get_vendor_orders'
+        );
+
+        Route::get(
             '/vendor/vendor-dashboard-analysis/{code}/{user}',
             'VendorController@vendor_dashboard_analysis'
         );

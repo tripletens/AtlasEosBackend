@@ -353,6 +353,8 @@ class VendorController extends Controller
 
     public function vendor_dashboard_analysis($code, $user)
     {
+        $total_sales = 0;
+        $total_orders = 0;
         $selected_user = Users::where('id', $user)
             ->where('vendor_code', $code)
             ->get()
@@ -361,8 +363,6 @@ class VendorController extends Controller
         $privilaged_vendors = $selected_user->privileged_vendors;
         if ($privilaged_vendors != null) {
             $separator = explode(',', $privilaged_vendors);
-            $total_sales = 0;
-            $total_orders = 0;
 
             $all_vendor_data = Vendors::all();
 

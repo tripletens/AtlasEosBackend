@@ -585,8 +585,13 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/vendor-dashboard/{code}/{user}',
-            'VendorController@vendor_dashboard'
+            '/vendor/vendor-dashboard-analysis/{code}/{user}',
+            'VendorController@vendor_dashboard_analysis'
+        );
+
+        Route::get(
+            '/vendor/vendor-dashboard-most-purchaser/{code}/{user}',
+            'VendorController@vendor_dashboard_most_purchaser'
         );
 
         Route::get(

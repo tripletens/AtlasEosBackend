@@ -625,6 +625,13 @@ class VendorController extends Controller
 
         $vendor_products = Products::where('vendor_code', $code)->get();
 
+        foreach ($vendor_products as $value) {
+            $spec_data = $value->spec_data;
+            if ($spec_data) {
+                $value->spec_data = json_decode($spec_data);
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor data';

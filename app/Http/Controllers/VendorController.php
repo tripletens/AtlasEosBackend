@@ -569,14 +569,26 @@ class VendorController extends Controller
     {
         $vendor_purchases = Cart::where('vendor', $code)->get();
         $res_data = [];
+        $users = [];
         foreach ($vendor_purchases as $value) {
             $user_id = $value->uid;
             $product_id = $value->product_id;
 
-            $user = Users::where('id', $user_id)
+            if (!in_array($user_id, $users)) {
+                array_push($users, $user_id);
+            }
+        }
+
+        foreach ($users as $value) {
+            $cart_user = Cart::where('vendor', $code)
+                ->where('uid', $value)
                 ->get()
                 ->first();
-            $product = Products::where('id', $product_id)
+            $sum_user_total = Cart::where('vendor', $code)
+                ->where('uid', $value)
+                ->get()
+                ->sum('price');
+            $user = Users::where('id', $value)
                 ->get()
                 ->first();
 
@@ -586,7 +598,7 @@ class VendorController extends Controller
                 'user' => $user_id,
                 'vendor_code' => $code,
                 'purchaser_name' => $user->first_name . ' ' . $user->last_name,
-                'amount' => $value->price,
+                'amount' => $sum_user_total,
             ];
 
             array_push($res_data, $data);

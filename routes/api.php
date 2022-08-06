@@ -446,7 +446,6 @@ Route::group(
             'DealerController@fetch_orders_remaining'
         );
 
-
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(
@@ -607,6 +606,16 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/vendor-single-dashboard-most-purchaser/{code}',
+            'VendorController@vendor_single_dashboard_most_purchaser'
+        );
+
+        Route::get(
+            '/vendor/vendor-single-dashboard-analysis/{code}',
+            'VendorController@vendor_single_dashboard_analysis'
+        );
+
+        Route::get(
             '/vendor/get-vendor-products/{code}',
             'VendorController@get_vendors_products'
         );
@@ -725,8 +734,6 @@ Route::group(
             '/fetch-all-orders-per-day/{account_id}',
             'DealerController@fetch_all_orders_per_day'
         );
-
-
 
         //------------------- special orders starts here ---------------- //
 

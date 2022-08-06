@@ -286,6 +286,65 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
+    public function vendor_single_dashboard_analysis($code)
+    {
+        $total_sales = Cart::where('vendor', $code)->sum('price');
+        $total_orders = Cart::where('vendor', $code)->sum('qty');
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor dashboard analysis';
+        $this->result->data->total_sales = $total_sales;
+        $this->result->data->total_orders = $total_orders;
+        return response()->json($this->result);
+    }
+
+    public function vendor_single_dashboard_most_purchaser($code)
+    {
+        $dealer_data = [];
+        $dealer_sales = [];
+        $dealers = [];
+        $purchasers = [];
+        $vend = [];
+
+        $cart_dealer = Cart::where('vendor', $code)->get();
+        foreach ($cart_dealer as $value) {
+            $dealer_id = $value->dealer;
+            if (!in_array($dealer_id, $dealers)) {
+                array_push($dealers, $dealer_id);
+            }
+        }
+
+        for ($i = 0; $i < count($dealers); $i++) {
+            $dealer_code = $dealers[$i];
+            $total = Cart::where('dealer', $dealer_code)->sum('price');
+            $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                ->get()
+                ->first();
+
+            $data = [
+                'dealer' => $dealer_code,
+                'dealer_name' => $dealer_data->dealer_name,
+                'sales' => $total,
+            ];
+
+            array_push($purchasers, $data);
+        }
+
+        /////// Sorting //////////
+        usort($purchasers, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor single dashboard';
+        $this->result->data = $purchasers;
+
+        return response()->json($this->result);
+    }
+
     public function vendor_dashboard_most_purchaser($code, $user)
     {
         $dealer_data = [];

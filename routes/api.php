@@ -26,7 +26,22 @@ Route::group(
     ],
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
-        Route::get('/admin-dashboard', 'AdminController@dashboard');
+
+        Route::get(
+            '/admin/analysis-admin-dashboard',
+            'AdminController@admin_dashboard_analysis'
+        );
+
+        Route::get(
+            '/admin/most-sales-dealers-admin-dashboard',
+            'AdminController@most_sales_dealer_admin_dashboard'
+        );
+
+        Route::get(
+            '/admin/most-sales-vendor-admin-dashboard',
+            'AdminController@most_sales_vendors_admin_dashboard'
+        );
+
         Route::get(
             '/get-all-vendor-users',
             'AdminController@get_all_vendor_users'
@@ -74,7 +89,7 @@ Route::group(
 
         Route::get('/get-vendor-user/{id}', 'AdminController@get_vendor_user');
 
-        // Route::post('/upload-dealers', 'AdminController@upload_dealers');
+        Route::post('/upload-dealers', 'AdminController@upload_dealers');
 
         Route::post(
             '/edit-vendor-user',
@@ -241,6 +256,15 @@ Route::group(
             'AdminController@get_special_orders'
         );
 
+        Route::get('/admin/get-all-vendors', 'AdminController@get_all_vendor');
+
+        Route::get(
+            '/admin/get-vendor-products/{code}',
+            'AdminController@get_vendor_products'
+        );
+
+        Route::get('/admin/dealer-summary', 'AdminController@dealer_summary');
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -257,6 +281,16 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
+        Route::get(
+            '/dealer/get-vendor-data/{code}',
+            'VendorController@get_vendor_data'
+        );
+
+        Route::get(
+            '/dealer/get-vendor-item/{vendor}/{atlas}',
+            'DealerController@get_vendor_item'
+        );
 
         Route::post(
             '/dealer/save-edited-user-order',
@@ -558,8 +592,18 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/vendor-dashboard/{code}/{user}',
-            'VendorController@vendor_dashboard'
+            '/vendor/get-vendor-order-data/{code}',
+            'VendorController@get_vendor_orders'
+        );
+
+        Route::get(
+            '/vendor/vendor-dashboard-analysis/{code}/{user}',
+            'VendorController@vendor_dashboard_analysis'
+        );
+
+        Route::get(
+            '/vendor/vendor-dashboard-most-purchaser/{code}/{user}',
+            'VendorController@vendor_dashboard_most_purchaser'
         );
 
         Route::get(
@@ -712,7 +756,6 @@ Route::group(
 
         //------------------- special orders ends here ------------------ //
 
-
         // ------------------ Product summary --------------------------- //
 
         // fetch product summary by dealer_id
@@ -725,23 +768,14 @@ Route::group(
 
         // ------------------- show bucks starts here  ------------------ //
 
-        Route::post(
-            '/add_showbucks',
-            'BuckController@create_buck'
-        );
+        Route::post('/add_showbucks', 'BuckController@create_buck');
 
         Route::get(
             '/fetch_show_buck_promotional_flier/{vendor_code}',
             'BuckController@fetch_show_buck_promotional_flier'
         );
 
-        Route::post(
-            '/edit_buck',
-            'BuckController@edit_buck'
-        );
-
-
-
+        Route::post('/edit_buck', 'BuckController@edit_buck');
 
         // ------------------- show bucks ends here  ------------------ //
 

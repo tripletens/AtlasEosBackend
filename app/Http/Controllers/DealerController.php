@@ -1662,21 +1662,30 @@ class DealerController extends Controller
     // fetch the sum of order price per dealer per day
     public function fetch_all_orders_per_day($account){
         // fetch all the orders
-        $all_orders = Cart::where('dealer',$account)->where('status', '1')->get();
-        $all_order_per_day_sum_price = $all_orders->groupBy(function ($item) {
-            return $item->created_at->format('Y-m-d');
-        })->map(function ($item) {
-            return $item->sum('price');
-        });
+        $all_orders = Cart::where('dealer',$account)->where('status', '1');
+        if(!$all_orders){
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch all the orders";
+            return response()->json($this->result);
+        }
 
-        // $all_orders_per_day = $all_orders->groupBy(function ($item) {
-        //     return $item->created_at->format('Y-m-d');
-        // });
+        // get all the order dates using group by
+        $all_orders_dates = $all_orders->groupBy('created_at')->pluck('created_at')->toArray();
+        // format date to be able to compare
+        $all_orders_dates = array_map(function ($date) {
+            return Carbon::parse($date)->format('Y-m-d');
+        }, $all_orders_dates);
+
+        // get all orders per day sum
+        $all_orders_per_day = $all_orders->groupBy('created_at')->select(DB::raw('sum(price) as total_price'))->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data = $all_order_per_day_sum_price;
-        $this->result->message = 'All Orders per day fetched successfully';
+        $this->result->data->order_count = count($all_orders_per_day);
+        $this->result->data->dates = $all_orders_dates;
+        $this->result->data->orders = $all_orders_per_day;
+        $this->result->message = 'All orders per day fetched successfully';
         return response()->json($this->result);
     }
 

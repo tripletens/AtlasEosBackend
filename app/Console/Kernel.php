@@ -19,6 +19,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('seminar:reminder')->everyFiveMinutes()
             ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
+
+        $schedule->command('seminar:check-status')->everyMinute()
+            ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
     }
 
     /**

@@ -126,4 +126,11 @@ class SeminarReminderCron extends Command
             Mail::to($recipient)->send(new SeminarEmail($dealer_and_seminar_data));
         }
     }
+
+    // check the status of the seminar based on the time difference
+    public function check_seminar_status(){
+        $all_seminars = Seminar::all();
+
+        return $all_seminars;
+    }
 }

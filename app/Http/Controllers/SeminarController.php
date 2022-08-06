@@ -40,14 +40,14 @@ class SeminarController extends Controller
         $start_difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
         $stop_difference = $seminar_stop_time->diffInMinutes($current_time, $absolute = false);
 
-        // return [
-        //     'seminar_duration' => $seminar_duration,
-        //     'start_difference' => $start_difference,
-        //     'stop_difference' => $stop_difference,
-        //     'seminar_time' => $seminar_time,
-        //     'seminar_stop_time' => $seminar_stop_time,
-        //     'current_time' => $current_time,
-        // ];
+        return [
+            'seminar_duration' => $seminar_duration,
+            'start_difference' => $start_difference,
+            'stop_difference' => $stop_difference,
+            'seminar_time' => $seminar_time,
+            'seminar_stop_time' => $seminar_stop_time,
+            'current_time' => $current_time,
+        ];
 
         if ($stop_difference > 0) {
             // update the seminar_status to '3' (seminar is over)
@@ -82,7 +82,6 @@ class SeminarController extends Controller
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->message = $response;
-
             return response()->json($this->result);
         } else {
 
@@ -90,18 +89,18 @@ class SeminarController extends Controller
             $vendor_name = $request->input('vendor_name');
             $vendor_id = $request->input('vendor_id');
             $seminar_date = Carbon::parse($request->input('seminar_date'))->format('Y-m-d H:i');
-            $seminar_time = Carbon::parse($request->input('seminar_time'))->format('H:i:s');
+            $start_time = Carbon::parse($request->input('start_time'))->format('H:i:s');
+            $stop_time = Carbon::parse($request->input('stop_time'))->format('H:i:s');
             $bookmark = $request->input('bookmark');
             // $status = $request->input('status');
-
-            return $this->check_seminar_status($seminar_time, $seminar_date);
 
             $createseminar = Seminar::create([
                 'seminar_name' => $seminar_name ? $seminar_name : null,
                 'vendor_name' => $vendor_name ? $vendor_name : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'seminar_date' => $seminar_date ? $seminar_date : null,
-                'seminar_time' => $seminar_time ? $seminar_time : null,
+                'start_time' => $start_time ? $start_time : null,
+                'stop_time' => $stop_time ? $stop_time : null,
                 'bookmark' => $bookmark ? $bookmark : null,
                 // 'status' => $status ? $status : null,
             ]);
@@ -135,7 +134,6 @@ class SeminarController extends Controller
         }
 
         // check if the user has bookmarked the seminar
-
         foreach ($fetch_seminars as $seminar) {
             $check_bookmarked =
                 SeminarMembers::where('seminar_id', $seminar->id)->where('dealer_id', $dealer_id)->first();

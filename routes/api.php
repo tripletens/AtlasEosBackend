@@ -878,3 +878,11 @@ Route::group(
         Route::get('/testing-chat', 'ChatController@testing_chat');
     }
 );
+
+///////////////// Sales REp /////////////
+Route::group(
+    ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+    function () {
+        Route::get('/sales-rep/dashboard', 'SalesRepController@dashboard');
+    }
+);

@@ -140,7 +140,7 @@
     }
 
     .table-wrapper{
-        margin-top: 50px
+        margin-top: 150px
     }
 
 </style>
@@ -156,7 +156,7 @@
                 <h2 class="dealer-name">Dealer Account #: {{ $dealer->dealer_code }}</h2>
                 {{-- <h2 class="dealer-name">Order Date: {{ $dealer_updated_at }} MST</h2> --}}
             </div>
-            <div class="mt-3 mb-4">
+            <div class="mb-4">
                 <img src="https://atlasbookingprogram.com/assets/atlas-lgo.png" class="com-logo" alt="">
             </div>
         </div>

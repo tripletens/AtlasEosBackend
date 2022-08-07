@@ -1711,6 +1711,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    // dealer dashboard
     public function dealer_dashboard($account)
     {
         // completed orders are the list of vendors that you have ordered from

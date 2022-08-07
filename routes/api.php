@@ -265,6 +265,11 @@ Route::group(
 
         Route::get('/admin/dealer-summary', 'AdminController@dealer_summary');
 
+        Route::get(
+            '/admin/vendor-summary/{code}',
+            'AdminController@vendor_summary'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

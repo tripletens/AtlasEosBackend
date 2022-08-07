@@ -139,6 +139,10 @@
         padding-top: 0px !important;
     }
 
+    .table-wrapper{
+        margin-top: 50px
+    }
+
 </style>
 
 <body>
@@ -153,7 +157,7 @@
                 {{-- <h2 class="dealer-name">Order Date: {{ $dealer_updated_at }} MST</h2> --}}
             </div>
             <div class="mt-3 mb-4">
-                <img src="https://atlasbookingprogram.com/assets/new-atlas-logo.png" class="com-logo" alt="">
+                <img src="https://atlasbookingprogram.com/assets/atlas-lgo.png" class="com-logo" alt="">
             </div>
         </div>
     </div>
@@ -163,82 +167,78 @@
 
 
 
-    @if (count($data) > 0)
-    @foreach ($data as $item)
-
-    <div class="">
-        <h5 class="top-title-table" style="">{{ $item['vendor_name']}}
-        </h5>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th class="thead-custom">Quantity</th>
-                <th class="thead-custom">Atlas #</th>
-                <th class="thead-custom">Vendor #</th>
-                <th class="thead-custom">Description</th>
-                <th class="thead-custom">Special Price ($)</th>
-                <th class="thead-custom">Total ($)</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            @foreach ($item['data'] as $inner)
-                <tr>
-                    <td class="table-value-custom center-text">
-                        {{ $inner['qty'] }}
-                    </td>
-                    <td class="table-value-custom center-text">
-                        {{ $inner['atlas_id'] }}
-                    </td>
-
-                    <td class="table-value-custom center-text">
-                        {{ $inner['vendor_product_code'] }}
-                    </td>
-
-                    {{-- <td>
-                        <img src="{{ $item['vendor_img'] }}" class="vendor-logo" alt="">
-                    </td> --}}
-                    <td class="table-value-custom center-text">
-                        {{ $inner['description'] }}
-                    </td>
-                    <td class="table-value-custom right-align">
-                        {{ number_format(floatval($inner['unit_price']), 2) }}
-                    </td>
-                    <td class="table-value-custom right-align">
-                        {{ number_format($inner['price'], 2) }}
-                    </td>
-                </tr>
-
+    <div class="table-wrapper">
+        @if (count($data) > 0)
+            @foreach ($data as $item)
+                <div class="">
+                    <h5 class="top-title-table" style="">{{ $item['vendor_name']}}
+                    </h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="">
+                        <thead>
+                            <tr>
+                                <th class="thead-custom">Quantity</th>
+                                <th class="thead-custom">Atlas #</th>
+                                <th class="thead-custom">Vendor #</th>
+                                <th class="thead-custom">Description</th>
+                                <th class="thead-custom">Special Price ($)</th>
+                                <th class="thead-custom">Total ($)</th>
+                            </tr>
+                        </thead>
+            
+                        <tbody>
+            
+                            @foreach ($item['data'] as $inner)
+                                <tr>
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['qty'] }}
+                                    </td>
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['atlas_id'] }}
+                                    </td>
+            
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['vendor_product_code'] }}
+                                    </td>
+            
+                                    {{-- <td>
+                                        <img src="{{ $item['vendor_img'] }}" class="vendor-logo" alt="">
+                                    </td> --}}
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['description'] }}
+                                    </td>
+                                    <td class="table-value-custom right-align">
+                                        {{ number_format(floatval($inner['unit_price']), 2) }}
+                                    </td>
+                                    <td class="table-value-custom right-align">
+                                        {{ number_format($inner['price'], 2) }}
+                                    </td>
+                                </tr>
+            
+                            @endforeach
+            
+                            <tr>
+                                <td colspan="5">
+                                    <h5 class="each-total-cate-text" style="">
+                                        TOTAL FOR {{ $item['vendor_name'] }}
+                                        </h5>
+                                </td>
+                                <td>
+                                    <h5 class="each-total-text" style="">
+                                        {{ number_format( $item['total'], 2) }}</h5>
+                                </td>
+                            </tr>
+            
+            
+                        </tbody>
+                    </table>
+                </div>
             @endforeach
+        @endif
+    </div>
 
-            <tr>
-                <td colspan="5">
-                    <h5 class="each-total-cate-text" style="">
-                        TOTAL FOR {{ $item['vendor_name'] }}
-                        </h5>
-                </td>
-                <td>
-                    <h5 class="each-total-text" style="">
-                        {{ number_format( $item['total'], 2) }}</h5>
-                </td>
-            </tr>
-
-
-        </tbody>
-    </table>
-
-  
-    @endforeach
-
-
-       
-
-
-    @endif
-
-   
+ 
 
 
 

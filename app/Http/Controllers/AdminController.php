@@ -37,6 +37,8 @@ use App\Models\ProgramNotes;
 use App\Models\PriceOverideReport;
 use App\Models\SpecialOrder;
 
+use App\Models\UserStatus;
+
 use DateTime;
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
@@ -73,6 +75,167 @@ class AdminController extends Controller
     // dealer == 4
     // inside sales == 5
     // outside == 6
+
+    public function view_dealer_summary($code)
+    {
+        $vendors = [];
+        $res_data = [];
+        $grand_total = 0;
+
+        $dealer_data = Cart::where('dealer', $code)->get();
+        $dealer_ship = Dealer::where('dealer_code', $code)
+            ->get()
+            ->first();
+
+        foreach ($dealer_data as $value) {
+            $vendor_code = $value->vendor;
+            if (!\in_array($vendor_code, $vendors)) {
+                array_push($vendors, $vendor_code);
+            }
+        }
+
+        foreach ($vendors as $value) {
+            $vendor_data = Vendors::where('vendor_code', $value)
+                ->get()
+                ->first();
+            $cart_data = Cart::where('vendor', $value)
+                ->where('dealer', $code)
+                ->get();
+
+            $total = 0;
+
+            foreach ($cart_data as $value) {
+                $total += $value->price;
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->description = $pro_data->description;
+                $value->vendor_product_code = $pro_data->vendor_product_code;
+            }
+
+            $data = [
+                'vendor_code' => $vendor_data->vendor_code,
+                'vendor_name' => $vendor_data->vendor_name,
+                'total' => floatval($total),
+                'data' => $cart_data,
+            ];
+
+            $grand_total += $total;
+
+            array_push($res_data, $data);
+        }
+
+        $pdf_data = [
+            'data' => $res_data,
+            'dealer' => $dealer_ship,
+            'grand_total' => $grand_total,
+        ];
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $pdf_data;
+        $this->result->message = 'View Dealer Summary';
+        return response()->json($this->result);
+    }
+
+    public function dealer_single_summary($code)
+    {
+        $dealers = Dealer::where('dealer_code', $code)->get();
+        $dealer_count = Dealer::count();
+        $total_sales = 0;
+        $res_data = [];
+
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $dealer_code = $value->dealer_code;
+                $dealer_name = $value->dealer_name;
+                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'sales' => $dealer_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($res_data, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+        $this->result->message = 'Dealer Single Summary';
+        return response()->json($this->result);
+    }
+
+    public function get_users_status()
+    {
+        $users_status = UserStatus::all();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All vendor users status';
+        $this->result->data = $users_status;
+        return response()->json($this->result);
+    }
+
+    public function activate_all_vendors()
+    {
+        Users::where('role', '3')->update(['status' => 1]);
+        $users_status = UserStatus::where('role', '3')->update(['status' => 1]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All vendor users has been activated';
+        $this->result->data = $users_status;
+
+        return response()->json($this->result);
+    }
+
+    public function deactivate_all_vendors()
+    {
+        Users::where('role', '3')->update(['status' => 0]);
+        $users_status = UserStatus::where('role', '3')->update(['status' => 0]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All vendor users has been deactivated';
+        return response()->json($this->result);
+    }
+
+    public function activate_all_dealers()
+    {
+        Users::where('role', '4')->update(['status' => 1]);
+        $users_status = UserStatus::where('role', '4')->update(['status' => 1]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All Dealer users has been activated';
+        return response()->json($this->result);
+    }
+
+    public function deactivate_all_dealers()
+    {
+        Users::where('role', '4')->update(['status' => 0]);
+        $users_status = UserStatus::where('role', '4')->update(['status' => 0]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All Dealer users has been deactivated';
+        return response()->json($this->result);
+    }
 
     public function vendor_summary($code)
     {
@@ -156,7 +319,6 @@ class AdminController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $res_data;
-
         $this->result->message = 'Dealer Summary';
         return response()->json($this->result);
     }
@@ -1587,10 +1749,14 @@ class AdminController extends Controller
             foreach ($all_dealer_users as $value) {
                 $user_id = $value->id;
                 $total_sales = Cart::where('uid', $user_id)->sum('price');
+                $dealer_code = $value->account_id;
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
 
                 $data = [
                     'account_id' => $value->account_id,
-                    'full_name' => $value->first_name . ' ' . $value->last_name,
+                    'dealer' => $dealer_data,
                     'total_sales' => $total_sales,
                     'trend' => '0%',
                 ];

@@ -116,8 +116,6 @@ class DealerController extends Controller
             array_push($res_data, $data);
         }
 
-        //return $res_data;
-
         $pdf_data = [
             'data' => $res_data,
             'dealer' => $dealer_ship,

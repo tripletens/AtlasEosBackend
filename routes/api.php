@@ -520,6 +520,13 @@ Route::group(
             'SeminarController@fetch_only_dealer_emails'
         );
 
+        Route::post(
+            '/edit-seminar',
+            'SeminarController@edit_seminar'
+        );
+
+
+
         // ------------------promotional flier ------------------//
 
         Route::post(

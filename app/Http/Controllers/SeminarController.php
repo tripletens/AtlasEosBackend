@@ -12,6 +12,7 @@ use DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SeminarEmail;
 use App\Models\Dealer;
+use PDO;
 
 class SeminarController extends Controller
 {
@@ -443,6 +444,83 @@ class SeminarController extends Controller
         // send them an email each
         foreach ($emails as $recipient) {
             Mail::to($recipient)->send(new SeminarEmail($dealer_and_seminar_data));
+        }
+    }
+
+    public function edit_seminar(Request $request){
+        // `topic`, `vendor_name`, `link`,
+        // `completed_seminar_link`, `vendor_id`,
+        // `seminar_date`, `start_time`,`stop_time`, `bookmark`,
+        // `status`,
+        $validator = Validator::make($request->all(), [
+            'topic' => 'required',
+            'vendor_name' => 'required',
+            'join_link' => 'required|string',
+            'completed_seminar_link' => 'required|string',
+            'vendor_id' => 'required',
+            'seminar_date' => 'required',
+            'start_time' => 'required',
+            'stop_time' => 'required',
+            'status' => 'required|integer',
+            'seminar_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            $seminar_id = $request->input('seminar_id');
+            $topic = $request->input('topic');
+            $vendor_name = $request->input('vendor_name');
+            $join_link = $request->input('join_link');
+            $completed_seminar_link = $request->input('completed_seminar_link');
+            $vendor_id = $request->input('vendor_id');
+            $seminar_date = $request->input('seminar_date');
+            $start_time = $request->input('start_time');
+            $stop_time = $request->input('stop_time');
+            $status = $request->input('status');
+
+
+            $find_seminar = Seminar::find($seminar_id);
+
+            // seminar doesnt exist
+            if (!$find_seminar) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'Sorry we cannot find seminar at this time. Try again later';
+                return response()->json($this->result);
+            }
+
+            $update_seminar = $find_seminar->update([
+                'topic' => $topic,
+                'vendor_name' => $vendor_name,
+                'join_link' => $join_link,
+                'completed_seminar_link' => $completed_seminar_link,
+                'vendor_id' => $vendor_id,
+                'seminar_date' => $seminar_date,
+                'start_time' => $start_time,
+                'stop_time' => $stop_time,
+                'status' => $status, // 1 is scheduled, 2 is ongoing and 3 is for ended / watched
+            ]);
+
+            if (!$update_seminar) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'Sorry we cannot update seminar at this time. Try again later';
+                return response()->json($this->result);
+            }
+
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'You have successfully updated the seminar';
+            return response()->json($this->result);
         }
     }
 }

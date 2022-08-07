@@ -455,8 +455,8 @@ class SeminarController extends Controller
         $validator = Validator::make($request->all(), [
             'topic' => 'required',
             'vendor_name' => 'required',
-            'join_link' => 'required|string',
-            'completed_seminar_link' => 'required|string',
+            // 'join_link' => 'required|string',
+            // 'completed_seminar_link' => 'required|string',
             'vendor_id' => 'required',
             'seminar_date' => 'required',
             'start_time' => 'required',
@@ -499,7 +499,7 @@ class SeminarController extends Controller
             $update_seminar = $find_seminar->update([
                 'topic' => $topic,
                 'vendor_name' => $vendor_name,
-                'join_link' => $join_link,
+                'link' => $join_link,
                 'completed_seminar_link' => $completed_seminar_link,
                 'vendor_id' => $vendor_id,
                 'seminar_date' => $seminar_date,

@@ -74,15 +74,58 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function vendor_summary($code)
+    {
+        $vendor_purchases = Cart::where('vendor', $code)->get();
+        $res_data = [];
+        $users = [];
+        foreach ($vendor_purchases as $value) {
+            $user_id = $value->uid;
+            $product_id = $value->product_id;
+
+            if (!in_array($user_id, $users)) {
+                array_push($users, $user_id);
+            }
+        }
+
+        foreach ($users as $value) {
+            $cart_user = Cart::where('vendor', $code)
+                ->where('uid', $value)
+                ->get()
+                ->first();
+            $sum_user_total = Cart::where('vendor', $code)
+                ->where('uid', $value)
+                ->get()
+                ->sum('price');
+            $user = Users::where('id', $value)
+                ->get()
+                ->first();
+
+            $data = [
+                'account_id' => $user->account_id,
+                'dealer_name' => $user->company_name,
+                'user' => $user_id,
+                'vendor_code' => $code,
+                'purchaser_name' => $user->first_name . ' ' . $user->last_name,
+                'amount' => $sum_user_total,
+            ];
+
+            array_push($res_data, $data);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Purchasers by Dealers';
+        $this->result->data = $res_data;
+        return response()->json($this->result);
+    }
+
     public function dealer_summary()
     {
         $dealers = Dealer::all();
         $dealer_count = Dealer::count();
-
         $total_sales = 0;
-
         $res_data = [];
-
         if ($dealers) {
             foreach ($dealers as $value) {
                 $dealer_code = $value->dealer_code;

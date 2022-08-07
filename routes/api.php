@@ -266,8 +266,43 @@ Route::group(
         Route::get('/admin/dealer-summary', 'AdminController@dealer_summary');
 
         Route::get(
+            '/admin/view-dealer-summary/{code}',
+            'AdminController@view_dealer_summary'
+        );
+
+        Route::get(
+            '/admin/dealer-single-summary/{code}',
+            'AdminController@dealer_single_summary'
+        );
+
+        Route::get(
             '/admin/vendor-summary/{code}',
             'AdminController@vendor_summary'
+        );
+
+        Route::get(
+            '/admin/deactivate-dealers',
+            'AdminController@deactivate_all_dealers'
+        );
+
+        Route::get(
+            '/admin/activate-dealers',
+            'AdminController@activate_all_dealers'
+        );
+
+        Route::get(
+            '/admin/deactivate-vendors',
+            'AdminController@deactivate_all_vendors'
+        );
+
+        Route::get(
+            '/admin/get-all-users-status',
+            'AdminController@get_users_status'
+        );
+
+        Route::get(
+            '/admin/activate-vendors',
+            'AdminController@activate_all_vendors'
         );
 
         Route::get('/testing', 'AdminController@testing_api');

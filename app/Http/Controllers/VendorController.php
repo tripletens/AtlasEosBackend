@@ -111,7 +111,6 @@ class VendorController extends Controller
     public function get_privileged_dealers($code)
     {
         $dealers = Users::where('role', '4')->get();
-
         $access_dealers = [];
 
         if ($dealers) {

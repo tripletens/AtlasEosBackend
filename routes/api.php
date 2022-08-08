@@ -733,6 +733,15 @@ Route::group(
             'DealerController@fetch_all_orders_per_day'
         );
 
+        // ---------------- Branch starts here  ------------------------- //
+        Route::get(
+            '/branch/get-dealer-order-summary/{uid}',
+            'BranchController@get_dealer_order_summary'
+        );
+
+
+        // ---------------- Branch ends here  --------------------------- //
+
 
 
         //------------------- special orders starts here ---------------- //

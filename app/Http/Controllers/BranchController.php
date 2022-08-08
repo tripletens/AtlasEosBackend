@@ -52,9 +52,10 @@ class BranchController extends Controller
         if ($branch_detail->privileged_dealers !== null) {
             $get_priviledged_account_ids_array = explode(',', $branch_detail->privileged_dealers);
         }
-
-        // return $get_priviledged_account_ids_array;
-
+        else {
+            $get_priviledged_account_ids_array = [];
+        }
+        
         # array to store the result
         $dealer_summary_result = [];
 
@@ -66,30 +67,35 @@ class BranchController extends Controller
                 ->get();
 
             # add the dealer info to the result array
-            $dealer_summary_result[] = $dealer_details;
-            // array_merge($dealer_summary_result,$dealer_details);
+            array_push($dealer_summary_result,json_decode($dealer_details));
         }
 
-        return array_merge(...$dealer_summary_result);
+
+        $result_arr = array();
+
+        foreach ($dealer_summary_result as $sub_arr){
+            $result_arr = array_merge($result_arr,$sub_arr);
+        }
+        return $result_arr;
     }
 
     public function get_dealer_order_summary($uid)
     {
         $dealer_summary_result = $this->get_dealers_in_branch($uid);
 
-        return $dealer_summary_result;
+        // return $dealer_summary_result;
 
         # get all the dealers with account id orders
         if($dealer_summary_result && count($dealer_summary_result) > 0){
             foreach($dealer_summary_result as $key => $dealer){
                 # get dealer orders with id
-                $dealer_orders_query = Cart::where('uid', $dealer[$key]->id);
+                $dealer_orders_query = Cart::where('uid', $dealer->id);
 
                 # get the total price of items ordered by dealer
                 $dealer_orders_total_sum = $dealer_orders_query->sum('price');
 
                 # assign the dealer total price to the dealer
-                $dealer[$key]->total_price = $dealer_orders_total_sum;
+                $dealer->total_price = $dealer_orders_total_sum;
             }
         }
 

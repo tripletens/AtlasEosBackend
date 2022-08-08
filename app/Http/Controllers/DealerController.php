@@ -831,6 +831,8 @@ class DealerController extends Controller
             $dealer = $request->dealer;
             $vendor = $request->vendor;
 
+            Users::where('id', $uid)->update(['order_status' => 1]);
+
             // lets get the items from the array
             $product_array = $request->input('product_array');
 
@@ -859,6 +861,10 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
+                        Users::where('id', $uid)->update([
+                            'place_order_date' => Carbon::now(),
+                        ]);
+
                         $current_vendor = $product->vendor_id;
                         $submitted_status = true;
                         $save = Cart::create([

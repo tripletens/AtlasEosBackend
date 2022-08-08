@@ -265,6 +265,46 @@ Route::group(
 
         Route::get('/admin/dealer-summary', 'AdminController@dealer_summary');
 
+        Route::get(
+            '/admin/view-dealer-summary/{code}',
+            'AdminController@view_dealer_summary'
+        );
+
+        Route::get(
+            '/admin/dealer-single-summary/{code}',
+            'AdminController@dealer_single_summary'
+        );
+
+        Route::get(
+            '/admin/vendor-summary/{code}',
+            'AdminController@vendor_summary'
+        );
+
+        Route::get(
+            '/admin/deactivate-dealers',
+            'AdminController@deactivate_all_dealers'
+        );
+
+        Route::get(
+            '/admin/activate-dealers',
+            'AdminController@activate_all_dealers'
+        );
+
+        Route::get(
+            '/admin/deactivate-vendors',
+            'AdminController@deactivate_all_vendors'
+        );
+
+        Route::get(
+            '/admin/get-all-users-status',
+            'AdminController@get_users_status'
+        );
+
+        Route::get(
+            '/admin/activate-vendors',
+            'AdminController@activate_all_vendors'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -446,7 +486,6 @@ Route::group(
             'DealerController@fetch_orders_remaining'
         );
 
-
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(
@@ -614,6 +653,16 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/vendor-single-dashboard-most-purchaser/{code}',
+            'VendorController@vendor_single_dashboard_most_purchaser'
+        );
+
+        Route::get(
+            '/vendor/vendor-single-dashboard-analysis/{code}',
+            'VendorController@vendor_single_dashboard_analysis'
+        );
+
+        Route::get(
             '/vendor/get-vendor-products/{code}',
             'VendorController@get_vendors_products'
         );
@@ -742,8 +791,6 @@ Route::group(
 
         // ---------------- Branch ends here  --------------------------- //
 
-
-
         //------------------- special orders starts here ---------------- //
 
         // add a special order item
@@ -845,5 +892,26 @@ Route::group(
         );
 
         Route::get('/testing-chat', 'ChatController@testing_chat');
+    }
+);
+
+///////////////// Sales REp /////////////
+Route::group(
+    ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+    function () {
+        Route::get(
+            '/sales-rep/dashboard-analysis/{user}',
+            'SalesRepController@sales_rep_dashboard_analysis'
+        );
+
+        Route::get(
+            '/sales-rep/get-purchasers-dealer/{user}',
+            'SalesRepController@get_purchases_dealers'
+        );
+
+        Route::get(
+            '/sales-rep/view-dealer-summary/{user}/{code}',
+            'SalesRepController@view_dealer_summary'
+        );
     }
 );

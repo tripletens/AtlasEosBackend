@@ -739,6 +739,12 @@ Route::group(
             'BranchController@get_dealer_order_summary'
         );
 
+        Route::get(
+            '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}',
+            'BranchController@get_dealers_with_account_id_under_branch'
+        );
+
+
 
         // ---------------- Branch ends here  --------------------------- //
 

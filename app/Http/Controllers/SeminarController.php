@@ -62,6 +62,19 @@ class SeminarController extends Controller
             $seminar->save();
         }
     }
+
+    // deactivate all the seminars set all the seminars to completed
+    public function deactivate_all_seminars(){
+        $all_seminars = Seminar::all();
+
+        if(count($all_seminars) > 0){
+            foreach($all_seminars as $seminar){
+                $seminar->update([
+                    'status' => '3'
+                ]);
+            }
+        }
+    }
     // create seminar api
     public function create_seminar(Request $request)
     {
@@ -94,6 +107,9 @@ class SeminarController extends Controller
             $stop_time = Carbon::parse($request->input('stop_time'))->format('H:i:s');
             $bookmark = $request->input('bookmark');
             // $status = $request->input('status');
+
+            // first deactivate all the previous seminars... change them to completed i.e status of 3
+            $this->deactivate_all_seminars();
 
             $createseminar = Seminar::create([
                 'seminar_name' => $seminar_name ? $seminar_name : null,

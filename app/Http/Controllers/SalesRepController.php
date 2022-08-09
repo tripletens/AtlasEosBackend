@@ -225,29 +225,44 @@ class SalesRepController extends Controller
         $total_sales = 0;
         $total_orders = 0;
         $total_dealers = 0;
+        $total_logged_in = 0;
+        $total_not_logged_in = 0;
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
 
-        $privilaged_dealers = $selected_user->privileged_dealers;
-        if ($privilaged_dealers != null) {
-            $separator = explode(',', $privilaged_dealers);
-            $total_dealers = count($separator);
-            if (\in_array(null, $separator)) {
-                $total_dealers = $total_dealers - 1;
-            }
+        if ($selected_user) {
+            $privilaged_dealers = $selected_user->privileged_dealers;
+            if ($privilaged_dealers != null) {
+                $separator = explode(',', $privilaged_dealers);
+                $total_dealers = count($separator);
+                if (\in_array(null, $separator)) {
+                    $total_dealers = $total_dealers - 1;
+                }
 
-            $all_vendor_data = Vendors::all();
+                foreach ($separator as $value) {
+                    $total_logged_in += Users::where('account_id', $value)
+                        ->where('last_login', '!=', null)
+                        ->count();
 
-            foreach ($all_vendor_data as $value) {
-                $vendor_code = $value->vendor_code;
-                if (in_array($vendor_code, $separator)) {
-                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
-                        'price'
-                    );
-                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
-                        'qty'
-                    );
+                    $total_not_logged_in += Users::where('account_id', $value)
+                        ->where('last_login', '=', null)
+                        ->count();
+                }
+
+                $all_vendor_data = Vendors::all();
+                foreach ($all_vendor_data as $value) {
+                    $vendor_code = $value->vendor_code;
+                    if (in_array($vendor_code, $separator)) {
+                        $total_sales += Cart::where(
+                            'vendor',
+                            $vendor_code
+                        )->sum('price');
+                        $total_orders += Cart::where(
+                            'vendor',
+                            $vendor_code
+                        )->sum('qty');
+                    }
                 }
             }
         }
@@ -258,6 +273,9 @@ class SalesRepController extends Controller
         $this->result->data->total_sales = $total_sales;
         $this->result->data->total_orders = $total_orders;
         $this->result->data->total_dealers = $total_dealers;
+
+        $this->result->data->total_logged_in = $total_logged_in;
+        $this->result->data->total_not_logged_in = $total_not_logged_in;
 
         return response()->json($this->result);
     }

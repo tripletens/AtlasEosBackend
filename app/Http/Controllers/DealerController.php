@@ -567,8 +567,10 @@ class DealerController extends Controller
 
     public function get_dealer_quick_orders($dealer, $uid)
     {
-        $quick_orders = DealerQuickOrder::where('uid', $uid)
-            ->where('dealer', $dealer)
+        $quick_orders = DealerQuickOrder::where('quick_order.uid', $uid)
+            ->where('quick_order.dealer', $dealer)
+            ->join('vendors','vendors.vendor_code','=','quick_order.vendor')
+            ->select('quick_order.*','vendors.vendor_name')
             ->orderBy('created_at', 'desc')
             ->get();
 

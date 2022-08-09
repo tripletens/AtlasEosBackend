@@ -323,10 +323,9 @@ class VendorController extends Controller
 
             $data = [
                 'dealer' => $dealer_code,
-                'dealer_name' =>
-                    $dealer_data->dealer_name != null
-                        ? $dealer_data->dealer_name
-                        : null,
+                'dealer_name' => is_null($dealer_data->dealer_name)
+                    ? null
+                    : $dealer_data->dealer_name,
                 'sales' => $total,
             ];
 

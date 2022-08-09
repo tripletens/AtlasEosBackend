@@ -177,7 +177,7 @@
                     <table class="">
                         <thead>
                             <tr>
-                                <th class="thead-custom">Quantity</th>
+                                <th class="thead-custom">Qty</th>
                                 <th class="thead-custom">Atlas #</th>
                                 <th class="thead-custom">Vendor #</th>
                                 <th class="thead-custom">Description</th>

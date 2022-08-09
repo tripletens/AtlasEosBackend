@@ -115,4 +115,34 @@ class BranchController extends Controller
         //     # check
         // }
     }
+
+    # get all the dealers under a branch with account id
+    public function get_dealers_with_account_id_under_branch_with_orders($uid){
+        $dealers = $this->get_dealers_in_branch($uid);
+
+        #get all the dealers with account id orders
+        if($dealers && count($dealers) > 0){
+            foreach($dealers as $key => $dealer){
+                # get dealer orders with id
+                $dealer_orders_query = Cart::where('uid', $dealer->id);
+                # get the total price of items ordered by dealer
+                $dealer_orders_total_sum = $dealer_orders_query->sum('price');
+                # assign the dealer total price to the dealer
+                $dealer->total_price = $dealer_orders_total_sum;
+            }
+        }
+        
+        return $dealers;
+    }
+
+    # fetch all the dealers in a branch
+    public function branch_dealers($uid){
+        $dealers = $this->get_dealers_in_branch($uid);
+
+        $this->result->status = true;
+        $this->result->data = $dealers;
+        $this->result->status_code = 200;
+        $this->result->message = 'Branch dealers fetched successfully';
+        return response()->json($this->result);
+    }
 }

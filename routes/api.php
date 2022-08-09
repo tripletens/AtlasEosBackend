@@ -833,6 +833,17 @@ Route::group(
             'SummaryController@product_summary'
         );
 
+        // fetch all the orders per branch per dealer
+        Route::get(
+            '/branch-dealers-orders/{uid}',
+            'BranchController@get_dealers_with_account_id_under_branch_with_orders'
+        );
+
+        // fetch all branch dealers
+        Route::get(
+            '/branch-dealers/{uid}',
+            'BranchController@branch_dealers'
+        );
         // ------------------ Product summary ends here ----------------- //
 
         // ------------------- show bucks starts here  ------------------ //

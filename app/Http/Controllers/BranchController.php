@@ -55,7 +55,7 @@ class BranchController extends Controller
         else {
             $get_priviledged_account_ids_array = [];
         }
-        
+
         # array to store the result
         $dealer_summary_result = [];
 

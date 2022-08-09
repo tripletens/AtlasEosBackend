@@ -24,26 +24,35 @@ class SummaryController extends Controller
         ];
     }
 
-    public function product_summary($dealer_id){
-
+    public function product_summary($dealer_id)
+    {
         // get all the users under a dealer
-        $users = Users::where('account_id',$dealer_id)->where('role','4')->where('account_id', '!=', null);
+        $users = Users::where('account_id', $dealer_id)->where('role', '4')->where('account_id', '!=', null);
 
         $res_data = [];
 
         $user_account_id = $users->pluck('id');
 
+        $group = array();
 
-        if($users){
-            $fetch_all_users = $users->get();
+        if ($users) {
+            // $fetch_all_users = $users->pluck('id')->toArray();
+            $fetch_all_users = $users->select('id','first_name','last_name','full_name')->get();
 
-            foreach($fetch_all_users as $user){
+            foreach ($fetch_all_users as $user) {
                 // get all the cart items for each user
-                $cart_items = Cart::where('uid',$user->id);
-                $cart_items_total_price = $cart_items->sum('price');
-                $user->total_price = $cart_items_total_price;
+                $cart_items = Cart::where('uid', $user->id);
                 $user->cart =  $cart_items->get();
-                // $user->vendor = Vendors::where('vendor_code',$user_cart['vendor'])->get();
+                $user->vendors = $cart_items->join('vendors','vendor_code', '=', 'cart.vendor')
+                    ->select('vendors.*','cart.price','cart.uid')->distinct('vendors.vendor_code')->get();
+                $user->all_vendors = $user->vendors->groupBy('vendor_code');
+                // $user->total_price = $cart_items->sum('price');
+                // $user->vendors = $group;
+            }
+
+            foreach($user->vendors as $vendor){
+                $vendor->total_price = $vendor->sum('price');
+                $sum = $vendor->sum('price');
             }
 
             $this->result->status = true;
@@ -52,24 +61,6 @@ class SummaryController extends Controller
             $this->result->message = 'Product summary fetched Successfully';
             return response()->json($this->result);
         }
-
-        // $get_all_the_orders_per_user = DB::table('cart')
-        //     ->whereIn('uid', $users)
-        //     ->where('status', 1)
-        //     ->get();
-
-
-
-        // return $all_vendors;
-        // return $users;
-        // get all the items that the dealer have ordered
-        // $all_dealer_orders = Cart::where('cart.dealer',$dealer_id)
-        //     ->join('vendors','vendors.vendor_code','=','vendor')
-        //     ->select('vendors.*','cart.*')
-        //     ->orderby('cart.id','desc')->get();
-
-        // return $all_dealer_orders;
-        // return $this->get_all_users_with_same_accout_ids($dealer_id);
     }
 
     public function get_ordered_vendor($code)
@@ -107,7 +98,8 @@ class SummaryController extends Controller
         return $res_data;
     }
 
-    public function get_all_users_with_same_accout_ids($dealer_id){
+    public function get_all_users_with_same_accout_ids($dealer_id)
+    {
 
         // $account_ids = [];
         // foreach ($users as $user) {

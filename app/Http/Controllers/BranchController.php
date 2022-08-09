@@ -120,6 +120,7 @@ class BranchController extends Controller
     public function get_dealers_with_account_id_under_branch_with_orders($uid){
         $dealers = $this->get_dealers_in_branch($uid);
 
+        $vendor_array = [];
         #get all the dealers with account id orders
         if($dealers && count($dealers) > 0){
             foreach($dealers as $key => $dealer){
@@ -129,10 +130,25 @@ class BranchController extends Controller
                 $dealer_orders_total_sum = $dealer_orders_query->sum('price');
                 # assign the dealer total price to the dealer
                 $dealer->total_price = $dealer_orders_total_sum;
+
+                // $dealer->orders = $dealer_orders_query->get();
+
+                $dealer->vendors = $dealer_orders_query->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+                    ->select('vendors.id', 'vendors.vendor_name','vendors.vendor_code')
+                    ->groupBy('vendors.id')
+                    ->get();
+
+                foreach($dealer->vendors as $vendor){
+                    $vendor->orders = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->get();
+                }
             }
         }
-        
-        return $dealers;
+
+        $this->result->status = true;
+        $this->result->data = $dealers;
+        $this->result->status_code = 200;
+        $this->result->message = 'Branch dealers with orders fetched successfully';
+        return response()->json($this->result);
     }
 
     # fetch all the dealers in a branch

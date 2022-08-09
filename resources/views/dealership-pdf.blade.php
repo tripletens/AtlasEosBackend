@@ -201,9 +201,6 @@
                                         {{ $inner['vendor_product_code'] }}
                                     </td>
             
-                                    {{-- <td>
-                                        <img src="{{ $item['vendor_img'] }}" class="vendor-logo" alt="">
-                                    </td> --}}
                                     <td class="table-value-custom center-text">
                                         {{ $inner['description'] }}
                                     </td>

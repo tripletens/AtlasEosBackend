@@ -1380,7 +1380,7 @@ class AdminController extends Controller
 
     public function get_all_seminar()
     {
-        $seminar = Seminar::orderBy('desc')->get();
+        $seminar = Seminar::orderBy('id', 'desc')->get();
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $seminar;

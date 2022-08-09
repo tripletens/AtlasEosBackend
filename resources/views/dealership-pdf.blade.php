@@ -140,7 +140,7 @@
     }
 
     .table-wrapper{
-        margin-top: 250px
+        margin-top: 150px
     }
 
 </style>

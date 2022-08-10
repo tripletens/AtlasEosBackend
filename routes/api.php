@@ -920,7 +920,7 @@ Route::group(
 
         Route::get(
             '/sales-rep/dealers-summary/{dealer}',
-            'SalesRepController@view_dealer_summary'
+            'SalesRepController@view_dealer_summary_page'
         );
     }
 );

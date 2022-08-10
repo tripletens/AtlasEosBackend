@@ -56,7 +56,7 @@ class SalesRepController extends Controller
         ];
     }
 
-    public function view_dealer_summary($dealer)
+    public function view_dealer_summary_page($dealer)
     {
         $vendors = [];
         $res_data = [];

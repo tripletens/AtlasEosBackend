@@ -520,12 +520,7 @@ Route::group(
             'SeminarController@fetch_only_dealer_emails'
         );
 
-        Route::post(
-            '/edit-seminar',
-            'SeminarController@edit_seminar'
-        );
-
-
+        Route::post('/edit-seminar', 'SeminarController@edit_seminar');
 
         // ------------------promotional flier ------------------//
 
@@ -793,8 +788,6 @@ Route::group(
             'BranchController@get_dealers_with_account_id_under_branch'
         );
 
-
-
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //
@@ -928,6 +921,16 @@ Route::group(
 
         Route::get(
             '/sales-rep/view-dealer-summary/{user}/{code}',
+            'SalesRepController@view_dealer_summary'
+        );
+
+        Route::get(
+            '/sales-rep/dealers-sales/{user}',
+            'SalesRepController@all_dealers_sales'
+        );
+
+        Route::get(
+            '/sales-rep/dealers-summary/{dealer}',
             'SalesRepController@view_dealer_summary'
         );
     }

@@ -56,6 +56,109 @@ class SalesRepController extends Controller
         ];
     }
 
+    public function view_dealer_summary($dealer)
+    {
+        $vendors = [];
+        $res_data = [];
+        $grand_total = 0;
+
+        $dealer_data = Cart::where('dealer', $dealer)->get();
+        $dealer_ship = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
+        foreach ($dealer_data as $value) {
+            $vendor_code = $value->vendor;
+            if (!\in_array($vendor_code, $vendors)) {
+                array_push($vendors, $vendor_code);
+            }
+        }
+
+        foreach ($vendors as $value) {
+            $vendor_data = Vendors::where('vendor_code', $value)
+                ->get()
+                ->first();
+            $cart_data = Cart::where('vendor', $value)
+                ->where('dealer', $dealer)
+                ->get();
+
+            $total = 0;
+
+            foreach ($cart_data as $value) {
+                $total += $value->price;
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->description = $pro_data->description;
+                $value->vendor_product_code = $pro_data->vendor_product_code;
+            }
+
+            $data = [
+                'vendor_code' => $vendor_data->vendor_code,
+                'vendor_name' => $vendor_data->vendor_name,
+                'total' => floatval($total),
+                'data' => $cart_data,
+            ];
+
+            $grand_total += $total;
+
+            array_push($res_data, $data);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'all dealer sales';
+        $this->result->data = $res_data;
+        // $this->result->data->atlas_id = $atlas_id_data;
+
+        return response()->json($this->result);
+    }
+
+    public function all_dealers_sales($user)
+    {
+        $res_data = [];
+        $selected_user = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        if ($selected_user) {
+            $privilaged_dealers = $selected_user->privileged_dealers;
+            if ($privilaged_dealers != null) {
+                $separator = explode(',', $privilaged_dealers);
+                foreach ($separator as $value) {
+                    $dealer = Dealer::where('dealer_code', $value)
+                        ->get()
+                        ->first();
+                    if ($dealer) {
+                        $total_sales = Cart::where('dealer', $value)->sum(
+                            'price'
+                        );
+
+                        if ($total_sales > 0) {
+                            $data = [
+                                'dealer_name' => $dealer->dealer_name,
+                                'dealer_code' => $dealer->dealer_code,
+                                'sales' => $total_sales,
+                            ];
+
+                            array_push($res_data, $data);
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'all dealer sales';
+        $this->result->data = $res_data;
+        // $this->result->data->atlas_id = $atlas_id_data;
+
+        return response()->json($this->result);
+    }
+
     public function sales_by_item_detailed($user)
     {
         $res_data = [];

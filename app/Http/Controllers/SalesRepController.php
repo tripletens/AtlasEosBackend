@@ -267,6 +267,7 @@ class SalesRepController extends Controller
 
     public function get_purchases_dealers($user)
     {
+        $dealership_codes = [];
         $res_data = [];
         $selected_user = Users::where('id', $user)
             ->get()
@@ -277,6 +278,12 @@ class SalesRepController extends Controller
             $separator = explode(',', $privilaged_dealers);
 
             foreach ($separator as $value) {
+                if (!in_array($value, $dealership_codes)) {
+                    array_push($dealership_codes, $value);
+                }
+            }
+
+            foreach ($dealership_codes as $value) {
                 $value = trim($value);
                 $vendor_purchases = Cart::where('dealer', $value)->get();
 
@@ -314,6 +321,11 @@ class SalesRepController extends Controller
                 //Sort the array using a user defined function
                 return $a['amount'] > $b['amount'] ? -1 : 1; //Compare the scores
             });
+
+            $res_data = array_map(
+                'unserialize',
+                array_unique(array_map('serialize', $res_data))
+            );
 
             $this->result->status = true;
             $this->result->status_code = 200;

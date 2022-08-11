@@ -151,8 +151,19 @@
         <div class="row">
             <div class="col-6">
                 <h2 class="top-title">ATLAS 2023 ATLAS VIRTUAL SHOW <br> SUMMARY</h2>
+                @if($dealer->dealer_name)
                 <h2 class="dealer-name">Dealer Name: {{ $dealer->dealer_name }}</h2>
+                @else
+                <h2 class="dealer-name">Dealer Name: No name found</h2>
+                @endif
+
+                @if($dealer->dealer_code)
                 <h2 class="dealer-name">Dealer Account #: {{ $dealer->dealer_code }}</h2>
+                @else
+                <h2 class="dealer-name">Dealer Account #: No dealer code found</h2>
+                @endif
+
+
                 {{-- <h2 class="dealer-name">Order Date: {{ $dealer_updated_at }} MST</h2> --}}
             </div>
             <div>

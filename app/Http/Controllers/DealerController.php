@@ -74,10 +74,14 @@ class DealerController extends Controller
 
             if (count($tickets) > 0) {
                 foreach ($tickets as $value) {
-                    $counter += ReportReply::where('ticket', $value)
+                    $cur = ReportReply::where('ticket', $value)
                         ->where('status', '1')
                         ->where('role', '1')
-                        ->count();
+                        ->get();
+
+                    if ($cur) {
+                        $counter = $counter + 1;
+                    }
                 }
             }
         }

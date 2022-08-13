@@ -2092,7 +2092,7 @@ class DealerController extends Controller
                 'users.login_device as dealer_login_device',
                 'users.place_order_date as dealer_place_order_date'
             )
-            ->orderby('cart.id', 'desc')
+            ->orderby('cart.id', 'asc')
             ->get();
 
         if (!$fetch_cart_items) {
@@ -2304,7 +2304,7 @@ class DealerController extends Controller
     public function fetch_quick_order_items_dealer_id($dealer_id)
     {
         $fetch_cart_items = QuickOrder::where('dealer', $dealer_id)
-            ->orderby('id', 'desc')
+            ->orderby('id', 'asc')
             ->get();
 
         if (!$fetch_cart_items) {
@@ -2345,7 +2345,7 @@ class DealerController extends Controller
                 'quick_order.updated_at as quick_order_updated_at',
                 'quick_order.deleted_at as quick_order_deleted_at'
             )
-            ->orderby('id', 'desc')
+            ->orderby('id', 'asc')
             ->get();
 
         if (!$fetch_cart_items) {
@@ -2368,7 +2368,7 @@ class DealerController extends Controller
     public function delete_quick_order_items_user_id($user_id)
     {
         $fetch_cart_items = QuickOrder::where('uid', $user_id)
-            ->orderby('id', 'desc')
+            ->orderby('id', 'asc')
             ->get();
 
         if (!$fetch_cart_items) {
@@ -2575,7 +2575,7 @@ class DealerController extends Controller
                 'products.updated_at as product_updated_at',
                 'cart.*'
             )
-            ->orderby('cart.atlas_id', 'desc')
+            ->orderby('cart.atlas_id', 'asc')
             ->get();
 
         foreach ($fetch_cart_items as $value) {

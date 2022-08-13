@@ -140,6 +140,7 @@ class BranchController extends Controller
 
                 foreach($dealer->vendors as $vendor){
                     $vendor->orders = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->get();
+                    $vendor->orders->total_price = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->sum('price');
                 }
             }
         }

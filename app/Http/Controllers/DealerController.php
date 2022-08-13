@@ -79,7 +79,8 @@ class DealerController extends Controller
                     $cur = ReportReply::where('ticket', $value)
                         ->where('status', '1')
                         ->where('role', '1')
-                        ->get();
+                        ->get()
+                        ->first();
 
                     if ($cur) {
                         $counter = $counter + 1;

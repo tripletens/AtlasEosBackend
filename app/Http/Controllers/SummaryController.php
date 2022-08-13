@@ -120,7 +120,7 @@ class SummaryController extends Controller
         # get the total price of items ordered by dealer
         $dealer_orders_total_sum = $dealer_orders_query->sum('price');
         # assign the dealer total price to the dealer
-        $dealer->total_price = $dealer_orders_total_sum;
+        $dealer['total_price'] = $dealer_orders_total_sum;
 
         // $dealer->orders = $dealer_orders_query->get();
 

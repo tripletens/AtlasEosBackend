@@ -323,6 +323,11 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::get(
+            '/dealer/unread-report-reply/{user}',
+            'DealerController@get_unread_report_reply'
+        );
+
+        Route::get(
             '/dealer/get-vendor-data/{code}',
             'VendorController@get_vendor_data'
         );

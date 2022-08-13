@@ -60,6 +60,18 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function update_report_ticket($ticket)
+    {
+        $cur = ReportReply::where('ticket', $ticket)->update(['status' => '2']);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $cur;
+        $this->result->message = 'Update report reply';
+
+        return response()->json($this->result);
+    }
+
     public function get_unread_report_reply($user)
     {
         $tickets = [];

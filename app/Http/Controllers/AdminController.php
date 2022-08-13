@@ -3115,6 +3115,48 @@ class AdminController extends Controller
         return $this->respondWithToken(auth()->refresh());
     }
 
+    public function admin_get_all_reports()
+    {
+        $reports = Report::where('status', '1')
+            ->orderBy('id', 'desc')
+            ->get();
+        $res_data = [];
+
+        if ($reports) {
+            foreach ($reports as $value) {
+                $user = $value->user_id;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                if ($user_data) {
+                    $data = [
+                        'full_name' => !is_null($user_data->full_name)
+                            ? $user_data->full_name
+                            : '',
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'email' => $user_data->email,
+                        'subject' => $value->subject,
+                        'description' => $value->description,
+                        'file_url' => $value->file_url,
+                        'ticket_id' => $value->ticket_id,
+                        'status' => $value->status,
+                        'created_at' => $value->created_at,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All reports fetched successfully';
+        $this->result->data = $res_data;
+        return response()->json($this->result);
+    }
+
     public function get_all_reports()
     {
         $reports = Report::join('users', 'users.id', '=', 'reports.user_id')

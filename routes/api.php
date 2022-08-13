@@ -179,7 +179,11 @@ Route::group(
             'AdminController@get_dealer_unread_msg'
         );
 
-        Route::get('/get-all-reports', 'AdminController@get_all_reports');
+        Route::get(
+            '/admin/get-all-reports',
+            'AdminController@admin_get_all_reports'
+        );
+
         Route::get(
             '/get-all-reports/{user_id}',
             'AdminController@fetch_reports_by_user_id'
@@ -325,6 +329,11 @@ Route::group(
         Route::get(
             '/dealer/unread-report-reply/{user}',
             'DealerController@get_unread_report_reply'
+        );
+
+        Route::get(
+            '/dealer/update-report-ticket/{ticket}',
+            'DealerController@update_report_ticket'
         );
 
         Route::get(
@@ -844,10 +853,7 @@ Route::group(
         );
 
         // fetch all branch dealers
-        Route::get(
-            '/branch-dealers/{uid}',
-            'BranchController@branch_dealers'
-        );
+        Route::get('/branch-dealers/{uid}', 'BranchController@branch_dealers');
         // ------------------ Product summary ends here ----------------- //
 
         // ------------------- show bucks starts here  ------------------ //

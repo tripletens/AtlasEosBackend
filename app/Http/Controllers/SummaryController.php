@@ -124,12 +124,12 @@ class SummaryController extends Controller
 
         // $dealer->orders = $dealer_orders_query->get();
 
-        $dealer->vendors = $dealer_orders_query->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+        $dealer['vendors'] = $dealer_orders_query->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
             ->select('vendors.id', 'vendors.vendor_name', 'vendors.vendor_code')
             ->groupBy('vendors.id')
             ->get();
 
-        foreach ($dealer->vendors as $vendor) {
+        foreach ($dealer['vendors'] as $vendor) {
             $vendor->orders = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->get();
             $vendor->orders->total_price = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->sum('price');
         }

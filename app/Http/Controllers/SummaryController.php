@@ -37,20 +37,20 @@ class SummaryController extends Controller
 
         if ($users) {
             // $fetch_all_users = $users->pluck('id')->toArray();
-            $fetch_all_users = $users->select('id','first_name','last_name','full_name')->get();
+            $fetch_all_users = $users->select('id', 'first_name', 'last_name', 'full_name')->get();
 
             foreach ($fetch_all_users as $user) {
                 // get all the cart items for each user
                 $cart_items = Cart::where('uid', $user->id);
                 $user->cart =  $cart_items->get();
-                $user->vendors = $cart_items->join('vendors','vendor_code', '=', 'cart.vendor')
-                    ->select('vendors.*','cart.price','cart.uid')->distinct('vendors.vendor_code')->get();
+                $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
+                    ->select('vendors.*', 'cart.price', 'cart.uid')->distinct('vendors.vendor_code')->get();
                 $user->all_vendors = $user->vendors->groupBy('vendor_code');
                 // $user->total_price = $cart_items->sum('price');
                 // $user->vendors = $group;
             }
 
-            foreach($user->vendors as $vendor){
+            foreach ($user->vendors as $vendor) {
                 $vendor->total_price = $vendor->sum('price');
                 $sum = $vendor->sum('price');
             }
@@ -108,5 +108,36 @@ class SummaryController extends Controller
         // $account_ids = array_unique($account_ids);
         // return $account_ids;
         // return $users;
+    }
+
+    public function get_dealers_with_orders($uid)
+    {
+        $dealer = Users::where('id', $uid)->first();
+        $vendor_array = [];
+        #get all the dealers with account id orders
+        # get dealer orders with id
+        $dealer_orders_query = Cart::where('uid', $uid);
+        # get the total price of items ordered by dealer
+        $dealer_orders_total_sum = $dealer_orders_query->sum('price');
+        # assign the dealer total price to the dealer
+        $dealer->total_price = $dealer_orders_total_sum;
+
+        // $dealer->orders = $dealer_orders_query->get();
+
+        $dealer->vendors = $dealer_orders_query->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+            ->select('vendors.id', 'vendors.vendor_name', 'vendors.vendor_code')
+            ->groupBy('vendors.id')
+            ->get();
+
+        foreach ($dealer->vendors as $vendor) {
+            $vendor->orders = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->get();
+            $vendor->orders->total_price = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->sum('price');
+        }
+
+        $this->result->status = true;
+        $this->result->data = $dealer;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer orders fetched successfully';
+        return response()->json($this->result);
     }
 }

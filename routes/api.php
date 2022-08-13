@@ -786,6 +786,12 @@ Route::group(
             'SummaryController@product_summary'
         );
 
+        // get_dealer_with_her_orders
+        Route::get(
+            '/dealer-product-summary/{uid}',
+            'SummaryController@get_dealers_with_orders'
+        );
+
         // fetch all the orders per branch per dealer
         Route::get(
             '/branch-dealers-orders/{uid}',

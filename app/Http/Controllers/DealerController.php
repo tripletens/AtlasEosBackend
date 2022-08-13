@@ -60,6 +60,35 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
+    public function get_unread_report_reply($user)
+    {
+        $tickets = [];
+        $counter = 0;
+
+        $reports = Report::where('user_id', $user)->get();
+        if ($reports) {
+            foreach ($reports as $value) {
+                $ticket = $value->ticket_id;
+                array_push($tickets, $ticket);
+            }
+
+            if (count($tickets) > 0) {
+                foreach ($tickets as $value) {
+                    $counter += ReportReply::where('ticket', $value)
+                        ->where('status', '1')
+                        ->count();
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $counter;
+        $this->result->message = 'get unread report reply';
+
+        return response()->json($this->result);
+    }
+
     public function generate_pdf($dealer)
     {
         $data = [
@@ -1846,23 +1875,30 @@ class DealerController extends Controller
     public function fetch_all_orders_per_day($account)
     {
         // fetch all the orders
-        $all_orders = Cart::where('dealer',$account)->where('status', '1');
-        if(!$all_orders){
+        $all_orders = Cart::where('dealer', $account)->where('status', '1');
+        if (!$all_orders) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the orders";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the orders";
             return response()->json($this->result);
         }
 
         // get all the order dates using group by
-        $all_orders_dates = $all_orders->groupBy('created_at')->pluck('created_at')->toArray();
+        $all_orders_dates = $all_orders
+            ->groupBy('created_at')
+            ->pluck('created_at')
+            ->toArray();
         // format date to be able to compare
         $all_orders_dates = array_map(function ($date) {
             return Carbon::parse($date)->format('Y-m-d');
         }, $all_orders_dates);
 
         // get all orders per day sum
-        $all_orders_per_day = $all_orders->groupBy('created_at')->select(DB::raw('sum(price) as total_price'))->get();
+        $all_orders_per_day = $all_orders
+            ->groupBy('created_at')
+            ->select(DB::raw('sum(price) as total_price'))
+            ->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;

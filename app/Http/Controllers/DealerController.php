@@ -69,7 +69,9 @@ class DealerController extends Controller
         if ($reports) {
             foreach ($reports as $value) {
                 $ticket = $value->ticket_id;
-                array_push($tickets, $ticket);
+                if (!in_array($ticket, $tickets)) {
+                    array_push($tickets, $ticket);
+                }
             }
 
             if (count($tickets) > 0) {
@@ -603,8 +605,8 @@ class DealerController extends Controller
     {
         $quick_orders = DealerQuickOrder::where('quick_order.uid', $uid)
             ->where('quick_order.dealer', $dealer)
-            ->join('vendors','vendors.vendor_code','=','quick_order.vendor')
-            ->select('quick_order.*','vendors.vendor_name')
+            ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')
+            ->select('quick_order.*', 'vendors.vendor_name')
             ->orderBy('created_at', 'desc')
             ->get();
 

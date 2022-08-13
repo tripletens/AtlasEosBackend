@@ -23,7 +23,7 @@ class ProductsController extends Controller
     public function fetch_all_new_products()
     {
         $fetch_new_products = Products::where('check_new', true)
-            ->orderby('id', 'desc')
+            ->orderby('atlas_id', 'asc')
             ->get();
 
         if (!$fetch_new_products) {
@@ -45,7 +45,7 @@ class ProductsController extends Controller
     public function sort_newproduct_by_vendor_id($vendor_id)
     {
         $fetch_new_products_by_vendor = Products::where('check_new','1')->where('vendor', $vendor_id)
-            ->orderby('id', 'desc')
+            ->orderby('atlas_id', 'asc')
             ->get();
 
         if (!$fetch_new_products_by_vendor) {
@@ -67,7 +67,7 @@ class ProductsController extends Controller
     public function sort_newproduct_by_atlas_id($atlas_id)
     {
         $fetch_new_products_by_atlas_id = Products::where('atlas_id', $atlas_id)
-            ->orderby('id', 'desc')
+            ->orderby('atlas_id', 'asc')
             ->get();
 
         if (!$fetch_new_products_by_atlas_id) {
@@ -90,7 +90,7 @@ class ProductsController extends Controller
     public function fetch_all_products_by_vendor_id($vendor_id)
     {
         $fetch_all_products_by_vendor = Products::where('vendor', $vendor_id)
-            ->orderby('id', 'desc')
+            ->orderby('atlas_id', 'asc')
             ->get();
 
         if (!$fetch_all_products_by_vendor) {
@@ -112,7 +112,7 @@ class ProductsController extends Controller
     public function fetch_all_products_by_vendor_code($vendor_code)
     {
         $fetch_all_products_by_vendor_code = Products::where('vendor_code', $vendor_code)
-            ->orderby('id', 'desc')
+            ->orderby('atlas_id', 'asc')
             ->get();
 
         if (!$fetch_all_products_by_vendor_code) {

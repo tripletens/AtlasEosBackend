@@ -76,6 +76,7 @@ class DealerController extends Controller
                 foreach ($tickets as $value) {
                     $counter += ReportReply::where('ticket', $value)
                         ->where('status', '1')
+                        ->where('role', '1')
                         ->count();
                 }
             }

@@ -37,6 +37,8 @@ use App\Models\ProgramNotes;
 use App\Models\PriceOverideReport;
 use App\Models\SpecialOrder;
 use App\Models\UserStatus;
+use Stichoza\GoogleTranslate\GoogleTranslate;
+use App;
 
 use DateTime;
 // use App\Models\Catalogue_Order;
@@ -3115,8 +3117,24 @@ class AdminController extends Controller
         return $this->respondWithToken(auth()->refresh());
     }
 
+    public function translateToLocal($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        return $tr->translate($text);
+    }
+
     public function admin_get_all_reports()
     {
+        /// App::setLocale('fr');
+
         $reports = Report::where('status', '1')
             ->orderBy('id', 'desc')
             ->get();

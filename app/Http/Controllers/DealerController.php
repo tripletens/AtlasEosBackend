@@ -39,6 +39,7 @@ use App\Models\ProgramNotes;
 
 use App\Models\DealerQuickOrder;
 use App\Models\PromotionalFlier;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class DealerController extends Controller
 {
@@ -58,6 +59,34 @@ class DealerController extends Controller
     public function login()
     {
         echo 'login page setup';
+    }
+
+    public static function staticTrans($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        return $tr->translate($text);
+    }
+
+    public function translateToLocal($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        return $tr->translate($text);
     }
 
     public function update_report_ticket($ticket)
@@ -125,6 +154,11 @@ class DealerController extends Controller
             ->get()
             ->first();
 
+        $dealer_ship->dealer_name = $this->translateToLocal(
+            'fr',
+            $dealer_ship->dealer_name
+        );
+
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
             if (!\in_array($vendor_code, $vendors)) {
@@ -149,13 +183,22 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $pro_data->description;
-                $value->vendor_product_code = $pro_data->vendor_product_code;
+                $value->description = $this->translateToLocal(
+                    'fr',
+                    $pro_data->description
+                );
+                $value->vendor_product_code = $this->translateToLocal(
+                    'fr',
+                    $pro_data->vendor_product_code
+                );
             }
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+                'vendor_name' => $this->translateToLocal(
+                    'fr',
+                    $vendor_data->vendor_name
+                ),
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -170,6 +213,8 @@ class DealerController extends Controller
             'dealer' => $dealer_ship,
             'grand_total' => $grand_total,
         ];
+
+        /////  return $pdf_data;
 
         $pdf = PDF::loadView('dealership-pdf', $pdf_data);
         return $pdf->stream('dealership.pdf');

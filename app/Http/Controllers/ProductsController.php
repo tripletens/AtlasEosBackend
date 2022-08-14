@@ -23,7 +23,7 @@ class ProductsController extends Controller
     public function fetch_all_new_products()
     {
         $fetch_new_products = Products::where('check_new', true)
-            ->orderby('atlas_id', 'asc')
+            ->orderby('id', 'asc')
             ->get();
 
         if (!$fetch_new_products) {

@@ -138,7 +138,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function generate_pdf($dealer)
+    public function generate_pdf($dealer, $lang)
     {
         $data = [
             'title' => 'Welcome to Tutsmake.com',
@@ -155,7 +155,7 @@ class DealerController extends Controller
             ->first();
 
         $dealer_ship->dealer_name = $this->translateToLocal(
-            'fr',
+            $lang,
             $dealer_ship->dealer_name
         );
 
@@ -184,11 +184,11 @@ class DealerController extends Controller
                     ->first();
 
                 $value->description = $this->translateToLocal(
-                    'fr',
+                    $lang,
                     $pro_data->description
                 );
                 $value->vendor_product_code = $this->translateToLocal(
-                    'fr',
+                    $lang,
                     $pro_data->vendor_product_code
                 );
             }
@@ -196,7 +196,7 @@ class DealerController extends Controller
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
                 'vendor_name' => $this->translateToLocal(
-                    'fr',
+                    $lang,
                     $vendor_data->vendor_name
                 ),
                 'total' => floatval($total),
@@ -212,6 +212,7 @@ class DealerController extends Controller
             'data' => $res_data,
             'dealer' => $dealer_ship,
             'grand_total' => $grand_total,
+            'lang' => $lang,
         ];
 
         /////  return $pdf_data;

@@ -45,7 +45,7 @@ class ProductsController extends Controller
     public function sort_newproduct_by_vendor_id($vendor_id)
     {
         $fetch_new_products_by_vendor = Products::where('check_new','1')->where('vendor', $vendor_id)
-            ->orderby('atlas_id', 'asc')
+            ->orderby('id', 'asc')
             ->get();
 
         if (!$fetch_new_products_by_vendor) {

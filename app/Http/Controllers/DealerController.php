@@ -154,10 +154,7 @@ class DealerController extends Controller
             ->get()
             ->first();
 
-        $dealer_ship->dealer_name = $this->translateToLocal(
-            'fr',
-            $dealer_ship->dealer_name
-        );
+        $dealer_ship->dealer_name = $dealer_ship->dealer_name;
 
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
@@ -183,22 +180,13 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $this->translateToLocal(
-                    'fr',
-                    $pro_data->description
-                );
-                $value->vendor_product_code = $this->translateToLocal(
-                    'fr',
-                    $pro_data->vendor_product_code
-                );
+                $value->description = $pro_data->description;
+                $value->vendor_product_code = $pro_data->vendor_product_code;
             }
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $this->translateToLocal(
-                    'fr',
-                    $vendor_data->vendor_name
-                ),
+                'vendor_name' => $vendor_data->vendor_name,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];

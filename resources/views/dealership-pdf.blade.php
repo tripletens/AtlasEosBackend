@@ -150,17 +150,17 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
-                <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans('fr', 'SUMMARY') }} </h2>
+                <h2 class="top-title">ATLAS 2023 ATLAS VIRTUAL SHOW <br> SUMMARY </h2>
                 @if($dealer->dealer_name)
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
+                <h2 class="dealer-name">Dealer Name: {{ $dealer->dealer_name }}</h2>
                 @else
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Dealer Name: No name found') }}  </h2>
+                <h2 class="dealer-name">Dealer Name: No name found </h2>
                 @endif
 
                 @if($dealer->dealer_code)
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Dealer Account') }}   #: {{ $dealer->dealer_code }}</h2>
+                <h2 class="dealer-name">Dealer Account #: {{ $dealer->dealer_code }}</h2>
                 @else
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Dealer Account #: No dealer code found') }}  </h2>
+                <h2 class="dealer-name">Dealer Account #: No dealer code found </h2>
                 @endif
 
 
@@ -188,12 +188,12 @@
                     <table class="">
                         <thead>
                             <tr>
-                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans('fr', 'Qty') }} </th>
-                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Atlas') }}  #</th>
-                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans('fr', 'Vendor') }} #</th>
-                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans('fr', 'Description') }}</th>
-                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Special Price') }}  ($)</th>
-                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans('fr', 'Total') }}  ($)</th>
+                                <th class="thead-custom"> Qty</th>
+                                <th class="thead-custom">Atlas  #</th>
+                                <th class="thead-custom"> Vendor #</th>
+                                <th class="thead-custom"> Description</th>
+                                <th class="thead-custom">Special Price($)</th>
+                                <th class="thead-custom">Total ($)</th>
                             </tr>
                         </thead>
             
@@ -228,7 +228,7 @@
                             <tr>
                                 <td colspan="5">
                                     <h5 class="each-total-cate-text" style="">
-                                        {{ App\Http\Controllers\DealerController::staticTrans('fr', 'TOTAL FOR') }}    {{ $item['vendor_name'] }}
+                                        TOTAL FOR   {{ $item['vendor_name'] }}
                                         </h5>
                                 </td>
                                 <td>
@@ -252,7 +252,7 @@
 
     @if (count($data) > 0)
     <div style="width: 100%; text-align: right; border: 1px solid gray; margin-top: 20px">
-        <h5 class="each-total-cate-text" style="display: inline-block; border-right: 1px solid gray"> {{ App\Http\Controllers\DealerController::staticTrans('fr', 'Grand Total') }}   ($):
+        <h5 class="each-total-cate-text" style="display: inline-block; border-right: 1px solid gray"> Grand Total  ($):
         </h5>
         <h5 class="each-total-text" style="display: inline-block; padding-right: 30px">
             {{ number_format($grand_total, 2) }}

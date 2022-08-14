@@ -138,7 +138,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function generate_pdf($dealer)
+    public function generate_pdf($dealer, $lang)
     {
         $data = [
             'title' => 'Welcome to Tutsmake.com',
@@ -154,7 +154,10 @@ class DealerController extends Controller
             ->get()
             ->first();
 
-        $dealer_ship->dealer_name = $dealer_ship->dealer_name;
+        $dealer_ship->dealer_name = $this->translateToLocal(
+            $lang,
+            $dealer_ship->dealer_name
+        );
 
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
@@ -180,13 +183,23 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $pro_data->description;
-                $value->vendor_product_code = $pro_data->vendor_product_code;
+                $value->description = $this->translateToLocal(
+                    $lang,
+                    $pro_data->description
+                );
+                $value->vendor_product_code = $this->translateToLocal(
+                    $lang,
+                    $pro_data->vendor_product_code
+                );
             }
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+
+                'vendor_name' => $this->translateToLocal(
+                    $lang,
+                    $vendor_data->vendor_name
+                ),
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -200,6 +213,7 @@ class DealerController extends Controller
             'data' => $res_data,
             'dealer' => $dealer_ship,
             'grand_total' => $grand_total,
+            'lang' => $lang,
         ];
 
         /////  return $pdf_data;

@@ -371,6 +371,11 @@ Route::group(
             'DealerController@submit_quick_order'
         );
 
+        Route::post(
+            '/dealer/save-quick-order-changes',
+            'DealerController@save_quick_order_changes'
+        );
+
         Route::get(
             '/dealer/get-dealer-quick-orders/{dealer}/{uid}',
             'DealerController@get_dealer_quick_orders'

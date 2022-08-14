@@ -827,6 +827,62 @@ class DealerController extends Controller
         }
     }
 
+    // adds item to the quick order table
+    public function save_quick_order_changes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+            $dealer = $request->dealer;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        DealerQuickOrder::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        DealerQuickOrder::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->update([
+                                'qty' =>
+                                    $product->qty != '' ? $product->qty : 0,
+                                'price' => $product->price,
+                                'unit_price' => $product->unit_price,
+                            ]);
+                    } else {
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Quick order Updated';
+
+            return response()->json($this->result);
+        }
+    }
+
     public function get_fetch_by_vendor_atlas($code)
     {
         $filtered_item = Products::orWhere('atlas_id', $code)

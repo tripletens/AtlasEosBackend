@@ -154,10 +154,12 @@ class DealerController extends Controller
             ->get()
             ->first();
 
-        $dealer_ship->dealer_name = $this->translateToLocal(
-            $lang,
-            $dealer_ship->dealer_name
-        );
+        if ($dealer_ship) {
+            $dealer_ship->dealer_name = $this->translateToLocal(
+                $lang,
+                $dealer_ship->dealer_name
+            );
+        }
 
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
@@ -195,7 +197,6 @@ class DealerController extends Controller
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-
                 'vendor_name' => $this->translateToLocal(
                     $lang,
                     $vendor_data->vendor_name
@@ -211,7 +212,7 @@ class DealerController extends Controller
 
         $pdf_data = [
             'data' => $res_data,
-            'dealer' => $dealer_ship,
+            'dealer' => $dealer_ship ? $dealer_ship : null,
             'grand_total' => $grand_total,
             'lang' => $lang,
         ];

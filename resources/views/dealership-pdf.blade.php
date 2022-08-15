@@ -158,7 +158,7 @@
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name: No name found') }}  </h2>
                 @endif
 
-                @if($dealer != null $dealer->dealer_code)
+                @if($dealer != null && $dealer->dealer_code)
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account') }}   #: {{ $dealer->dealer_code }}</h2>
                 @else
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account #: No dealer code found') }}  </h2>

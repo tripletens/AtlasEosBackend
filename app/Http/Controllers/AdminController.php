@@ -690,7 +690,7 @@ class AdminController extends Controller
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'Admin User Added Successfully';
+            $this->result->message = 'report replied Successfully';
 
             return response()->json($this->result);
         }

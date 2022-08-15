@@ -3135,9 +3135,7 @@ class AdminController extends Controller
     {
         /// App::setLocale('fr');
 
-        $reports = Report::where('status', '1')
-            ->orderBy('id', 'desc')
-            ->get();
+        $reports = Report::orderBy('id', 'desc')->get();
         $res_data = [];
 
         if ($reports) {

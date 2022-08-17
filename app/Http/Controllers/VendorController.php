@@ -321,15 +321,17 @@ class VendorController extends Controller
                 ->get()
                 ->first();
 
-            $data = [
-                'dealer' => $dealer_code,
-                'dealer_name' => is_null($dealer_data->dealer_name)
-                    ? null
-                    : $dealer_data->dealer_name,
-                'sales' => $total,
-            ];
+            if ($dealer_data) {
+                $data = [
+                    'dealer' => $dealer_code,
+                    'dealer_name' => is_null($dealer_data->dealer_name)
+                        ? null
+                        : $dealer_data->dealer_name,
+                    'sales' => $total,
+                ];
 
-            array_push($purchasers, $data);
+                array_push($purchasers, $data);
+            }
         }
 
         /////// Sorting //////////

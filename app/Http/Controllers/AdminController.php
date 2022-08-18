@@ -1920,7 +1920,6 @@ class AdminController extends Controller
             'atlasId' => 'required',
             'desc' => 'required',
             'regular' => 'required',
-            'special' => 'required',
             'vendor' => 'required',
         ]);
 
@@ -1944,9 +1943,14 @@ class AdminController extends Controller
                 'atlas_id' => $atlasId,
                 'description' => $desc,
                 'booking' => $regular,
-                'special' => $special,
                 'vendor' => $vendor,
             ]);
+
+            if ($special != null) {
+                Products::where('atlas_id', $atlasId)->update([
+                    'special' => $special != null ? $special : '',
+                ]);
+            }
 
             if ($update) {
                 $this->result->status = true;

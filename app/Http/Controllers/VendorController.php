@@ -560,7 +560,7 @@ class VendorController extends Controller
             $data = [
                 'qty' => $value->qty,
                 'atlas_id' => $value->atlas_id,
-                'vendor' => $product->vendor_code,
+                'vendor' => $product->vendor_product_code,
                 'description' => $product->description,
                 'regular' => $product->regular,
                 'booking' => $product->booking,

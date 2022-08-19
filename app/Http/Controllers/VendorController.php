@@ -533,10 +533,12 @@ class VendorController extends Controller
             // return $res_data;
         }
 
+        $res = $this->sort_according_atlas_id($res_data);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
-        $this->result->data->res = $res_data;
+        $this->result->data->res = $res;
         // $this->result->data->atlas_id = $atlas_id_data;
 
         return response()->json($this->result);

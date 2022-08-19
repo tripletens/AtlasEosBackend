@@ -562,6 +562,7 @@ class VendorController extends Controller
                 ->first();
 
             $data = [
+                'pro_id' => $product_id,
                 'qty' => $value->qty,
                 'atlas_id' => $value->atlas_id,
                 'vendor' => $product->vendor_product_code,
@@ -574,12 +575,12 @@ class VendorController extends Controller
             array_push($res_data, $data);
         }
 
-        //// $res = $this->sort_according_atlas_id($res_data);
+        $res = $this->sort_according_atlas_id($res_data);
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data = $res_data;
+        $this->result->data = $res;
         return response()->json($this->result);
     }
 
@@ -595,14 +596,15 @@ class VendorController extends Controller
             }, $data);
 
             usort($ddt, function ($object1, $object2) {
-                $ex1 = explode('-', $object1->atlas_id);
-                $ex2 = explode('-', $object2->atlas_id);
+                // $ex1 = explode('-', $object1->atlas_id);
+                // $ex2 = explode('-', $object2->atlas_id);
 
-                if ($ex1[0] > $ex2[0]) {
-                    return true;
-                } else {
-                    return false;
-                }
+                // if ($ex1[0] > $ex2[0]) {
+                //     return true;
+                // } else {
+                //     return false;
+                // }
+                return $object1->pro_id > $object2->pro_id;
             });
 
             return $ddt;

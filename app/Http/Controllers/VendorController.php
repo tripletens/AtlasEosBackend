@@ -570,11 +570,32 @@ class VendorController extends Controller
             array_push($res_data, $data);
         }
 
+        $res = $this->sort_according_atlas_id($res_data);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data = $res_data;
+        $this->result->data = $res;
         return response()->json($this->result);
+    }
+
+    public function sort_according_atlas_id($data)
+    {
+        if (count($data) > 0 && !empty($data)) {
+            $ddt = array_map(function ($each) {
+                $con = (object) $each;
+                $atlas = $con->atlas_id;
+                $tem = str_replace('-', '', $atlas);
+                $con->temp = $tem;
+                return $con;
+            }, $data);
+
+            usort($ddt, function ($object1, $object2) {
+                return $object1->temp > $object2->temp;
+            });
+
+            return $ddt;
+        }
     }
 
     public function view_dealer_summary($user, $dealer, $vendor)

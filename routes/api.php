@@ -807,6 +807,11 @@ Route::group(
             'BranchController@get_dealers_with_account_id_under_branch'
         );
 
+        Route::get(
+            '/branch/dashboard/{uid}',
+            'BranchController@branch_dashboard'
+        );
+        
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //

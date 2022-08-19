@@ -2018,6 +2018,7 @@ class DealerController extends Controller
             return Carbon::parse($date)->format('Y-m-d');
         }, $all_orders_dates);
 
+        // FILESYSTEM_DRIVER publicproba
         // get all orders per day sum
         $all_orders_per_day = $all_orders
             ->groupBy('created_at')

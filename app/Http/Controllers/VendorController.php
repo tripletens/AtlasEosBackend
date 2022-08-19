@@ -602,7 +602,7 @@ class VendorController extends Controller
 
                 if (
                     strlen($ex1[0]) < strlen($ex2[0]) &&
-                    strlen($ex1[1]) > strlen($ex2[1])
+                    strlen($ex1[1]) < strlen($ex2[1])
                 ) {
                     // return $object1->temp < $object2->temp;
                     return true;

@@ -595,7 +595,14 @@ class VendorController extends Controller
             }, $data);
 
             usort($ddt, function ($object1, $object2) {
-                return $object1->temp > $object2->temp;
+                $ex1 = explode('-', $object1->atlas_id);
+                $ex2 = explode('-', $object2->atlas_id);
+
+                /// return $ex1;
+
+                if (strlen($ex1[0]) < strlen($ex2[0])) {
+                    return $object1->temp > $object2->temp;
+                }
             });
 
             return $ddt;

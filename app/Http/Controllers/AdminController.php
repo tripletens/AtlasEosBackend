@@ -2411,7 +2411,7 @@ class AdminController extends Controller
         $status = $request->status;
         $vendor = $request->vendor;
         $vendorId = $request->vendorId;
-        $locaton = $request->location;
+        $location = $request->location;
 
         if ($firstName != '') {
             $update = Users::where('id', $vendorId)->update([

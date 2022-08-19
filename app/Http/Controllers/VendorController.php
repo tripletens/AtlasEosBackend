@@ -598,15 +598,14 @@ class VendorController extends Controller
                 $ex1 = explode('-', $object1->atlas_id);
                 $ex2 = explode('-', $object2->atlas_id);
 
-                /// return $ex1;
+                $lesser = 0;
+                $greater = 0;
 
-                if (strlen($ex1[0]) < strlen($ex2[0])) {
-                    return $object1->temp > $object2->temp;
+                if ($ex1[0] > $ex2[0]) {
+                    return true;
+                } else {
+                    return false;
                 }
-                ///return true;
-                // } else {
-                ///  return $object1->temp > $object2->temp;
-                // }
             });
 
             return $ddt;

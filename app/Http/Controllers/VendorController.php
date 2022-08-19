@@ -494,26 +494,28 @@ class VendorController extends Controller
                         ->first();
 
                     $price = $value->price;
-                    //  $total_atlas_amount += $price;
                     $total_atlas_product += $qty;
 
-                    $data = [
-                        'atlas_id' => $value->atlas_id,
-                        'dealer_name' => $dealer_db->company_name,
-                        'qty' => $qty,
-                        'account_id' => $dealer_db->account_id,
-                        'user' =>
-                            $dealer_db->first_name .
-                            ' ' .
-                            $dealer_db->last_name,
-                        'total' => $value->price,
-                        'item_total' => intval($qty) * floatval($value->price),
-                    ];
+                    if ($dealer_db) {
+                        $data = [
+                            'atlas_id' => $value->atlas_id,
+                            'dealer_name' => $dealer_db->company_name,
+                            'qty' => $qty,
+                            'account_id' => $dealer_db->account_id,
+                            'user' =>
+                                $dealer_db->first_name .
+                                ' ' .
+                                $dealer_db->last_name,
+                            'total' => $value->price,
+                            'item_total' =>
+                                intval($qty) * floatval($value->price),
+                        ];
 
-                    $total_atlas_amount +=
-                        intval($qty) * floatval($value->price);
+                        $total_atlas_amount +=
+                            intval($qty) * floatval($value->price);
 
-                    array_push($dealer_data, $data);
+                        array_push($dealer_data, $data);
+                    }
                 }
 
                 $data = [
@@ -622,9 +624,7 @@ class VendorController extends Controller
 
                 $data = [
                     'dealer_rep_name' =>
-                        $dealer_data->first_name .
-                        ' ' .
-                        $dealer_data->last_name,
+                        $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
@@ -675,16 +675,19 @@ class VendorController extends Controller
                 ->get()
                 ->first();
 
-            $data = [
-                'account_id' => $user->account_id,
-                'dealer_name' => $user->company_name,
-                'user' => $user_id,
-                'vendor_code' => $code,
-                'purchaser_name' => $user->first_name . ' ' . $user->last_name,
-                'amount' => $sum_user_total,
-            ];
+            if ($user) {
+                $data = [
+                    'account_id' => $user->account_id,
+                    'dealer_name' => $user->company_name,
+                    'user' => $user_id,
+                    'vendor_code' => $code,
+                    'purchaser_name' =>
+                        $user->first_name . ' ' . $user->last_name,
+                    'amount' => $sum_user_total,
+                ];
 
-            array_push($res_data, $data);
+                array_push($res_data, $data);
+            }
         }
 
         $this->result->status = true;

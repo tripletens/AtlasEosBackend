@@ -111,7 +111,6 @@ class VendorController extends Controller
     public function get_privileged_dealers($code)
     {
         $dealers = Users::where('role', '4')->get();
-
         $access_dealers = [];
 
         if ($dealers) {
@@ -286,6 +285,69 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
+    public function vendor_single_dashboard_analysis($code)
+    {
+        $total_sales = Cart::where('vendor', $code)->sum('price');
+        $total_orders = Cart::where('vendor', $code)->sum('qty');
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor dashboard analysis';
+        $this->result->data->total_sales = $total_sales;
+        $this->result->data->total_orders = $total_orders;
+        return response()->json($this->result);
+    }
+
+    public function vendor_single_dashboard_most_purchaser($code)
+    {
+        $dealer_data = [];
+        $dealer_sales = [];
+        $dealers = [];
+        $purchasers = [];
+        $vend = [];
+
+        $cart_dealer = Cart::where('vendor', $code)->get();
+        foreach ($cart_dealer as $value) {
+            $dealer_id = $value->dealer;
+            if (!in_array($dealer_id, $dealers)) {
+                array_push($dealers, $dealer_id);
+            }
+        }
+
+        for ($i = 0; $i < count($dealers); $i++) {
+            $dealer_code = $dealers[$i];
+            $total = Cart::where('dealer', $dealer_code)->sum('price');
+            $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                ->get()
+                ->first();
+
+            if ($dealer_data) {
+                $data = [
+                    'dealer' => $dealer_code,
+                    'dealer_name' => is_null($dealer_data->dealer_name)
+                        ? null
+                        : $dealer_data->dealer_name,
+                    'sales' => $total,
+                ];
+
+                array_push($purchasers, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($purchasers, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor single dashboard';
+        $this->result->data = $purchasers;
+
+        return response()->json($this->result);
+    }
+
     public function vendor_dashboard_most_purchaser($code, $user)
     {
         $dealer_data = [];
@@ -432,29 +494,32 @@ class VendorController extends Controller
                         ->first();
 
                     $price = $value->price;
-                    //  $total_atlas_amount += $price;
                     $total_atlas_product += $qty;
 
-                    $data = [
-                        'atlas_id' => $value->atlas_id,
-                        'dealer_name' => $dealer_db->company_name,
-                        'qty' => $qty,
-                        'account_id' => $dealer_db->account_id,
-                        'user' =>
-                            $dealer_db->first_name .
-                            ' ' .
-                            $dealer_db->last_name,
-                        'total' => $value->price,
-                        'item_total' => intval($qty) * floatval($value->price),
-                    ];
+                    if ($dealer_db) {
+                        $data = [
+                            'atlas_id' => $value->atlas_id,
+                            'dealer_name' => $dealer_db->company_name,
+                            'qty' => $qty,
+                            'account_id' => $dealer_db->account_id,
+                            'user' =>
+                                $dealer_db->first_name .
+                                ' ' .
+                                $dealer_db->last_name,
+                            'total' => $value->price,
+                            'item_total' =>
+                                intval($qty) * floatval($value->price),
+                        ];
 
-                    $total_atlas_amount +=
-                        intval($qty) * floatval($value->price);
+                        $total_atlas_amount +=
+                            intval($qty) * floatval($value->price);
 
-                    array_push($dealer_data, $data);
+                        array_push($dealer_data, $data);
+                    }
                 }
 
                 $data = [
+                    'pro_id' => $pro_data->id,
                     'vendor' => $code,
                     'description' => $pro_data->description,
                     'overall_total' => $total_atlas_amount,
@@ -469,10 +534,12 @@ class VendorController extends Controller
             // return $res_data;
         }
 
+        $res = $this->sort_according_atlas_id($res_data);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
-        $this->result->data->res = $res_data;
+        $this->result->data->res = $res;
         // $this->result->data->atlas_id = $atlas_id_data;
 
         return response()->json($this->result);
@@ -481,7 +548,7 @@ class VendorController extends Controller
     public function sales_by_item_summary($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('atlas_id', 'asc')
+            ->orderBy('product_id', 'asc')
             ->get();
         $res_data = [];
         foreach ($vendor_purchases as $value) {
@@ -496,9 +563,10 @@ class VendorController extends Controller
                 ->first();
 
             $data = [
+                'pro_id' => $product_id,
                 'qty' => $value->qty,
                 'atlas_id' => $value->atlas_id,
-                'vendor' => $product->vendor_code,
+                'vendor' => $product->vendor_product_code,
                 'description' => $product->description,
                 'regular' => $product->regular,
                 'booking' => $product->booking,
@@ -508,11 +576,40 @@ class VendorController extends Controller
             array_push($res_data, $data);
         }
 
+        $res = $this->sort_according_atlas_id($res_data);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data = $res_data;
+        $this->result->data = $res;
         return response()->json($this->result);
+    }
+
+    public function sort_according_atlas_id($data)
+    {
+        if (count($data) > 0 && !empty($data)) {
+            $ddt = array_map(function ($each) {
+                $con = (object) $each;
+                $atlas = $con->atlas_id;
+                $tem = str_replace('-', '', $atlas);
+                $con->temp = $tem;
+                return $con;
+            }, $data);
+
+            usort($ddt, function ($object1, $object2) {
+                // $ex1 = explode('-', $object1->atlas_id);
+                // $ex2 = explode('-', $object2->atlas_id);
+
+                // if ($ex1[0] > $ex2[0]) {
+                //     return true;
+                // } else {
+                //     return false;
+                // }
+                return $object1->pro_id > $object2->pro_id;
+            });
+
+            return $ddt;
+        }
     }
 
     public function view_dealer_summary($user, $dealer, $vendor)
@@ -539,9 +636,7 @@ class VendorController extends Controller
 
                 $data = [
                     'dealer_rep_name' =>
-                        $dealer_data->first_name .
-                        ' ' .
-                        $dealer_data->last_name,
+                        $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
@@ -592,16 +687,19 @@ class VendorController extends Controller
                 ->get()
                 ->first();
 
-            $data = [
-                'account_id' => $user->account_id,
-                'dealer_name' => $user->company_name,
-                'user' => $user_id,
-                'vendor_code' => $code,
-                'purchaser_name' => $user->first_name . ' ' . $user->last_name,
-                'amount' => $sum_user_total,
-            ];
+            if ($user) {
+                $data = [
+                    'account_id' => $user->account_id,
+                    'dealer_name' => $user->company_name,
+                    'user' => $user_id,
+                    'vendor_code' => $code,
+                    'purchaser_name' =>
+                        $user->first_name . ' ' . $user->last_name,
+                    'amount' => $sum_user_total,
+                ];
 
-            array_push($res_data, $data);
+                array_push($res_data, $data);
+            }
         }
 
         $this->result->status = true;

@@ -179,7 +179,11 @@ Route::group(
             'AdminController@get_dealer_unread_msg'
         );
 
-        Route::get('/get-all-reports', 'AdminController@get_all_reports');
+        Route::get(
+            '/admin/get-all-reports',
+            'AdminController@admin_get_all_reports'
+        );
+
         Route::get(
             '/get-all-reports/{user_id}',
             'AdminController@fetch_reports_by_user_id'
@@ -265,6 +269,46 @@ Route::group(
 
         Route::get('/admin/dealer-summary', 'AdminController@dealer_summary');
 
+        Route::get(
+            '/admin/view-dealer-summary/{code}',
+            'AdminController@view_dealer_summary'
+        );
+
+        Route::get(
+            '/admin/dealer-single-summary/{code}',
+            'AdminController@dealer_single_summary'
+        );
+
+        Route::get(
+            '/admin/vendor-summary/{code}',
+            'AdminController@vendor_summary'
+        );
+
+        Route::get(
+            '/admin/deactivate-dealers',
+            'AdminController@deactivate_all_dealers'
+        );
+
+        Route::get(
+            '/admin/activate-dealers',
+            'AdminController@activate_all_dealers'
+        );
+
+        Route::get(
+            '/admin/deactivate-vendors',
+            'AdminController@deactivate_all_vendors'
+        );
+
+        Route::get(
+            '/admin/get-all-users-status',
+            'AdminController@get_users_status'
+        );
+
+        Route::get(
+            '/admin/activate-vendors',
+            'AdminController@activate_all_vendors'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -281,6 +325,16 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
+        Route::get(
+            '/dealer/unread-report-reply/{user}',
+            'DealerController@get_unread_report_reply'
+        );
+
+        Route::get(
+            '/dealer/update-report-ticket/{ticket}',
+            'DealerController@update_report_ticket'
+        );
 
         Route::get(
             '/dealer/get-vendor-data/{code}',
@@ -315,6 +369,11 @@ Route::group(
         Route::post(
             '/dealer/submit-quick-order',
             'DealerController@submit_quick_order'
+        );
+
+        Route::post(
+            '/dealer/save-quick-order-changes',
+            'DealerController@save_quick_order_changes'
         );
 
         Route::get(
@@ -446,7 +505,6 @@ Route::group(
             'DealerController@fetch_orders_remaining'
         );
 
-
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(
@@ -481,12 +539,7 @@ Route::group(
             'SeminarController@fetch_only_dealer_emails'
         );
 
-        Route::post(
-            '/edit-seminar',
-            'SeminarController@edit_seminar'
-        );
-
-
+        Route::post('/edit-seminar', 'SeminarController@edit_seminar');
 
         // ------------------promotional flier ------------------//
 
@@ -611,6 +664,16 @@ Route::group(
         Route::get(
             '/vendor/vendor-dashboard-most-purchaser/{code}/{user}',
             'VendorController@vendor_dashboard_most_purchaser'
+        );
+
+        Route::get(
+            '/vendor/vendor-single-dashboard-most-purchaser/{code}',
+            'VendorController@vendor_single_dashboard_most_purchaser'
+        );
+
+        Route::get(
+            '/vendor/vendor-single-dashboard-analysis/{code}',
+            'VendorController@vendor_single_dashboard_analysis'
         );
 
         Route::get(
@@ -748,12 +811,8 @@ Route::group(
             '/branch/dashboard/{uid}',
             'BranchController@branch_dashboard'
         );
-
-
-
+        
         // ---------------- Branch ends here  --------------------------- //
-
-
 
         //------------------- special orders starts here ---------------- //
 
@@ -804,10 +863,7 @@ Route::group(
         );
 
         // fetch all branch dealers
-        Route::get(
-            '/branch-dealers/{uid}',
-            'BranchController@branch_dealers'
-        );
+        Route::get('/branch-dealers/{uid}', 'BranchController@branch_dealers');
         // ------------------ Product summary ends here ----------------- //
 
         // ------------------- show bucks starts here  ------------------ //
@@ -873,5 +929,36 @@ Route::group(
         );
 
         Route::get('/testing-chat', 'ChatController@testing_chat');
+    }
+);
+
+///////////////// Sales REp /////////////
+Route::group(
+    ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
+    function () {
+        Route::get(
+            '/sales-rep/dashboard-analysis/{user}',
+            'SalesRepController@sales_rep_dashboard_analysis'
+        );
+
+        Route::get(
+            '/sales-rep/get-purchasers-dealer/{user}',
+            'SalesRepController@get_purchases_dealers'
+        );
+
+        Route::get(
+            '/sales-rep/view-dealer-summary/{user}/{code}',
+            'SalesRepController@view_dealer_summary'
+        );
+
+        Route::get(
+            '/sales-rep/dealers-sales/{user}',
+            'SalesRepController@all_dealers_sales'
+        );
+
+        Route::get(
+            '/sales-rep/dealers-summary/{dealer}',
+            'SalesRepController@view_dealer_summary_page'
+        );
     }
 );

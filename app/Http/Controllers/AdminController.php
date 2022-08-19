@@ -36,6 +36,9 @@ use App\Models\ProgramNotes;
 
 use App\Models\PriceOverideReport;
 use App\Models\SpecialOrder;
+use App\Models\UserStatus;
+use Stichoza\GoogleTranslate\GoogleTranslate;
+use App;
 
 use DateTime;
 // use App\Models\Catalogue_Order;
@@ -74,13 +77,75 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
-    public function dealer_summary()
+    public function view_dealer_summary($code)
     {
-        $dealers = Dealer::all();
+        $vendors = [];
+        $res_data = [];
+        $grand_total = 0;
+
+        $dealer_data = Cart::where('dealer', $code)->get();
+        $dealer_ship = Dealer::where('dealer_code', $code)
+            ->get()
+            ->first();
+
+        foreach ($dealer_data as $value) {
+            $vendor_code = $value->vendor;
+            if (!\in_array($vendor_code, $vendors)) {
+                array_push($vendors, $vendor_code);
+            }
+        }
+
+        foreach ($vendors as $value) {
+            $vendor_data = Vendors::where('vendor_code', $value)
+                ->get()
+                ->first();
+            $cart_data = Cart::where('vendor', $value)
+                ->where('dealer', $code)
+                ->get();
+
+            $total = 0;
+
+            foreach ($cart_data as $value) {
+                $total += $value->price;
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->description = $pro_data->description;
+                $value->vendor_product_code = $pro_data->vendor_product_code;
+            }
+
+            $data = [
+                'vendor_code' => $vendor_data->vendor_code,
+                'vendor_name' => $vendor_data->vendor_name,
+                'total' => floatval($total),
+                'data' => $cart_data,
+            ];
+
+            $grand_total += $total;
+
+            array_push($res_data, $data);
+        }
+
+        $pdf_data = [
+            'data' => $res_data,
+            'dealer' => $dealer_ship,
+            'grand_total' => $grand_total,
+        ];
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $pdf_data;
+        $this->result->message = 'View Dealer Summary';
+        return response()->json($this->result);
+    }
+
+    public function dealer_single_summary($code)
+    {
+        $dealers = Dealer::where('dealer_code', $code)->get();
         $dealer_count = Dealer::count();
-
         $total_sales = 0;
-
         $res_data = [];
 
         if ($dealers) {
@@ -113,7 +178,148 @@ class AdminController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $res_data;
+        $this->result->message = 'Dealer Single Summary';
+        return response()->json($this->result);
+    }
 
+    public function get_users_status()
+    {
+        $users_status = UserStatus::all();
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All vendor users status';
+        $this->result->data = $users_status;
+        return response()->json($this->result);
+    }
+
+    public function activate_all_vendors()
+    {
+        Users::where('role', '3')->update(['status' => 1]);
+        $users_status = UserStatus::where('role', '3')->update(['status' => 1]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All vendor users has been activated';
+        $this->result->data = $users_status;
+
+        return response()->json($this->result);
+    }
+
+    public function deactivate_all_vendors()
+    {
+        Users::where('role', '3')->update(['status' => 0]);
+        $users_status = UserStatus::where('role', '3')->update(['status' => 0]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All vendor users has been deactivated';
+        return response()->json($this->result);
+    }
+
+    public function activate_all_dealers()
+    {
+        Users::where('role', '4')->update(['status' => 1]);
+        $users_status = UserStatus::where('role', '4')->update(['status' => 1]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All Dealer users has been activated';
+        return response()->json($this->result);
+    }
+
+    public function deactivate_all_dealers()
+    {
+        Users::where('role', '4')->update(['status' => 0]);
+        $users_status = UserStatus::where('role', '4')->update(['status' => 0]);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All Dealer users has been deactivated';
+        return response()->json($this->result);
+    }
+
+    public function vendor_summary($code)
+    {
+        $vendor_purchases = Cart::where('vendor', $code)->get();
+        $res_data = [];
+        $users = [];
+        foreach ($vendor_purchases as $value) {
+            $user_id = $value->uid;
+            $product_id = $value->product_id;
+
+            if (!in_array($user_id, $users)) {
+                array_push($users, $user_id);
+            }
+        }
+
+        foreach ($users as $value) {
+            $cart_user = Cart::where('vendor', $code)
+                ->where('uid', $value)
+                ->get()
+                ->first();
+            $sum_user_total = Cart::where('vendor', $code)
+                ->where('uid', $value)
+                ->get()
+                ->sum('price');
+            $user = Users::where('id', $value)
+                ->get()
+                ->first();
+
+            $data = [
+                'account_id' => $user->account_id,
+                'dealer_name' => $user->company_name,
+                'user' => $user_id,
+                'vendor_code' => $code,
+                'purchaser_name' => $user->first_name . ' ' . $user->last_name,
+                'amount' => $sum_user_total,
+            ];
+
+            array_push($res_data, $data);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Purchasers by Dealers';
+        $this->result->data = $res_data;
+        return response()->json($this->result);
+    }
+
+    public function dealer_summary()
+    {
+        $dealers = Dealer::all();
+        $dealer_count = Dealer::count();
+        $total_sales = 0;
+        $res_data = [];
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $dealer_code = $value->dealer_code;
+                $dealer_name = $value->dealer_name;
+                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'sales' => $dealer_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        /////// Sorting //////////
+        usort($res_data, function ($a, $b) {
+            //Sort the array using a user defined function
+            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        });
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
         $this->result->message = 'Dealer Summary';
         return response()->json($this->result);
     }
@@ -484,7 +690,7 @@ class AdminController extends Controller
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'Admin User Added Successfully';
+            $this->result->message = 'report replied Successfully';
 
             return response()->json($this->result);
         }
@@ -1176,7 +1382,7 @@ class AdminController extends Controller
 
     public function get_all_seminar()
     {
-        $seminar = Seminar::all()->orderby('desc',);
+        $seminar = Seminar::orderBy('id', 'desc')->get();
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $seminar;
@@ -1544,10 +1750,14 @@ class AdminController extends Controller
             foreach ($all_dealer_users as $value) {
                 $user_id = $value->id;
                 $total_sales = Cart::where('uid', $user_id)->sum('price');
+                $dealer_code = $value->account_id;
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
 
                 $data = [
                     'account_id' => $value->account_id,
-                    'full_name' => $value->first_name . ' ' . $value->last_name,
+                    'dealer' => $dealer_data,
                     'total_sales' => $total_sales,
                     'trend' => '0%',
                 ];
@@ -1710,7 +1920,6 @@ class AdminController extends Controller
             'atlasId' => 'required',
             'desc' => 'required',
             'regular' => 'required',
-            'special' => 'required',
             'vendor' => 'required',
         ]);
 
@@ -1734,9 +1943,14 @@ class AdminController extends Controller
                 'atlas_id' => $atlasId,
                 'description' => $desc,
                 'booking' => $regular,
-                'special' => $special,
                 'vendor' => $vendor,
             ]);
+
+            if ($special != null) {
+                Products::where('atlas_id', $atlasId)->update([
+                    'special' => $special != null ? $special : '',
+                ]);
+            }
 
             if ($update) {
                 $this->result->status = true;
@@ -2905,6 +3119,62 @@ class AdminController extends Controller
     public function refresh()
     {
         return $this->respondWithToken(auth()->refresh());
+    }
+
+    public function translateToLocal($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        return $tr->translate($text);
+    }
+
+    public function admin_get_all_reports()
+    {
+        /// App::setLocale('fr');
+
+        $reports = Report::orderBy('id', 'desc')->get();
+        $res_data = [];
+
+        if ($reports) {
+            foreach ($reports as $value) {
+                $user = $value->user_id;
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                if ($user_data) {
+                    $data = [
+                        'full_name' => !is_null($user_data->full_name)
+                            ? $user_data->full_name
+                            : '',
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'email' => $user_data->email,
+                        'subject' => $value->subject,
+                        'description' => $value->description,
+                        'file_url' => $value->file_url,
+                        'ticket_id' => $value->ticket_id,
+                        'status' => $value->status,
+                        'created_at' => $value->created_at,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'All reports fetched successfully';
+        $this->result->data = $res_data;
+        return response()->json($this->result);
     }
 
     public function get_all_reports()

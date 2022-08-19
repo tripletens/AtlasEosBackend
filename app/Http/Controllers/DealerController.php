@@ -39,6 +39,7 @@ use App\Models\ProgramNotes;
 
 use App\Models\DealerQuickOrder;
 use App\Models\PromotionalFlier;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class DealerController extends Controller
 {
@@ -60,7 +61,84 @@ class DealerController extends Controller
         echo 'login page setup';
     }
 
-    public function generate_pdf($dealer)
+    public static function staticTrans($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        return $tr->translate($text);
+    }
+
+    public function translateToLocal($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        return $tr->translate($text);
+    }
+
+    public function update_report_ticket($ticket)
+    {
+        $cur = ReportReply::where('ticket', $ticket)->update(['status' => '2']);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $cur;
+        $this->result->message = 'Update report reply';
+
+        return response()->json($this->result);
+    }
+
+    public function get_unread_report_reply($user)
+    {
+        $tickets = [];
+        $counter = 0;
+
+        $reports = Report::where('user_id', $user)->get();
+        if ($reports) {
+            foreach ($reports as $value) {
+                $ticket = $value->ticket_id;
+                if (!in_array($ticket, $tickets)) {
+                    array_push($tickets, $ticket);
+                }
+            }
+
+            if (count($tickets) > 0) {
+                foreach ($tickets as $value) {
+                    $cur = ReportReply::where('ticket', $value)
+                        ->where('status', '1')
+                        ->where('role', '1')
+                        ->get()
+                        ->first();
+
+                    if ($cur) {
+                        $counter = $counter + 1;
+                    }
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $counter;
+        $this->result->message = 'get unread report reply';
+
+        return response()->json($this->result);
+    }
+
+    public function generate_pdf($dealer, $lang)
     {
         $data = [
             'title' => 'Welcome to Tutsmake.com',
@@ -75,6 +153,13 @@ class DealerController extends Controller
         $dealer_ship = Dealer::where('dealer_code', $dealer)
             ->get()
             ->first();
+
+        if ($dealer_ship) {
+            $dealer_ship->dealer_name = $this->translateToLocal(
+                $lang,
+                $dealer_ship->dealer_name
+            );
+        }
 
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
@@ -100,13 +185,22 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $pro_data->description;
-                $value->vendor_product_code = $pro_data->vendor_product_code;
+                $value->description = $this->translateToLocal(
+                    $lang,
+                    $pro_data->description
+                );
+                $value->vendor_product_code = $this->translateToLocal(
+                    $lang,
+                    $pro_data->vendor_product_code
+                );
             }
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+                'vendor_name' => $this->translateToLocal(
+                    $lang,
+                    $vendor_data->vendor_name
+                ),
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -116,13 +210,14 @@ class DealerController extends Controller
             array_push($res_data, $data);
         }
 
-        //return $res_data;
-
         $pdf_data = [
             'data' => $res_data,
-            'dealer' => $dealer_ship,
+            'dealer' => $dealer_ship ? $dealer_ship : null,
             'grand_total' => $grand_total,
+            'lang' => $lang,
         ];
+
+        /////  return $pdf_data;
 
         $pdf = PDF::loadView('dealership-pdf', $pdf_data);
         return $pdf->stream('dealership.pdf');
@@ -571,8 +666,8 @@ class DealerController extends Controller
     {
         $quick_orders = DealerQuickOrder::where('quick_order.uid', $uid)
             ->where('quick_order.dealer', $dealer)
-            ->join('vendors','vendors.vendor_code','=','quick_order.vendor')
-            ->select('quick_order.*','vendors.vendor_name')
+            ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')
+            ->select('quick_order.*', 'vendors.vendor_name')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -780,6 +875,62 @@ class DealerController extends Controller
         }
     }
 
+    // adds item to the quick order table
+    public function save_quick_order_changes(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uid' => 'required',
+            'dealer' => 'required',
+            'product_array' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $uid = $request->uid;
+            $atlas_id = $request->atlas_id;
+            $dealer = $request->dealer;
+
+            // lets get the items from the array
+            $product_array = $request->input('product_array');
+            if (count(json_decode($product_array)) > 0 && $product_array) {
+                $decode_product_array = json_decode($product_array);
+
+                foreach ($decode_product_array as $product) {
+                    // update to the db
+
+                    if (
+                        DealerQuickOrder::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
+                    ) {
+                        DealerQuickOrder::where('dealer', $dealer)
+                            ->where('atlas_id', $product->atlas_id)
+                            ->update([
+                                'qty' =>
+                                    $product->qty != '' ? $product->qty : 0,
+                                'price' => $product->price,
+                                'unit_price' => $product->unit_price,
+                            ]);
+                    } else {
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Quick order Updated';
+
+            return response()->json($this->result);
+        }
+    }
+
     public function get_fetch_by_vendor_atlas($code)
     {
         $filtered_item = Products::orWhere('atlas_id', $code)
@@ -835,6 +986,8 @@ class DealerController extends Controller
             $dealer = $request->dealer;
             $vendor = $request->vendor;
 
+            Users::where('id', $uid)->update(['order_status' => 1]);
+
             // lets get the items from the array
             $product_array = $request->input('product_array');
 
@@ -863,6 +1016,10 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
+                        Users::where('id', $uid)->update([
+                            'place_order_date' => Carbon::now(),
+                        ]);
+
                         $current_vendor = $product->vendor_id;
                         $submitted_status = true;
                         $save = Cart::create([
@@ -1842,16 +1999,20 @@ class DealerController extends Controller
     public function fetch_all_orders_per_day($account)
     {
         // fetch all the orders
-        $all_orders = Cart::where('dealer',$account)->where('status', '1');
-        if(!$all_orders){
+        $all_orders = Cart::where('dealer', $account)->where('status', '1');
+        if (!$all_orders) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the orders";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the orders";
             return response()->json($this->result);
         }
 
         // get all the order dates using group by
-        $all_orders_dates = $all_orders->groupBy('created_at')->pluck('created_at')->toArray();
+        $all_orders_dates = $all_orders
+            ->groupBy('created_at')
+            ->pluck('created_at')
+            ->toArray();
         // format date to be able to compare
         $all_orders_dates = array_map(function ($date) {
             return Carbon::parse($date)->format('Y-m-d');
@@ -1859,7 +2020,10 @@ class DealerController extends Controller
 
         // FILESYSTEM_DRIVER publicproba
         // get all orders per day sum
-        $all_orders_per_day = $all_orders->groupBy('created_at')->select(DB::raw('sum(price) as total_price'))->get();
+        $all_orders_per_day = $all_orders
+            ->groupBy('created_at')
+            ->select(DB::raw('sum(price) as total_price'))
+            ->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;

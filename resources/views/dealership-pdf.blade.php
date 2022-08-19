@@ -139,22 +139,37 @@
         padding-top: 0px !important;
     }
 
+    .table-wrapper{
+        margin-top: 80px
+    }
+
 </style>
 
 <body>
 
-
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
-                <h2 class="top-title">ATLAS 2023 ATLAS VIRTUAL SHOW <br> SUMMARY</h2>
-                <h2 class="dealer-name">Dealer Name: {{ $dealer->dealer_name }}</h2>
-                <h2 class="dealer-name">Dealer Account #: {{ $dealer->dealer_code }}</h2>
+
+                <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SUMMARY') }} </h2>
+                @if($dealer != null && $dealer->dealer_name)
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
+                @else
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name: No name found') }}  </h2>
+                @endif
+
+                @if($dealer != null && $dealer->dealer_code)
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account') }}   #: {{ $dealer->dealer_code }}</h2>
+                @else
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account #: No dealer code found') }}  </h2>
+                @endif
+
+
                 {{-- <h2 class="dealer-name">Order Date: {{ $dealer_updated_at }} MST</h2> --}}
             </div>
-            {{-- <div class="mt-3">
-                <img src="https://atlasbookingprogram.com/assets/new-atlas-logo.png" class="com-logo" alt="">
-            </div> --}}
+            <div>
+                <img src="https://atlasbookingprogram.com/assets/atlas-lgo.png" class="com-logo" alt="">
+            </div>
         </div>
     </div>
 
@@ -163,89 +178,85 @@
 
 
 
-    @if (count($data) > 0)
-    @foreach ($data as $item)
+    <div class="table-wrapper">
+        @if (count($data) > 0)
+            @foreach ($data as $item)
+                <div class="">
+                    <h5 class="top-title-table" style="">{{ $item['vendor_name']}}
+                    </h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="">
+                        <thead>
+                            <tr>
 
-    <div>
-        <h5 class="top-title-table" style="">{{ $item['vendor_name']}}
-        </h5>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th class="thead-custom">Quantity</th>
-                <th class="thead-custom">Atlas #</th>
-                <th class="thead-custom">Vendor #</th>
-                <th class="thead-custom">Description</th>
-                <th class="thead-custom">Special Price ($)</th>
-                <th class="thead-custom">Total ($)</th>
-            </tr>
-        </thead>
+                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Qty') }} </th>
+                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Atlas') }}  #</th>
+                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor') }} #</th>
+                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Description') }}</th>
+                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Special Price') }}  ($)</th>
+                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Total') }}  ($)</th>
+                            </tr>
+                        </thead>
+            
+                        <tbody>
+            
+                            @foreach ($item['data'] as $inner)
+                                <tr>
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['qty'] }}
+                                    </td>
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['atlas_id'] }}
+                                    </td>
+            
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['vendor_product_code'] }}
+                                    </td>
+            
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['description'] }}
+                                    </td>
+                                    <td class="table-value-custom right-align">
+                                        {{ number_format(floatval($inner['unit_price']), 2) }}
+                                    </td>
+                                    <td class="table-value-custom right-align">
+                                        {{ number_format($inner['price'], 2) }}
+                                    </td>
+                                </tr>
+            
+                            @endforeach
+            
+                            <tr>
+                                <td colspan="5">
+                                    <h5 class="each-total-cate-text" style="">
 
-        <tbody>
-
-            @foreach ($item['data'] as $inner)
-                <tr>
-                    <td class="table-value-custom center-text">
-                        {{ $inner['qty'] }}
-                    </td>
-                    <td class="table-value-custom center-text">
-                        {{ $inner['atlas_id'] }}
-                    </td>
-
-                    <td class="table-value-custom center-text">
-                        {{ $inner['vendor_product_code'] }}
-                    </td>
-
-                    {{-- <td>
-                        <img src="{{ $item['vendor_img'] }}" class="vendor-logo" alt="">
-                    </td> --}}
-                    <td class="table-value-custom center-text">
-                        {{ $inner['description'] }}
-                    </td>
-                    <td class="table-value-custom right-align">
-                        {{ number_format(floatval($inner['unit_price']), 2) }}
-                    </td>
-                    <td class="table-value-custom right-align">
-                        {{ number_format($inner['price'], 2) }}
-                    </td>
-                </tr>
-
+                                        {{ App\Http\Controllers\DealerController::staticTrans($lang, 'TOTAL FOR') }}    {{ $item['vendor_name'] }}
+                                        </h5>
+                                </td>
+                                <td>
+                                    <h5 class="each-total-text" style="">
+                                        {{ number_format( $item['total'], 2) }}</h5>
+                                </td>
+                            </tr>
+            
+            
+                        </tbody>
+                    </table>
+                </div>
             @endforeach
+        @endif
+    </div>
 
-            <tr>
-                <td colspan="5">
-                    <h5 class="each-total-cate-text" style="">
-                        TOTAL FOR {{ $item['vendor_name'] }}
-                        </h5>
-                </td>
-                <td>
-                    <h5 class="each-total-text" style="">
-                        {{ number_format( $item['total'], 2) }}</h5>
-                </td>
-            </tr>
-
-
-        </tbody>
-    </table>
-
-  
-    @endforeach
-
-
-       
-
-
-    @endif
-
-   
+ 
 
 
 
 
     @if (count($data) > 0)
     <div style="width: 100%; text-align: right; border: 1px solid gray; margin-top: 20px">
-        <h5 class="each-total-cate-text" style="display: inline-block; border-right: 1px solid gray">Grand Total ($):
+
+        <h5 class="each-total-cate-text" style="display: inline-block; border-right: 1px solid gray"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Grand Total') }}   ($):
         </h5>
         <h5 class="each-total-text" style="display: inline-block; padding-right: 30px">
             {{ number_format($grand_total, 2) }}

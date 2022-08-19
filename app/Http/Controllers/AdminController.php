@@ -2411,6 +2411,7 @@ class AdminController extends Controller
         $status = $request->status;
         $vendor = $request->vendor;
         $vendorId = $request->vendorId;
+        $locaton = $request->location;
 
         if ($firstName != '') {
             $update = Users::where('id', $vendorId)->update([
@@ -2502,6 +2503,12 @@ class AdminController extends Controller
         if ($username != '') {
             $update = Users::where('id', $vendorId)->update([
                 'username' => $username,
+            ]);
+        }
+
+        if ($location != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'location' => $location,
             ]);
         }
 

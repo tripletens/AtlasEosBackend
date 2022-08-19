@@ -519,6 +519,7 @@ class VendorController extends Controller
                 }
 
                 $data = [
+                    'pro_id' => $pro_data->id,
                     'vendor' => $code,
                     'description' => $pro_data->description,
                     'overall_total' => $total_atlas_amount,

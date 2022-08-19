@@ -547,7 +547,7 @@ class VendorController extends Controller
     public function sales_by_item_summary($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('atlas_id', 'asc')
+            ->orderBy('product_id', 'asc')
             ->get();
         $res_data = [];
         foreach ($vendor_purchases as $value) {
@@ -574,12 +574,12 @@ class VendorController extends Controller
             array_push($res_data, $data);
         }
 
-        $res = $this->sort_according_atlas_id($res_data);
+        //// $res = $this->sort_according_atlas_id($res_data);
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data = $res;
+        $this->result->data = $res_data;
         return response()->json($this->result);
     }
 
@@ -597,9 +597,6 @@ class VendorController extends Controller
             usort($ddt, function ($object1, $object2) {
                 $ex1 = explode('-', $object1->atlas_id);
                 $ex2 = explode('-', $object2->atlas_id);
-
-                $lesser = 0;
-                $greater = 0;
 
                 if ($ex1[0] > $ex2[0]) {
                     return true;

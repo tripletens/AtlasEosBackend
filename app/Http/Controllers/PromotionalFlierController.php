@@ -44,21 +44,29 @@ class PromotionalFlierController extends Controller
         } else {
 
             if ($request->hasFile('pdf')) {
-                $filenameWithExt = $request
-                    ->file('pdf')
-                    ->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request
-                    ->file('pdf')
-                    ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
-                $filepath =
-                    env('APP_URL') .
-                    Storage::url(
-                        $request
-                            ->file('pdf')
-                            ->storeAs('public/pdf', $fileNameToStore)
-                    );
+                // $filenameWithExt = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalName();
+                // $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                // $extension = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalExtension();
+                // $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
+                // $filepath =
+                //     env('APP_URL') .
+                //     Storage::url(
+                //         $request
+                //             ->file('pdf')
+                //             ->storeAs('public/pdf', $fileNameToStore)
+                //     );
+
+                // $imageName = time().'.'.$request->image->extension();
+
+                $path = Storage::disk('s3')->put('pdf', $request->pdf,'public');
+
+                $full_file_path = Storage::disk('s3')->url($path);
+
+                // Storage::setVisibility($full_file_path, 'public');
             }
 
             $name = $request->input('name');
@@ -69,7 +77,7 @@ class PromotionalFlierController extends Controller
 
             $createPromotionalFlier = PromotionalFlier::create([
                 'name' => $name ? $name : null,
-                'pdf_url' => $request->hasFile('pdf') ? $filepath : null,
+                'pdf_url' => $request->hasFile('pdf') ? $full_file_path : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'description' => $description ? $description : null,
                 'image_url' => $image_url ? $image_url : null
@@ -150,7 +158,7 @@ class PromotionalFlierController extends Controller
                     $extension = $request
                         ->file('pdf')
                         ->getClientOriginalExtension();
-                    $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                    $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
                     $filepath =
                         env('APP_URL') .
                         Storage::url(
@@ -194,7 +202,6 @@ class PromotionalFlierController extends Controller
             $this->result->message = "An Error Ocurred, we couldn't fetch the promotional fliers";
             return response()->json($this->result);
         } else {
-             
         }
     }
 
@@ -216,7 +223,7 @@ class PromotionalFlierController extends Controller
         }
     }
 
-    // delete the promotional flier 
+    // delete the promotional flier
     public function delete_promotional_flier($id)
     {
         $promotional_flier = PromotionalFlier::find($id);
@@ -249,9 +256,9 @@ class PromotionalFlierController extends Controller
     {
         $all_vendors_with_promotional_fliers =
             PromotionalFlier::select('vendor_id')
-                ->groupBy('vendor_id')->get();
-            // ::distinct('vendor_id')
-            // ->distinct()
+            ->groupBy('vendor_id')->get();
+        // ::distinct('vendor_id')
+        // ->distinct()
 
 
         // return $all_vendors_with_promotional_fliers;

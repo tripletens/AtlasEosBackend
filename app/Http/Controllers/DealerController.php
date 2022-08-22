@@ -2046,7 +2046,7 @@ class DealerController extends Controller
             'atlas_id',
             'LIKE',
             '%' . $search . '%'
-        )->get();
+        )->orWhere('vendor_product_code', 'LIKE' , '%' . $search . '%')->get();
 
         $search_result = [
             'products' => count($product) > 0 ? $product : null,

@@ -811,7 +811,7 @@ Route::group(
             '/branch/dashboard/{uid}',
             'BranchController@branch_dashboard'
         );
-        
+
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //

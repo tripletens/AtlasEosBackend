@@ -949,6 +949,11 @@ Route::group(
             'ChatController@count_unread_msg_role'
         );
 
+        Route::get(
+            '/chat/get-chat-history/{user}/{role}',
+            'ChatController@get_chat_history'
+        );
+
         Route::get('/testing-chat', 'ChatController@testing_chat');
     }
 );

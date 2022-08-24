@@ -77,6 +77,41 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_chat_selected_vendor_users($code)
+    {
+        $vendor = Users::where('vendor_code', $code)
+            ->where('role', '3')
+            ->get()
+            ->toArray();
+
+        $data = [];
+
+        if ($vendor) {
+            foreach ($vendor as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all chat selected vendors';
+        $this->result->data = $data;
+        return response()->json($this->result);
+    }
+
     public function view_dealer_summary($code)
     {
         $vendors = [];

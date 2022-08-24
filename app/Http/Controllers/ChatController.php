@@ -70,6 +70,46 @@ class ChatController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_user_chat_async($receiver, $sender)
+    {
+        $sender_data = Users::where('id', $sender)
+            ->get()
+            ->first();
+        $receiver_data = Users::where('id', $receiver)
+            ->get()
+            ->first();
+
+        $phase_one_unique_id =
+            $sender_data->id .
+            $sender_data->first_name .
+            $receiver_data->id .
+            $receiver_data->first_name;
+        $phase_two_unique_id =
+            $receiver_data->id .
+            $receiver_data->first_name .
+            $sender_data->id .
+            $sender_data->first_name;
+
+        $chat_history = Chat::orWhere('unique_id', $phase_one_unique_id)
+            ->orWhere('unique_id', $phase_two_unique_id)
+            ->get();
+
+        foreach ($chat_history as $value) {
+            $value->from_username =
+                $sender_data->first_name . ' ' . $sender_data->last_name;
+            $value->to_username =
+                $receiver_data->first_name . ' ' . $receiver_data->last_name;
+
+            $value->time_ago = ChatController::timeAgo($value->created_at);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $chat_history;
+        $this->result->message = 'all User chat History';
+        return response()->json($this->result);
+    }
+
     public function get_user_chat($receiver, $sender)
     {
         $sender_data = Users::where('id', $sender)

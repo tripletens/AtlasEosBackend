@@ -180,6 +180,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/get-users-unread-msg/{user}',
+            'AdminController@get_users_unread_msg'
+        );
+
+        Route::get(
             '/admin/get-all-reports',
             'AdminController@admin_get_all_reports'
         );
@@ -307,6 +312,11 @@ Route::group(
         Route::get(
             '/admin/activate-vendors',
             'AdminController@activate_all_vendors'
+        );
+
+        Route::get(
+            '/admin/get-all-company',
+            'AdminController@get_user_company'
         );
 
         Route::get('/testing', 'AdminController@testing_api');

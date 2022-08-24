@@ -319,6 +319,11 @@ Route::group(
             'AdminController@get_user_company'
         );
 
+        Route::get(
+            '/admin/get-chat-selected-vendor-users/{code}',
+            'AdminController@get_chat_selected_vendor_users'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -923,9 +928,15 @@ Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/store-chat', 'ChatController@store_chat');
+
         Route::get(
             '/get-user-chat/{receiver}/{sender}',
             'ChatController@get_user_chat'
+        );
+
+        Route::get(
+            '/get-user-chat-async/{receiver}/{sender}',
+            'ChatController@get_user_chat_async'
         );
 
         Route::get(

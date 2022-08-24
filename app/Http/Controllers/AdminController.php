@@ -1125,10 +1125,12 @@ class AdminController extends Controller
             }
         }
 
-        // $data = array_map(
-        //     'unserialize',
-        //     array_unique(array_map('serialize', $data))
-        // );
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
+
+        $data = (array) $data;
 
         $this->result->status = true;
         $this->result->status_code = 200;

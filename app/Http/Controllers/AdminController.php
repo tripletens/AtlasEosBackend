@@ -1130,12 +1130,18 @@ class AdminController extends Controller
             array_unique(array_map('serialize', $data))
         );
 
+        $filter_data = [];
+
+        foreach ($data as $item) {
+            array_push($filter_data, $item);
+        }
+
         $data = (array) $data;
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get dealer unread msg';
-        $this->result->data = $data;
+        $this->result->data = $filter_data;
         return response()->json($this->result);
     }
 

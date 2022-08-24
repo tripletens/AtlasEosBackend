@@ -131,8 +131,8 @@ class ChatController extends Controller
             $sender_data->first_name;
 
         // orWhere('unique_id', $phase_one_unique_id)
-        Chat::where('chat_from', $sender)
-            ->where('chat_to', $receiver)
+        Chat::where('chat_from', $receiver)
+            ->where('chat_to', $sender)
             ->update([
                 'status' => '1',
             ]);

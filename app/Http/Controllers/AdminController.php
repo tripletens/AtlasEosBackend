@@ -1101,9 +1101,7 @@ class AdminController extends Controller
         $this->result->status_code = 200;
         $this->result->data->vendor = $vendors;
         $this->result->data->dealer = $dealers;
-
         $this->result->message = 'all users companys';
-
         return response()->json($this->result);
     }
 

@@ -93,7 +93,7 @@ class UserController extends Controller
             )->format('Y-m-d H:i');
 
             $ch = new Carbon($end_program);
-            $current = Carbon::now();
+            $current = $request->timer;
 
             if (!$ch->gt($current)) {
                 $this->result->status = false;

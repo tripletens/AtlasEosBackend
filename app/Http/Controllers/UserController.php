@@ -30,6 +30,7 @@ use App\Models\CardedProducts;
 
 use App\Models\ServiceParts;
 use App\Models\Cart;
+use App\Models\ProgramCountdown;
 
 class UserController extends Controller
 {
@@ -76,6 +77,14 @@ class UserController extends Controller
             $this->result->status_code = 401;
             $this->result->message = 'Account has been deactivated';
             return response()->json($this->result);
+        }
+
+        if ($active_staff['role'] != '1') {
+            $count_down = ProgramCountdown::where('status', '1')
+                ->get()
+                ->first();
+
+            return $count_down;
         }
 
         $dealer = Users::where('email', $request->email)->first();

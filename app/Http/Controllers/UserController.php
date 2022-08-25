@@ -79,7 +79,7 @@ class UserController extends Controller
             return response()->json($this->result);
         }
 
-        if ($active_staff['role'] != '1') {
+        if ($active_staff['role'] == '4') {
             $count_down = ProgramCountdown::where('status', '1')
                 ->get()
                 ->first();

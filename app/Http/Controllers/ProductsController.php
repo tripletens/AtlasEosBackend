@@ -26,6 +26,10 @@ class ProductsController extends Controller
             ->orderby('id', 'asc')
             ->get();
 
+        foreach ($fetch_new_products as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
+
         if (!$fetch_new_products) {
             $this->result->status = true;
             $this->result->status_code = 400;
@@ -44,9 +48,13 @@ class ProductsController extends Controller
     // sort new products by vendor id
     public function sort_newproduct_by_vendor_id($vendor_id)
     {
-        $fetch_new_products_by_vendor = Products::where('check_new','1')->where('vendor', $vendor_id)
+        $fetch_new_products_by_vendor = Products::where('check_new', '1')->where('vendor', $vendor_id)
             ->orderby('id', 'asc')
             ->get();
+
+        foreach ($fetch_new_products_by_vendor as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
 
         if (!$fetch_new_products_by_vendor) {
             $this->result->status = true;
@@ -129,5 +137,4 @@ class ProductsController extends Controller
         $this->result->message = 'All products for vendor code fetched successfully';
         return response()->json($this->result);
     }
-
 }

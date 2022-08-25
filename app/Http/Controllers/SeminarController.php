@@ -140,7 +140,9 @@ class SeminarController extends Controller
     // fetch all the seminars
     public function fetch_all_seminars($dealer_id)
     {
-        $fetch_seminars = Seminar::orderBy('id', 'desc')->get();
+        // status => [ 1 => 'scheduled', 2 => 'ongoing', 3 => 'watched']
+        // fetch all except completed seminars
+        $fetch_seminars = Seminar::orderBy('id', 'desc')->where('status',"!=",3)->get();
         // $check_bookmarked = [];
 
         if (!$fetch_seminars) {

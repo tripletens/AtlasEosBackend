@@ -601,10 +601,12 @@ Route::group(
             '/products/new/atlas_id/{atlas_id}',
             'ProductsController@sort_newproduct_by_atlas_id'
         );
+        
         Route::get(
             '/get-product-by-vendor-id/{vendor_id}',
             'ProductsController@fetch_all_products_by_vendor_id'
         );
+
         Route::get(
             '/get-all-new-products',
             'ProductsController@fetch_all_new_products'
@@ -820,6 +822,11 @@ Route::group(
         Route::get(
             '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}',
             'BranchController@get_dealers_with_account_id_under_branch'
+        );
+
+        Route::get(
+            '/branch/dashboard/{uid}',
+            'BranchController@branch_dashboard'
         );
 
         // ---------------- Branch ends here  --------------------------- //

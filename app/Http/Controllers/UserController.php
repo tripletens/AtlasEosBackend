@@ -84,7 +84,22 @@ class UserController extends Controller
                 ->get()
                 ->first();
 
-            return $count_down;
+            $end_date = $count_down->end_countdown_date;
+            $end_time = $count_down->end_countdown_time;
+            $end_count = $end_date . ' ' . $end_time;
+            $end_program = Carbon::createFromFormat(
+                'Y-m-d H:i',
+                $end_count
+            )->format('Y-m-d H:i');
+
+            $ch = new Carbon($end_program);
+            $current = Carbon::now();
+
+            if (!$ch->gt($current)) {
+                $this->result->status = false;
+                $this->result->message = 'Program has closed';
+                return response()->json($this->result);
+            }
         }
 
         $dealer = Users::where('email', $request->email)->first();

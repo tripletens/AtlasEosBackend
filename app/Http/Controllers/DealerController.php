@@ -2001,7 +2001,7 @@ class DealerController extends Controller
         // fetch all the orders
         // $all_orders = Cart::where('dealer', $account)->where('status', '1');
 
-        $new_all_orders = DB::table('cart')
+        $new_all_orders = DB::table('cart')->where('dealer', $account)->where('status', '1')
         ->select(DB::raw('DATE(created_at) as date'), DB::raw('sum(price) as amount'))
         ->groupBy('date')
         ->get();

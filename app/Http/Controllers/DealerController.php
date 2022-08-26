@@ -496,12 +496,13 @@ class DealerController extends Controller
         if ($order) {
             foreach ($order as $value) {
                 $atlas_id = $value->atlas_id;
+                $pro_id = $value->product_id;
                 $product_data = Products::where('atlas_id', $atlas_id)
                     ->get()
                     ->first();
 
                 $data = [
-                    'id' => $product_data->id,
+                    'id' => $pro_id,
                     'desc' => $product_data->description,
                     'spec_data' => $product_data->spec_data
                         ? json_decode($product_data->spec_data)
@@ -519,6 +520,16 @@ class DealerController extends Controller
                 array_push($res_data, $data);
             }
         }
+
+        // function comparator($object1, $object2) {
+        //     return $object1->score > $object2->score;
+        // }
+
+        $res = (object) $res_data;
+
+        usort($res_data, function ($object1, $object2) {
+            return $object1['id'] > $object2['id'];
+        });
 
         $this->result->status = true;
         $this->result->status_code = 200;

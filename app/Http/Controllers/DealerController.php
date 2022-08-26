@@ -267,17 +267,18 @@ class DealerController extends Controller
             $value->spec_data = json_decode($value->spec_data);
         }
 
-        $check_assorted = $item->grouping != null ? true : false;
+        if (isset($item->grouping)) {
+            $check_assorted = $item->grouping != null ? true : false;
+            if ($check_assorted) {
+                $assorted_status = true;
+                $assorted_data = Products::where(
+                    'grouping',
+                    $item->grouping
+                )->get();
 
-        if ($check_assorted) {
-            $assorted_status = true;
-            $assorted_data = Products::where(
-                'grouping',
-                $item->grouping
-            )->get();
-
-            foreach ($assorted_data as $value) {
-                $value->spec_data = json_decode($value->spec_data);
+                foreach ($assorted_data as $value) {
+                    $value->spec_data = json_decode($value->spec_data);
+                }
             }
         }
 

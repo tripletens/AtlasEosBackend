@@ -488,7 +488,7 @@ class DealerController extends Controller
     {
         $order = Cart::where('vendor', $vendor)
             ->where('dealer', $dealer)
-            ->orderBy('atlas_id', 'asc')
+            ->orderBy('product_id', 'asc')
             ->get();
 
         $res_data = [];

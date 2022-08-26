@@ -586,7 +586,7 @@ Route::group(
             '/products/new/atlas_id/{atlas_id}',
             'ProductsController@sort_newproduct_by_atlas_id'
         );
-        
+
         Route::get(
             '/get-product-by-vendor-id/{vendor_id}',
             'ProductsController@fetch_all_products_by_vendor_id'
@@ -637,6 +637,8 @@ Route::group(
         );
 
         Route::get('/dealer/get-vendors', 'DealerController@get_vendor');
+        Route::get('/dealer/get-vendors-with-orders', 'DealerController@get_vendors_with_orders');
+
 
         Route::get(
             '/dealer/get-selected-company-vendor/{code}/{user}',

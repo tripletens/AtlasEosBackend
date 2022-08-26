@@ -1049,6 +1049,17 @@ class DealerController extends Controller
                     ) {
                         $item_already_added += 1;
                         $item_details .= $product->atlas_id . ',';
+
+                        if ($request->type == 'edit') {
+                            Cart::where('atlas_id', $product->atlas_id)
+                                ->where('dealer', $dealer)
+                                ->update([
+                                    'qty' => $product->qty,
+                                    'price' => $product->price,
+                                    'unit_price' => $product->unit_price,
+                                ]);
+                        }
+
                         // break;
                         /// break;
                         // $this->result->status = true;

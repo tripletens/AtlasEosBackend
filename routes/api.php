@@ -657,6 +657,8 @@ Route::group(
         );
 
         Route::get('/dealer/get-vendors', 'DealerController@get_vendor');
+        Route::get('/dealer/get-vendors-with-orders', 'DealerController@get_vendors_with_orders');
+
 
         Route::get(
             '/dealer/get-selected-company-vendor/{code}/{user}',

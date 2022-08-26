@@ -1844,6 +1844,36 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_vendors_with_orders(){
+        $get_all_vendors = Vendors::get();
+
+        if (!$get_all_vendors) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch all the vendors";
+            return response()->json($this->result);
+        }
+
+        $vendors_array = [];
+
+        foreach($get_all_vendors as $item){
+            $product = Products::where('vendor', $item['vendor_code'])
+            ->where('status', '1')
+            ->exists();
+
+            if($product){
+               array_push($vendors_array,$item);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $vendors_array;
+        $this->result->message = 'Vendors fetched successfully';
+
+        return response()->json($this->result);
+    }
+
     public function dealer_get_vendor_products($code)
     {
         if (

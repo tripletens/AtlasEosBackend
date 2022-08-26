@@ -40,6 +40,7 @@ use App\Models\ProgramNotes;
 use App\Models\DealerQuickOrder;
 use App\Models\PromotionalFlier;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use App\Models\ProgramCountdown;
 
 class DealerController extends Controller
 {
@@ -54,6 +55,31 @@ class DealerController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function check_end_program(Request $request)
+    {
+        $count_down = ProgramCountdown::where('status', '1')
+            ->get()
+            ->first();
+
+        $end_date = $count_down->end_countdown_date;
+        $end_time = $count_down->end_countdown_time;
+        $end_count = $end_date . ' ' . $end_time;
+        $end_program = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $end_count
+        )->format('Y-m-d H:i');
+
+        $ch = new Carbon($end_program);
+        $current = $request->timer;
+
+        if (!$ch->gt($current)) {
+            $this->result->status = true;
+            $this->result->message = 'Program has closed';
+        }
+
+        return response()->json($this->result);
     }
 
     public function login()

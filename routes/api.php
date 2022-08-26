@@ -341,6 +341,11 @@ Route::group(
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
+        Route::post(
+            '/dealer/check-program-state',
+            'DealerController@check_end_program'
+        );
+
         Route::get(
             '/dealer/unread-report-reply/{user}',
             'DealerController@get_unread_report_reply'
@@ -601,7 +606,7 @@ Route::group(
             '/products/new/atlas_id/{atlas_id}',
             'ProductsController@sort_newproduct_by_atlas_id'
         );
-        
+
         Route::get(
             '/get-product-by-vendor-id/{vendor_id}',
             'ProductsController@fetch_all_products_by_vendor_id'

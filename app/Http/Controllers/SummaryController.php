@@ -44,7 +44,7 @@ class SummaryController extends Controller
                 $cart_items = Cart::where('uid', $user->id);
                 $user->cart =  $cart_items->get();
                 $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
-                    ->join('products', 'cart.product_id', '=', 'id')
+                    ->join('products', 'cart.product_id', '=', 'products.id')
                     ->select('vendors.*','products.*','cart.price', 'cart.uid')
                     ->distinct('vendors.vendor_code')
                     ->get();
@@ -127,10 +127,24 @@ class SummaryController extends Controller
 
         // $dealer->orders = $dealer_orders_query->get();
 
-        $dealer['vendors'] = $dealer_orders_query->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+        $dealer['vendors'] = $dealer_orders_query
+            ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
             ->select('vendors.id', 'vendors.vendor_name', 'vendors.vendor_code')
             ->groupBy('vendors.id')
             ->get();
+
+        // $users = Users::where('account_id', $dealer_id)
+        //         ->where('role', '4')->where('account_id', '!=', null);
+
+
+
+        // $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
+        //     ->join('products', 'cart.product_id', '=', 'id')
+        //     ->select('vendors.*','products.*','cart.price', 'cart.uid')
+        //     ->distinct('vendors.vendor_code')
+        //     ->get();
+
+        // $user->all_vendors = $user->vendors->groupBy('vendor_code');
 
         foreach ($dealer['vendors'] as $vendor) {
             $vendor->orders = Cart::where('cart.uid', $dealer->id)->where('cart.vendor', $vendor->vendor_code)->join('products','products.id','=','cart.product_id')->get();

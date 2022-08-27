@@ -44,7 +44,10 @@ class SummaryController extends Controller
                 $cart_items = Cart::where('uid', $user->id);
                 $user->cart =  $cart_items->get();
                 $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
-                    ->select('vendors.*', 'cart.price', 'cart.uid')->distinct('vendors.vendor_code')->get();
+                    ->join('products', 'cart.product_id', '=', 'id')
+                    ->select('vendors.*','products.*','cart.price', 'cart.uid')
+                    ->distinct('vendors.vendor_code')
+                    ->get();
                 $user->all_vendors = $user->vendors->groupBy('vendor_code');
                 // $user->total_price = $cart_items->sum('price');
                 // $user->vendors = $group;

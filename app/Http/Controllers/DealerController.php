@@ -39,6 +39,7 @@ use App\Models\ProgramNotes;
 
 use App\Models\DealerQuickOrder;
 use App\Models\PromotionalFlier;
+use App\Models\SystemSettings;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\ProgramCountdown;
 
@@ -2080,14 +2081,15 @@ class DealerController extends Controller
     {
         // fetch all the orders
         // $all_orders = Cart::where('dealer', $account)->where('status', '1');
+        $settings_id = 1;
+        # select the settings
+        $fetch_settings = SystemSettings::find($settings_id);
 
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)
+            ->whereDate('created_at', '>=',$fetch_settings->chart_start_date)
             ->where('status', '1')
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('sum(price) as amount')
-            )
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('sum(price) as amount'))
             ->groupBy('date')
             ->get();
 

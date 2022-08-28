@@ -800,6 +800,12 @@ Route::group(
             'DealerController@fetch_all_orders_per_day'
         );
 
+        // add the chart start date
+        Route::post(
+            '/add-chart-date',
+            'AdminController@add_chart_date'
+        );
+
         // ---------------- Branch starts here  ------------------------- //
         Route::get(
             '/branch/get-dealer-order-summary/{uid}',

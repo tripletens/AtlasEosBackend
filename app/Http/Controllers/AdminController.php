@@ -39,7 +39,7 @@ use App\Models\SpecialOrder;
 use App\Models\UserStatus;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use App;
-
+use App\Models\SystemSettings;
 use DateTime;
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
@@ -394,6 +394,48 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    # create a function to add a date to the chart start time
+    public function add_chart_date(Request $request)
+    {
+        // return $request->all();
+
+        $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date',
+        ]);
+
+
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            $start_date = $request->input('start_date');
+
+            #id is 1
+            $settings_id = 1;
+            # select the settings
+            $fetch_settings = SystemSettings::find($settings_id);
+            $fetch_settings->chart_start_date = $start_date;
+            $update_settings = $fetch_settings->save();
+
+            if(!$update_settings){
+                $this->result->status = false;
+                $this->result->status_code = 422;
+                $this->result->message = "Sorry! we could not save the date";
+            }
+
+            $this->result->status = true;
+            $this->result->data = null;
+            $this->result->status_code = 200;
+            $this->result->message = 'Start date saved successfully';
+            return response()->json($this->result);
+        }
+    }
+
     public function get_special_orders()
     {
         $orders = SpecialOrder::orderBy('created_at', 'desc')->get();
@@ -420,7 +462,7 @@ class AdminController extends Controller
                 'account' => $user_data->account_id,
                 'dealer_name' => $user_data->company_name,
                 'rep_name' =>
-                    $user_data->first_name . ' ' . $user_data->last_name,
+                $user_data->first_name . ' ' . $user_data->last_name,
                 'vendor_no' => null,
             ];
 
@@ -470,7 +512,7 @@ class AdminController extends Controller
                     'show' => $show,
                     'overide_price' => $overide_price,
                     'authorized_by' =>
-                        $user_data->first_name . ' ' . $user_data->last_name,
+                    $user_data->first_name . ' ' . $user_data->last_name,
                 ];
 
                 array_push($res_data, $data);
@@ -542,8 +584,8 @@ class AdminController extends Controller
     {
         if (
             Cart::where('dealer', $dealer)
-                ->where('atlas_id', $atlas_id)
-                ->exists()
+            ->where('atlas_id', $atlas_id)
+            ->exists()
         ) {
             $cart_data = Cart::where('dealer', $dealer)
                 ->where('atlas_id', $atlas_id)
@@ -3276,9 +3318,9 @@ class AdminController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' =>
-                auth()
-                    ->factory()
-                    ->getTTL() * 60,
+            auth()
+                ->factory()
+                ->getTTL() * 60,
         ]);
     }
 

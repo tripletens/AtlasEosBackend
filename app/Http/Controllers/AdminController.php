@@ -77,6 +77,41 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_chat_selected_vendor_users($code)
+    {
+        $vendor = Users::where('vendor_code', $code)
+            ->where('role', '3')
+            ->get()
+            ->toArray();
+
+        $data = [];
+
+        if ($vendor) {
+            foreach ($vendor as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all chat selected vendors';
+        $this->result->data = $data;
+        return response()->json($this->result);
+    }
+
     public function view_dealer_summary($code)
     {
         $vendors = [];
@@ -1129,6 +1164,122 @@ class AdminController extends Controller
         }
     }
 
+    public function get_user_company()
+    {
+        $vendors = Vendors::all();
+
+        $dealers = Users::select('account_id', 'company_name')
+            ->where('role', '4')
+            ->distinct('account_id')
+            ->orderBy('company_name', 'asc')
+            ->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->vendor = $vendors;
+        $this->result->data->dealer = $dealers;
+        $this->result->message = 'all users companys';
+        return response()->json($this->result);
+    }
+
+    public function get_users_unread_msg($user)
+    {
+        $unread_msg_data = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->get()
+            ->toArray();
+
+        $vendor_data = [];
+        $dealer_data = [];
+
+        if ($unread_msg_data) {
+            foreach ($unread_msg_data as $value) {
+                $sender = $value['chat_from'];
+
+                ////// Dealer ///////
+                $sender_dealer_data = Users::where('id', $sender)
+                    ->where('role', '4')
+                    ->get()
+                    ->first();
+
+                if ($sender_dealer_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
+
+                    $each_data = [
+                        'id' => $sender_dealer_data->id,
+                        'first_name' => $sender_dealer_data->first_name,
+                        'last_name' => $sender_dealer_data->last_name,
+                        'full_name' => $sender_dealer_data->full_name,
+                        'email' => $sender_dealer_data->email,
+                        'notification' => $count_notification,
+                    ];
+                    array_push($dealer_data, $each_data);
+                }
+
+                /////////// Vendor ///////////
+                $sender_vendor_data = Users::where('id', $sender)
+                    ->where('role', '3')
+                    ->get()
+                    ->first();
+
+                if ($sender_vendor_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
+
+                    $each_data = [
+                        'id' => $sender_vendor_data->id,
+                        'first_name' => $sender_vendor_data->first_name,
+                        'last_name' => $sender_vendor_data->last_name,
+                        'full_name' => $sender_vendor_data->full_name,
+                        'email' => $sender_vendor_data->email,
+                        'notification' => $count_notification,
+                    ];
+
+                    array_push($vendor_data, $each_data);
+                }
+            }
+        }
+
+        ///////////// Filter Vendor //////////////////
+        $vendor_data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $vendor_data))
+        );
+
+        $filter_vendor_data = [];
+        foreach ($vendor_data as $item) {
+            array_push($filter_vendor_data, $item);
+        }
+
+        $vendor_data = (array) $filter_vendor_data;
+
+        //////// Filter Dealer ///////////
+        $dealer_data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $dealer_data))
+        );
+
+        $filter_dealer_data = [];
+        foreach ($dealer_data as $item) {
+            array_push($filter_dealer_data, $item);
+        }
+
+        $dealer_data = (array) $filter_dealer_data;
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get dealer unread msg';
+        $this->result->data->vendor = $filter_vendor_data;
+        $this->result->data->dealer = $filter_dealer_data;
+
+        return response()->json($this->result);
+    }
+
     public function get_dealer_unread_msg($user)
     {
         $unread_msg_data = Chat::where('chat_to', $user)
@@ -1172,10 +1323,18 @@ class AdminController extends Controller
             array_unique(array_map('serialize', $data))
         );
 
+        $filter_data = [];
+
+        foreach ($data as $item) {
+            array_push($filter_data, $item);
+        }
+
+        $data = (array) $data;
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get dealer unread msg';
-        $this->result->data = $data;
+        $this->result->data = $filter_data;
         return response()->json($this->result);
     }
 
@@ -2453,6 +2612,7 @@ class AdminController extends Controller
         $status = $request->status;
         $vendor = $request->vendor;
         $vendorId = $request->vendorId;
+        $location = $request->location;
 
         if ($firstName != '') {
             $update = Users::where('id', $vendorId)->update([
@@ -2544,6 +2704,12 @@ class AdminController extends Controller
         if ($username != '') {
             $update = Users::where('id', $vendorId)->update([
                 'username' => $username,
+            ]);
+        }
+
+        if ($location != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'location' => $location,
             ]);
         }
 

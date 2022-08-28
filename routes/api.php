@@ -180,6 +180,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/get-users-unread-msg/{user}',
+            'AdminController@get_users_unread_msg'
+        );
+
+        Route::get(
             '/admin/get-all-reports',
             'AdminController@admin_get_all_reports'
         );
@@ -309,6 +314,16 @@ Route::group(
             'AdminController@activate_all_vendors'
         );
 
+        Route::get(
+            '/admin/get-all-company',
+            'AdminController@get_user_company'
+        );
+
+        Route::get(
+            '/admin/get-chat-selected-vendor-users/{code}',
+            'AdminController@get_chat_selected_vendor_users'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );
@@ -325,6 +340,11 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
+        Route::post(
+            '/dealer/check-program-state',
+            'DealerController@check_end_program'
+        );
 
         Route::get(
             '/dealer/unread-report-reply/{user}',
@@ -923,9 +943,15 @@ Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/store-chat', 'ChatController@store_chat');
+
         Route::get(
             '/get-user-chat/{receiver}/{sender}',
             'ChatController@get_user_chat'
+        );
+
+        Route::get(
+            '/get-user-chat-async/{receiver}/{sender}',
+            'ChatController@get_user_chat_async'
         );
 
         Route::get(
@@ -936,6 +962,11 @@ Route::group(
         Route::get(
             '/chat/count-unread-msg-role/{user}',
             'ChatController@count_unread_msg_role'
+        );
+
+        Route::get(
+            '/chat/get-chat-history/{user}/{role}',
+            'ChatController@get_chat_history'
         );
 
         Route::get('/testing-chat', 'ChatController@testing_chat');

@@ -2069,7 +2069,6 @@ class DealerController extends Controller
         // }, $all_orders_dates);
 
 
-        // FILESYSTEM_DRIVER publicproba
         // get all orders per day sum
         // $all_orders_per_day = $all_orders
         //     ->groupBy('created_at')
@@ -2081,6 +2080,19 @@ class DealerController extends Controller
         $this->result->data->order_count = count($new_all_orders);
         $this->result->data = $new_all_orders;
         $this->result->message = 'All orders per day fetched successfully';
+        return response()->json($this->result);
+    }
+
+    public function fetch_start_date(){
+        $settings_id = 1;
+        $fetch_settings = SystemSettings::find($settings_id);
+
+        $chart_start_date = $fetch_settings->chart_start_date;
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->start_date = $chart_start_date;
+        $this->result->message = 'Chart start date fetched successfully';
         return response()->json($this->result);
     }
 

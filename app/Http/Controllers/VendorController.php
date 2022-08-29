@@ -580,11 +580,11 @@ class VendorController extends Controller
                     $total_price += intval($kvalue->price);
                 }
 
-                $user_id = $item_cart->uid;
+                /// $user_id = $item_cart->uid;
                 $product_id = $item_cart->product_id;
-                $user = Users::where('id', $user_id)
-                    ->get()
-                    ->first();
+                // $user = Users::where('id', $user_id)
+                //     ->get()
+                //     ->first();
                 $product = Products::where('id', $product_id)
                     ->get()
                     ->first();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Chat;
 use App\Models\Users;
+use App\Models\ChatHistory;
 
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,41 @@ class ChatController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function get_chat_history($user, $role)
+    {
+        $res_data = [];
+        $chat_history = ChatHistory::where('owner_uid', $user)
+            ->where('role', $role)
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        if ($chat_history) {
+            foreach ($chat_history as $value) {
+                $suser = $value->user;
+                $user_data = Users::where('id', $suser)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'id' => $user_data->id,
+                    'first_name' => $user_data->first_name,
+                    'last_name' => $user_data->last_name,
+                    'email' => $user_data->email,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+
+        $this->result->message = 'recent chat history';
+        return response()->json($this->result);
     }
 
     public function testing_chat()
@@ -70,6 +106,46 @@ class ChatController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_user_chat_async($receiver, $sender)
+    {
+        $sender_data = Users::where('id', $sender)
+            ->get()
+            ->first();
+        $receiver_data = Users::where('id', $receiver)
+            ->get()
+            ->first();
+
+        $phase_one_unique_id =
+            $sender_data->id .
+            $sender_data->first_name .
+            $receiver_data->id .
+            $receiver_data->first_name;
+        $phase_two_unique_id =
+            $receiver_data->id .
+            $receiver_data->first_name .
+            $sender_data->id .
+            $sender_data->first_name;
+
+        $chat_history = Chat::orWhere('unique_id', $phase_one_unique_id)
+            ->orWhere('unique_id', $phase_two_unique_id)
+            ->get();
+
+        foreach ($chat_history as $value) {
+            $value->from_username =
+                $sender_data->first_name . ' ' . $sender_data->last_name;
+            $value->to_username =
+                $receiver_data->first_name . ' ' . $receiver_data->last_name;
+
+            $value->time_ago = ChatController::timeAgo($value->created_at);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $chat_history;
+        $this->result->message = 'all User chat History';
+        return response()->json($this->result);
+    }
+
     public function get_user_chat($receiver, $sender)
     {
         $sender_data = Users::where('id', $sender)
@@ -91,11 +167,15 @@ class ChatController extends Controller
             $sender_data->first_name;
 
         // orWhere('unique_id', $phase_one_unique_id)
-        Chat::where('chat_from', $sender)
-            ->where('chat_to', $receiver)
-            ->update([
-                'status' => '1',
-            ]);
+        // Chat::where('chat_from', $receiver)
+        //     ->where('chat_to', $sender)
+        //     ->update([
+        //         'status' => '1',
+        //     ]);
+
+        Chat::where('unique_id', $phase_two_unique_id)->update([
+            'status' => '1',
+        ]);
 
         $chat_history = Chat::orWhere('unique_id', $phase_one_unique_id)
             ->orWhere('unique_id', $phase_two_unique_id)
@@ -142,6 +222,28 @@ class ChatController extends Controller
             $chat_user = $request->chatUser;
             $unique_id = $request->uniqueId;
             $role = $request->role;
+
+            $chat_to_data = Users::where('id', $chat_to)
+                ->get()
+                ->first();
+
+            if (
+                ChatHistory::where('owner_uid', $chat_from)
+                    ->where('user', $chat_to)
+                    ->exists()
+            ) {
+                ChatHistory::where('owner_uid', $chat_from)
+                    ->where('user', $chat_to)
+                    ->update([
+                        'status' => 1,
+                    ]);
+            } else {
+                ChatHistory::create([
+                    'owner_uid' => $chat_from,
+                    'user' => $chat_to,
+                    'role' => $chat_to_data->role,
+                ]);
+            }
 
             $store_chat = Chat::create([
                 'chat_from' => $chat_from,

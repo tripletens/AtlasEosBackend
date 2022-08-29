@@ -165,7 +165,7 @@
                 @endif
 
 
-                {{-- <h2 class="dealer-name">Order Date: {{ $dealer_updated_at }} MST</h2> --}}
+                <h2 class="dealer-name">Date: {{ $printed_at }}</h2>
             </div>
             <div>
                 <img src="https://atlasbookingprogram.com/assets/atlas-lgo.png" class="com-logo" alt="">

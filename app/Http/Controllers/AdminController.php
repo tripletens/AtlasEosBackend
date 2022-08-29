@@ -300,6 +300,10 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
+            $first_name = isset($user->first_name) ? $user->first_name : null;
+
+            $last_name = isset($user->last_name) ? $user->last_name : null;
+
             $data = [
                 'account_id' => isset($user->account_id)
                     ? $user->account_id
@@ -309,11 +313,7 @@ class AdminController extends Controller
                     : null,
                 'user' => $user_id,
                 'vendor_code' => $code,
-                'purchaser_name' => (isset($user->first_name)
-                        ? $user->first_name
-                        : null . ' ' . isset($user->last_name))
-                    ? $user->last_name
-                    : null,
+                'purchaser_name' => $first_name . ' ' . $last_name,
                 'amount' => $sum_user_total,
             ];
 

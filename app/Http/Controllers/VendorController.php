@@ -590,9 +590,11 @@ class VendorController extends Controller
                     ->first();
 
                 $data = [
-                    'pro_id' => $product->id,
+                    'pro_id' => isset($product->id) ? $product->id : null,
                     'qty' => $total_qty,
-                    'atlas_id' => $product->atlas_id,
+                    'atlas_id' => isset($product->atlas_id)
+                        ? $product->atlas_id
+                        : null,
                     'vendor' => isset($product->vendor_product_code)
                         ? $product->vendor_product_code
                         : null,

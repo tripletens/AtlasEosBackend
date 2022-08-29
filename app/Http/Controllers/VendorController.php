@@ -569,8 +569,12 @@ class VendorController extends Controller
         foreach ($atlas_id_checker as $value) {
             $item_cart = Cart::where('vendor', $code)
                 ->where('atlas_id', $value)
-                ->get()
-                ->first();
+                ->get();
+
+            foreach ($item_cart as $kvalue) {
+                $total_qty += intval($kvalue->qty);
+                $total_price += intval($kvalue->price);
+            }
 
             $user_id = $item_cart->uid;
             $product_id = $item_cart->product_id;
@@ -583,8 +587,8 @@ class VendorController extends Controller
 
             $data = [
                 'pro_id' => $product_id,
-                'qty' => $value->qty,
-                'atlas_id' => $value->atlas_id,
+                'qty' => $total_qty,
+                'atlas_id' => $item_cart->atlas_id,
                 'vendor' => isset($product->vendor_product_code)
                     ? $product->vendor_product_code
                     : null,
@@ -597,7 +601,7 @@ class VendorController extends Controller
                 'booking' => isset($product->booking)
                     ? $product->booking
                     : null,
-                'total' => $value->price,
+                'total' => $total_price,
             ];
 
             array_push($res_data, $data);

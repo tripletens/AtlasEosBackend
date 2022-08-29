@@ -181,12 +181,12 @@ class DealerController extends Controller
             ->get()
             ->first();
 
-        if ($dealer_ship) {
-            $dealer_ship->dealer_name = $this->translateToLocal(
-                $lang,
-                $dealer_ship->dealer_name
-            );
-        }
+        // if ($dealer_ship) {
+        //     $dealer_ship->dealer_name = $this->translateToLocal(
+        //         $lang,
+        //         $dealer_ship->dealer_name
+        //     );
+        // }
 
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;

@@ -301,8 +301,12 @@ class AdminController extends Controller
                 ->first();
 
             $data = [
-                'account_id' => $user->account_id,
-                'dealer_name' => $user->company_name,
+                'account_id' => isset($user->account_id)
+                    ? $user->account_id
+                    : null,
+                'dealer_name' => isset($user->company_name)
+                    ? $user->company_name
+                    : null,
                 'user' => $user_id,
                 'vendor_code' => $code,
                 'purchaser_name' => $user->first_name . ' ' . $user->last_name,

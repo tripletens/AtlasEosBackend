@@ -571,6 +571,9 @@ class VendorController extends Controller
                 ->where('atlas_id', $value)
                 ->get();
 
+            $total_qty = 0;
+            $total_price = 0;
+
             foreach ($item_cart as $kvalue) {
                 $total_qty += intval($kvalue->qty);
                 $total_price += intval($kvalue->price);

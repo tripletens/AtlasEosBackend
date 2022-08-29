@@ -820,6 +820,12 @@ Route::group(
             'DealerController@fetch_all_orders_per_day'
         );
 
+        // fetch chart start date
+        Route::get(
+            '/fetch-start-date',
+            'DealerController@fetch_start_date'
+        );
+
         // add the chart start date
         Route::post(
             '/add-chart-date',

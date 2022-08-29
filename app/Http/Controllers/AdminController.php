@@ -403,8 +403,6 @@ class AdminController extends Controller
             'start_date' => 'required|date',
         ]);
 
-
-
         if ($validator->fails()) {
             $response['response'] = $validator->messages();
             $this->result->status = false;

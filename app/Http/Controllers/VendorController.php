@@ -581,16 +581,16 @@ class VendorController extends Controller
                 }
 
                 /// $user_id = $item_cart->uid;
-                $product_id = $item_cart->product_id;
+                ////  $product_id = $item_cart->product_id;
                 // $user = Users::where('id', $user_id)
                 //     ->get()
                 //     ->first();
-                $product = Products::where('id', $product_id)
+                $product = Products::where('atlas_id', $value)
                     ->get()
                     ->first();
 
                 $data = [
-                    'pro_id' => $product_id,
+                    'pro_id' => $product->id,
                     'qty' => $total_qty,
                     'atlas_id' => $item_cart->atlas_id,
                     'vendor' => isset($product->vendor_product_code)

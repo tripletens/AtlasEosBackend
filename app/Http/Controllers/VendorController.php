@@ -592,7 +592,7 @@ class VendorController extends Controller
                 $data = [
                     'pro_id' => $product->id,
                     'qty' => $total_qty,
-                    'atlas_id' => $item_cart->atlas_id,
+                    'atlas_id' => $product->atlas_id,
                     'vendor' => isset($product->vendor_product_code)
                         ? $product->vendor_product_code
                         : null,

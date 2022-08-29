@@ -309,7 +309,11 @@ class AdminController extends Controller
                     : null,
                 'user' => $user_id,
                 'vendor_code' => $code,
-                'purchaser_name' => $user->first_name . ' ' . $user->last_name,
+                'purchaser_name' => (isset($user->first_name)
+                        ? $user->first_name
+                        : null . ' ' . isset($user->last_name))
+                    ? $user->last_name
+                    : null,
                 'amount' => $sum_user_total,
             ];
 

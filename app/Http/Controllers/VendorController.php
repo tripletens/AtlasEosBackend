@@ -569,9 +569,15 @@ class VendorController extends Controller
                 'vendor' => isset($product->vendor_product_code)
                     ? $product->vendor_product_code
                     : null,
-                'description' => $product->description,
-                'regular' => $product->regular,
-                'booking' => $product->booking,
+                'description' => isset($product->description)
+                    ? $product->description
+                    : null,
+                'regular' => isset($product->regular)
+                    ? $product->regular
+                    : null,
+                'booking' => isset($product->booking)
+                    ? $product->booking
+                    : null,
                 'total' => $value->price,
             ];
 

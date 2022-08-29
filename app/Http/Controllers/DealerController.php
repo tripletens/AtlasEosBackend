@@ -223,10 +223,7 @@ class DealerController extends Controller
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $this->translateToLocal(
-                    $lang,
-                    $vendor_data->vendor_name
-                ),
+                'vendor_name' => $vendor_data->vendor_name,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];

@@ -519,7 +519,7 @@ class VendorController extends Controller
                 }
 
                 $data = [
-                    'pro_id' => $pro_data->id,
+                    'pro_id' => isset($pro_data->id) ? $pro_data->id : null,
                     'vendor' => $code,
                     'description' => $pro_data->description,
                     'overall_total' => $total_atlas_amount,
@@ -566,7 +566,9 @@ class VendorController extends Controller
                 'pro_id' => $product_id,
                 'qty' => $value->qty,
                 'atlas_id' => $value->atlas_id,
-                'vendor' => $product->vendor_product_code,
+                'vendor' => isset($product->vendor_product_code)
+                    ? $product->vendor_product_code
+                    : null,
                 'description' => $product->description,
                 'regular' => $product->regular,
                 'booking' => $product->booking,

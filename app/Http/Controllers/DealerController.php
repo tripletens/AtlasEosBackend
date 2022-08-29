@@ -2035,9 +2035,15 @@ class DealerController extends Controller
         # select the settings
         $fetch_settings = SystemSettings::find($settings_id);
 
+        // return $fetch_settings;
+
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)
-            ->whereDate('created_at', '>=',$fetch_settings->chart_start_date)
+            // ->where(function($q) {
+            //     $q->where('created_at', '>=', $fetch_settings->chart_start_date)
+            //       ->orWhereNull('created_ar');
+            // })
+            ->whereDate('created_at', '>=',$fetch_settings->chart_start_date ? $fetch_settings->chart_start_date : date("Y-m-d"))
             ->where('status', '1')
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('sum(price) as amount'))
             ->groupBy('date')

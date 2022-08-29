@@ -518,12 +518,14 @@ class VendorController extends Controller
                     }
                 }
 
+                $desc = isset($pro_data->description)
+                    ? $pro_data->description
+                    : null;
+
                 $data = [
                     'pro_id' => isset($pro_data->id) ? $pro_data->id : null,
                     'vendor' => $code,
-                    'description' => isset($pro_data->description)
-                        ? $pro_data->description
-                        : null,
+                    'description' => $desc,
                     'overall_total' => $total_atlas_amount,
                     'qty_total' => $total_atlas_product,
                     'atlas_id' => $each_id,

@@ -555,10 +555,25 @@ class VendorController extends Controller
             ->orderBy('product_id', 'asc')
             ->get();
         $res_data = [];
-        foreach ($vendor_purchases as $value) {
-            $user_id = $value->uid;
-            $product_id = $value->product_id;
+        $atlas_id_checker = [];
 
+        if ($vendor_purchases) {
+            foreach ($vendor_purchases as $value) {
+                $atlas_id = $value->atlas_id;
+                if (!in_array($atlas_id, $atlas_id_checker)) {
+                    array_push($atlas_id_checker, $atlas_id);
+                }
+            }
+        }
+
+        foreach ($atlas_id_checker as $value) {
+            $item_cart = Cart::where('vendor', $code)
+                ->where('atlas_id', $value)
+                ->get()
+                ->first();
+
+            $user_id = $item_cart->uid;
+            $product_id = $item_cart->product_id;
             $user = Users::where('id', $user_id)
                 ->get()
                 ->first();
@@ -587,6 +602,38 @@ class VendorController extends Controller
 
             array_push($res_data, $data);
         }
+
+        // foreach ($vendor_purchases as $value) {
+        //     $user_id = $value->uid;
+        //     $product_id = $value->product_id;
+        //     $user = Users::where('id', $user_id)
+        //         ->get()
+        //         ->first();
+        //     $product = Products::where('id', $product_id)
+        //         ->get()
+        //         ->first();
+
+        //     $data = [
+        //         'pro_id' => $product_id,
+        //         'qty' => $value->qty,
+        //         'atlas_id' => $value->atlas_id,
+        //         'vendor' => isset($product->vendor_product_code)
+        //             ? $product->vendor_product_code
+        //             : null,
+        //         'description' => isset($product->description)
+        //             ? $product->description
+        //             : null,
+        //         'regular' => isset($product->regular)
+        //             ? $product->regular
+        //             : null,
+        //         'booking' => isset($product->booking)
+        //             ? $product->booking
+        //             : null,
+        //         'total' => $value->price,
+        //     ];
+
+        //     array_push($res_data, $data);
+        // }
 
         $res = $this->sort_according_atlas_id($res_data);
 

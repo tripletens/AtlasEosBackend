@@ -224,10 +224,7 @@ class DealerController extends Controller
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $this->translateToLocal(
-                    $lang,
-                    $vendor_data->vendor_name
-                ),
+                'vendor_name' => $vendor_data->vendor_name,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -1868,25 +1865,27 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function get_vendors_with_orders(){
+    public function get_vendors_with_orders()
+    {
         $get_all_vendors = Vendors::get();
 
         if (!$get_all_vendors) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the vendors";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the vendors";
             return response()->json($this->result);
         }
 
         $vendors_array = [];
 
-        foreach($get_all_vendors as $item){
+        foreach ($get_all_vendors as $item) {
             $product = Products::where('vendor', $item['vendor_code'])
-            ->where('status', '1')
-            ->exists();
+                ->where('status', '1')
+                ->exists();
 
-            if($product){
-               array_push($vendors_array,$item);
+            if ($product) {
+                array_push($vendors_array, $item);
             }
         }
 
@@ -2089,9 +2088,18 @@ class DealerController extends Controller
 
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)
-            ->whereDate('created_at', '>=',$fetch_settings->chart_start_date ? $fetch_settings->chart_start_date : date("Y-m-d"))
+            ->whereDate(
+                'created_at',
+                '>=',
+                $fetch_settings->chart_start_date
+                    ? $fetch_settings->chart_start_date
+                    : date('Y-m-d')
+            )
             ->where('status', '1')
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('sum(price) as amount'))
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('sum(price) as amount')
+            )
             ->groupBy('date')
             ->get();
 
@@ -2128,7 +2136,8 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function fetch_start_date(){
+    public function fetch_start_date()
+    {
         $settings_id = 1;
         $fetch_settings = SystemSettings::find($settings_id);
 

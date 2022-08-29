@@ -574,40 +574,42 @@ class VendorController extends Controller
             $total_qty = 0;
             $total_price = 0;
 
-            foreach ($item_cart as $kvalue) {
-                $total_qty += intval($kvalue->qty);
-                $total_price += intval($kvalue->price);
+            if ($item_cart) {
+                foreach ($item_cart as $kvalue) {
+                    $total_qty += intval($kvalue->qty);
+                    $total_price += intval($kvalue->price);
+                }
+
+                $user_id = $item_cart->uid;
+                $product_id = $item_cart->product_id;
+                $user = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+                $product = Products::where('id', $product_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'pro_id' => $product_id,
+                    'qty' => $total_qty,
+                    'atlas_id' => $item_cart->atlas_id,
+                    'vendor' => isset($product->vendor_product_code)
+                        ? $product->vendor_product_code
+                        : null,
+                    'description' => isset($product->description)
+                        ? $product->description
+                        : null,
+                    'regular' => isset($product->regular)
+                        ? $product->regular
+                        : null,
+                    'booking' => isset($product->booking)
+                        ? $product->booking
+                        : null,
+                    'total' => $total_price,
+                ];
+
+                array_push($res_data, $data);
             }
-
-            $user_id = $item_cart->uid;
-            $product_id = $item_cart->product_id;
-            $user = Users::where('id', $user_id)
-                ->get()
-                ->first();
-            $product = Products::where('id', $product_id)
-                ->get()
-                ->first();
-
-            $data = [
-                'pro_id' => $product_id,
-                'qty' => $total_qty,
-                'atlas_id' => $item_cart->atlas_id,
-                'vendor' => isset($product->vendor_product_code)
-                    ? $product->vendor_product_code
-                    : null,
-                'description' => isset($product->description)
-                    ? $product->description
-                    : null,
-                'regular' => isset($product->regular)
-                    ? $product->regular
-                    : null,
-                'booking' => isset($product->booking)
-                    ? $product->booking
-                    : null,
-                'total' => $total_price,
-            ];
-
-            array_push($res_data, $data);
         }
 
         // foreach ($vendor_purchases as $value) {

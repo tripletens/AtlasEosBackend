@@ -452,7 +452,7 @@ class VendorController extends Controller
     public function sales_by_item_detailed($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('atlas_id', 'asc')
+            ->orderBy('product_id', 'asc')
             ->get();
         $res_data = [];
         $atlas_id_data = [];
@@ -463,7 +463,7 @@ class VendorController extends Controller
 
             foreach ($vendor_purchases as $value) {
                 $atlas_id = $value->atlas_id;
-                $user_id = $value->uid;
+                ///$user_id = $value->uid;
 
                 if (!in_array($atlas_id, $unique_array)) {
                     array_push($unique_array, $atlas_id);
@@ -489,7 +489,7 @@ class VendorController extends Controller
                 $dealer_data = [];
                 foreach ($atlas_filter as $value) {
                     $qty = $value->qty;
-                    $dealer_db = Users::where('id', $user_id)
+                    $dealer_db = Users::where('id', $value->uid)
                         ->get()
                         ->first();
 

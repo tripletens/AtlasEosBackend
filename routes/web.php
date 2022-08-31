@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DealerController;
+use App\Http\Controllers\VendorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,4 +25,9 @@ Route::get('/', function () {
 Route::get('/generate-pdf/{dealer}/{lang}/{current_time}', [
     DealerController::class,
     'generate_pdf',
+]);
+
+Route::get('/generate-vendor-sales-summary-pdf/{vendor}/{lang}', [
+    VendorController::class,
+    'generate_sales_summary_pdf',
 ]);

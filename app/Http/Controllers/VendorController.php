@@ -12,6 +12,7 @@ use App\Models\Cart;
 use App\Models\Dealer;
 use App\Models\Faq;
 use App\Models\ProgramNotes;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class VendorController extends Controller
 {
@@ -28,6 +29,92 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function generate_sales_summary_pdf($code, $lang)
+    {
+        $vendor_data = Vendors::where('vendor_code', $code)
+            ->get()
+            ->first();
+
+        $vendor_purchases = Cart::where('vendor', $code)
+            ->orderBy('product_id', 'asc')
+            ->get();
+        $res_data = [];
+        $atlas_id_checker = [];
+
+        $over_all_total = 0;
+
+        if ($vendor_purchases) {
+            foreach ($vendor_purchases as $value) {
+                $atlas_id = $value->atlas_id;
+                if (!in_array($atlas_id, $atlas_id_checker)) {
+                    array_push($atlas_id_checker, $atlas_id);
+                }
+            }
+        }
+
+        foreach ($atlas_id_checker as $value) {
+            $item_cart = Cart::where('vendor', $code)
+                ->where('atlas_id', $value)
+                ->get();
+
+            $total_qty = 0;
+            $total_price = 0;
+
+            if ($item_cart) {
+                foreach ($item_cart as $kvalue) {
+                    $total_qty += intval($kvalue->qty);
+                    $total_price += intval($kvalue->price);
+                }
+
+                $product = Products::where('atlas_id', $value)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'pro_id' => isset($product->id) ? $product->id : null,
+                    'qty' => $total_qty,
+                    'atlas_id' => isset($product->atlas_id)
+                        ? $product->atlas_id
+                        : null,
+                    'vendor' => isset($product->vendor_product_code)
+                        ? $product->vendor_product_code
+                        : null,
+                    'description' => isset($product->description)
+                        ? $product->description
+                        : null,
+                    'regular' => isset($product->regular)
+                        ? $product->regular
+                        : null,
+                    'booking' => isset($product->booking)
+                        ? $product->booking
+                        : null,
+                    'total' => $total_price,
+                ];
+
+                $data = (object) $data;
+
+                $over_all_total += $total_price;
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $res = $this->sort_according_atlas_id($res_data);
+
+        $pdf_data = [
+            'data' => $res,
+            'vendor' => $vendor_data ? $vendor_data : null,
+            'grand_total' => $over_all_total,
+            'lang' => $lang,
+        ];
+
+        /////  return $pdf_data;
+
+        $pdf = PDF::loadView('vendor-summary-sales', $pdf_data);
+        return $pdf->stream('vendor-summary-sales.pdf');
+        // return $pdf->download('dealership.pdf');
     }
 
     public function get_vendor_data($code)

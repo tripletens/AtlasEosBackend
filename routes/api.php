@@ -679,18 +679,23 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/vendor-dashboard-analysis/{code}/{user}',
+            '/vendor/vendor-dashboard-analysis/{user}',
             'VendorController@vendor_dashboard_analysis'
         );
 
         Route::get(
-            '/vendor/vendor-dashboard-most-purchaser/{code}/{user}',
+            '/vendor/vendor-dashboard-most-purchaser/{user}',
             'VendorController@vendor_dashboard_most_purchaser'
         );
 
         Route::get(
             '/vendor/vendor-single-dashboard-most-purchaser/{code}',
             'VendorController@vendor_single_dashboard_most_purchaser'
+        );
+
+        Route::get(
+            '/vendor/vendor-dashboard-sup-most-purchaser/{user}',
+            'VendorController@vendor_dashboard_sup_most_purchaser'
         );
 
         Route::get(
@@ -737,7 +742,7 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/view-dealer-summary/{user}/{dealer}/{vendor}',
+            '/vendor/view-dealer-summary/{dealer}/{vendor}',
             'VendorController@view_dealer_summary'
         );
 

@@ -746,6 +746,11 @@ Route::group(
             'VendorController@view_dealer_summary'
         );
 
+        Route::get(
+            '/vendor/view-dealer-purchaser-summary/{user}/{dealer}/{vendor}',
+            'VendorController@view_dealer_purchaser_summary'
+        );
+
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
 
         Route::get(

@@ -649,6 +649,8 @@ class VendorController extends Controller
 
             sort($unique_array);
 
+            return $unique_array;
+
             for ($i = 0; $i < count($unique_array); $i++) {
                 $each_id = $unique_array[$i];
 
@@ -857,6 +859,54 @@ class VendorController extends Controller
 
             return $ddt;
         }
+    }
+
+    public function view_dealer_purchaser_summary($user, $dealer, $vendor)
+    {
+        $dealer_cart = Cart::where('uid', $user)
+            ->where('vendor', $vendor)
+            ->get();
+
+        $res_data = [];
+
+        $vendor_data = Vendors::where('vendor_code', $vendor)
+            ->get()
+            ->first();
+        $dealer_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        if ($dealer_cart) {
+            foreach ($dealer_cart as $value) {
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $data = [
+                    'dealer_rep_name' =>
+                        $dealer_data->full_name . ' ' . $dealer_data->last_name,
+                    'user_id' => $user,
+                    'qty' => $value->qty,
+                    'atlas_id' => $atlas_id,
+                    'vendor_product_code' => $pro_data->vendor_product_code,
+                    'special' => $pro_data->booking,
+                    'desc' => $pro_data->description,
+                    'total' => $value->price,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'View Dealer Summary';
+        $this->result->data->summary = $res_data;
+        $this->result->data->vendor = $vendor_data;
+        $this->result->data->dealer = $dealer_data;
+
+        return response()->json($this->result);
     }
 
     public function view_dealer_summary($dealer, $vendor)

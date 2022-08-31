@@ -514,7 +514,7 @@ class VendorController extends Controller
         $res = [];
 
         foreach ($purchasers as $value) {
-            $sales = $value->sales;
+            $sales = $value['sales'];
             if ($sales > 0) {
                 array_push($res, $value);
             }
@@ -523,7 +523,7 @@ class VendorController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';
-        $this->result->data = $purchasers;
+        $this->result->data = $res;
         // $this->result->data = $dealers;
 
         return response()->json($this->result);

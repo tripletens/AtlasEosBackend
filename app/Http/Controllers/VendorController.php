@@ -556,6 +556,8 @@ class VendorController extends Controller
                 // $vendor_code = $separator[0];
                 array_push($separator, $user_vendor_code);
 
+                $dealers = [];
+
                 $all_vendor_data = Vendors::all();
                 foreach ($separator as $value) {
                     $vendor_code = $value;

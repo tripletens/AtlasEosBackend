@@ -525,6 +525,9 @@ class VendorController extends Controller
         $total_sales = 0;
         $total_orders = 0;
 
+        $dealers = [];
+        $purchasers = [];
+
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
@@ -553,59 +556,24 @@ class VendorController extends Controller
                     'qty'
                 );
             } else {
-                // $vendor_code = $separator[0];
-                array_push($separator, $user_vendor_code);
-
-                $dealers = [];
-
-                $all_vendor_data = Vendors::all();
                 foreach ($separator as $value) {
                     $vendor_code = $value;
 
-                    $cart_dealer = Cart::where('vendor', $vendor_code)->get();
-                    if ($cart_dealer) {
-                        foreach ($cart_dealer as $value) {
-                            $dealer_id = $value->dealer;
-                            if ($dealer_id) {
-                                if (!in_array($dealer_id, $dealers)) {
-                                    array_push($dealers, $dealer_id);
-                                }
-                            }
-                        }
-                    }
-                }
+                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                        'price'
+                    );
+                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
+                        'qty'
+                    );
 
-                foreach ($separator as $value) {
-                    $vendor_code = $value;
-                    if ($vendor_code != '') {
-                        for ($i = 0; $i < count($dealers); $i++) {
-                            $dealer_code = $dealers[$i];
-                            $total = Cart::where('dealer', $dealer_code)
-                                ->where('vendor', $vendor_code)
-                                ->sum('price');
-                            $dealer_data = Dealer::where(
-                                'dealer_code',
-                                $dealer_code
-                            )
-                                ->get()
-                                ->first();
-
-                            if ($dealer_data) {
-                                $data = [
-                                    'vendor' => $vendor_code,
-                                    'dealer' => $dealer_code,
-                                    'dealer_name' => is_null(
-                                        $dealer_data->dealer_name
-                                    )
-                                        ? null
-                                        : $dealer_data->dealer_name,
-                                    'sales' => $total,
-                                ];
-
-                                array_push($purchasers, $data);
-                            }
-                        }
-                    }
+                    $total_sales += Cart::where(
+                        'vendor',
+                        $pri_vendor_code
+                    )->sum('price');
+                    $total_orders += Cart::where(
+                        'vendor',
+                        $pri_vendor_code
+                    )->sum('qty');
                 }
             }
         } else {

@@ -630,7 +630,7 @@ class VendorController extends Controller
 
             sort($unique_array);
 
-            return $unique_array;
+            // return $unique_array;
 
             for ($i = 0; $i < count($unique_array); $i++) {
                 $each_id = $unique_array[$i];

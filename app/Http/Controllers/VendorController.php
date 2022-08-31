@@ -568,11 +568,11 @@ class VendorController extends Controller
 
                     $total_sales += Cart::where(
                         'vendor',
-                        $pri_vendor_code
+                        $user_vendor_code
                     )->sum('price');
                     $total_orders += Cart::where(
                         'vendor',
-                        $pri_vendor_code
+                        $user_vendor_code
                     )->sum('qty');
                 }
             }

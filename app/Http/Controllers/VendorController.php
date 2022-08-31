@@ -511,6 +511,15 @@ class VendorController extends Controller
             return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
         });
 
+        $res = [];
+
+        foreach ($purchasers as $value) {
+            $sales = $value->sales;
+            if ($sales > 0) {
+                array_push($res, $value);
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';

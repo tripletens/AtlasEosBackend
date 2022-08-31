@@ -566,8 +566,10 @@ class VendorController extends Controller
                     if ($cart_dealer) {
                         foreach ($cart_dealer as $value) {
                             $dealer_id = $value->dealer;
-                            if (!in_array($dealer_id, $dealers)) {
-                                array_push($dealers, $dealer_id);
+                            if ($dealer_id) {
+                                if (!in_array($dealer_id, $dealers)) {
+                                    array_push($dealers, $dealer_id);
+                                }
                             }
                         }
                     }

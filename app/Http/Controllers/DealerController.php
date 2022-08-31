@@ -165,7 +165,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function generate_pdf($dealer, $lang)
+    public function generate_pdf($dealer, $lang, $current_time)
     {
         $data = [
             'title' => 'Welcome to Tutsmake.com',
@@ -239,7 +239,7 @@ class DealerController extends Controller
             'dealer' => $dealer_ship ? $dealer_ship : null,
             'grand_total' => $grand_total,
             'lang' => $lang,
-            'printed_at' => date('Y-m-d H:i'),
+            'printed_at' => $current_time,
         ];
 
         /////  return $pdf_data;

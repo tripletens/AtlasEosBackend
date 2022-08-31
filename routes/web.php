@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 // Route::get('/generate-pdf/{code}', 'DealerController@generate_pdf');
 
-Route::get('/generate-pdf/{dealer}/{lang}', [
+Route::get('/generate-pdf/{dealer}/{lang}/{current_time}', [
     DealerController::class,
     'generate_pdf',
 ]);

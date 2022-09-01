@@ -55,7 +55,7 @@ class SeminarReminderCron extends Command
     public function fetch_all_dealers_in_seminar($seminar_id)
     {
         // role 4 is for dealers
-        $fetch_dealers = Users::where('role', 4)->join('seminar_members', 'users.id', '=', 'seminar_members.dealer_id')
+        $fetch_dealers = Users::where('role', 4)->join('seminar_members', 'users.account_id', '=', 'seminar_members.dealer_id')
             ->where('seminar_members.seminar_id', $seminar_id)
             ->get();
 
@@ -70,7 +70,7 @@ class SeminarReminderCron extends Command
         return $fetch_dealers;
     }
 
-
+    // fetch only dealers emails by seminar ids
     public function fetch_only_dealer_emails($seminar_id)
     {
         $all_dealers = $this->fetch_all_dealers_in_seminar($seminar_id);
@@ -81,6 +81,7 @@ class SeminarReminderCron extends Command
         return $dealer_emails;
     }
 
+    // fetch seminars to remind
     public function select_seminars_to_remind()
     {
         // selects all the seminars that are 15 mins less than the current time
@@ -118,6 +119,7 @@ class SeminarReminderCron extends Command
         return $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today;
     }
 
+    // send reminder email by emails and dealer seminar data
     public function send_reminder_email($emails, $dealer_and_seminar_data)
     {
         // select all the people that bookmarked the individual seminars

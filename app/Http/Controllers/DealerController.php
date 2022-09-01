@@ -2274,7 +2274,7 @@ class DealerController extends Controller
 
             return response()->json($this->result);
         } else {
-            if ($request->hasFile('file')) {
+            if ($request->hasFile('photo')) {
                 // $filenameWithExt = $request
                 //     ->file('file')
                 //     ->getClientOriginalName();
@@ -2316,9 +2316,7 @@ class DealerController extends Controller
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('file')
-                    ? $full_file_path
-                    : null,
+                'file_url' => $request->hasFile('photo') ? $full_file_path : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,

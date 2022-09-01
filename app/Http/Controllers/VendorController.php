@@ -14,6 +14,8 @@ use App\Models\Faq;
 use App\Models\ProgramNotes;
 use Barryvdh\DomPDF\Facade as PDF;
 
+use App\Models\VendorOrderNotify;
+
 class VendorController extends Controller
 {
     //
@@ -29,6 +31,36 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function get_vendor_rece_orders($user)
+    {
+        $all_bell_notify = VendorOrderNotify::where('uid', $user)
+            ->where('status', 0)
+            ->get();
+
+        $bell_notify_count = VendorOrderNotify::where('uid', $user)
+            ->where('status', 0)
+            ->count();
+
+        if ($all_bell_notify) {
+            foreach ($all_bell_notify as $value) {
+                $code = $value->vendor;
+                $vendor_data = Vendors::where('vendor_code', $code)
+                    ->get()
+                    ->first();
+                $value->vendor_name = $vendor_data->vendor_name;
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'vendor bell notification';
+        $this->result->data->notify = $all_bell_notify;
+
+        $this->result->data->count = $bell_notify_count;
+
+        return response()->json($this->result);
     }
 
     public function generate_sales_summary_pdf($code, $lang)

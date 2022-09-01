@@ -657,8 +657,10 @@ Route::group(
         );
 
         Route::get('/dealer/get-vendors', 'DealerController@get_vendor');
-        Route::get('/dealer/get-vendors-with-orders', 'DealerController@get_vendors_with_orders');
-
+        Route::get(
+            '/dealer/get-vendors-with-orders',
+            'DealerController@get_vendors_with_orders'
+        );
 
         Route::get(
             '/dealer/get-selected-company-vendor/{code}/{user}',
@@ -726,6 +728,11 @@ Route::group(
         Route::get(
             '/vendor/get-sales-by-item-detailed/{code}',
             'VendorController@sales_by_item_detailed'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-order-bell-count/{code}',
+            'VendorController@get_vendor_rece_orders'
         );
 
         Route::get(
@@ -831,16 +838,10 @@ Route::group(
         );
 
         // fetch chart start date
-        Route::get(
-            '/fetch-start-date',
-            'DealerController@fetch_start_date'
-        );
+        Route::get('/fetch-start-date', 'DealerController@fetch_start_date');
 
         // add the chart start date
-        Route::post(
-            '/add-chart-date',
-            'AdminController@add_chart_date'
-        );
+        Route::post('/add-chart-date', 'AdminController@add_chart_date');
 
         // ---------------- Branch starts here  ------------------------- //
         Route::get(

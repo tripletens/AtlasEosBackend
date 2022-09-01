@@ -43,6 +43,8 @@ use App\Models\SystemSettings;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\ProgramCountdown;
 
+use App\Models\VendorOrderNotify;
+
 class DealerController extends Controller
 {
     public function __construct()
@@ -1018,10 +1020,61 @@ class DealerController extends Controller
             return response()->json($this->result);
         } else {
             // process the request
+            global $vendor;
+
             $uid = $request->uid;
             $atlas_id = $request->atlas_id;
             $dealer = $request->dealer;
             $vendor = $request->vendor;
+
+            // VendorOrderNotify::create([
+            //     'uid' => 'hello',
+            //     'vendor' => 'hetetet',
+            // ]);
+
+            $all_users = Users::where('role', '3')->get();
+
+            $individual = false;
+
+            foreach ($all_users as $value) {
+                $pri_vendor = $value->privileged_vendors;
+                $vendor_code = $value->vendor_code;
+                $user_id = $value->id;
+
+                if ($vendor_code == $vendor) {
+                    if (
+                        !VendorOrderNotify::where('uid', $user_id)
+                            ->where('vendor', $vendor)
+                            ->where('status', 0)
+                            ->exists()
+                    ) {
+                        VendorOrderNotify::create([
+                            'uid' => $user_id,
+                            'vendor' => $vendor,
+                        ]);
+                        $individual = true;
+                    }
+                }
+
+                if (!$individual) {
+                    if ($pri_vendor != null) {
+                        $pp = explode(',', $pri_vendor);
+                        if (in_array($vendor, $pp)) {
+                            if (
+                                !VendorOrderNotify::where('uid', $user_id)
+                                    ->where('vendor', $vendor)
+                                    ->where('status', 0)
+                                    ->exists()
+                            ) {
+                                VendorOrderNotify::create([
+                                    'uid' => $user_id,
+                                    'vendor' => $vendor,
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
 
             Users::where('id', $uid)->update(['order_status' => 1]);
 

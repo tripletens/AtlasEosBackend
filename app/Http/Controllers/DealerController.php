@@ -2223,7 +2223,7 @@ class DealerController extends Controller
                 //             ->file('file')
                 //             ->storeAs('public/reports', $fileNameToStore)
                 //     );
-                $path = Storage::disk('s3')->put('reports', $request->pdf,'public');
+                $path = Storage::disk('s3')->put('reports', $request->photo,'public');
 
                 $full_file_path = Storage::disk('s3')->url($path);
             }

@@ -2265,26 +2265,29 @@ class DealerController extends Controller
             return response()->json($this->result);
         } else {
             if ($request->hasFile('file')) {
-                $filenameWithExt = $request
-                    ->file('file')
-                    ->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request
-                    ->file('file')
-                    ->getClientOriginalExtension();
-                $fileNameToStore =
-                    Str::slug($filename, '_', $language = 'en') .
-                    '_' .
-                    time() .
-                    '.' .
-                    $extension;
-                $filepath =
-                    env('APP_URL') .
-                    Storage::url(
-                        $request
-                            ->file('file')
-                            ->storeAs('public/reports', $fileNameToStore)
-                    );
+                // $filenameWithExt = $request
+                //     ->file('file')
+                //     ->getClientOriginalName();
+                // $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                // $extension = $request
+                //     ->file('file')
+                //     ->getClientOriginalExtension();
+                // $fileNameToStore =
+                //     Str::slug($filename, '_', $language = 'en') .
+                //     '_' .
+                //     time() .
+                //     '.' .
+                //     $extension;
+                // $filepath =
+                //     env('APP_URL') .
+                //     Storage::url(
+                //         $request
+                //             ->file('file')
+                //             ->storeAs('public/reports', $fileNameToStore)
+                //     );
+                $path = Storage::disk('s3')->put('reports', $request->pdf,'public');
+
+                $full_file_path = Storage::disk('s3')->url($path);
             }
 
             $subject = $request->input('subject');
@@ -2299,7 +2302,7 @@ class DealerController extends Controller
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('file') ? $filepath : null,
+                'file_url' => $request->hasFile('file') ? $full_file_path : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,
@@ -2312,7 +2315,7 @@ class DealerController extends Controller
                 $this->result->status = true;
                 $this->result->status_code = 400;
                 $this->result->message =
-                    'An Error Ocurred, Vendor Addition failed';
+                    'An Error Ocurred, Report Addition failed';
                 return response()->json($this->result);
             }
 

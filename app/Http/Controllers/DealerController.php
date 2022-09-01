@@ -43,6 +43,8 @@ use App\Models\SystemSettings;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\ProgramCountdown;
 
+use App\Models\VendorOrderNotify;
+
 class DealerController extends Controller
 {
     public function __construct()
@@ -165,7 +167,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function generate_pdf($dealer, $lang)
+    public function generate_pdf($dealer, $lang, $current_time)
     {
         $data = [
             'title' => 'Welcome to Tutsmake.com',
@@ -181,12 +183,12 @@ class DealerController extends Controller
             ->get()
             ->first();
 
-        if ($dealer_ship) {
-            $dealer_ship->dealer_name = $this->translateToLocal(
-                $lang,
-                $dealer_ship->dealer_name
-            );
-        }
+        // if ($dealer_ship) {
+        //     $dealer_ship->dealer_name = $this->translateToLocal(
+        //         $lang,
+        //         $dealer_ship->dealer_name
+        //     );
+        // }
 
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
@@ -224,10 +226,7 @@ class DealerController extends Controller
 
             $data = [
                 'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $this->translateToLocal(
-                    $lang,
-                    $vendor_data->vendor_name
-                ),
+                'vendor_name' => $vendor_data->vendor_name,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -242,7 +241,7 @@ class DealerController extends Controller
             'dealer' => $dealer_ship ? $dealer_ship : null,
             'grand_total' => $grand_total,
             'lang' => $lang,
-            'printed_at' => date('Y-m-d H:i'),
+            'printed_at' => $current_time,
         ];
 
         /////  return $pdf_data;
@@ -597,10 +596,18 @@ class DealerController extends Controller
                         ->where('atlas_id', $atlas_id)
                         ->exists()
                 ) {
-                    $this->result->status = true;
-                    $this->result->status_code = 404;
-                    $this->result->message = 'item has been added already';
-                    break;
+                    Cart::where('dealer', $dealer)
+                        ->where('atlas_id', $atlas_id)
+                        ->where('product_id', $product_id)
+                        ->update([
+                            'qty' => $qty,
+                            'price' => $price,
+                            'unit_price' => $unit_price,
+                        ]);
+                    // $this->result->status = true;
+                    // $this->result->status_code = 404;
+                    // $this->result->message = 'item has been added already';
+                    // break;
                 } else {
                     $save = Cart::create([
                         'uid' => $uid,
@@ -1021,10 +1028,61 @@ class DealerController extends Controller
             return response()->json($this->result);
         } else {
             // process the request
+            global $vendor;
+
             $uid = $request->uid;
             $atlas_id = $request->atlas_id;
             $dealer = $request->dealer;
             $vendor = $request->vendor;
+
+            // VendorOrderNotify::create([
+            //     'uid' => 'hello',
+            //     'vendor' => 'hetetet',
+            // ]);
+
+            $all_users = Users::where('role', '3')->get();
+
+            $individual = false;
+
+            foreach ($all_users as $value) {
+                $pri_vendor = $value->privileged_vendors;
+                $vendor_code = $value->vendor_code;
+                $user_id = $value->id;
+
+                if ($vendor_code == $vendor) {
+                    if (
+                        !VendorOrderNotify::where('uid', $user_id)
+                            ->where('vendor', $vendor)
+                            ->where('status', 0)
+                            ->exists()
+                    ) {
+                        VendorOrderNotify::create([
+                            'uid' => $user_id,
+                            'vendor' => $vendor,
+                        ]);
+                        $individual = true;
+                    }
+                }
+
+                if (!$individual) {
+                    if ($pri_vendor != null) {
+                        $pp = explode(',', $pri_vendor);
+                        if (in_array($vendor, $pp)) {
+                            if (
+                                !VendorOrderNotify::where('uid', $user_id)
+                                    ->where('vendor', $vendor)
+                                    ->where('status', 0)
+                                    ->exists()
+                            ) {
+                                VendorOrderNotify::create([
+                                    'uid' => $user_id,
+                                    'vendor' => $vendor,
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
 
             Users::where('id', $uid)->update(['order_status' => 1]);
 
@@ -1184,6 +1242,8 @@ class DealerController extends Controller
             $role = $request->role;
             $ticket = $request->ticket;
             $replier = $request->replier;
+
+            Report::where('ticket_id', $ticket)->update(['admin_status' => 0]);
 
             $save_reply = ReportReply::create([
                 'user' => $userId,
@@ -1868,25 +1928,27 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function get_vendors_with_orders(){
+    public function get_vendors_with_orders()
+    {
         $get_all_vendors = Vendors::get();
 
         if (!$get_all_vendors) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the vendors";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the vendors";
             return response()->json($this->result);
         }
 
         $vendors_array = [];
 
-        foreach($get_all_vendors as $item){
+        foreach ($get_all_vendors as $item) {
             $product = Products::where('vendor', $item['vendor_code'])
-            ->where('status', '1')
-            ->exists();
+                ->where('status', '1')
+                ->exists();
 
-            if($product){
-               array_push($vendors_array,$item);
+            if ($product) {
+                array_push($vendors_array, $item);
             }
         }
 
@@ -2089,9 +2151,18 @@ class DealerController extends Controller
 
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)
-            ->whereDate('created_at', '>=',$fetch_settings->chart_start_date ? $fetch_settings->chart_start_date : date("Y-m-d"))
+            ->whereDate(
+                'created_at',
+                '>=',
+                $fetch_settings->chart_start_date
+                    ? $fetch_settings->chart_start_date
+                    : date('Y-m-d')
+            )
             ->where('status', '1')
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('sum(price) as amount'))
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('sum(price) as amount')
+            )
             ->groupBy('date')
             ->get();
 
@@ -2128,7 +2199,8 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function fetch_start_date(){
+    public function fetch_start_date()
+    {
         $settings_id = 1;
         $fetch_settings = SystemSettings::find($settings_id);
 
@@ -2223,7 +2295,11 @@ class DealerController extends Controller
                 //             ->file('file')
                 //             ->storeAs('public/reports', $fileNameToStore)
                 //     );
-                $path = Storage::disk('s3')->put('reports', $request->photo,'public');
+                $path = Storage::disk('s3')->put(
+                    'reports',
+                    $request->photo,
+                    'public'
+                );
 
                 $full_file_path = Storage::disk('s3')->url($path);
             }

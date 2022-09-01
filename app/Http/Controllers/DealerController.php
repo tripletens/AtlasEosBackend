@@ -596,10 +596,18 @@ class DealerController extends Controller
                         ->where('atlas_id', $atlas_id)
                         ->exists()
                 ) {
-                    $this->result->status = true;
-                    $this->result->status_code = 404;
-                    $this->result->message = 'item has been added already';
-                    break;
+                    Cart::where('dealer', $dealer)
+                        ->where('atlas_id', $atlas_id)
+                        ->where('product_id', $product_id)
+                        ->update([
+                            'qty' => $qty,
+                            'price' => $price,
+                            'unit_price' => $unit_price,
+                        ]);
+                    // $this->result->status = true;
+                    // $this->result->status_code = 404;
+                    // $this->result->message = 'item has been added already';
+                    // break;
                 } else {
                     $save = Cart::create([
                         'uid' => $uid,

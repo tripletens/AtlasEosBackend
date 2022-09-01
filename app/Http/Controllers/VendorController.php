@@ -33,6 +33,19 @@ class VendorController extends Controller
         ];
     }
 
+    public function change_user_bell_status($user, $vendor)
+    {
+        if (
+            VendorOrderNotify::where('uid', $user)
+                ->where('vendor', $vendor)
+                ->exists()
+        ) {
+            VendorOrderNotify::where('uid', $user)
+                ->where('vendor', $vendor)
+                ->update(['status' => 1]);
+        }
+    }
+
     public function get_vendor_rece_orders($user)
     {
         $all_bell_notify = VendorOrderNotify::where('uid', $user)

@@ -726,6 +726,11 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/change-bell-notify-status/{user}/{vendor}',
+            'VendorController@change_user_bell_status'
+        );
+
+        Route::get(
             '/vendor/get-sales-by-item-detailed/{code}',
             'VendorController@sales_by_item_detailed'
         );

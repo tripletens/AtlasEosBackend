@@ -77,6 +77,51 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_unread_report()
+    {
+        $count = Report::where('admin_status', 0)->count();
+        $data = Report::where('admin_status', 0)->get();
+
+        $checker = [];
+        $res = [];
+
+        foreach ($data as $value) {
+            $code = $value->dealer_id;
+            $ticket = $value->ticket_id;
+
+            $dealer_data = Dealer::where('dealer_code', $code)
+                ->get()
+                ->first();
+
+            if ($dealer_data) {
+                $dealer = isset($dealer_data->dealer_name)
+                    ? $dealer_data->dealer_name
+                    : null;
+
+                $dealer_code = isset($dealer_data->dealer_code)
+                    ? $dealer_data->dealer_code
+                    : null;
+
+                if ($dealer != null) {
+                    $data_push = [
+                        'name' => $dealer,
+                        'code' => $ticket,
+                    ];
+
+                    array_push($res, $data_push);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all chat selected vendors';
+        $this->result->data->count = $count;
+        $this->result->data->dealer = $res;
+
+        return response()->json($this->result);
+    }
+
     public function get_chat_selected_vendor_users($code)
     {
         $vendor = Users::where('vendor_code', $code)
@@ -300,12 +345,20 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
+            $first_name = isset($user->first_name) ? $user->first_name : null;
+
+            $last_name = isset($user->last_name) ? $user->last_name : null;
+
             $data = [
-                'account_id' => $user->account_id,
-                'dealer_name' => $user->company_name,
+                'account_id' => isset($user->account_id)
+                    ? $user->account_id
+                    : null,
+                'dealer_name' => isset($user->company_name)
+                    ? $user->company_name
+                    : null,
                 'user' => $user_id,
                 'vendor_code' => $code,
-                'purchaser_name' => $user->first_name . ' ' . $user->last_name,
+                'purchaser_name' => $first_name . ' ' . $last_name,
                 'amount' => $sum_user_total,
             ];
 
@@ -420,10 +473,10 @@ class AdminController extends Controller
             $fetch_settings->chart_start_date = $start_date;
             $update_settings = $fetch_settings->save();
 
-            if(!$update_settings){
+            if (!$update_settings) {
                 $this->result->status = false;
                 $this->result->status_code = 422;
-                $this->result->message = "Sorry! we could not save the date";
+                $this->result->message = 'Sorry! we could not save the date';
             }
 
             $this->result->status = true;
@@ -460,7 +513,7 @@ class AdminController extends Controller
                 'account' => $user_data->account_id,
                 'dealer_name' => $user_data->company_name,
                 'rep_name' =>
-                $user_data->first_name . ' ' . $user_data->last_name,
+                    $user_data->first_name . ' ' . $user_data->last_name,
                 'vendor_no' => null,
             ];
 
@@ -510,7 +563,7 @@ class AdminController extends Controller
                     'show' => $show,
                     'overide_price' => $overide_price,
                     'authorized_by' =>
-                    $user_data->first_name . ' ' . $user_data->last_name,
+                        $user_data->first_name . ' ' . $user_data->last_name,
                 ];
 
                 array_push($res_data, $data);
@@ -582,8 +635,8 @@ class AdminController extends Controller
     {
         if (
             Cart::where('dealer', $dealer)
-            ->where('atlas_id', $atlas_id)
-            ->exists()
+                ->where('atlas_id', $atlas_id)
+                ->exists()
         ) {
             $cart_data = Cart::where('dealer', $dealer)
                 ->where('atlas_id', $atlas_id)
@@ -690,6 +743,8 @@ class AdminController extends Controller
     public function get_report_reply($ticket)
     {
         $selected = ReportReply::where('ticket', $ticket)->get();
+
+        Report::where('ticket_id', $ticket)->update(['admin_status' => 1]);
 
         $res_data = [];
         if ($selected) {
@@ -3316,9 +3371,9 @@ class AdminController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' =>
-            auth()
-                ->factory()
-                ->getTTL() * 60,
+                auth()
+                    ->factory()
+                    ->getTTL() * 60,
         ]);
     }
 
@@ -3345,7 +3400,7 @@ class AdminController extends Controller
     {
         /// App::setLocale('fr');
 
-        $reports = Report::orderBy('id', 'desc')->get();
+        $reports = Report::orderBy('updated_at', 'desc')->get();
         $res_data = [];
 
         if ($reports) {

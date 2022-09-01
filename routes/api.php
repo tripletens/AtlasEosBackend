@@ -33,6 +33,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/get-unread-report',
+            'AdminController@get_unread_report'
+        );
+
+        Route::get(
             '/admin/most-sales-dealers-admin-dashboard',
             'AdminController@most_sales_dealer_admin_dashboard'
         );
@@ -657,8 +662,10 @@ Route::group(
         );
 
         Route::get('/dealer/get-vendors', 'DealerController@get_vendor');
-        Route::get('/dealer/get-vendors-with-orders', 'DealerController@get_vendors_with_orders');
-
+        Route::get(
+            '/dealer/get-vendors-with-orders',
+            'DealerController@get_vendors_with_orders'
+        );
 
         Route::get(
             '/dealer/get-selected-company-vendor/{code}/{user}',
@@ -681,18 +688,23 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/vendor-dashboard-analysis/{code}/{user}',
+            '/vendor/vendor-dashboard-analysis/{user}',
             'VendorController@vendor_dashboard_analysis'
         );
 
         Route::get(
-            '/vendor/vendor-dashboard-most-purchaser/{code}/{user}',
+            '/vendor/vendor-dashboard-most-purchaser/{user}',
             'VendorController@vendor_dashboard_most_purchaser'
         );
 
         Route::get(
             '/vendor/vendor-single-dashboard-most-purchaser/{code}',
             'VendorController@vendor_single_dashboard_most_purchaser'
+        );
+
+        Route::get(
+            '/vendor/vendor-dashboard-sup-most-purchaser/{user}',
+            'VendorController@vendor_dashboard_sup_most_purchaser'
         );
 
         Route::get(
@@ -719,8 +731,18 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/change-bell-notify-status/{user}/{vendor}',
+            'VendorController@change_user_bell_status'
+        );
+
+        Route::get(
             '/vendor/get-sales-by-item-detailed/{code}',
             'VendorController@sales_by_item_detailed'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-order-bell-count/{code}',
+            'VendorController@get_vendor_rece_orders'
         );
 
         Route::get(
@@ -739,8 +761,13 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/view-dealer-summary/{user}/{dealer}/{vendor}',
+            '/vendor/view-dealer-summary/{dealer}/{vendor}',
             'VendorController@view_dealer_summary'
+        );
+
+        Route::get(
+            '/vendor/view-dealer-purchaser-summary/{user}/{dealer}/{vendor}',
+            'VendorController@view_dealer_purchaser_summary'
         );
 
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
@@ -821,16 +848,10 @@ Route::group(
         );
 
         // fetch chart start date
-        Route::get(
-            '/fetch-start-date',
-            'DealerController@fetch_start_date'
-        );
+        Route::get('/fetch-start-date', 'DealerController@fetch_start_date');
 
         // add the chart start date
-        Route::post(
-            '/add-chart-date',
-            'AdminController@add_chart_date'
-        );
+        Route::post('/add-chart-date', 'AdminController@add_chart_date');
 
         // ---------------- Branch starts here  ------------------------- //
         Route::get(

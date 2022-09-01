@@ -1243,6 +1243,8 @@ class DealerController extends Controller
             $ticket = $request->ticket;
             $replier = $request->replier;
 
+            Report::where('ticket_id', $ticket)->update(['admin_status' => 0]);
+
             $save_reply = ReportReply::create([
                 'user' => $userId,
                 'reply_msg' => $replyMsg,
@@ -2293,7 +2295,11 @@ class DealerController extends Controller
                 //             ->file('file')
                 //             ->storeAs('public/reports', $fileNameToStore)
                 //     );
-                $path = Storage::disk('s3')->put('reports', $request->photo,'public');
+                $path = Storage::disk('s3')->put(
+                    'reports',
+                    $request->photo,
+                    'public'
+                );
 
                 $full_file_path = Storage::disk('s3')->url($path);
             }
@@ -2310,7 +2316,9 @@ class DealerController extends Controller
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('file') ? $full_file_path : null,
+                'file_url' => $request->hasFile('file')
+                    ? $full_file_path
+                    : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,

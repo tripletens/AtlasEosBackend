@@ -33,6 +33,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/get-unread-report',
+            'AdminController@get_unread_report'
+        );
+
+        Route::get(
             '/admin/most-sales-dealers-admin-dashboard',
             'AdminController@most_sales_dealer_admin_dashboard'
         );

@@ -164,6 +164,8 @@
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Account #: No vendor code found') }}  </h2>
                 @endif
 
+                <h2 class="dealer-name">Date: {{ $printed_at }}</h2>
+
 
             </div>
             <div>

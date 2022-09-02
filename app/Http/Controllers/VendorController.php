@@ -76,7 +76,7 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
-    public function generate_sales_summary_pdf($code, $lang)
+    public function generate_sales_summary_pdf($code, $lang, $create_time)
     {
         $vendor_data = Vendors::where('vendor_code', $code)
             ->get()
@@ -153,6 +153,7 @@ class VendorController extends Controller
             'vendor' => $vendor_data ? $vendor_data : null,
             'grand_total' => $over_all_total,
             'lang' => $lang,
+            'printed_at' => $create_time,
         ];
 
         /////  return $pdf_data;

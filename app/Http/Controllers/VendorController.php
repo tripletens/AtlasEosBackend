@@ -1476,7 +1476,7 @@ class VendorController extends Controller
 
         // return $vendor_details;
 
-        $privileged_vendors = (string) $vendor_details[0]->privileged_vendors;
+        $privileged_vendors = trim(str_replace('"',' ', $vendor_details[0]->privileged_vendors));
 
         $vendor_code = $vendor_details[0]->vendor_code;
 
@@ -1489,13 +1489,12 @@ class VendorController extends Controller
             array_push($all_priviledged_vendor_code_array, $vendor_code);
         }
 
+    
         $new_all_orders = array_map(function ($vendor_code) {
+            $vendor_code_format = str_replace('\"','-',$vendor_code);
             $settings_id = 1;
             # select the settings
             $fetch_settings = SystemSettings::find($settings_id);
-
-            $get_vendor_details = Users::where('role','3')->where('vendor_code', (string)$vendor_code)
-                ->select('vendor_name','vendor_code')->first();
 
             $vendor_cart = DB::table('cart')->where('vendor', $vendor_code)
             ->whereDate(
@@ -1514,9 +1513,8 @@ class VendorController extends Controller
             ->get();
 
             # sort by vendor code
-            $get_vendor_details->orders = $vendor_cart;
-
-            return $get_vendor_details;
+           return [$vendor_code_format => $vendor_cart];
+            // return $get_vendor_details;
         }, $all_priviledged_vendor_code_array);
 
         // $settings_id = 1;

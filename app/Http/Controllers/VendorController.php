@@ -13,6 +13,8 @@ use App\Models\Dealer;
 use App\Models\Faq;
 use App\Models\ProgramNotes;
 use Barryvdh\DomPDF\Facade as PDF;
+use App\Models\SystemSettings;
+use DB;
 
 use App\Models\VendorOrderNotify;
 
@@ -37,8 +39,8 @@ class VendorController extends Controller
     {
         if (
             VendorOrderNotify::where('uid', $user)
-                ->where('vendor', $vendor)
-                ->exists()
+            ->where('vendor', $vendor)
+            ->exists()
         ) {
             VendorOrderNotify::where('uid', $user)
                 ->where('vendor', $vendor)
@@ -193,7 +195,7 @@ class VendorController extends Controller
                 $data = [
                     'note' => $value->notes,
                     'rep_name' =>
-                        $user_data->first_name . ' ' . $user_data->last_name,
+                    $user_data->first_name . ' ' . $user_data->last_name,
                 ];
 
                 array_push($res_data, $data);
@@ -225,7 +227,7 @@ class VendorController extends Controller
                 $data = [
                     'note' => $value->notes,
                     'rep_name' =>
-                        $user_data->first_name . ' ' . $user_data->last_name,
+                    $user_data->first_name . ' ' . $user_data->last_name,
                 ];
 
                 array_push($res_data, $data);
@@ -795,12 +797,12 @@ class VendorController extends Controller
                             'qty' => $qty,
                             'account_id' => $dealer_db->account_id,
                             'user' =>
-                                $dealer_db->first_name .
+                            $dealer_db->first_name .
                                 ' ' .
                                 $dealer_db->last_name,
                             'total' => $value->price,
                             'item_total' =>
-                                intval($qty) * floatval($value->price),
+                            intval($qty) * floatval($value->price),
                         ];
 
                         $total_atlas_amount +=
@@ -998,7 +1000,7 @@ class VendorController extends Controller
 
                 $data = [
                     'dealer_rep_name' =>
-                        $dealer_data->full_name . ' ' . $dealer_data->last_name,
+                    $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
@@ -1147,7 +1149,7 @@ class VendorController extends Controller
                     'user' => $value,
                     'vendor_code' => $code,
                     'purchaser_name' =>
-                        $user->first_name . ' ' . $user->last_name,
+                    $user->first_name . ' ' . $user->last_name,
                     'amount' => $sum_user_total,
                 ];
 
@@ -1452,6 +1454,90 @@ class VendorController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'get all vendors was successful';
         $this->result->data = $vendors;
+        return response()->json($this->result);
+    }
+
+    // fetch the sum of order price per vendors per day
+    public function fetch_all_vendor_orders_per_day($id)
+    {
+        // fetch all the orders
+        // $all_orders = Cart::where('dealer', $account)->where('status', '1');
+
+        // return $fetch_settings;
+
+        $vendor_details = Users::where('role', '=', '3')->where('id', $id)->get();
+
+        if (!$vendor_details || count($vendor_details) == 0) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't find the vendor";
+            return response()->json($this->result);
+        }
+
+        // return $vendor_details;
+
+        $privileged_vendors = (string) $vendor_details[0]->privileged_vendors;
+
+        $vendor_code = $vendor_details[0]->vendor_code;
+
+        $all_priviledged_vendor_code_array = [];
+
+        # get all the priviledged vendor vendor_codes
+        if ($privileged_vendors !== null) {
+            $all_priviledged_vendor_code_array = explode(',', $privileged_vendors);
+        } else {
+            array_push($all_priviledged_vendor_code_array, $vendor_code);
+        }
+
+        $new_all_orders = array_map(function ($vendor_code) {
+            $settings_id = 1;
+            # select the settings
+            $fetch_settings = SystemSettings::find($settings_id);
+
+            $get_vendor_details = Users::where('role','3')->where('vendor_code', (string)$vendor_code)
+                ->select('vendor_name','vendor_code')->first();
+
+            $vendor_cart = DB::table('cart')->where('vendor', $vendor_code)
+            ->whereDate(
+                'created_at',
+                '>=',
+                $fetch_settings->chart_start_date
+                    ? $fetch_settings->chart_start_date
+                    : date('Y-m-d')
+            )
+            ->where('status', '1')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('sum(price) as amount')
+            )
+            ->groupBy('date')
+            ->get();
+
+            # sort by vendor code
+            $get_vendor_details->orders = $vendor_cart;
+
+            return $get_vendor_details;
+        }, $all_priviledged_vendor_code_array);
+
+        // $settings_id = 1;
+        // # select the settings
+        // $fetch_settings = SystemSettings::find($settings_id);
+
+        // return $fetch_settings->chart_start_date;
+
+        if (!$new_all_orders) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the orders";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->order_count = count($new_all_orders);
+        $this->result->data = $new_all_orders;
+        $this->result->message = 'All orders per day fetched successfully';
         return response()->json($this->result);
     }
 }

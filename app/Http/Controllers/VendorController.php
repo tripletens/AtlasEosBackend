@@ -1521,63 +1521,27 @@ class VendorController extends Controller
             // return $get_vendor_details;
         }, $all_priviledged_vendor_code_array);
 
-        // $new_array  = [];
-
-        // for($i = 0; $i < count($all_priviledged_vendor_code_array); $i ++ ){
-        //     $vendor_code = $all_priviledged_vendor_code_array[$i];
-        //     $vendor_code_format = str_replace('\"','-',$vendor_code);
-        //     $settings_id = 1;
-        //     # select the settings
-        //     $fetch_settings = SystemSettings::find($settings_id);
-
-        //     $vendor_cart = DB::table('cart')->where('vendor', $vendor_code)
-        //     ->whereDate(
-        //         'created_at',
-        //         '>=',
-        //         $fetch_settings->chart_start_date
-        //             ? $fetch_settings->chart_start_date
-        //             : date('Y-m-d')
-        //     )
-        //     ->where('status', '1')
-        //     ->select(
-        //         DB::raw('DATE(created_at) as date'),
-        //         DB::raw('sum(price) as amount')
-        //     )
-        //     ->groupBy('date')
-        //     ->get();
-
-        //     array_merge($new_array,[...$vendor_cart]);
-        // }
-
-        // $settings_id = 1;
-        // # select the settings
-        // $fetch_settings = SystemSettings::find($settings_id);
-
-        // return $fetch_settings->chart_start_date;
-
         $new_david_array = [];
 
         foreach ($new_all_orders as $key => $order){
             $new_david_array = array_merge($new_david_array,$order);
         }
 
-        // for($i = 0; $i < count($new_david_array); $i++){
-        //     if($new_david_array[$key + 1] <= count($new_david_array)){
-        //         if($new_david_array[$i]->date == $new_david_array[$i + 1]->date){
-        //             $new_david_array[$i]->amount += $new_david_array[$i + 1]->amount;
-        //         }
-        //     }
-        // }
+        $new_data_array = [];
 
-        // foreach($new_david_array as $key => $david_order){
-        //     if(array_key_exists($key + 1,$new_david_array)){
-        //         if($david_order->date == $new_david_array[$key + 1]->date){
-        //             $david_order->amount += $new_david_array[$key + 1]->amount;
-        //         }
+        foreach($new_david_array as $key => $value){
+            $dates = array_values(array_column($new_data_array,'date'));
+            if(in_array($value->date,$dates)){
+                $item_index = array_search($value->date, $new_data_array);
+                $new_data_array[$item_index]->amount += $value->amount;
+            }else{
+                array_push($new_data_array,$value);
+            }
+        }
 
-        //         array_push($new_formated_david_array,$david_order);
-        //     }
-        // }
+        sort($new_data_array);
+
+        // return $sort_new_array;
 
         if (!$new_all_orders) {
             $this->result->status = true;
@@ -1589,8 +1553,8 @@ class VendorController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data->order_count = count($new_david_array);
-        $this->result->data = $new_david_array;
+        $this->result->data->order_count = count($new_data_array);
+        $this->result->data = $new_data_array;
         $this->result->message = 'All orders per day fetched successfully';
         return response()->json($this->result);
     }

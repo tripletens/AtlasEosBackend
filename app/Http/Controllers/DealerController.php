@@ -1059,6 +1059,7 @@ class DealerController extends Controller
                         VendorOrderNotify::create([
                             'uid' => $user_id,
                             'vendor' => $vendor,
+                            'dealer' => $dealer,
                         ]);
                         $individual = true;
                     }
@@ -1077,6 +1078,7 @@ class DealerController extends Controller
                                 VendorOrderNotify::create([
                                     'uid' => $user_id,
                                     'vendor' => $vendor,
+                                    'dealer' => $dealer,
                                 ]);
                             }
                         }

@@ -11,5 +11,5 @@ class VendorOrderNotify extends Model
 
     protected $table = 'vendor_order_notify';
 
-    protected $fillable = ['uid', 'vendor', 'status'];
+    protected $fillable = ['uid', 'vendor', 'status', 'dealer'];
 }

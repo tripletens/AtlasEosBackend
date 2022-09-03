@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DealerController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\SalesRepController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +31,9 @@ Route::get('/generate-pdf/{dealer}/{lang}/{current_time}', [
 Route::get('/generate-vendor-sales-summary-pdf/{vendor}/{lang}/{create_time}', [
     VendorController::class,
     'generate_sales_summary_pdf',
+]);
+
+Route::get('/generate-sales-rep-purchasers-pdf/{user}/', [
+    SalesRepController::class,
+    'generate_sales_rep_purchasers_pdf',
 ]);

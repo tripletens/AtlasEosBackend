@@ -59,10 +59,14 @@ class VendorController extends Controller
         if ($all_bell_notify) {
             foreach ($all_bell_notify as $value) {
                 $code = $value->vendor;
+                $dealer_code = $value->dealer;
                 $vendor_data = Vendors::where('vendor_code', $code)
                     ->get()
                     ->first();
-                $value->vendor_name = $vendor_data->vendor_name;
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+                $value->vendor_name = $dealer_data->dealer_name;
             }
         }
 

@@ -1053,6 +1053,7 @@ class DealerController extends Controller
                     if (
                         !VendorOrderNotify::where('uid', $user_id)
                             ->where('vendor', $vendor)
+                            ->where('dealer', $dealer)
                             ->where('status', 0)
                             ->exists()
                     ) {
@@ -1072,6 +1073,7 @@ class DealerController extends Controller
                             if (
                                 !VendorOrderNotify::where('uid', $user_id)
                                     ->where('vendor', $vendor)
+                                    ->where('dealer', $dealer)
                                     ->where('status', 0)
                                     ->exists()
                             ) {

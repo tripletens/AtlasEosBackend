@@ -28,7 +28,7 @@ class AddSoftDeleteToQuickOrderTable extends Migration
     {
         Schema::table('quick_order', function (Blueprint $table) {
             // deletes the soft delete from the table
-            $table->dropSoftDeletes();
+            // $table->dropSoftDeletes();
         });
     }
 }

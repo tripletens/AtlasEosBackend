@@ -548,8 +548,6 @@ class VendorController extends Controller
                     $dealers = [];
                 }
             } else {
-                // $vendor_code = $separator[0];
-
                 array_push($separator, $user_vendor_code);
                 array_unique($separator);
 

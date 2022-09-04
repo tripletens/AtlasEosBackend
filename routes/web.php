@@ -37,3 +37,8 @@ Route::get('/generate-sales-rep-purchasers-pdf/{user}/', [
     SalesRepController::class,
     'generate_sales_rep_purchasers_pdf',
 ]);
+
+Route::get(
+    '/generate-vendor-purchaser-summary/{user}/{dealer}/{vendor}/{lang}/{created_time}',
+    [VendorController::class, 'generate_vendor_purchasers_summary']
+);

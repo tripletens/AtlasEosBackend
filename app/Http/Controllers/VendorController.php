@@ -62,7 +62,7 @@ class VendorController extends Controller
                     ->get()
                     ->first();
 
-                $over_all_total += intval($value->price);
+                $over_all_total += floatval($value->price);
 
                 $data = [
                     // 'dealer_rep_name' =>
@@ -120,7 +120,7 @@ class VendorController extends Controller
                     ->get()
                     ->first();
 
-                $over_all_total += intval($value->price);
+                $over_all_total += floatval($value->price);
 
                 $data = [
                     'dealer_rep_name' =>

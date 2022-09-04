@@ -42,3 +42,8 @@ Route::get(
     '/generate-vendor-purchaser-summary/{user}/{dealer}/{vendor}/{lang}/{created_time}',
     [VendorController::class, 'generate_vendor_purchasers_summary']
 );
+
+Route::get(
+    '/generate-vendor-view-summary/{dealer}/{vendor}/{lang}/{created_time}',
+    [VendorController::class, 'generate_vendor_view_summary']
+);

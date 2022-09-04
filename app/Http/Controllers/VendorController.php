@@ -15,6 +15,7 @@ use App\Models\ProgramNotes;
 use Barryvdh\DomPDF\Facade as PDF;
 
 use App\Models\VendorOrderNotify;
+use App\Models\SpecialOrder;
 
 class VendorController extends Controller
 {
@@ -31,6 +32,243 @@ class VendorController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function get_special_orders_by_vendor($code)
+    {
+        $special_orders = SpecialOrder::where('vendor_code', $code)->get();
+
+        if ($special_orders) {
+            foreach ($special_orders as $value) {
+                $user = $value->uid;
+                $vendor = $value->vendor_code;
+                $dealer = $value->dealer_id;
+                $qty = $value->quantity;
+                $desc = $value->description;
+                $vendor_part = $value->vendor_no;
+                $dealer_id = $value->dealer_id;
+
+                $dealer_data = Dealer::where('dealer_code', $dealer)
+                    ->get()
+                    ->first();
+
+                $user_data = Users::where('id', $user)
+                    ->get()
+                    ->first();
+
+                $vendor_data = Vendors::where('vendor_code', $vendor)
+                    ->get()
+                    ->first();
+
+                $value->dealer_name = $dealer_data->dealer_name;
+                $value->vendor_name = $vendor_data->vendor_name;
+                $value->user = $user_data->full_name;
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get special order by vendor';
+        $this->result->data = $special_orders;
+        // $this->result->data = $dealers;
+
+        return response()->json($this->result);
+    }
+
+    public function get_vendor_special_orders($user)
+    {
+        $dealer_data = [];
+        $dealer_sales = [];
+        $dealers = [];
+        $purchasers = [];
+        $vend = [];
+
+        $selected_user = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $user_vendor_code = $selected_user->vendor_code;
+        $privilaged_vendors = isset($selected_user->privileged_vendors)
+            ? $selected_user->privileged_vendors
+            : null;
+
+        if ($privilaged_vendors != null) {
+            $separator = explode(',', $privilaged_vendors);
+            if ($separator[1] == '') {
+                $vendor_code = $separator[0];
+                $separator[1] = $user_vendor_code;
+                array_unique($separator);
+
+                $all_vendor_data = Vendors::all();
+                global $h;
+                for ($h = 0; $h < count($separator); $h++) {
+                    $cart_dealer = SpecialOrder::where(
+                        'vendor_code',
+                        $separator[$h]
+                    )->get();
+                    foreach ($cart_dealer as $value) {
+                        $dealer_id = $value->dealer_id;
+                        if (!in_array($dealer_id, $dealers)) {
+                            array_push($dealers, $dealer_id);
+                        }
+                    }
+
+                    for ($i = 0; $i < count($dealers); $i++) {
+                        $dealer_code = $dealers[$i];
+
+                        // $total = SpecialOrder::where('dealer', $dealer_code)
+                        //     ->where('vendor_code', $separator[$h])
+                        //     // ->sum('price');
+
+                        $dealer_data = Dealer::where('dealer_id', $dealer_code)
+                            ->get()
+                            ->first();
+
+                        if ($dealer_data) {
+                            $data = [
+                                'vendor' => $separator[$h],
+                                'dealer' => $dealer_code,
+                                'dealer_name' => is_null(
+                                    $dealer_data->dealer_name
+                                )
+                                    ? null
+                                    : $dealer_data->dealer_name,
+                            ];
+
+                            array_push($purchasers, $data);
+                        }
+                    }
+
+                    $dealers = [];
+                }
+            } else {
+                array_push($separator, $user_vendor_code);
+                array_unique($separator);
+
+                $all_vendor_data = Vendors::all();
+                foreach ($separator as $value) {
+                    $vendor_code = $value;
+                    if ($vendor_code != '') {
+                        $cart_dealer = SpecialOrder::where(
+                            'vendor_code',
+                            $vendor_code
+                        )->get();
+                        if ($cart_dealer) {
+                            foreach ($cart_dealer as $value) {
+                                $dealer_id = $value->dealer_id;
+                                if (!in_array($dealer_id, $dealers)) {
+                                    array_push($dealers, $dealer_id);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for ($i = 0; $i < count($dealers); $i++) {
+                    $dealer_code = $dealers[$i];
+
+                    $orders = SpecialOrder::where(
+                        'dealer_id',
+                        $dealer_code
+                    )->get();
+
+                    if ($orders) {
+                        foreach ($orders as $value) {
+                            $user = $value->uid;
+                            $vendor = $value->vendor_code;
+                            $dealer = $value->dealer_id;
+                            $qty = $value->quantity;
+                            $desc = $value->description;
+                            $vendor_part = $value->vendor_no;
+                            $dealer_id = $value->dealer_id;
+
+                            $dealer_data = Dealer::where('dealer_code', $dealer)
+                                ->get()
+                                ->first();
+
+                            $user_data = Users::where('id', $user)
+                                ->get()
+                                ->first();
+
+                            $vendor_data = Vendors::where(
+                                'vendor_code',
+                                $vendor
+                            )
+                                ->get()
+                                ->first();
+
+                            if ($dealer_data) {
+                                $data = [
+                                    'dealer_acc' => $dealer_id,
+                                    'vendor_part' => $vendor_part,
+                                    'desc' => $desc,
+                                    'qty' => $qty,
+                                    'vendor' => $vendor_data->vendor_name,
+                                    'dealer' => $dealer_data->dealer_name,
+                                    'dealer_name' => is_null(
+                                        $dealer_data->dealer_name
+                                    )
+                                        ? null
+                                        : $dealer_data->dealer_name,
+                                    'user' => $user_data->full_name,
+                                ];
+
+                                array_push($purchasers, $data);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            $vendor_code = $user_vendor_code;
+            $all_vendor_data = Vendors::all();
+
+            $cart_dealer = SpecialOrder::where(
+                'vendor_code',
+                $vendor_code
+            )->get();
+
+            return $cart_dealer;
+
+            foreach ($cart_dealer as $value) {
+                $dealer_id = $value->dealer;
+                if (!in_array($dealer_id, $dealers)) {
+                    array_push($dealers, $dealer_id);
+                }
+            }
+
+            for ($i = 0; $i < count($dealers); $i++) {
+                $dealer_code = $dealers[$i];
+
+                // $total = SpecialOrder::where('dealer', $dealer_code)
+                //     ->where('vendor_code', $vendor_code)
+                //     ->sum('price');
+
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+
+                if ($dealer_data) {
+                    $data = [
+                        'vendor' => $vendor_code,
+                        'dealer' => $dealer_code,
+                        'dealer_name' => is_null($dealer_data->dealer_name)
+                            ? null
+                            : $dealer_data->dealer_name,
+                    ];
+
+                    array_push($purchasers, $data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor dashboard';
+        $this->result->data = $purchasers;
+        // $this->result->data = $dealers;
+
+        return response()->json($this->result);
     }
 
     public function change_user_bell_status($user, $vendor)
@@ -74,9 +312,7 @@ class VendorController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'vendor bell notification';
         $this->result->data->notify = $all_bell_notify;
-
         $this->result->data->count = $bell_notify_count;
-
         return response()->json($this->result);
     }
 
@@ -1079,46 +1315,6 @@ class VendorController extends Controller
         $users = [];
         $dealers = [];
 
-        // foreach ($vendor_purchases as $value) {
-        //     $dealer = $value->dealer;
-        //     $product_id = $value->product_id;
-
-        //     if (!in_array($dealer, $dealers)) {
-        //         array_push($dealers, $dealer);
-        //     }
-        // }
-
-        // return $dealers;
-
-        //  foreach ($dealers as $value) {
-        //     $cart_user = Cart::where('vendor', $code)
-        //         ->where('dealer', $value)
-        //         ->get()
-        //         ->first();
-
-        //     $sum_user_total = Cart::where('vendor', $code)
-        //         ->where('uid', $value)
-        //         ->get()
-        //         ->sum('price');
-        //     $user = Users::where('id', $value)
-        //         ->get()
-        //         ->first();
-
-        //     if ($user) {
-        //         $data = [
-        //             'account_id' => $user->account_id,
-        //             'dealer_name' => $user->company_name,
-        //             'user' => $user_id,
-        //             'vendor_code' => $code,
-        //             'purchaser_name' =>
-        //                 $user->first_name . ' ' . $user->last_name,
-        //             'amount' => $sum_user_total,
-        //         ];
-
-        //         array_push($res_data, $data);
-        //     }
-        // }
-
         foreach ($vendor_purchases as $value) {
             $user_id = $value->uid;
             $product_id = $value->product_id;
@@ -1127,8 +1323,6 @@ class VendorController extends Controller
                 array_push($users, $user_id);
             }
         }
-
-        // return $users;
 
         foreach ($users as $value) {
             $cart_user = Cart::where('vendor', $code)

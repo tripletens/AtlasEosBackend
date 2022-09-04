@@ -65,8 +65,12 @@ class VendorController extends Controller
                     ->get()
                     ->first();
 
-                $value->dealer_name = $dealer_data->dealer_name;
-                $value->vendor_name = $vendor_data->vendor_name;
+                $value->dealer_name = isset($dealer_data->dealer_name)
+                    ? $dealer_data->dealer_name
+                    : null;
+                $value->vendor_name = isset($vendor_data->vendor_name)
+                    ? $vendor_data->vendor_name
+                    : null;
                 $value->user = $user_data->full_name;
             }
         }

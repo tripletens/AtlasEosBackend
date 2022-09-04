@@ -1470,7 +1470,7 @@ class VendorController extends Controller
         $vendor_details = Users::where('role', '=', '3')->where('id', $id)->get();
 
         if (!$vendor_details || count($vendor_details) == 0) {
-            $this->result->status = true;
+            $this->result->status = false;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't find the vendor";
             return response()->json($this->result);
@@ -1487,6 +1487,7 @@ class VendorController extends Controller
         # get all the priviledged vendor vendor_codes
         if ($privileged_vendors !== null) {
             $all_priviledged_vendor_code_array = explode(',', $privileged_vendors);
+            array_push($all_priviledged_vendor_code_array,$vendor_code);
         } else {
             array_push($all_priviledged_vendor_code_array, $vendor_code);
         }
@@ -1545,7 +1546,7 @@ class VendorController extends Controller
         // return $sort_new_array;
 
         if (!$new_all_orders) {
-            $this->result->status = true;
+            $this->result->status = false;
             $this->result->status_code = 400;
             $this->result->message =
                 "An Error Ocurred, we couldn't fetch all the orders";

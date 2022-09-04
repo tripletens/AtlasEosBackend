@@ -39,6 +39,63 @@ class VendorController extends Controller
         ];
     }
 
+    public function generate_vendor_view_summary(
+        $dealer,
+        $vendor,
+        $lang,
+        $create_time
+    ) {
+        $over_all_total = 0;
+
+        $dealer_cart = Cart::where('vendor', $vendor)
+            ->where('dealer', $dealer)
+            ->get();
+
+        $res_data = [];
+
+        $vendor_data = Vendors::where('vendor_code', $vendor)
+            ->get()
+            ->first();
+        $dealer_data = Users::where('account_id', $dealer)
+            ->get()
+            ->first();
+
+        if ($dealer_cart) {
+            foreach ($dealer_cart as $value) {
+                $atlas_id = $value->atlas_id;
+                $pro_data = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $over_all_total += intval($value->price);
+
+                $data = [
+                    // 'dealer_rep_name' =>
+                    //     $dealer_data->full_name . ' ' . $dealer_data->last_name,
+                    'qty' => $value->qty,
+                    'atlas_id' => $atlas_id,
+                    'vendor_product_code' => $pro_data->vendor_product_code,
+                    'special' => $pro_data->booking,
+                    'desc' => $pro_data->description,
+                    'total' => $value->price,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $pdf_data = [
+            'data' => $res_data,
+            'dealer' => $dealer_data ? $dealer_data : null,
+            'grand_total' => $over_all_total,
+            'lang' => $lang,
+            'printed_at' => $create_time,
+        ];
+
+        $pdf = PDF::loadView('vendor-purchasers-summary', $pdf_data);
+        return $pdf->stream('vendor-purchasers-summary.pdf');
+    }
+
     public function generate_vendor_purchasers_summary(
         $user,
         $dealer,

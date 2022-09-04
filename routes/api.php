@@ -773,6 +773,16 @@ Route::group(
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
 
         Route::get(
+            '/vendor/get-vendor-special-orders/{user}',
+            'VendorController@get_vendor_special_orders'
+        );
+
+        Route::get(
+            '/vendor/get-special-orders-by-vendor/{code}',
+            'VendorController@get_special_orders_by_vendor'
+        );
+
+        Route::get(
             '/seminars/remind',
             'SeminarController@select_seminars_to_remind'
         );

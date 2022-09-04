@@ -773,6 +773,11 @@ Route::group(
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
 
         Route::get(
+            '/vendor/generate-vendor-purchaser-summary/{user}/{dealer}/{vendor}/{lang}/{created_time}',
+            'VendorController@generate_vendor_purchasers_summary'
+        );
+
+        Route::get(
             '/vendor/get-vendor-special-orders/{user}',
             'VendorController@get_vendor_special_orders'
         );

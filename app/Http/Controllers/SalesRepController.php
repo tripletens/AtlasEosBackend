@@ -418,13 +418,10 @@ class SalesRepController extends Controller
             ->get()
             ->first();
 
-        return $selected_user;
-
         if ($selected_user) {
             $privilaged_dealers = $selected_user->privileged_dealers;
             if ($privilaged_dealers != null) {
                 $separator = explode(',', $privilaged_dealers);
-
 
                 // if (\in_array(null, $separator)) {
                 //     $total_dealers = $total_dealers - 1;

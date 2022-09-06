@@ -346,16 +346,27 @@ class SalesRepController extends Controller
             ->get()
             ->first();
 
+        return $selected_user;
+
         if ($selected_user) {
             $privilaged_dealers = $selected_user->privileged_dealers;
             if ($privilaged_dealers != null) {
                 $separator = explode(',', $privilaged_dealers);
-                $total_dealers = count($separator);
-                if (\in_array(null, $separator)) {
-                    $total_dealers = $total_dealers - 1;
-                }
 
-                foreach ($separator as $value) {
+
+                // if (\in_array(null, $separator)) {
+                //     $total_dealers = $total_dealers - 1;
+                // }
+
+                $separator_without_null_values = array_map(function($record){
+                    if($record !== null){
+                        return $record;
+                    }
+                },$separator);
+
+                $total_dealers = count($separator_without_null_values);
+
+                foreach ($separator_without_null_values as $value) {
                     $total_logged_in += Users::where('account_id', $value)
                         ->where('last_login', '!=', null)
                         ->count();
@@ -366,6 +377,7 @@ class SalesRepController extends Controller
                 }
 
                 $all_vendor_data = Vendors::all();
+
                 foreach ($all_vendor_data as $value) {
                     $vendor_code = $value->vendor_code;
                     if (in_array($vendor_code, $separator)) {
@@ -391,11 +403,12 @@ class SalesRepController extends Controller
 
         $this->result->data->total_logged_in = $total_logged_in;
         $this->result->data->total_not_logged_in = $total_not_logged_in;
-
         return response()->json($this->result);
+
     }
 
     public function dashboard()
     {
+
     }
 }

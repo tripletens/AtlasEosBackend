@@ -13,9 +13,14 @@ use App\Models\Dealer;
 use App\Models\Faq;
 use App\Models\ProgramNotes;
 use Barryvdh\DomPDF\Facade as PDF;
+use App\Models\SystemSettings;
+use DB;
 
 use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
+
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 class VendorController extends Controller
 {
@@ -1042,47 +1047,80 @@ class VendorController extends Controller
             if ($separator[1] == '') {
                 $pri_vendor_code = $separator[0];
 
-                $total_sales = Cart::where('vendor', $user_vendor_code)->sum(
-                    'price'
-                );
-                $total_orders = Cart::where('vendor', $user_vendor_code)->sum(
-                    'qty'
-                );
+                array_push($separator, $user_vendor_code);
 
-                $total_sales += Cart::where('vendor', $pri_vendor_code)->sum(
-                    'price'
-                );
-                $total_orders += Cart::where('vendor', $pri_vendor_code)->sum(
-                    'qty'
-                );
-            } else {
+                $uni_arr = [];
+
                 foreach ($separator as $value) {
                     $vendor_code = $value;
+                    if ($value != '') {
+                        $items = DB::table('cart')
+                            ->where('vendor', $value)
+                            ->select('uid')
+                            ->distinct()
+                            ->get();
+
+                        foreach ($items as $value) {
+                            if (!in_array($value->uid, $uni_arr)) {
+                                array_push($uni_arr, $value->uid);
+                            }
+                        }
+                    }
 
                     $total_sales += Cart::where('vendor', $vendor_code)->sum(
                         'price'
                     );
-                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
-                        'qty'
-                    );
-
-                    $total_sales += Cart::where(
-                        'vendor',
-                        $user_vendor_code
-                    )->sum('price');
-                    $total_orders += Cart::where(
-                        'vendor',
-                        $user_vendor_code
-                    )->sum('qty');
                 }
+
+                $total_orders = count($uni_arr);
+            } else {
+                $ar = [];
+                array_push($separator, $user_vendor_code);
+                $uni_arr = [];
+
+                foreach ($separator as $value) {
+                    $vendor_code = $value;
+                    if ($value != '') {
+                        $items = DB::table('cart')
+                            ->where('vendor', $value)
+                            ->select('uid')
+                            ->distinct()
+                            ->get();
+
+                        foreach ($items as $value) {
+                            if (!in_array($value->uid, $uni_arr)) {
+                                array_push($uni_arr, $value->uid);
+                            }
+                        }
+                    }
+
+                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                        'price'
+                    );
+                }
+
+                $total_orders = count($uni_arr);
             }
         } else {
             $total_sales = Cart::where('vendor', $user_vendor_code)->sum(
                 'price'
             );
-            $total_orders = Cart::where('vendor', $user_vendor_code)->sum(
-                'qty'
-            );
+
+            $uni_arr = [];
+
+            $items = DB::table('cart')
+                ->where('vendor', $user_vendor_code)
+                ->select('uid')
+                ->distinct()
+                ->get();
+
+            foreach ($items as $value) {
+                if (!in_array($value->uid, $uni_arr)) {
+                    array_push($uni_arr, $value->uid);
+                }
+            }
+
+            $total_orders = count($uni_arr);
         }
 
         $this->result->status = true;
@@ -1770,5 +1808,131 @@ class VendorController extends Controller
         $this->result->message = 'get all vendors was successful';
         $this->result->data = $vendors;
         return response()->json($this->result);
+    }
+
+    // fetch the sum of order price per vendors per day
+    public function fetch_all_vendor_orders_per_day($id)
+    {
+        // fetch all the orders
+        // $all_orders = Cart::where('dealer', $account)->where('status', '1');
+
+        // return $fetch_settings;
+
+        $vendor_details = Users::where('role', '=', '3')
+            ->where('id', $id)
+            ->get();
+
+        if (!$vendor_details || count($vendor_details) == 0) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't find the vendor";
+            return response()->json($this->result);
+        }
+
+        // return $vendor_details;
+
+        $privileged_vendors = trim(
+            str_replace('"', ' ', $vendor_details[0]->privileged_vendors)
+        );
+
+        $vendor_code = $vendor_details[0]->vendor_code;
+
+        $all_priviledged_vendor_code_array = [];
+
+        # get all the priviledged vendor vendor_codes
+        if ($privileged_vendors !== null) {
+            $all_priviledged_vendor_code_array = explode(
+                ',',
+                $privileged_vendors
+            );
+            array_push($all_priviledged_vendor_code_array, $vendor_code);
+        } else {
+            array_push($all_priviledged_vendor_code_array, $vendor_code);
+        }
+
+        // return $all_priviledged_vendor_code_array;
+
+        $new_all_orders = array_map(function ($vendor_code) {
+            $vendor_code_format = str_replace('\"', '-', $vendor_code);
+            $settings_id = 1;
+            # select the settings
+            $fetch_settings = SystemSettings::find($settings_id);
+
+            $vendor_cart = DB::table('cart')
+                ->where('vendor', $vendor_code)
+                ->whereDate(
+                    'created_at',
+                    '>=',
+                    $fetch_settings->chart_start_date
+                        ? $fetch_settings->chart_start_date
+                        : date('Y-m-d')
+                )
+                ->where('status', '1')
+                ->select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('sum(price) as amount')
+                )
+                ->groupBy('date')
+                ->get()
+                ->toArray();
+
+            # sort by vendor code
+            // return [$vendor_code_format => $vendor_cart];
+            return $vendor_cart;
+
+            // return $get_vendor_details;
+        }, $all_priviledged_vendor_code_array);
+
+        $new_david_array = [];
+
+        foreach ($new_all_orders as $key => $order) {
+            $new_david_array = array_merge($new_david_array, $order);
+        }
+
+        $new_data_array = [];
+
+        foreach ($new_david_array as $key => $value) {
+            $dates = array_values(array_column($new_data_array, 'date'));
+            if (in_array($value->date, $dates)) {
+                $item_index = array_search($value->date, $new_data_array);
+                $new_data_array[$item_index]->amount += $value->amount;
+            } else {
+                array_push($new_data_array, $value);
+            }
+        }
+
+        sort($new_data_array);
+
+        // return $sort_new_array;
+
+        if (!$new_all_orders) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the orders";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->order_count = count($new_data_array);
+        $this->result->data = $new_data_array;
+        $this->result->message = 'All orders per day fetched successfully';
+        return response()->json($this->result);
+    }
+
+    public function flatten_array(array $items, array $flattened = [])
+    {
+        foreach ($items as $item) {
+            if (is_array($item)) {
+                $flattened = $this->flatten_array($item, $flattened);
+                continue;
+            }
+
+            $flattened[] = $item;
+        }
+
+        return $flattened;
     }
 }

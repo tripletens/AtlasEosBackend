@@ -1047,47 +1047,80 @@ class VendorController extends Controller
             if ($separator[1] == '') {
                 $pri_vendor_code = $separator[0];
 
-                $total_sales = Cart::where('vendor', $user_vendor_code)->sum(
-                    'price'
-                );
-                $total_orders = Cart::where('vendor', $user_vendor_code)->sum(
-                    'qty'
-                );
+                array_push($separator, $user_vendor_code);
 
-                $total_sales += Cart::where('vendor', $pri_vendor_code)->sum(
-                    'price'
-                );
-                $total_orders += Cart::where('vendor', $pri_vendor_code)->sum(
-                    'qty'
-                );
-            } else {
+                $uni_arr = [];
+
                 foreach ($separator as $value) {
                     $vendor_code = $value;
+                    if ($value != '') {
+                        $items = DB::table('cart')
+                            ->where('vendor', $value)
+                            ->select('uid')
+                            ->distinct()
+                            ->get();
+
+                        foreach ($items as $value) {
+                            if (!in_array($value->uid, $uni_arr)) {
+                                array_push($uni_arr, $value->uid);
+                            }
+                        }
+                    }
 
                     $total_sales += Cart::where('vendor', $vendor_code)->sum(
                         'price'
                     );
-                    $total_orders += Cart::where('vendor', $vendor_code)->sum(
-                        'qty'
-                    );
-
-                    $total_sales += Cart::where(
-                        'vendor',
-                        $user_vendor_code
-                    )->sum('price');
-                    $total_orders += Cart::where(
-                        'vendor',
-                        $user_vendor_code
-                    )->sum('qty');
                 }
+
+                $total_orders = count($uni_arr);
+            } else {
+                $ar = [];
+                array_push($separator, $user_vendor_code);
+                $uni_arr = [];
+
+                foreach ($separator as $value) {
+                    $vendor_code = $value;
+                    if ($value != '') {
+                        $items = DB::table('cart')
+                            ->where('vendor', $value)
+                            ->select('uid')
+                            ->distinct()
+                            ->get();
+
+                        foreach ($items as $value) {
+                            if (!in_array($value->uid, $uni_arr)) {
+                                array_push($uni_arr, $value->uid);
+                            }
+                        }
+                    }
+
+                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                        'price'
+                    );
+                }
+
+                $total_orders = count($uni_arr);
             }
         } else {
             $total_sales = Cart::where('vendor', $user_vendor_code)->sum(
                 'price'
             );
-            $total_orders = Cart::where('vendor', $user_vendor_code)->sum(
-                'qty'
-            );
+
+            $uni_arr = [];
+
+            $items = DB::table('cart')
+                ->where('vendor', $user_vendor_code)
+                ->select('uid')
+                ->distinct()
+                ->get();
+
+            foreach ($items as $value) {
+                if (!in_array($value->uid, $uni_arr)) {
+                    array_push($uni_arr, $value->uid);
+                }
+            }
+
+            $total_orders = count($uni_arr);
         }
 
         $this->result->status = true;

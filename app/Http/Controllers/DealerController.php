@@ -1053,12 +1053,14 @@ class DealerController extends Controller
                     if (
                         !VendorOrderNotify::where('uid', $user_id)
                             ->where('vendor', $vendor)
+                            ->where('dealer', $dealer)
                             ->where('status', 0)
                             ->exists()
                     ) {
                         VendorOrderNotify::create([
                             'uid' => $user_id,
                             'vendor' => $vendor,
+                            'dealer' => $dealer,
                         ]);
                         $individual = true;
                     }
@@ -1071,12 +1073,14 @@ class DealerController extends Controller
                             if (
                                 !VendorOrderNotify::where('uid', $user_id)
                                     ->where('vendor', $vendor)
+                                    ->where('dealer', $dealer)
                                     ->where('status', 0)
                                     ->exists()
                             ) {
                                 VendorOrderNotify::create([
                                     'uid' => $user_id,
                                     'vendor' => $vendor,
+                                    'dealer' => $dealer,
                                 ]);
                             }
                         }

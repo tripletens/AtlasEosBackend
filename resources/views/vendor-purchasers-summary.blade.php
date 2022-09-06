@@ -151,18 +151,21 @@
         <div class="row">
             <div class="col-6">
 
-                <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SUMMARY') }} </h2>
+                <br>
+                <br>
+                <h2 class="top-title" style="margin-top: 20px">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'PURCHASES BY DEALER (Detailed
+                    display)') }} </h2>
                 @if($dealer != null && $dealer->dealer_name)
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
                 @else
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name: No name found') }}  </h2>
                 @endif
 
-                @if($dealer != null && $dealer->dealer_code)
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account') }}   #: {{ $dealer->dealer_code }}</h2>
+                {{-- @if($dealer != null && $dealer->dealer_code)
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account') }}   #: {{ $dealer->account_id }}</h2>
                 @else
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account #: No dealer code found') }}  </h2>
-                @endif
+                @endif --}}
 
 
                 <h2 class="dealer-name">Date: {{ $printed_at }} (MST)</h2>
@@ -180,11 +183,10 @@
 
     <div class="table-wrapper">
         @if (count($data) > 0)
-            @foreach ($data as $item)
-                <div class="">
+                {{-- <div class="">
                     <h5 class="top-title-table" style="">{{ $item['vendor_name']}}
                     </h5>
-                </div>
+                </div> --}}
                 <div class="table-responsive">
                     <table class="">
                         <thead>
@@ -200,34 +202,35 @@
                         </thead>
             
                         <tbody>
-            
-                            @foreach ($item['data'] as $inner)
+                            @foreach ($data as $item)
+
                                 <tr>
                                     <td class="table-value-custom center-text">
-                                        {{ $inner['qty'] }}
+                                        {{ $item['qty'] }}
                                     </td>
                                     <td class="table-value-custom center-text">
-                                        {{ $inner['atlas_id'] }}
+                                        {{ $item['atlas_id'] }}
                                     </td>
             
                                     <td class="table-value-custom center-text">
-                                        {{ $inner['vendor_product_code'] }}
+                                        {{ $item['vendor_product_code'] }}
                                     </td>
             
                                     <td class="table-value-custom center-text">
-                                        {{ $inner['description'] }}
+                                        {{ $item['desc'] }}
                                     </td>
                                     <td class="table-value-custom right-align">
-                                        {{ number_format(floatval($inner['unit_price']), 2) }}
+                                        {{ number_format(floatval($item['special']), 2) }}
                                     </td>
                                     <td class="table-value-custom right-align">
-                                        {{ number_format($inner['price'], 2) }}
+                                        {{ number_format($item['total'], 2) }}
                                     </td>
                                 </tr>
-            
+
                             @endforeach
+
             
-                            <tr>
+                            {{-- <tr>
                                 <td colspan="5">
                                     <h5 class="each-total-cate-text" style="">
 
@@ -239,20 +242,15 @@
                                         {{ number_format( $item['total'], 2) }}</h5>
                                 </td>
                             </tr>
-            
+             --}}
             
                         </tbody>
                     </table>
                 </div>
-            @endforeach
         @endif
     </div>
 
  
-
-
-
-
     @if (count($data) > 0)
     <div style="width: 100%; text-align: right; border: 1px solid gray; margin-top: 20px">
 
@@ -263,7 +261,7 @@
         </h5>
     </div>
 @endif
- 
+  
 
 
 

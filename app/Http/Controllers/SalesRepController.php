@@ -427,15 +427,18 @@ class SalesRepController extends Controller
                 //     $total_dealers = $total_dealers - 1;
                 // }
 
-                $separator_without_null_values = array_map(function($record){
-                    if($record !== null){
-                        return $record;
-                    }
-                },$separator);
+                // $separator_without_null_values = array_map(function($record){
+                //     if($record !== null){
+                //         return $record;
+                //     }
+                // },$separator);
 
-                $total_dealers = count($separator_without_null_values);
+                // $total_dealers = count($separator_without_null_values);
 
-                foreach ($separator_without_null_values as $value) {
+                // return $separator_without_null_values;
+
+                foreach ($separator as $value) {
+
                     $total_logged_in += Users::where('account_id', $value)
                         ->where('last_login', '!=', null)
                         ->count();

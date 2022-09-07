@@ -355,6 +355,7 @@ class SalesRepController extends Controller
         $total_dealers = 0;
         $total_logged_in = 0;
         $total_not_logged_in = 0;
+        
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
@@ -388,11 +389,11 @@ class SalesRepController extends Controller
 
                     // array_push($dealers_array,$dealer_details);
 
-                    $total_logged_in += Users::where('id', $separator_format)
+                    $total_logged_in += Users::where('account_id', $separator_format)
                         ->where('last_login', '!=', null)
                         ->count();
 
-                    $total_not_logged_in += Users::where('id', $separator_format)
+                    $total_not_logged_in += Users::where('account_id', $separator_format)
                         ->where('last_login', '=', null)
                         ->count();
                 }

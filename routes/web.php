@@ -28,7 +28,7 @@ Route::get('/generate-pdf/{dealer}/{lang}/{current_time}', [
     'generate_pdf',
 ]);
 
-Route::get('/generate-vendor-sales-summary-pdf/{vendor}/{lang}', [
+Route::get('/generate-vendor-sales-summary-pdf/{vendor}/{lang}/{create_time}', [
     VendorController::class,
     'generate_sales_summary_pdf',
 ]);

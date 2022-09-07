@@ -314,8 +314,6 @@ class SeminarController extends Controller
         } else {
 
             // check if the seminar exists
-
-
             $seminar_id = $request->input('seminar_id');
             $dealer_id = $request->input('dealer_id');
             $bookmark_status = $request->input('bookmark_status');

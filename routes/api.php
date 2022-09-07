@@ -867,6 +867,14 @@ Route::group(
             'DealerController@fetch_all_orders_per_day'
         );
 
+        // fetch the vendor purchases per day
+        //
+
+        Route::get(
+            '/fetch-all-vendor-orders-per-day/{id}',
+            'VendorController@fetch_all_vendor_orders_per_day'
+        );
+
         // fetch chart start date
         Route::get('/fetch-start-date', 'DealerController@fetch_start_date');
 

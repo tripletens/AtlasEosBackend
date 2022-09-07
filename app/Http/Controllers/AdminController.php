@@ -79,8 +79,9 @@ class AdminController extends Controller
 
     public function get_unread_report()
     {
-        $count = Report::where('admin_status', 0)->count();
+        ////// $count = Report::where('admin_status', 0)->count();
         $data = Report::where('admin_status', 0)->get();
+        $count = 0;
 
         $checker = [];
         $res = [];
@@ -102,7 +103,8 @@ class AdminController extends Controller
                     ? $dealer_data->dealer_code
                     : null;
 
-                if ($dealer != null) {
+                if ($dealer != null && $dealer != '') {
+                    $count++;
                     $data_push = [
                         'name' => $dealer,
                         'code' => $ticket,

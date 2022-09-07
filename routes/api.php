@@ -1068,5 +1068,12 @@ Route::group(
             '/sales-rep/dealers-summary/{dealer}',
             'SalesRepController@view_dealer_summary_page'
         );
+
+        Route::get(
+            '/sales-rep/dashboard/{user}',
+            'SalesRepController@sales_rep_dashboard'
+        );
+
+
     }
 );

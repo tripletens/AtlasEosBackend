@@ -83,6 +83,11 @@ Route::group(
 
         Route::get('/activate-vendor/{id}', 'AdminController@activate_vendor');
 
+        Route::post(
+            '/admin/edit-dealer-data',
+            'AdminController@edit_dealer_data'
+        );
+
         Route::get(
             '/deactivate-vendor-user/{id}',
             'AdminController@deactivate_vendor_user'
@@ -327,6 +332,11 @@ Route::group(
         Route::get(
             '/admin/get-chat-selected-vendor-users/{code}',
             'AdminController@get_chat_selected_vendor_users'
+        );
+
+        Route::get(
+            '/admin/all-dealership',
+            'AdminController@get_all_dealership'
         );
 
         Route::get('/testing', 'AdminController@testing_api');

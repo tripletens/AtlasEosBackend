@@ -338,7 +338,7 @@ class SalesRepController extends Controller
     public function get_dealers_under_sales_rep($user_id)
     {
         $user_dealers_array = [];
-        $user_data = User::where('id', $user_id)->get()->first();
+        $user_data = Users::where('id', $user_id)->get()->first();
 
         if (!$user_data) {
             $this->result->status = false;
@@ -378,7 +378,7 @@ class SalesRepController extends Controller
     public function get_sales_rep_dealer_purchases($user_id)
     {
         $user_dealers_array = [];
-        $user_data = User::where('id', $user_id)->get()->first();
+        $user_data = Users::where('id', $user_id)->get()->first();
 
         if (!$user_data) {
             $this->result->status = false;

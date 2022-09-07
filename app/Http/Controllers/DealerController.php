@@ -1121,7 +1121,7 @@ class DealerController extends Controller
                 }
             }
 
-            Users::where('id', $uid)->update(['order_status' => 1]);
+            Users::where('id', $uid)->where('account_id',$dealer)->update(['order_status' => 1]);
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -1162,7 +1162,7 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
-                        Users::where('id', $uid)->update([
+                        Users::where('id', $uid)->where('account_id',$dealer)->update([
                             'place_order_date' => Carbon::now(),
                         ]);
 
@@ -1220,7 +1220,7 @@ class DealerController extends Controller
         }
     }
 
-    public function get_report_reply($ticket)
+    public function get_report_reply($ticket,$dealer)
     {
         $selected = ReportReply::where('ticket', $ticket)->get();
 
@@ -1229,6 +1229,7 @@ class DealerController extends Controller
             foreach ($selected as $value) {
                 $user = $value->user;
                 $user_data = Users::where('id', $user)
+                    ->where('account_id',$dealer)
                     ->get()
                     ->first();
 

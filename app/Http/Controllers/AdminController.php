@@ -77,6 +77,60 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function edit_dealer_data(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'dealerName' => 'required',
+            'dealerCode' => 'required',
+            'dealerId' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->dealerName;
+            $code = $request->dealerCode;
+            $id = $request->dealerId;
+
+            // update to the db
+            $update = Dealer::where('id', $id)->update([
+                'dealer_name' => $name,
+                'dealer_code' => $code,
+            ]);
+
+            if ($update) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Dealer Updated Successfully';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Dealer Update failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
+    public function get_all_dealership()
+    {
+        $dealer = Dealer::all();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get all dealership';
+        $this->result->data = $dealer;
+
+        return response()->json($this->result);
+    }
+
     public function get_unread_report()
     {
         ////// $count = Report::where('admin_status', 0)->count();
@@ -2675,10 +2729,21 @@ class AdminController extends Controller
         $vendor = $request->vendor;
         $vendorId = $request->vendorId;
         $location = $request->location;
+        $dealerCode = $request->dealerCode;
+        $dealerName = $request->dealerName;
 
         if ($firstName != '') {
             $update = Users::where('id', $vendorId)->update([
                 'first_name' => $firstName,
+            ]);
+        }
+
+        if ($dealerCode != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'company_name' => $dealerName,
+                'dealer_name' => $dealerName,
+                'account_id' => $dealerCode,
+                'company_code' => $dealerCode,
             ]);
         }
 

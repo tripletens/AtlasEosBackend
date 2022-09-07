@@ -1024,7 +1024,7 @@ class VendorController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';
-        $this->result->data = $response_data;
+        $this->result->data = (array) $response_data;
         // $this->result->data = $dealers;
 
         return response()->json($this->result);

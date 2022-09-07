@@ -97,11 +97,13 @@ class AdminController extends Controller
             $name = $request->dealerName;
             $code = $request->dealerCode;
             $id = $request->dealerId;
+            $location = $request->location;
 
             // update to the db
             $update = Dealer::where('id', $id)->update([
                 'dealer_name' => $name,
                 'dealer_code' => $code,
+                'location' => $location,
             ]);
 
             if ($update) {

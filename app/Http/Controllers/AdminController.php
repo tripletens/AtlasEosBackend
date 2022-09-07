@@ -79,8 +79,9 @@ class AdminController extends Controller
 
     public function get_unread_report()
     {
-        $count = Report::where('admin_status', 0)->count();
+        ////// $count = Report::where('admin_status', 0)->count();
         $data = Report::where('admin_status', 0)->get();
+        $count = 0;
 
         $checker = [];
         $res = [];
@@ -102,7 +103,8 @@ class AdminController extends Controller
                     ? $dealer_data->dealer_code
                     : null;
 
-                if ($dealer != null) {
+                if ($dealer != null && $dealer != '') {
+                    $count++;
                     $data_push = [
                         'name' => $dealer,
                         'code' => $ticket,
@@ -2062,12 +2064,19 @@ class AdminController extends Controller
         $cart_total = 0;
         $total_item_ordered = 0;
 
+        $total_orders = DB::table('cart')
+            ->select('uid')
+            ->distinct()
+            ->get();
+
+        $total_item_ordered = count($total_orders);
+
         if ($cart_data) {
             foreach ($cart_data as $value) {
                 $price = $value->price;
                 $qty = $value->qty;
                 $cart_total += floatval($price);
-                $total_item_ordered += intval($qty);
+                /////   $total_item_ordered += intval($qty);
             }
         }
 
@@ -2870,6 +2879,8 @@ class AdminController extends Controller
         $update = Users::where('id', $id)->update([
             'status' => '0',
         ]);
+
+        // DB::table('users')->where('id', $id)->delete();
 
         if ($update) {
             $this->result->status = true;

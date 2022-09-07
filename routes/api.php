@@ -346,6 +346,11 @@ Route::group(
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
+        Route::get(
+            '/dealer/dealer-privileged-dealers/{user}',
+            'DealerController@get_dealers_privileged_dealers'
+        );
+
         Route::post(
             '/dealer/check-program-state',
             'DealerController@check_end_program'
@@ -771,6 +776,21 @@ Route::group(
         );
 
         Route::get('/vendor/get-vendor-faq', 'VendorController@get_vendor_faq');
+
+        Route::get(
+            '/vendor/generate-vendor-purchaser-summary/{user}/{dealer}/{vendor}/{lang}/{created_time}',
+            'VendorController@generate_vendor_purchasers_summary'
+        );
+
+        Route::get(
+            '/vendor/get-vendor-special-orders/{user}',
+            'VendorController@get_vendor_special_orders'
+        );
+
+        Route::get(
+            '/vendor/get-special-orders-by-vendor/{code}',
+            'VendorController@get_special_orders_by_vendor'
+        );
 
         Route::get(
             '/seminars/remind',

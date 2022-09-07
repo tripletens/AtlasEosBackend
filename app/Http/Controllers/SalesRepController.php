@@ -274,6 +274,8 @@ class SalesRepController extends Controller
             ->get()
             ->first();
 
+        $vendor_uids = [];
+
         $privilaged_dealers = $selected_user->privileged_dealers;
         if ($privilaged_dealers != null) {
             $separator = explode(',', $privilaged_dealers);
@@ -290,108 +292,59 @@ class SalesRepController extends Controller
             foreach ($dealership_codes as $value) {
 
                 $value = str_replace('"', '', trim($value));
-                // get all the dealers with each account ids
-                $dealer_details = Users::where('account_id', $value)->get();
 
-                array_push($all_dealers, $dealer_details);
+                // get all the dealers with each account ids
+                $dealer_details = Users::where('account_id', $value)->get()->toArray();
+
+                // return $dealer_details;
+                $all_dealers = array_merge($dealer_details, $all_dealers);
             }
 
-            $vendor_purchases_array = [];
-
-            foreach ($all_dealers as $key => $dealer) {
-                // $dealer_id = $dealer[$key]['id'];
-                // $dealer_account_id = $dealer[$key]['account_id'];
-                // $dealer_full_name = $dealer[$key]['company_name'];
-                // $dealer_first_name = $dealer[$key]['first_name'];
-                // $dealer_last_name = $dealer[$key]['last_name'];
-
+            foreach ($all_dealers as $dealer) {
+                $dealer = (object) $dealer;
                 $dealer_id = $dealer->id;
-                $dealer_account_id = $dealer->account_id;
-                $dealer_full_name = $dealer->company_name;
-                $dealer_first_name = $dealer->first_name;
-                $dealer_last_name = $dealer->last_name;
-
                 $sum_user_total = Cart::where('uid', $dealer_id)
                     ->get()
                     ->sum('price');
 
-                $vendor_purchases = Cart::where('dealer', $dealer_account_id)->get();
+                $vendor_purchases = Cart::where('uid', $dealer_id)->pluck('uid')->toArray();
 
-                // return $vendor_purchases;
+                // array_merge($vendor_purchases_array, $vendor_purchases);
 
-                array_push($vendor_purchases_array, $vendor_purchases);
-
-                if (count($vendor_purchases) > 0) {
-                    foreach ($vendor_purchases as $key => $cart_data) {
-                        $user_id = $cart_data->uid;
-
-                        // return $cart_data->uid;
-
-                        $user_data = Users::where('id', $user_id)
-                            ->get()
-                            ->first();
-
-                        $sum_user_total = Cart::where('uid', $user_id)
-                            ->get()
-                            ->sum('price');
-
-                        if ($user_data) {
-                            $data = [
-                                'account_id' => $user_data->account_id,
-                                'full_name' => $user_data->company_name,
-                                'user' => $user_id,
-                                'purchaser_name' =>
-                                $user_data->first_name .
-                                    ' ' .
-                                    $user_data->last_name,
-                                'amount' => $sum_user_total,
-                            ];
-
-                            array_push($res_data, $data);
-                        }
+                foreach ($vendor_purchases as $value) {
+                    if (!in_array($value, $vendor_uids)) {
+                        array_push($vendor_uids, $value);
                     }
-                } else {
-
-                    $other_dealers = [
-                        'account_id' => $dealer_account_id,
-                        'full_name' => $dealer_full_name,
-                        'user' => $dealer_id,
-                        'purchaser_name' =>
-                        $dealer_first_name .
-                            ' ' .
-                            $dealer_last_name,
-                        'amount' => 0,
-                    ];
-
-                    array_push($res_data, $other_dealers);
                 }
             }
 
-            // return $vendor_purchases_array;
+            foreach($vendor_uids as $uid){
+                $user_data = Users::where('id', $uid)->get()->first();
+
+                $user_data = (object) $user_data;
+
+                $sum_user_total = Cart::where('uid', $uid)
+                    ->get()
+                    ->sum('price');
+
+                if ($user_data) {
+                    $data = [
+                        'account_id' => $user_data->account_id,
+                        'full_name' => $user_data->company_name,
+                        'user' => $user_data->id,
+                        'purchaser_name' =>
+                        $user_data->first_name .
+                            ' ' .
+                            $user_data->last_name,
+                        'amount' => $sum_user_total,
+                    ];
+
+                    array_push($res_data, $data);
+                }
+            };
 
             // return $res_data;
 
-            // return $value;
-
-            // if (count($vendor_purchases) > 0) {
-
-
-            //     // $format_dealers_data = array_map(function ($record) {
-            //     //     $data = [
-            //     //         'account_id' => $record->account_id,
-            //     //         'full_name' => $record->company_name,
-            //     //         'user' => $record->id,
-            //     //         'purchaser_name' => $record->first_name . ' ' . $record,
-            //     //         'amount' => null,
-            //     //     ];
-            //     //     return $data;
-            //     // }, $dealer_details);
-
-            //     // return $format_dealers_data;
-            //     // array_push($res_data, $format_dealers_data);
-            // }
-
-            // return $all_dealers;
 
             /////// Sorting //////////
             usort($res_data, function ($a, $b) {
@@ -410,6 +363,39 @@ class SalesRepController extends Controller
             $this->result->data = $res_data;
             return response()->json($this->result);
         }
+    }
+
+    public function fetch_unique_res_data($res_data, $all_dealers)
+    {
+        foreach ($all_dealers as $dealer) {
+            $dealer = (object) $dealer;
+            $dealer_id = $dealer->id;
+            $dealer_account_id = $dealer->account_id;
+            $dealer_full_name = $dealer->company_name;
+            $dealer_first_name = $dealer->first_name;
+            $dealer_last_name = $dealer->last_name;
+
+            foreach ($res_data as $value) {
+                $value = (object) $value;
+
+                $other_dealers = [
+                    'account_id' => $dealer_account_id,
+                    'full_name' => $dealer_full_name,
+                    'user' => $dealer_id,
+                    'purchaser_name' =>
+                    $dealer_first_name .
+                        ' ' .
+                        $dealer_last_name,
+                    'amount' => 0,
+                ];
+
+                if ($value->user !== $dealer_id) {
+                    array_push($res_data, $other_dealers);
+                }
+            }
+        }
+
+        return $res_data;
     }
 
     public function sales_rep_dashboard_analysis($user)

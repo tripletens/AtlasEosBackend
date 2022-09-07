@@ -1047,6 +1047,13 @@ Route::group(
             'SalesRepController@view_dealer_summary'
         );
 
+        // get the dealers under a salerep
+        Route::get(
+            '/sales-rep/dealers/{user}',
+            'SalesRepController@get_dealers_under_sales_rep'
+        );
+
+
         Route::get(
             '/sales-rep/dealers-sales/{user}',
             'SalesRepController@all_dealers_sales'

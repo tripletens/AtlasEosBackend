@@ -283,9 +283,13 @@ class SalesRepController extends Controller
                 }
             }
 
+            // return $dealership_codes;
+
             foreach ($dealership_codes as $value) {
                 $value = trim($value);
                 $vendor_purchases = Cart::where('dealer', $value)->get();
+
+                $dealer_details = Users::where('account_id',$value)->get()->first();
 
                 if (count($vendor_purchases) > 0) {
                     foreach ($vendor_purchases as $cart_data) {
@@ -313,6 +317,15 @@ class SalesRepController extends Controller
                             array_push($res_data, $data);
                         }
                     }
+                }else{
+                    $data = [
+                        'account_id' => $dealer_details->account_id,
+                        'dealer_name' => $dealer_details->company_name,
+                        'user' => $dealer_details->id,
+                        'purchaser_name' => null,
+                        'amount' => null,
+                    ];
+                    array_push($res_data, $data);
                 }
             }
 
@@ -350,30 +363,51 @@ class SalesRepController extends Controller
             $privilaged_dealers = $selected_user->privileged_dealers;
             if ($privilaged_dealers != null) {
                 $separator = explode(',', $privilaged_dealers);
+                //
+
+                // return str_replace('\"','00',$separator);
 
                 // if (\in_array(null, $separator)) {
                 //     $total_dealers = $total_dealers - 1;
                 // }
 
-                // $separator_without_null_values = array_map(function($record){
-                //     if($record !== null){
-                //         return $record;
-                //     }
-                // },$separator);
+                $separator_without_null_values = array_map(function($record){
+                    if($record !== null){
+                        return $record;
+                    }
+                },$separator);
 
                 $total_dealers = count($separator);
 
-                // return $separator_without_null_values;
+                $dealers_array = [];
 
                 foreach ($separator as $value) {
-                    $total_logged_in += Users::where('account_id', $value)
+                    $separator_format = str_replace('"','',$value);
+
+                    $dealer_details = Users::where('account_id',$separator_format)->get();
+
+                    // array_push($dealers_array,$dealer_details);
+
+                    $total_logged_in += Users::where('id', $separator_format)
                         ->where('last_login', '!=', null)
                         ->count();
 
-                    $total_not_logged_in += Users::where('account_id', $value)
+                    $total_not_logged_in += Users::where('id', $separator_format)
                         ->where('last_login', '=', null)
                         ->count();
                 }
+
+                // foreach($dealers_array as $dealers_item){
+                //     if($dealers_item->last_login !== null){
+                //         $total_logged_in ++;
+                //     }else{
+                //         $total_not_logged_in ++;
+                //     }
+                // }
+
+                // return $dealers_array;
+
+                // return $total_not_logged_in;
 
                 $all_vendor_data = Vendors::all();
 

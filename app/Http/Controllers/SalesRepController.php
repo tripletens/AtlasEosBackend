@@ -399,7 +399,7 @@ class SalesRepController extends Controller
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
                 $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
-                    ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name')->get();
+                    ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array

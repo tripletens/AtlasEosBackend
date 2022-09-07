@@ -462,7 +462,7 @@ Route::group(
         );
 
         Route::get(
-            '/dealer/get-ticket-first/{ticket}',
+            '/dealer/get-ticket-first/{ticket}/{dealer_id}',
             'DealerController@get_first_ticket'
         );
 

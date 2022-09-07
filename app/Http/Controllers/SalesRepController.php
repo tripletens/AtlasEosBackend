@@ -56,6 +56,76 @@ class SalesRepController extends Controller
         ];
     }
 
+    public function generate_sales_rep_purchasers_pdf($user)
+    {
+        $dealership_codes = [];
+        $res_data = [];
+        $selected_user = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $privilaged_dealers = $selected_user->privileged_dealers;
+        if ($privilaged_dealers != null) {
+            $separator = explode(',', $privilaged_dealers);
+
+            foreach ($separator as $value) {
+                if (!in_array($value, $dealership_codes)) {
+                    array_push($dealership_codes, $value);
+                }
+            }
+
+            foreach ($dealership_codes as $value) {
+                $value = trim($value);
+                $vendor_purchases = Cart::where('dealer', $value)->get();
+
+                if (count($vendor_purchases) > 0) {
+                    foreach ($vendor_purchases as $cart_data) {
+                        $user_id = $cart_data->uid;
+                        $user_data = Users::where('id', $user_id)
+                            ->get()
+                            ->first();
+
+                        $sum_user_total = Cart::where('uid', $user_id)
+                            ->get()
+                            ->sum('price');
+
+                        if ($user_data) {
+                            $data = [
+                                'account_id' => $user_data->account_id,
+                                'dealer_name' => $user_data->company_name,
+                                'user' => $user_id,
+                                'purchaser_name' =>
+                                    $user_data->first_name .
+                                    ' ' .
+                                    $user_data->last_name,
+                                'amount' => $sum_user_total,
+                            ];
+
+                            array_push($res_data, $data);
+                        }
+                    }
+                }
+            }
+
+            /////// Sorting //////////
+            usort($res_data, function ($a, $b) {
+                //Sort the array using a user defined function
+                return $a['amount'] > $b['amount'] ? -1 : 1; //Compare the scores
+            });
+
+            $res_data = array_map(
+                'unserialize',
+                array_unique(array_map('serialize', $res_data))
+            );
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Purchasers by Dealers';
+            $this->result->data = $res_data;
+            return response()->json($this->result);
+        }
+    }
+
     public function view_dealer_summary_page($dealer)
     {
         $vendors = [];
@@ -273,7 +343,9 @@ class SalesRepController extends Controller
             ->get()
             ->first();
 
-        $privilaged_dealers = $selected_user->privileged_dealers;
+        $privilaged_dealers = isset($selected_user->privileged_dealers)
+            ? $selected_user->privileged_dealers
+            : null;
         if ($privilaged_dealers != null) {
             $separator = explode(',', $privilaged_dealers);
 
@@ -383,6 +455,7 @@ class SalesRepController extends Controller
                 $dealers_array = [];
 
                 foreach ($separator as $value) {
+                
                     $separator_format = str_replace('"','',$value);
 
                     $dealer_details = Users::where('account_id',$separator_format)->get();
@@ -390,6 +463,7 @@ class SalesRepController extends Controller
                     // array_push($dealers_array,$dealer_details);
 
                     $total_logged_in += Users::where('account_id', $separator_format)
+
                         ->where('last_login', '!=', null)
                         ->count();
 

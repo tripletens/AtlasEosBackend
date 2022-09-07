@@ -543,7 +543,6 @@ class SalesRepController extends Controller
                     // array_push($dealers_array,$dealer_details);
 
                     $total_logged_in += Users::where('account_id', $separator_format)
-
                         ->where('last_login', '!=', null)
                         ->count();
 
@@ -582,6 +581,73 @@ class SalesRepController extends Controller
         return response()->json($this->result);
     }
 
+    public function sales_rep_dashboard($user_id){
+        $user_dealers_array = [];
+        $user_data = Users::where('id', $user_id)->get()->first();
+
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        $user_privilaged_dealer_last_login = 0;
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                    ->select('id','account_id','first_name','last_name','company_name','last_login')
+                    ->get();
+
+                $get_priviledged_dealer_details->dealer_count = Users::where('account_id', $user_privileged_dealers_format)
+                ->count();
+
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+        }
+
+        $number_of_dealers = count($user_dealers_array);
+
+        $total_price = 0;
+
+        $last_loggedin_dealer_count = 0;
+
+        $last_not_loggedin_dealer_count = 0;
+
+        foreach($user_dealers_array as $dealer){
+            $cart_data_total = Cart::where('uid',$dealer->id)->sum('price');
+            $total_price += $cart_data_total;
+
+            if($dealer->last_login !== null){
+                $last_loggedin_dealer_count++;
+            }else{
+                $last_not_loggedin_dealer_count++;
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Sales Rep dashboard details fetched successfully';
+        $this->result->data->total_sales = $total_price;
+        $this->result->data->total_dealers = $number_of_dealers;
+
+        $this->result->data->total_logged_in = $last_loggedin_dealer_count;
+        $this->result->data->total_not_logged_in = $last_not_loggedin_dealer_count;
+        return response()->json($this->result);
+    }
     public function dashboard()
     {
     }

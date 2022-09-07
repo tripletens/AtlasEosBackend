@@ -552,18 +552,6 @@ class SalesRepController extends Controller
                         ->count();
                 }
 
-                // foreach($dealers_array as $dealers_item){
-                //     if($dealers_item->last_login !== null){
-                //         $total_logged_in ++;
-                //     }else{
-                //         $total_not_logged_in ++;
-                //     }
-                // }
-
-                // return $dealers_array;
-
-                // return $total_not_logged_in;
-
                 $all_vendor_data = Vendors::all();
 
                 foreach ($all_vendor_data as $value) {

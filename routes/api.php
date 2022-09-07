@@ -457,7 +457,7 @@ Route::group(
         );
 
         Route::get(
-            '/dealer/get-report-replies/{ticket}',
+            '/dealer/get-report-replies/{ticket}/{dealer}',
             'DealerController@get_report_reply'
         );
 

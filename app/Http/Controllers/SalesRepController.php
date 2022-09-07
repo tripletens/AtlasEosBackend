@@ -339,6 +339,7 @@ class SalesRepController extends Controller
     {
         $dealership_codes = [];
         $res_data = [];
+        $all_dealers = [];
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
@@ -357,23 +358,45 @@ class SalesRepController extends Controller
 
             // return $dealership_codes;
 
+
             foreach ($dealership_codes as $value) {
 
                 $value = str_replace('"', '', trim($value));
-
-                $vendor_purchases = Cart::where('dealer', $value)->get();
-
                 // get all the dealers with each account ids
                 $dealer_details = Users::where('account_id', $value)->get();
 
-                // return $value;
+                array_push($all_dealers, $dealer_details);
+            }
+
+            $vendor_purchases_array = [];
+
+            foreach ($all_dealers as $key => $dealer) {
+                $dealer_id = $dealer[$key]['id'];
+                $dealer_account_id = $dealer[$key]['account_id'];
+                $dealer_full_name = $dealer[$key]['company_name'];
+                $dealer_first_name = $dealer[$key]['first_name'];
+                $dealer_last_name = $dealer[$key]['last_name'];
+
+                $sum_user_total = Cart::where('uid', $dealer_id)
+                    ->get()
+                    ->sum('price');
+
+                $vendor_purchases = Cart::where('dealer', $dealer_account_id)->get();
+
+                // return $vendor_purchases;
+
+                array_push($vendor_purchases_array, $vendor_purchases);
 
                 if (count($vendor_purchases) > 0) {
-                    foreach ($vendor_purchases as $cart_data) {
+                    foreach ($vendor_purchases as $key => $cart_data) {
                         $user_id = $cart_data->uid;
+
+                        // return $cart_data->uid;
+
                         $user_data = Users::where('id', $user_id)
                             ->get()
                             ->first();
+
 
                         $sum_user_total = Cart::where('uid', $user_id)
                             ->get()
@@ -395,23 +418,48 @@ class SalesRepController extends Controller
                         }
                     }
                 }
+                else{
 
-
-                $format_dealers_data = array_map(function ($record) {
-                    $data = [
-                        'account_id' => $record->account_id,
-                        'full_name' => $record->company_name,
-                        'user' => $record->id,
-                        'purchaser_name' => $record->first_name . ' ' . $record,
-                        'amount' => null,
+                    $other_dealers = [
+                        'account_id' => $dealer_account_id,
+                        'full_name' => $dealer_full_name,
+                        'user' => $dealer_id,
+                        'purchaser_name' =>
+                        $dealer_first_name .
+                            ' ' .
+                            $dealer_last_name,
+                        'amount' => 0,
                     ];
-                    return $data;
-                }, $dealer_details);
 
-                return $format_dealers_data;
-                array_push($res_data, $format_dealers_data);
+                    array_push($res_data, $other_dealers);
+                }
             }
 
+            // return $vendor_purchases_array;
+
+            // return $res_data;
+
+            // return $value;
+
+            // if (count($vendor_purchases) > 0) {
+
+
+            //     // $format_dealers_data = array_map(function ($record) {
+            //     //     $data = [
+            //     //         'account_id' => $record->account_id,
+            //     //         'full_name' => $record->company_name,
+            //     //         'user' => $record->id,
+            //     //         'purchaser_name' => $record->first_name . ' ' . $record,
+            //     //         'amount' => null,
+            //     //     ];
+            //     //     return $data;
+            //     // }, $dealer_details);
+
+            //     // return $format_dealers_data;
+            //     // array_push($res_data, $format_dealers_data);
+            // }
+
+            // return $all_dealers;
 
             /////// Sorting //////////
             usort($res_data, function ($a, $b) {

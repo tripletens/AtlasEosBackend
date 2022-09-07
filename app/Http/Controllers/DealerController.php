@@ -60,6 +60,39 @@ class DealerController extends Controller
         ];
     }
 
+    public function get_dealers_privileged_dealers($user)
+    {
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+        $privileged_dealers = isset($user_data->privileged_dealers)
+            ? $user_data->privileged_dealers
+            : null;
+
+        $res_data = [];
+
+        if ($privileged_dealers != null) {
+            $expand = explode(',', $privileged_dealers);
+            array_unique($expand);
+
+            foreach ($expand as $value) {
+                $dealer_data = Dealer::where('dealer_code', $value)
+                    ->get()
+                    ->first();
+                if ($dealer_data) {
+                    array_push($res_data, $dealer_data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'privileged dealers ';
+        $this->result->data = $res_data;
+
+        return response()->json($this->result);
+    }
+
     public function check_end_program(Request $request)
     {
         $count_down = ProgramCountdown::where('status', '1')

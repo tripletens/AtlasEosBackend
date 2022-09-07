@@ -1016,10 +1016,15 @@ class VendorController extends Controller
             }
         }
 
+        $response_data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $res))
+        );
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';
-        $this->result->data = $res;
+        $this->result->data = $response_data;
         // $this->result->data = $dealers;
 
         return response()->json($this->result);

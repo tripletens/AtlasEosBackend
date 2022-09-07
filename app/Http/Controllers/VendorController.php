@@ -1037,6 +1037,8 @@ class VendorController extends Controller
             ->get()
             ->first();
 
+        return $selected_user;
+
         $user_vendor_code = $selected_user->vendor_code;
         $privilaged_vendors = isset($selected_user->privileged_vendors)
             ? $selected_user->privileged_vendors
@@ -1054,25 +1056,25 @@ class VendorController extends Controller
                 foreach ($separator as $value) {
                     $vendor_code = $value;
                     if ($value != '') {
-                        $items = DB::table('cart')
+                        $total_orders += DB::table('cart')
                             ->where('vendor', $value)
                             ->select('uid')
-                            ->distinct()
-                            ->get();
+                            ->count();
 
-                        foreach ($items as $value) {
-                            if (!in_array($value->uid, $uni_arr)) {
-                                array_push($uni_arr, $value->uid);
-                            }
-                        }
+                        // foreach ($items as $value) {
+                        //     if (!in_array($value->uid, $uni_arr)) {
+                        //         array_push($uni_arr, $value->uid);
+                        //     }
+                        // }
+
+                        $total_sales += Cart::where(
+                            'vendor',
+                            $vendor_code
+                        )->sum('price');
                     }
-
-                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
-                        'price'
-                    );
                 }
 
-                $total_orders = count($uni_arr);
+                // $total_orders = count($uni_arr);
             } else {
                 $ar = [];
                 array_push($separator, $user_vendor_code);
@@ -1081,22 +1083,22 @@ class VendorController extends Controller
                 foreach ($separator as $value) {
                     $vendor_code = $value;
                     if ($value != '') {
-                        $items = DB::table('cart')
+                        $total_orders += DB::table('cart')
                             ->where('vendor', $value)
                             ->select('uid')
-                            ->distinct()
-                            ->get();
+                            ->count();
 
-                        foreach ($items as $value) {
-                            if (!in_array($value->uid, $uni_arr)) {
-                                array_push($uni_arr, $value->uid);
-                            }
-                        }
+                        // foreach ($items as $value) {
+                        //     if (!in_array($value->uid, $uni_arr)) {
+                        //         array_push($uni_arr, $value->uid);
+                        //     }
+                        // }
+
+                        $total_sales += Cart::where(
+                            'vendor',
+                            $vendor_code
+                        )->sum('price');
                     }
-
-                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
-                        'price'
-                    );
                 }
 
                 $total_orders = count($uni_arr);
@@ -1108,19 +1110,18 @@ class VendorController extends Controller
 
             $uni_arr = [];
 
-            $items = DB::table('cart')
+            $total_orders += DB::table('cart')
                 ->where('vendor', $user_vendor_code)
                 ->select('uid')
-                ->distinct()
-                ->get();
+                ->count();
 
-            foreach ($items as $value) {
-                if (!in_array($value->uid, $uni_arr)) {
-                    array_push($uni_arr, $value->uid);
-                }
-            }
+            // foreach ($items as $value) {
+            //     if (!in_array($value->uid, $uni_arr)) {
+            //         array_push($uni_arr, $value->uid);
+            //     }
+            // }
 
-            $total_orders = count($uni_arr);
+            // $total_orders = count($uni_arr);
         }
 
         $this->result->status = true;

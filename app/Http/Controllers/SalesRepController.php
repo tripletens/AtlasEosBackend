@@ -265,16 +265,53 @@ class SalesRepController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_dealers_under_sales_rep($user_id){
+        $user_dealers_array = [];
+        $user_data = User::where('id',$user_id)->get()->first();
+
+        if(!$user_data){
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        if($user_privileged_dealers != null){
+
+            $user_privileged_dealers_array = explode(',',$user_privileged_dealers);
+
+            foreach($user_privileged_dealers_array as $user_privilaged_dealer){
+                $user_privileged_dealers_format = str_replace('"','',$user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = User::where('account_id',$user_privileged_dealers_format)
+                    ->select('id','account_id','full_name','first_name','last_name','vendor_name','company_name')->get();
+
+                if(count($get_priviledged_dealer_details) > 0 ){
+                    // yay its an array
+                    array_push($user_dealers_array,...$get_priviledged_dealer_details);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealers under sales rep fetched successfully';
+        $this->result->data = $user_dealers_array;
+        return response()->json($this->result);
+    }
+
+
     public function get_purchases_dealers($user)
     {
         $dealership_codes = [];
         $res_data = [];
-        $all_dealers = [];
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
-
-        $vendor_uids = [];
 
         $privilaged_dealers = $selected_user->privileged_dealers;
         if ($privilaged_dealers != null) {
@@ -286,65 +323,47 @@ class SalesRepController extends Controller
                 }
             }
 
-            // return $dealership_codes;
+            return $dealership_codes;
+
 
 
             foreach ($dealership_codes as $value) {
+                $value = trim($value);
+                $vendor_purchases = Cart::where('dealer', $value)->get();
 
-                $value = str_replace('"', '', trim($value));
+                if (count($vendor_purchases) > 0) {
+                    foreach ($vendor_purchases as $cart_data) {
+                        $user_id = $cart_data->uid;
+                        $user_data = Users::where('id', $user_id)
+                            ->get()
+                            ->first();
 
-                // get all the dealers with each account ids
-                $dealer_details = Users::where('account_id', $value)->get()->toArray();
+                        $sum_user_total = Cart::where('uid', $user_id)
+                            ->get()
+                            ->sum('price');
 
-                // return $dealer_details;
-                $all_dealers = array_merge($dealer_details, $all_dealers);
-            }
+                        if ($user_data) {
+                            $data = [
+                                'account_id' => $user_data->account_id,
+                                'dealer_name' => $user_data->company_name,
+                                'user' => $user_id,
+                                'purchaser_name' =>
+                                    $user_data->first_name .
+                                    ' ' .
+                                    $user_data->last_name,
+                                'amount' => $sum_user_total,
+                            ];
 
-            foreach ($all_dealers as $dealer) {
-                $dealer = (object) $dealer;
-                $dealer_id = $dealer->id;
-                $sum_user_total = Cart::where('uid', $dealer_id)
-                    ->get()
-                    ->sum('price');
-
-                $vendor_purchases = Cart::where('uid', $dealer_id)->pluck('uid')->toArray();
-
-                // array_merge($vendor_purchases_array, $vendor_purchases);
-
-                foreach ($vendor_purchases as $value) {
-                    if (!in_array($value, $vendor_uids)) {
-                        array_push($vendor_uids, $value);
+                            array_push($res_data, $data);
+                        }
                     }
+                }else{
+                    // $data = [
+
+                    // ]
+                    // array_push($res_data, $data);
                 }
             }
-
-            foreach($vendor_uids as $uid){
-                $user_data = Users::where('id', $uid)->get()->first();
-
-                $user_data = (object) $user_data;
-
-                $sum_user_total = Cart::where('uid', $uid)
-                    ->get()
-                    ->sum('price');
-
-                if ($user_data) {
-                    $data = [
-                        'account_id' => $user_data->account_id,
-                        'full_name' => $user_data->company_name,
-                        'user' => $user_data->id,
-                        'purchaser_name' =>
-                        $user_data->first_name .
-                            ' ' .
-                            $user_data->last_name,
-                        'amount' => $sum_user_total,
-                    ];
-
-                    array_push($res_data, $data);
-                }
-            };
-
-            // return $res_data;
-
 
             /////// Sorting //////////
             usort($res_data, function ($a, $b) {
@@ -365,39 +384,6 @@ class SalesRepController extends Controller
         }
     }
 
-    public function fetch_unique_res_data($res_data, $all_dealers)
-    {
-        foreach ($all_dealers as $dealer) {
-            $dealer = (object) $dealer;
-            $dealer_id = $dealer->id;
-            $dealer_account_id = $dealer->account_id;
-            $dealer_full_name = $dealer->company_name;
-            $dealer_first_name = $dealer->first_name;
-            $dealer_last_name = $dealer->last_name;
-
-            foreach ($res_data as $value) {
-                $value = (object) $value;
-
-                $other_dealers = [
-                    'account_id' => $dealer_account_id,
-                    'full_name' => $dealer_full_name,
-                    'user' => $dealer_id,
-                    'purchaser_name' =>
-                    $dealer_first_name .
-                        ' ' .
-                        $dealer_last_name,
-                    'amount' => 0,
-                ];
-
-                if ($value->user !== $dealer_id) {
-                    array_push($res_data, $other_dealers);
-                }
-            }
-        }
-
-        return $res_data;
-    }
-
     public function sales_rep_dashboard_analysis($user)
     {
         $total_sales = 0;
@@ -405,7 +391,6 @@ class SalesRepController extends Controller
         $total_dealers = 0;
         $total_logged_in = 0;
         $total_not_logged_in = 0;
-
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
@@ -422,28 +407,28 @@ class SalesRepController extends Controller
                 //     $total_dealers = $total_dealers - 1;
                 // }
 
-                $separator_without_null_values = array_map(function ($record) {
-                    if ($record !== null) {
+                $separator_without_null_values = array_map(function($record){
+                    if($record !== null){
                         return $record;
                     }
-                }, $separator);
+                },$separator);
 
-                // $total_dealers = count($separator);
+                $total_dealers = count($separator);
 
                 $dealers_array = [];
 
                 foreach ($separator as $value) {
-                    $separator_format = str_replace('"', '', $value);
+                    $separator_format = str_replace('"','',$value);
 
-                    $total_dealers += Users::where('account_id', $separator_format)->count();
+                    $dealer_details = Users::where('account_id',$separator_format)->get();
 
                     // array_push($dealers_array,$dealer_details);
 
-                    $total_logged_in += Users::where('account_id', $separator_format)
+                    $total_logged_in += Users::where('id', $separator_format)
                         ->where('last_login', '!=', null)
                         ->count();
 
-                    $total_not_logged_in += Users::where('account_id', $separator_format)
+                    $total_not_logged_in += Users::where('id', $separator_format)
                         ->where('last_login', '=', null)
                         ->count();
                 }
@@ -488,9 +473,11 @@ class SalesRepController extends Controller
         $this->result->data->total_logged_in = $total_logged_in;
         $this->result->data->total_not_logged_in = $total_not_logged_in;
         return response()->json($this->result);
+
     }
 
     public function dashboard()
     {
+
     }
 }

@@ -286,10 +286,15 @@ class SalesRepController extends Controller
             // return $dealership_codes;
 
             foreach ($dealership_codes as $value) {
-                $value = trim($value);
+
+                $value = str_replace('"', '', trim($value));
+
                 $vendor_purchases = Cart::where('dealer', $value)->get();
 
-                $dealer_details = Users::where('account_id',$value)->get()->first();
+                // get all the dealers with each account ids
+                $dealer_details = Users::where('account_id', $value)->get();
+
+                // return $value;
 
                 if (count($vendor_purchases) > 0) {
                     foreach ($vendor_purchases as $cart_data) {
@@ -305,10 +310,10 @@ class SalesRepController extends Controller
                         if ($user_data) {
                             $data = [
                                 'account_id' => $user_data->account_id,
-                                'dealer_name' => $user_data->company_name,
+                                'full_name' => $user_data->company_name,
                                 'user' => $user_id,
                                 'purchaser_name' =>
-                                    $user_data->first_name .
+                                $user_data->first_name .
                                     ' ' .
                                     $user_data->last_name,
                                 'amount' => $sum_user_total,
@@ -317,17 +322,24 @@ class SalesRepController extends Controller
                             array_push($res_data, $data);
                         }
                     }
-                }else{
+                }
+
+
+                $format_dealers_data = array_map(function ($record) {
                     $data = [
-                        'account_id' => $dealer_details->account_id,
-                        'dealer_name' => $dealer_details->company_name,
-                        'user' => $dealer_details->id,
-                        'purchaser_name' => null,
+                        'account_id' => $record->account_id,
+                        'full_name' => $record->company_name,
+                        'user' => $record->id,
+                        'purchaser_name' => $record->first_name . ' ' . $record,
                         'amount' => null,
                     ];
-                    array_push($res_data, $data);
-                }
+                    return $data;
+                }, $dealer_details);
+
+                return $format_dealers_data;
+                array_push($res_data, $format_dealers_data);
             }
+
 
             /////// Sorting //////////
             usort($res_data, function ($a, $b) {
@@ -355,7 +367,7 @@ class SalesRepController extends Controller
         $total_dealers = 0;
         $total_logged_in = 0;
         $total_not_logged_in = 0;
-        
+
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
@@ -372,20 +384,20 @@ class SalesRepController extends Controller
                 //     $total_dealers = $total_dealers - 1;
                 // }
 
-                $separator_without_null_values = array_map(function($record){
-                    if($record !== null){
+                $separator_without_null_values = array_map(function ($record) {
+                    if ($record !== null) {
                         return $record;
                     }
-                },$separator);
+                }, $separator);
 
-                $total_dealers = count($separator);
+                // $total_dealers = count($separator);
 
                 $dealers_array = [];
 
                 foreach ($separator as $value) {
-                    $separator_format = str_replace('"','',$value);
+                    $separator_format = str_replace('"', '', $value);
 
-                    $dealer_details = Users::where('account_id',$separator_format)->get();
+                    $total_dealers += Users::where('account_id', $separator_format)->count();
 
                     // array_push($dealers_array,$dealer_details);
 
@@ -438,11 +450,9 @@ class SalesRepController extends Controller
         $this->result->data->total_logged_in = $total_logged_in;
         $this->result->data->total_not_logged_in = $total_not_logged_in;
         return response()->json($this->result);
-
     }
 
     public function dashboard()
     {
-
     }
 }

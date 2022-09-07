@@ -358,8 +358,7 @@ class SalesRepController extends Controller
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
-                    ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name')->get();
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
@@ -552,18 +551,6 @@ class SalesRepController extends Controller
                         ->where('last_login', '=', null)
                         ->count();
                 }
-
-                // foreach($dealers_array as $dealers_item){
-                //     if($dealers_item->last_login !== null){
-                //         $total_logged_in ++;
-                //     }else{
-                //         $total_not_logged_in ++;
-                //     }
-                // }
-
-                // return $dealers_array;
-
-                // return $total_not_logged_in;
 
                 $all_vendor_data = Vendors::all();
 

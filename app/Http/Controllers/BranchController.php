@@ -154,10 +154,39 @@ class BranchController extends Controller
 
     # fetch all the dealers in a branch
     public function branch_dealers($uid){
-        $dealers = $this->get_dealers_in_branch($uid);
+        // $dealers = $this->get_dealers_in_branch($uid);
+        $user_dealers_array = [];
+        $user_data = Users::where('id', $uid)->get()->first();
+
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
+
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+        }
 
         $this->result->status = true;
-        $this->result->data = $dealers;
+        $this->result->data = $user_dealers_array;
         $this->result->status_code = 200;
         $this->result->message = 'Branch dealers fetched successfully';
         return response()->json($this->result);

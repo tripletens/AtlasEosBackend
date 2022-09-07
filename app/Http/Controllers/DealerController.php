@@ -1307,7 +1307,7 @@ class DealerController extends Controller
         }
     }
 
-    public function get_first_ticket($ticket)
+    public function get_first_ticket($ticket,$dealer_id)
     {
         $selected = Report::where('ticket_id', $ticket)
             ->get()
@@ -1315,6 +1315,7 @@ class DealerController extends Controller
 
         $user_id = $selected->user_id;
         $user_data = Users::where('id', $user_id)
+            ->where('account_id',$dealer_id)
             ->get()
             ->first();
 

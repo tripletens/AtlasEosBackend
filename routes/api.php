@@ -346,6 +346,11 @@ Route::group(
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
+        Route::get(
+            '/dealer/dealer-privileged-dealers/{user}',
+            'DealerController@get_dealers_privileged_dealers'
+        );
+
         Route::post(
             '/dealer/check-program-state',
             'DealerController@check_end_program'

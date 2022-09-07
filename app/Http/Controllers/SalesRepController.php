@@ -433,7 +433,7 @@ class SalesRepController extends Controller
                 //     }
                 // },$separator);
 
-                // $total_dealers = count($separator_without_null_values);
+                $total_dealers = count($separator);
 
                 // return $separator_without_null_values;
 

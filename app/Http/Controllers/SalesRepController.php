@@ -299,11 +299,17 @@ class SalesRepController extends Controller
             $vendor_purchases_array = [];
 
             foreach ($all_dealers as $key => $dealer) {
-                $dealer_id = $dealer[$key]['id'];
-                $dealer_account_id = $dealer[$key]['account_id'];
-                $dealer_full_name = $dealer[$key]['company_name'];
-                $dealer_first_name = $dealer[$key]['first_name'];
-                $dealer_last_name = $dealer[$key]['last_name'];
+                // $dealer_id = $dealer[$key]['id'];
+                // $dealer_account_id = $dealer[$key]['account_id'];
+                // $dealer_full_name = $dealer[$key]['company_name'];
+                // $dealer_first_name = $dealer[$key]['first_name'];
+                // $dealer_last_name = $dealer[$key]['last_name'];
+
+                $dealer_id = $dealer->id;
+                $dealer_account_id = $dealer->account_id;
+                $dealer_full_name = $dealer->company_name;
+                $dealer_first_name = $dealer->first_name;
+                $dealer_last_name = $dealer->last_name;
 
                 $sum_user_total = Cart::where('uid', $dealer_id)
                     ->get()
@@ -325,7 +331,6 @@ class SalesRepController extends Controller
                             ->get()
                             ->first();
 
-
                         $sum_user_total = Cart::where('uid', $user_id)
                             ->get()
                             ->sum('price');
@@ -345,8 +350,7 @@ class SalesRepController extends Controller
                             array_push($res_data, $data);
                         }
                     }
-                }
-                else{
+                } else {
 
                     $other_dealers = [
                         'account_id' => $dealer_account_id,

@@ -42,6 +42,7 @@ class Users extends Authenticatable implements JWTSubject
         'access_level_second',
         'region',
         'designation',
+        'switch_state',
     ];
 
     public function getJWTIdentifier()
@@ -54,8 +55,5 @@ class Users extends Authenticatable implements JWTSubject
         return [];
     }
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 }

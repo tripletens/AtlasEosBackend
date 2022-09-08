@@ -409,7 +409,6 @@ class SalesRepController extends Controller
         }
 
         // return $user_dealers_array;
-
         $unique_dealers = [];
 
         foreach ($user_dealers_array as $user_dealer) {
@@ -417,7 +416,6 @@ class SalesRepController extends Controller
                 array_push($unique_dealers,(string)$user_dealer->account_id);
             }
         }
-
         // return $unique_dealers;
 
         $dealer_info_array = [];
@@ -616,45 +614,51 @@ class SalesRepController extends Controller
 
         $user_privilaged_dealer_last_login = 0;
 
+        $total_price = 0;
+
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
-            // foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
-            //     $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-            //     $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
-            //         ->select('id','account_id','first_name','last_name','company_name','last_login')
-            //         ->get();
+                $cart_data_total = Cart::where('dealer',$user_privileged_dealers_format)->sum('price');
 
-            //     $get_priviledged_dealer_details->dealer_count = Users::where('account_id', $user_privileged_dealers_format)
-            //     ->count();
+                // return $user_privileged_dealers_format;
 
-            //     if (count($get_priviledged_dealer_details) > 0) {
-            //         // yay its an array
-            //         array_push($user_dealers_array, ...$get_priviledged_dealer_details);
-            //     }
-            // }
+                $total_price += $cart_data_total;
+
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                    ->select('id','account_id','first_name','last_name','company_name','last_login')
+                    ->get();
+
+                $get_priviledged_dealer_details->dealer_count = Users::where('account_id', $user_privileged_dealers_format)
+                ->count();
+
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
         }
 
-        $number_of_dealers = count($user_privileged_dealers_array);
+        $user_privileged_dealers_format = str_replace('\"', '', $user_privilaged_dealer);
 
-        $total_price = 0;
+        $number_of_dealers = count($user_privileged_dealers_array);
 
         $last_loggedin_dealer_count = 0;
 
         $last_not_loggedin_dealer_count = 0;
 
         foreach($user_dealers_array as $dealer){
-            $cart_data_total = Cart::where('uid',$dealer->id)->sum('price');
-            $total_price += $cart_data_total;
-
             if($dealer->last_login !== null){
                 $last_loggedin_dealer_count++;
             }else{
                 $last_not_loggedin_dealer_count++;
             }
         }
+
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -668,5 +672,6 @@ class SalesRepController extends Controller
     }
     public function dashboard()
     {
+
     }
 }

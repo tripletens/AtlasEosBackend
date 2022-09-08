@@ -675,7 +675,7 @@ class SalesRepController extends Controller
             $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
                 ->select('last_login')
                 ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
-            array_push($last_login_array,...array_values($dealer_inner_details));
+            array_push($last_login_array,array_values($dealer_inner_details));
         }
 
         // return $user_dealers_array;

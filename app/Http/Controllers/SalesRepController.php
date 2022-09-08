@@ -409,6 +409,7 @@ class SalesRepController extends Controller
         }
 
         // return $user_dealers_array;
+
         $unique_dealers = [];
 
         foreach ($user_dealers_array as $user_dealer) {
@@ -416,21 +417,66 @@ class SalesRepController extends Controller
                 array_push($unique_dealers,(string)$user_dealer->account_id);
             }
         }
+
         // return $unique_dealers;
 
         $dealer_info_array = [];
 
         foreach ($unique_dealers as $unique_user_dealer) {
             $dealer_info = Dealer::where('dealer_code', $unique_user_dealer)->get();
+            $dealer_inner_details = Users::where('account_id', $unique_user_dealer)
+                ->orderby('created_at','desc')->get();
+
             array_push($dealer_info_array, ...$dealer_info);
         }
 
+        // return $dealer_info_array;
+
+        $dealer_user_array = [];
+
+        $lastlogin = null;
+
+        // $dealer_new_array = array_map(function($record){
+        //     $dealer_account_id = $record->dealer_code;
+        //     $dealer_inner_details = Users::where('account_id', $dealer_account_id)
+        //         ->orderby('created_at','desc')->get();
+
+        //     // return [...$dealer_user_array,...$dealer_inner_details];
+        //     foreach($dealer_inner_details as $dealer_details){
+        //         if($dealer_details->last_login == null){
+
+        //         }
+        //     }
+        // },$dealer_info_array);
+
+        // return $dealer_info_array;
+
+        $new_dealers_array = [];
+
         foreach ($dealer_info_array as $_dealer) {
-            $sum_user_total = Cart::where('dealer', $_dealer->account_id)
+            $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
+                ->orderby('created_at','desc')->get();
+
+            array_push($new_dealers_array, ...$dealer_inner_details);
+
+            $sum_user_total = Cart::where('dealer', $_dealer->dealer_code)
                 ->get()
                 ->sum('price');
+
             $_dealer->amount = $sum_user_total;
         }
+
+        foreach($new_dealers_array as $new_dealer){
+
+            if($new_dealer->last_login !== null){
+                $lastlogin = $new_dealer->last_login;
+            }else{
+                $lastlogin = $new_dealer->last_login;
+            }
+            // $_dealer->last_login = $new_dealer->last_login;
+        }
+
+        // return $new_dealers_array;
 
         $this->result->status = true;
         $this->result->status_code = 200;

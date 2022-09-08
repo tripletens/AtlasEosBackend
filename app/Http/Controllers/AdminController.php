@@ -77,6 +77,44 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function deactivate_vendor_switch()
+    {
+        $switch_state = Users::where('status', '1')->update([
+            'switch_state' => 0,
+        ]);
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Deactivate vendor switch was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function activate_vendor_switch()
+    {
+        $switch_state = Users::where('status', '1')->update([
+            'switch_state' => 1,
+        ]);
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Activate vendor switch was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function edit_dealer_data(Request $request)
     {
         $validator = Validator::make($request->all(), [

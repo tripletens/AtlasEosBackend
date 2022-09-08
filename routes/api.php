@@ -83,6 +83,16 @@ Route::group(
 
         Route::get('/activate-vendor/{id}', 'AdminController@activate_vendor');
 
+        Route::get(
+            '/admin/activate-vendor-switch',
+            'AdminController@activate_vendor_switch'
+        );
+
+        Route::get(
+            '/admin/deactivate-vendor-switch',
+            'AdminController@deactivate_vendor_switch'
+        );
+
         Route::post(
             '/admin/edit-dealer-data',
             'AdminController@edit_dealer_data'

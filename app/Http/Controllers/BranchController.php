@@ -60,12 +60,15 @@ class BranchController extends Controller
         $dealer_summary_result = [];
 
         # get all the orders for each of the priviledged dealers
-        foreach ($get_priviledged_account_ids_array as $key => $priviledged_dealer) {
+        foreach ($get_priviledged_account_ids_array as  $priviledged_dealer) {
             # get all dealers with the dealer details
-            $dealer_details = Users::where('account_id', $priviledged_dealer)
-                ->select('id','full_name', 'first_name', 'last_name', 'account_id','last_login')
-                ->get();
+            // $dealer_details = Users::where('account_id', $priviledged_dealer)
+            //     ->select('id','full_name', 'first_name', 'last_name', 'account_id','last_login')
+            //     ->get();
 
+            $user_privileged_dealers_format = str_replace('"', '', $priviledged_dealer);
+
+            $dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
             # add the dealer info to the result array
             array_push($dealer_summary_result,json_decode($dealer_details));
         }
@@ -83,6 +86,7 @@ class BranchController extends Controller
     {
         $dealer_summary_result = $this->get_dealers_in_branch($uid);
 
+        // $dealer_summary_result =
         // return $dealer_summary_result;
 
         # get all the dealers with account id orders

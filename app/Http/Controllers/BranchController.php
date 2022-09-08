@@ -320,7 +320,7 @@ class BranchController extends Controller
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
-                    array_push($user_dealers_array, $get_priviledged_dealer_details);
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
             }
         }
@@ -339,7 +339,7 @@ class BranchController extends Controller
             $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
                 ->select('last_login')
                 ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
-            array_push($last_login_array,...array_values($dealer_inner_details));
+            array_push($last_login_array,array_values($dealer_inner_details));
         }
 
         // return $user_dealers_array;

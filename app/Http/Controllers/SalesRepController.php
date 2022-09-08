@@ -95,7 +95,7 @@ class SalesRepController extends Controller
                                 'dealer_name' => $user_data->company_name,
                                 'user' => $user_id,
                                 'purchaser_name' =>
-                                    $user_data->first_name .
+                                $user_data->first_name .
                                     ' ' .
                                     $user_data->last_name,
                                 'amount' => $sum_user_total,
@@ -413,8 +413,8 @@ class SalesRepController extends Controller
         $unique_dealers = [];
 
         foreach ($user_dealers_array as $user_dealer) {
-            if(!in_array($user_dealer->account_id, $unique_dealers)){
-                array_push($unique_dealers,(string)$user_dealer->account_id);
+            if (!in_array($user_dealer->account_id, $unique_dealers)) {
+                array_push($unique_dealers, (string)$user_dealer->account_id);
             }
         }
 
@@ -425,7 +425,7 @@ class SalesRepController extends Controller
         foreach ($unique_dealers as $unique_user_dealer) {
             $dealer_info = Dealer::where('dealer_code', $unique_user_dealer)->get();
             $dealer_inner_details = Users::where('account_id', $unique_user_dealer)
-                ->orderby('created_at','desc')->get();
+                ->orderby('created_at', 'desc')->get();
 
             array_push($dealer_info_array, ...$dealer_info);
         }
@@ -434,28 +434,16 @@ class SalesRepController extends Controller
 
         $dealer_user_array = [];
 
-        $lastlogin = null;
-
-        // $dealer_new_array = array_map(function($record){
-        //     $dealer_account_id = $record->dealer_code;
-        //     $dealer_inner_details = Users::where('account_id', $dealer_account_id)
-        //         ->orderby('created_at','desc')->get();
-
-        //     // return [...$dealer_user_array,...$dealer_inner_details];
-        //     foreach($dealer_inner_details as $dealer_details){
-        //         if($dealer_details->last_login == null){
-
-        //         }
-        //     }
-        // },$dealer_info_array);
-
-        // return $dealer_info_array;
+        $lastlogin = [];
 
         $new_dealers_array = [];
 
         foreach ($dealer_info_array as $_dealer) {
             $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
-                ->orderby('created_at','desc')->get();
+                ->select('last_login')
+                ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
+
+            $_dealer->login_array = array_values($dealer_inner_details);
 
             array_push($new_dealers_array, ...$dealer_inner_details);
 
@@ -466,17 +454,6 @@ class SalesRepController extends Controller
             $_dealer->amount = $sum_user_total;
         }
 
-        foreach($new_dealers_array as $new_dealer){
-
-            if($new_dealer->last_login !== null){
-                $lastlogin = $new_dealer->last_login;
-            }else{
-                $lastlogin = $new_dealer->last_login;
-            }
-            // $_dealer->last_login = $new_dealer->last_login;
-        }
-
-        // return $new_dealers_array;
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -643,7 +620,8 @@ class SalesRepController extends Controller
         return response()->json($this->result);
     }
 
-    public function sales_rep_dashboard($user_id){
+    public function sales_rep_dashboard($user_id)
+    {
         $user_dealers_array = [];
         $user_data = Users::where('id', $user_id)->get()->first();
 
@@ -669,18 +647,12 @@ class SalesRepController extends Controller
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-                $cart_data_total = Cart::where('dealer',$user_privileged_dealers_format)->sum('price');
-
-                // return $user_privileged_dealers_format;
+                $cart_data_total = Cart::where('dealer', $user_privileged_dealers_format)->sum('price');
 
                 $total_price += $cart_data_total;
 
-                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
-                    ->select('id','account_id','first_name','last_name','company_name','last_login')
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
-
-                $get_priviledged_dealer_details->dealer_count = Users::where('account_id', $user_privileged_dealers_format)
-                ->count();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
@@ -697,13 +669,16 @@ class SalesRepController extends Controller
 
         $last_not_loggedin_dealer_count = 0;
 
-        foreach($user_dealers_array as $dealer){
-            if($dealer->last_login !== null){
-                $last_loggedin_dealer_count++;
-            }else{
-                $last_not_loggedin_dealer_count++;
-            }
+        $last_login_array = [];
+
+        foreach ($user_dealers_array as $_dealer) {
+            $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
+                ->select('last_login')
+                ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
+            array_push($last_login_array,...array_values($dealer_inner_details));
         }
+
+        // return $user_dealers_array;
 
 
         $this->result->status = true;
@@ -711,13 +686,14 @@ class SalesRepController extends Controller
         $this->result->message = 'Sales Rep dashboard details fetched successfully';
         $this->result->data->total_sales = $total_price;
         $this->result->data->total_dealers = $number_of_dealers;
+        $this->result->data->login_array = $last_login_array;
 
         $this->result->data->total_logged_in = $last_loggedin_dealer_count;
         $this->result->data->total_not_logged_in = $last_not_loggedin_dealer_count;
         return response()->json($this->result);
     }
+
     public function dashboard()
     {
-
     }
 }

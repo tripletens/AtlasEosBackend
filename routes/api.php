@@ -136,6 +136,11 @@ Route::group(
             'AdminController@upload_product_csv'
         );
 
+        Route::post(
+            '/upload-new-product-csv',
+            'AdminController@upload_new_product_csv'
+        );
+
         Route::get('/all-products', 'AdminController@get_all_products');
         Route::get(
             '/deactivate-product/{id}',
@@ -1078,7 +1083,6 @@ Route::group(
             '/sales-rep/dealers-purchases/{user}',
             'SalesRepController@get_sales_rep_dealer_purchases'
         );
-        
 
         Route::get(
             '/sales-rep/dealers-sales/{user}',
@@ -1094,7 +1098,5 @@ Route::group(
             '/sales-rep/dashboard/{user}',
             'SalesRepController@sales_rep_dashboard'
         );
-
-
     }
 );

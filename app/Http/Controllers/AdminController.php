@@ -77,6 +77,88 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function upload_new_product_csv(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            $test = [];
+
+            foreach ($csv_data as $key => $value) {
+                # code...
+
+                $spec_arr = [];
+                $vendor_code = $value[0];
+                $vendor_name = $value[1];
+                $atlas_id = $value[2];
+                $vendor_product_code = $value[3];
+                $xref = $value[4];
+                $description = $value[5];
+                $regular_price = $value[6];
+                $booking_price = $value[7];
+                // $type = $value[9] ? $value[9] : '';
+
+                $type = array_key_exists('9', $value) ? $value[9] : '';
+
+                switch ($type) {
+                    case 'special':
+                        # code...
+                        break;
+
+                    case 'assorted':
+                        # code...
+                        break;
+
+                    default:
+                        $save_product = Products::create([
+                            'atlas_id' => $atlas_id,
+                            'description' => $description,
+                            'status' => '1',
+                            'vendor_code' => $vendor_code,
+                            'vendor' => $vendor_code,
+                            'vendor_name' => $vendor_name,
+                            'vendor_product_code' => $vendor_product_code,
+                            'xref' => $xref,
+                            'regular' => $regular_price,
+                            'booking' => $booking_price,
+                            'check_new' => 1,
+                        ]);
+
+                        if (!$save_product) {
+                            $this->result->status = false;
+                            $this->result->status_code = 422;
+                            $this->result->message =
+                                'Sorry File could not be uploaded. Try again later.';
+                            return response()->json($this->result);
+                        }
+                        break;
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Products uploaded successfully';
+            return response()->json($this->result);
+            fclose($file);
+        }
+    }
+
     public function deactivate_vendor_switch()
     {
         $switch_state = Users::where('status', '1')->update([

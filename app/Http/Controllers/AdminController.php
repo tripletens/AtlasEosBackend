@@ -2164,11 +2164,22 @@ class AdminController extends Controller
 
         $most_sales_vendor = array_slice($most_sales_vendor, 0, 6);
 
+        $response_data = [];
+
+        foreach ($most_sales_vendor as $value) {
+            $val = (object) $value;
+
+            $sales = $val->vendor_sales;
+
+            if ($sales > 0) {
+                array_push($response_data, $value);
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data = $most_sales_vendor;
-
-        $this->result->message = 'Mosr Sales Vendors Dashboard Data';
+        $this->result->data = $response_data;
+        $this->result->message = 'Most Sales Vendors Dashboard Data';
         return response()->json($this->result);
     }
 
@@ -2206,9 +2217,20 @@ class AdminController extends Controller
 
         $most_sale_dealer = array_slice($most_sale_dealer, 0, 6);
 
+        $response_data = [];
+
+        foreach ($most_sale_dealer as $value) {
+            $val = (object) $value;
+            $sales = $val->total_sales;
+
+            if ($sales > 0) {
+                array_push($response_data, $value);
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data = $most_sale_dealer;
+        $this->result->data = $response_data;
 
         $this->result->message = 'Most Sales Dealers Admin Dashboard Data';
         return response()->json($this->result);
@@ -2229,10 +2251,10 @@ class AdminController extends Controller
             ->where('last_login', '!=', null)
             ->count();
 
-        $logged_admin = Users::orWhere('role', '1')
-            ->orWhere('role', '5')
-            ->orWhere('role', '2')
-            ->orWhere('role', '6')
+        $logged_admin = Users::where('role', '1')
+            // ->orWhere('role', '5')
+            // ->orWhere('role', '2')
+            // ->orWhere('role', '6')
             ->where('last_login', '!=', null)
             ->count();
 
@@ -2942,11 +2964,24 @@ class AdminController extends Controller
 
         if ($vendor != '') {
             $vendor = $request->vendor;
-            $vendorName = $request->vendorName;
+            $vendorName =
+                isset($request->vendorName) && $request->vendorName != ''
+                    ? $request->vendorName
+                    : null;
+            $setVendor = '';
+            if ($vendorName == null) {
+                $vendors = Vendors::where('vendor_code', $vendor)
+                    ->get()
+                    ->first();
+                $setVendor = $vendors->vendor_name;
+            } else {
+                $setVendor = $vendorName;
+            }
+
             $update = Users::where('id', $vendorId)->update([
-                'vendor_name' => $vendorName,
+                'vendor_name' => $setVendor,
                 'vendor_code' => $vendor,
-                'company_name' => $vendorName,
+                'company_name' => $setVendor,
             ]);
         }
 
@@ -3063,9 +3098,22 @@ class AdminController extends Controller
     public function deactivate_vendor_user($id)
     {
         // update to the db
-        $update = Users::where('id', $id)->update([
-            'status' => '0',
-        ]);
+
+        $user_data = Users::where('id', $id)
+            ->get()
+            ->first();
+
+        $status = $user_data->status;
+
+        if ($status == '1') {
+            $update = Users::where('id', $id)->update([
+                'status' => '0',
+            ]);
+        } else {
+            $update = Users::where('id', $id)->update([
+                'status' => '1',
+            ]);
+        }
 
         // DB::table('users')->where('id', $id)->delete();
 
@@ -3104,10 +3152,22 @@ class AdminController extends Controller
 
     public function deactivate_vendor($id)
     {
-        // update to the db
-        $update = Vendors::where('id', $id)->update([
-            'status' => '0',
-        ]);
+        $curr = Vendors::where('id', $id)
+            ->get()
+            ->first();
+        $status = $curr->status;
+
+        if ($status == '1') {
+            // update to the db
+            $update = Vendors::where('id', $id)->update([
+                'status' => '0',
+            ]);
+        } else {
+            // update to the db
+            $update = Vendors::where('id', $id)->update([
+                'status' => '1',
+            ]);
+        }
 
         if ($update) {
             $this->result->status = true;
@@ -3257,7 +3317,7 @@ class AdminController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required',
             'fullName' => 'required',
-            'location' => 'required',
+            // 'location' => 'required',
             'password' => 'required',
             'vendor' => 'required',
             'vendorName' => 'required',
@@ -3274,7 +3334,7 @@ class AdminController extends Controller
             // process the request
             $name = $request->fullName;
             $email = $request->email;
-            $location = $request->location;
+            // $location = $request->location;
             $vendor_code = $request->vendor;
             $privilege_vendors = $request->privilegeVendors;
             $password = bcrypt($request->password);
@@ -3297,7 +3357,7 @@ class AdminController extends Controller
                 'vendor_name' => $vendor_name,
                 'privilege_vendors' => $privilege_vendors,
                 'username' => $email,
-                'location' => $location,
+                // 'location' => $location,
                 'company_name' => $vendor_name,
             ]);
 

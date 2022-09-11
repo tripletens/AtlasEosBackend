@@ -153,6 +153,11 @@ Route::group(
             'AdminController@get_product_by_atlas_id'
         );
 
+        Route::get(
+            '/admin/get-vendor-by-code/{code}',
+            'AdminController@get_vendor_by_code'
+        );
+
         Route::post('/edit-product', 'AdminController@edit_product');
         Route::post('/add-product', 'AdminController@add_product');
 

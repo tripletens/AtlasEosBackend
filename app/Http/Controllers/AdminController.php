@@ -77,6 +77,29 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_vendor_by_code($code)
+    {
+        if (Vendors::where('vendor_code', $code)->exists()) {
+            $data = Vendors::where('vendor_code', $code)
+                ->get()
+                ->first();
+            $this->result->status = true;
+            $this->result->status_code = 200;
+
+            $this->result->data = $data;
+
+            $this->result->message = 'selected vendor data';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+
+            $this->result->message = 'no vendor data found, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function upload_new_product_csv(Request $request)
     {
         $csv = $request->file('csv');
@@ -2320,6 +2343,7 @@ class AdminController extends Controller
             $special = $request->special;
             $vendorItemId = $request->vendorItemId;
             $description = $request->description;
+            $new_state = $request->newState;
 
             if (Products::where('atlas_id', $atlasId)->exists()) {
                 $this->result->status = false;
@@ -2338,6 +2362,7 @@ class AdminController extends Controller
                     'vendor_product_code' => $vendorItemId,
                     'booking' => $regular,
                     'special' => $special,
+                    'check_new' => $new_state ? '1' : '0',
                 ]);
 
                 if (!$save_product) {
@@ -2398,6 +2423,7 @@ class AdminController extends Controller
             $regular = $request->regular;
             $special = $request->special;
             $vendor = $request->vendor;
+            $spec = $request->spec;
 
             // update to the db
             $update = Products::where('atlas_id', $atlasId)->update([
@@ -2405,6 +2431,7 @@ class AdminController extends Controller
                 'description' => $desc,
                 'booking' => $regular,
                 'vendor' => $vendor,
+                'spec_data' => json_encode($spec),
             ]);
 
             if ($special != null) {
@@ -2453,6 +2480,9 @@ class AdminController extends Controller
         $product = Products::where('id', $id)
             ->get()
             ->first();
+
+        $product->spec_data = json_decode($product->spec_data);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get products was successful';
@@ -2718,11 +2748,9 @@ class AdminController extends Controller
     public function register_dealer_users(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'firstName' => 'required',
-            'lastName' => 'required',
-            'location' => 'required',
+            'fullName' => 'required',
+            'email' => 'required',
             'password' => 'required',
-            'accountId' => 'required',
             'companyName' => 'required',
         ]);
 
@@ -2735,16 +2763,24 @@ class AdminController extends Controller
             return response()->json($this->result);
         } else {
             // process the request
-            $first_name = $request->firstName;
-            $last_name = $request->lastName;
+            $full_name = $request->fullName;
             $email = $request->email;
             $location = $request->location;
-            $privilege_vendors = $request->privilegedVendors;
+
+            $privilege_vendors = $request->privilegeVendors;
+            $prvilage_dealers = $request->privilegeDealers;
+
             $password = bcrypt($request->password);
             $password_show = $request->password;
+
             $company_name = $request->companyName;
-            $accountId = $request->accountId;
-            $full_name = $first_name . ' ' . $last_name;
+            $company_code = $request->companyCode;
+
+            $split_full_name = explode(' ', $full_name);
+            $first_name = $split_full_name[0];
+            $last_name = isset($split_full_name[1])
+                ? $split_full_name[1]
+                : null;
 
             $role = '4';
             $role_name = 'dealer';
@@ -2766,12 +2802,17 @@ class AdminController extends Controller
                     'password_show' => $password_show,
                     'role' => $role,
                     'role_name' => $role_name,
-                    'privilege_vendors' => $privilege_vendors,
+                    'privileged_vendors' => $privilege_vendors,
+                    'privileged_dealers' => $prvilage_dealers,
+
                     'username' => $email,
                     'location' => $location,
                     'company_name' => $company_name,
-                    'company_code' => $accountId,
-                    'account_id' => $accountId,
+                    'company_code' => $company_code,
+                    'account_id' => $company_code,
+
+                    'dealer_code' => $company_code,
+                    'dealer_name' => $company_name,
                 ]);
             }
 
@@ -2817,6 +2858,8 @@ class AdminController extends Controller
                 $password_show = $value[4];
                 $email = strtolower($value[5]);
                 $privilege_vendors = $value[6];
+                $privilege_dealers = $value[7];
+
                 $full_name = $first_name . ' ' . $last_name;
                 $role = '4';
                 $role_name = 'dealer';
@@ -2834,19 +2877,20 @@ class AdminController extends Controller
                         'role_name' => $role_name,
                         'dealer_name' => $dealer_name,
                         'privileged_vendors' => $privilege_vendors,
+                        'privileged_dealers' => $privilege_dealers,
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
                     ]);
                 }
 
-                if (!$save_dealer) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
-                }
+                // if (!$save_dealer) {
+                //     $this->result->status = false;
+                //     $this->result->status_code = 422;
+                //     $this->result->message =
+                //         'Sorry File could not be uploaded. Try again later.';
+                //     return response()->json($this->result);
+                // }
             }
         }
 

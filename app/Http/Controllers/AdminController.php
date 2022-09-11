@@ -2344,6 +2344,7 @@ class AdminController extends Controller
             $vendorItemId = $request->vendorItemId;
             $description = $request->description;
             $new_state = $request->newState;
+            $image = $request->image;
 
             if (Products::where('atlas_id', $atlasId)->exists()) {
                 $this->result->status = false;
@@ -2363,6 +2364,7 @@ class AdminController extends Controller
                     'booking' => $regular,
                     'special' => $special,
                     'check_new' => $new_state ? '1' : '0',
+                    'img' => $image,
                 ]);
 
                 if (!$save_product) {

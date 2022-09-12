@@ -776,6 +776,14 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
+            $first_name = isset($user_data->first_name)
+                ? $user_data->first_name
+                : null;
+
+            $last_name = isset($user_data->last_name)
+                ? $user_data->last_name
+                : null;
+
             $data = [
                 'qty' => $value->quantity,
                 'description' => $value->description,
@@ -788,11 +796,7 @@ class AdminController extends Controller
                 'dealer_name' => isset($user_data->company_name)
                     ? $user_data->company_name
                     : null,
-                'rep_name' => (isset($user_data->first_name)
-                        ? $user_data->first_name
-                        : null . ' ' . isset($user_data->last_name))
-                    ? $user_data->last_name
-                    : null,
+                'rep_name' => $first_name . ' ' . $last_name,
                 'vendor_no' => null,
             ];
 

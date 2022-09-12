@@ -830,7 +830,11 @@ class AdminController extends Controller
                         ? $vendor_data->vendor_name
                         : null,
                     'atlas_id' => $atlas_id,
-                    'vendor_product_code' => $product_data->vendor_product_code,
+                    'vendor_product_code' => isset(
+                        $product_data->vendor_product_code
+                    )
+                        ? $product_data->vendor_product_code
+                        : null,
                     'qty' => $qty,
                     'new_qty' => $new_qty,
                     'regular' => $regular,

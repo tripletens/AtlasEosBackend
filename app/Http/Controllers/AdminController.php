@@ -779,13 +779,20 @@ class AdminController extends Controller
             $data = [
                 'qty' => $value->quantity,
                 'description' => $value->description,
-                'vendor_name' => $vendor_data->vendor_name
+                'vendor_name' => isset($vendor_data->vendor_name)
                     ? $vendor_data->vendor_name
                     : null,
-                'account' => $user_data->account_id,
-                'dealer_name' => $user_data->company_name,
-                'rep_name' =>
-                    $user_data->first_name . ' ' . $user_data->last_name,
+                'account' => isset($user_data->account_id)
+                    ? $user_data->account_id
+                    : null,
+                'dealer_name' => isset($user_data->company_name)
+                    ? $user_data->company_name
+                    : null,
+                'rep_name' => (isset($user_data->first_name)
+                        ? $user_data->first_name
+                        : null . ' ' . isset($user_data->last_name))
+                    ? $user_data->last_name
+                    : null,
                 'vendor_no' => null,
             ];
 

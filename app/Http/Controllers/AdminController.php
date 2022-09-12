@@ -77,6 +77,75 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
 
+    public function get_active_countdown()
+    {
+        if (ProgramCountdown::where('status', '1')->exists()) {
+            $data = ProgramCountdown::where('status', '1')
+                ->get()
+                ->first();
+            $this->result->status = true;
+            $this->result->status_code = 200;
+
+            $this->result->data = $data;
+
+            $this->result->message = 'active count down';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+
+            $this->result->message = 'no active count down found, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_item_by_atlas($code)
+    {
+        if (Products::where('atlas_id', $code)->exists()) {
+            $data = Products::where('atlas_id', $code)
+                ->get()
+                ->first();
+            $this->result->status = true;
+            $this->result->status_code = 200;
+
+            $this->result->data = $data;
+
+            $this->result->message = 'selected atlas item data';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+
+            $this->result->message = 'no atlas item data found, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function get_dealership_by_code($code)
+    {
+        if (Dealer::where('dealer_code', $code)->exists()) {
+            $data = Dealer::where('dealer_code', $code)
+                ->get()
+                ->first();
+            $this->result->status = true;
+            $this->result->status_code = 200;
+
+            $this->result->data = $data;
+
+            $this->result->message = 'selected dealership data';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+
+            $this->result->message = 'no vendor data found, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_vendor_by_code($code)
     {
         if (Vendors::where('vendor_code', $code)->exists()) {
@@ -583,6 +652,7 @@ class AdminController extends Controller
             foreach ($dealers as $value) {
                 $dealer_code = $value->dealer_code;
                 $dealer_name = $value->dealer_name;
+                $location = $value->location;
                 $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
                     'price'
                 );
@@ -593,6 +663,7 @@ class AdminController extends Controller
                 $data = [
                     'dealer_name' => $dealer_name,
                     'dealer_code' => $dealer_code,
+                    'location' => $location,
                     'sales' => $dealer_sales,
                 ];
 

@@ -158,6 +158,16 @@ Route::group(
             'AdminController@get_vendor_by_code'
         );
 
+        Route::get(
+            '/admin/get-dealership-by-code/{code}',
+            'AdminController@get_dealership_by_code'
+        );
+
+        Route::get(
+            '/admin/get-item-by-atlas/{code}',
+            'AdminController@get_item_by_atlas'
+        );
+
         Route::post('/edit-product', 'AdminController@edit_product');
         Route::post('/add-product', 'AdminController@add_product');
 
@@ -312,6 +322,11 @@ Route::group(
         Route::get(
             '/admin/dealer-single-summary/{code}',
             'AdminController@dealer_single_summary'
+        );
+
+        Route::get(
+            '/admin/get-active-countdown',
+            'AdminController@get_active_countdown'
         );
 
         Route::get(

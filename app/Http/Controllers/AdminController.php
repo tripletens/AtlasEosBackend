@@ -826,7 +826,9 @@ class AdminController extends Controller
 
                 $data = [
                     'dealer_code' => $dealer_code,
-                    'vendor_name' => $vendor_data->vendor_name,
+                    'vendor_name' => isset($vendor_data->vendor_name)
+                        ? $vendor_data->vendor_name
+                        : null,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $product_data->vendor_product_code,
                     'qty' => $qty,
@@ -834,8 +836,11 @@ class AdminController extends Controller
                     'regular' => $regular,
                     'show' => $show,
                     'overide_price' => $overide_price,
-                    'authorized_by' =>
-                        $user_data->first_name . ' ' . $user_data->last_name,
+                    'authorized_by' => (isset($user_data->first_name)
+                            ? $user_data->first_name
+                            : null . ' ' . isset($user_data->last_name))
+                        ? $user_data->last_name
+                        : null,
                 ];
 
                 array_push($res_data, $data);

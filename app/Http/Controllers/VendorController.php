@@ -435,10 +435,18 @@ class VendorController extends Controller
             }
         }
 
+        $res = [];
+
+        foreach ($all_bell_notify as $value) {
+            if ($value->vendor_name != '') {
+                array_push($res, $value);
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'vendor bell notification';
-        $this->result->data->notify = $all_bell_notify;
+        $this->result->data->notify = $res;
         $this->result->data->count = $bell_notify_count;
         return response()->json($this->result);
     }

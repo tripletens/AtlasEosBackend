@@ -30,6 +30,11 @@ Route::group(
         Route::get('/admin/get-aims-export', 'AdminController@aims_exports');
 
         Route::get(
+            '/admin/get-dealer-detailed-report',
+            'AdminController@dealer_detailed_report'
+        );
+
+        Route::get(
             '/admin/analysis-admin-dashboard',
             'AdminController@admin_dashboard_analysis'
         );

@@ -25,12 +25,12 @@ class BuckController extends Controller
             'debug' => null,
         ];
     }
-    // upload file 
+    // upload file
 
-    public function upload_file(){
-
+    public function upload_file()
+    {
     }
-    // add show bucks 
+    // add show bucks
     public function create_buck(Request $request)
     {
         // `vendor_name`, `vendor_code`,`title`, `description`, `img_url`,
@@ -56,39 +56,45 @@ class BuckController extends Controller
         } else {
 
             if ($request->hasFile('image')) {
-                $image_filenameWithExt = $request
-                    ->file('image')
-                    ->getClientOriginalName();
-                $image_filename = pathinfo($image_filenameWithExt, PATHINFO_FILENAME);
-                $image_extension = $request
-                    ->file('image')
-                    ->getClientOriginalExtension();
-                $image_fileNameToStore = Str::slug($image_filename,'_',$language='en') . '_' . time() . '.' . $image_extension;
-                $img_filepath =
-                    env('APP_URL') .
-                    Storage::url(
-                        $request
-                            ->file('image')
-                            ->storeAs('public/bucks', $image_fileNameToStore)
-                    );
+                // $image_filenameWithExt = $request
+                //     ->file('image')
+                //     ->getClientOriginalName();
+                // $image_filename = pathinfo($image_filenameWithExt, PATHINFO_FILENAME);
+                // $image_extension = $request
+                //     ->file('image')
+                //     ->getClientOriginalExtension();
+                // $image_fileNameToStore = Str::slug($image_filename,'_',$language='en') . '_' . time() . '.' . $image_extension;
+                // $img_filepath =
+                //     env('APP_URL') .
+                //     Storage::url(
+                //         $request
+                //             ->file('image')
+                //             ->storeAs('public/bucks', $image_fileNameToStore)
+                //     );
+                $image_path = Storage::disk('s3')->put('showbuck_image', $request->image, 'public');
+
+                $full_image_path = Storage::disk('s3')->url($image_path);
             }
 
             if ($request->hasFile('pdf')) {
-                $filenameWithExt = $request
-                    ->file('pdf')
-                    ->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request
-                    ->file('pdf')
-                    ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
-                $pdf_filepath =
-                    env('APP_URL') .
-                    Storage::url(
-                        $request
-                            ->file('pdf')
-                            ->storeAs('public/bucks', $fileNameToStore)
-                    );
+                // $filenameWithExt = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalName();
+                // $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                // $extension = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalExtension();
+                // $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                // $pdf_filepath =
+                //     env('APP_URL') .
+                //     Storage::url(
+                //         $request
+                //             ->file('pdf')
+                //             ->storeAs('public/bucks', $fileNameToStore)
+                //     );
+                $pdf_path = Storage::disk('s3')->put('showbuck_pdf', $request->pdf, 'public');
+
+                $full_pdf_path = Storage::disk('s3')->url($pdf_path);
             }
 
             // `vendor_name`, `vendor_code`,`title`, `description`, `img_url`,
@@ -107,8 +113,8 @@ class BuckController extends Controller
                 'title' => $title ? $title : null,
                 'description' => $description ? $description : null,
                 'status' => $status ? $status : null,
-                'img_url' => $request->hasFile('image') ? $img_filepath : null,
-                'pdf_url' => $request->hasFile('pdf') ? $pdf_filepath : null
+                'img_url' => $request->hasFile('image') ? $full_image_path : null,
+                'pdf_url' => $request->hasFile('pdf') ? $full_pdf_path : null
             ]);
 
             if (!$createBuck) {
@@ -126,20 +132,21 @@ class BuckController extends Controller
         }
     }
 
-    // fetch show bucks and promotional flier by vendor code 
+    // fetch show bucks and promotional flier by vendor code
 
-    public function fetch_show_buck_promotional_flier($vendor_code){
+    public function fetch_show_buck_promotional_flier($vendor_code)
+    {
 
-        $fetch_vendor_details = Vendors::where('vendor_code',$vendor_code)->get()->first();
+        $fetch_vendor_details = Vendors::where('vendor_code', $vendor_code)->get()->first();
 
         if (!$fetch_vendor_details) {
             $this->result->status = true;
             $this->result->status_code = 400;
             $this->result->message = "An Error Ocurred, we couldn't fetch the vendor with that vendor code";
             return response()->json($this->result);
-        } 
+        }
 
-        $fetch_show_bucks = Bucks::where('vendor_code',$vendor_code)->get();
+        $fetch_show_bucks = Bucks::where('vendor_code', $vendor_code)->get();
 
         if (!$fetch_show_bucks) {
             $this->result->status = true;
@@ -148,9 +155,9 @@ class BuckController extends Controller
             return response()->json($this->result);
         } else {
 
-            // check for promotional fliers with vendor code 
-            $fetch_promotional_flier = PromotionalFlier::where('vendor_id',$vendor_code)->get();
-            
+            // check for promotional fliers with vendor code
+            $fetch_promotional_flier = PromotionalFlier::where('vendor_id', $vendor_code)->get();
+
             if (!$fetch_promotional_flier) {
                 $this->result->status = true;
                 $this->result->status_code = 400;
@@ -177,9 +184,10 @@ class BuckController extends Controller
         }
     }
 
-    public function edit_buck(Request $request){
+    public function edit_buck(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-           'vendor_name' => 'required',
+            'vendor_name' => 'required',
             'vendor_code' => 'required|string',
             'title' => 'required|string',
             'description' => 'required',
@@ -204,8 +212,8 @@ class BuckController extends Controller
             $status = $request->input('status');
             $image =   $request->hasFile('image');
             $pdf =   $request->hasFile('pdf');
-            
-            $check_buck = Bucks::where('vendor_code',$vendor_code)->get()->first();
+
+            $check_buck = Bucks::where('vendor_code', $vendor_code)->get()->first();
 
             if (!$check_buck) {
                 $this->result->status = true;
@@ -214,7 +222,7 @@ class BuckController extends Controller
                 return response()->json($this->result);
             }
 
-            // upload show buck image 
+            // upload show buck image
             if ($request->hasFile('image')) {
                 $image_filenameWithExt = $request
                     ->file('image')
@@ -223,7 +231,7 @@ class BuckController extends Controller
                 $image_extension = $request
                     ->file('image')
                     ->getClientOriginalExtension();
-                $image_fileNameToStore = Str::slug($image_filename,'_',$language='en') . '_' . time() . '.' . $image_extension;
+                $image_fileNameToStore = Str::slug($image_filename, '_', $language = 'en') . '_' . time() . '.' . $image_extension;
                 $img_filepath =
                     env('APP_URL') .
                     Storage::url(
@@ -233,7 +241,7 @@ class BuckController extends Controller
                     );
             }
 
-            // upload show buck pdf 
+            // upload show buck pdf
             if ($request->hasFile('pdf')) {
                 $filenameWithExt = $request
                     ->file('pdf')
@@ -242,7 +250,7 @@ class BuckController extends Controller
                 $extension = $request
                     ->file('pdf')
                     ->getClientOriginalExtension();
-                $fileNameToStore = Str::slug($filename,'_',$language='en') . '_' . time() . '.' . $extension;
+                $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
                 $pdf_filepath =
                     env('APP_URL') .
                     Storage::url(
@@ -259,7 +267,7 @@ class BuckController extends Controller
             $check_buck->status = $status ? $status : null;
             $check_buck->img_url = $image ? $img_filepath : null;
             $check_buck->pdf_url = $pdf ? $pdf_filepath : null;
-            
+
 
             $update_buck = $check_buck->save();
 

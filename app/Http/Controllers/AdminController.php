@@ -728,7 +728,7 @@ class AdminController extends Controller
 
     public function get_all_vendor()
     {
-        $vendors = Vendors::all();
+        $vendors = Vendors::where('status', '1')->get();
 
         $this->result->status = true;
         $this->result->data = $vendors;

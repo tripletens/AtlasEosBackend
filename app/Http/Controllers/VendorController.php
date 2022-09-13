@@ -429,7 +429,9 @@ class VendorController extends Controller
                 $dealer_data = Dealer::where('dealer_code', $dealer_code)
                     ->get()
                     ->first();
-                $value->vendor_name = $dealer_data->dealer_name;
+                $value->vendor_name = $dealer_data->dealer_name
+                    ? $dealer_data->dealer_name
+                    : null;
             }
         }
 

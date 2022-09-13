@@ -27,6 +27,8 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::get('/admin/get-aims-export', 'AdminController@aims_exports');
+
         Route::get(
             '/admin/analysis-admin-dashboard',
             'AdminController@admin_dashboard_analysis'
@@ -648,6 +650,12 @@ Route::group(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );
+
+        Route::get(
+            '/switch-promotional-flier-status/{id}',
+            'PromotionalFlierController@switch_promotional_flier_status'
+        );
+
         // ------------------ new products --------------------//
         Route::get(
             '/products/new',

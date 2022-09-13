@@ -70,12 +70,29 @@ class AdminController extends Controller
     }
 
     ///// Permission Role Access
-    // admin == 1
+    // super admin == 1
     // branch manager == 2
     // vendor == 3
     // dealer == 4
     // inside sales == 5
     // outside == 6
+    // admin == 7
+
+    public function aims_exports()
+    {
+        $aims = Cart::where('status', '1')
+            ->orderBy('dealer', 'asc')
+            ->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+
+        $this->result->data = $aims;
+
+        $this->result->message = 'Aims export';
+
+        return response()->json($this->result);
+    }
 
     public function get_active_countdown()
     {

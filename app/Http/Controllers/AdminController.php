@@ -78,6 +78,31 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function dealer_detailed_report()
+    {
+        $cart = Cart::where('status', '1')
+            ->orderBy('product_id', 'asc')
+            ->get();
+
+        foreach ($cart as $value) {
+            $atlas_id = $value->atlas_id;
+
+            $pro_data = Products::where('atlas_id', $atlas_id)
+                ->get()
+                ->first();
+
+            $value->desc = $pro_data->description;
+            $value->vendor_product_code = $pro_data->vendor_product_code;
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $cart;
+        $this->result->message = 'Dealer Detailed export';
+
+        return response()->json($this->result);
+    }
+
     public function aims_exports()
     {
         $aims = Cart::where('status', '1')

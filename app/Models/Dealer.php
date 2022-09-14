@@ -19,6 +19,7 @@ class Dealer extends Authenticatable implements JWTSubject
         'dealer_code',
         'role_id',
         'role_name',
+        'location',
     ];
 
     protected $hidden = ['password'];

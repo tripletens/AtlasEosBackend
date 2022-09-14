@@ -429,14 +429,24 @@ class VendorController extends Controller
                 $dealer_data = Dealer::where('dealer_code', $dealer_code)
                     ->get()
                     ->first();
-                $value->vendor_name = $dealer_data->dealer_name;
+                $value->vendor_name = isset($dealer_data->dealer_name)
+                    ? $dealer_data->dealer_name
+                    : null;
+            }
+        }
+
+        $res = [];
+
+        foreach ($all_bell_notify as $value) {
+            if ($value->vendor_name != '') {
+                array_push($res, $value);
             }
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'vendor bell notification';
-        $this->result->data->notify = $all_bell_notify;
+        $this->result->data->notify = $res;
         $this->result->data->count = $bell_notify_count;
         return response()->json($this->result);
     }
@@ -1016,10 +1026,21 @@ class VendorController extends Controller
             }
         }
 
+        $response_data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $res))
+        );
+
+        $resx = [];
+
+        foreach ($response_data as $value) {
+            array_push($resx, $value);
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';
-        $this->result->data = $res;
+        $this->result->data = $resx;
         // $this->result->data = $dealers;
 
         return response()->json($this->result);

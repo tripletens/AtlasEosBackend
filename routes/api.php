@@ -27,6 +27,13 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::get('/admin/get-aims-export', 'AdminController@aims_exports');
+
+        Route::get(
+            '/admin/get-dealer-detailed-report',
+            'AdminController@dealer_detailed_report'
+        );
+
         Route::get(
             '/admin/analysis-admin-dashboard',
             'AdminController@admin_dashboard_analysis'
@@ -84,6 +91,21 @@ Route::group(
         Route::get('/activate-vendor/{id}', 'AdminController@activate_vendor');
 
         Route::get(
+            '/admin/activate-vendor-switch',
+            'AdminController@activate_vendor_switch'
+        );
+
+        Route::get(
+            '/admin/deactivate-vendor-switch',
+            'AdminController@deactivate_vendor_switch'
+        );
+
+        Route::post(
+            '/admin/edit-dealer-data',
+            'AdminController@edit_dealer_data'
+        );
+
+        Route::get(
             '/deactivate-vendor-user/{id}',
             'AdminController@deactivate_vendor_user'
         );
@@ -121,6 +143,11 @@ Route::group(
             'AdminController@upload_product_csv'
         );
 
+        Route::post(
+            '/upload-new-product-csv',
+            'AdminController@upload_new_product_csv'
+        );
+
         Route::get('/all-products', 'AdminController@get_all_products');
         Route::get(
             '/deactivate-product/{id}',
@@ -131,6 +158,21 @@ Route::group(
         Route::get(
             '/get-product-atlas-id/{id}',
             'AdminController@get_product_by_atlas_id'
+        );
+
+        Route::get(
+            '/admin/get-vendor-by-code/{code}',
+            'AdminController@get_vendor_by_code'
+        );
+
+        Route::get(
+            '/admin/get-dealership-by-code/{code}',
+            'AdminController@get_dealership_by_code'
+        );
+
+        Route::get(
+            '/admin/get-item-by-atlas/{code}',
+            'AdminController@get_item_by_atlas'
         );
 
         Route::post('/edit-product', 'AdminController@edit_product');
@@ -290,6 +332,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/get-active-countdown',
+            'AdminController@get_active_countdown'
+        );
+
+        Route::get(
             '/admin/vendor-summary/{code}',
             'AdminController@vendor_summary'
         );
@@ -327,6 +374,11 @@ Route::group(
         Route::get(
             '/admin/get-chat-selected-vendor-users/{code}',
             'AdminController@get_chat_selected_vendor_users'
+        );
+
+        Route::get(
+            '/admin/all-dealership',
+            'AdminController@get_all_dealership'
         );
 
         Route::get('/testing', 'AdminController@testing_api');
@@ -603,6 +655,12 @@ Route::group(
             '/delete-promotional-flier/{id}',
             'PromotionalFlierController@delete_promotional_flier'
         );
+
+        Route::get(
+            '/switch-promotional-flier-status/{id}',
+            'PromotionalFlierController@switch_promotional_flier_status'
+        );
+
         // ------------------ new products --------------------//
         Route::get(
             '/products/new',
@@ -1073,7 +1131,6 @@ Route::group(
             '/sales-rep/dashboard/{user}',
             'SalesRepController@sales_rep_dashboard'
         );
-
         Route::get(
             '/sales-rep/loggedin-dealers/{user_id}',
             'SalesRepController@fetch_loggedin_dealers'
@@ -1083,9 +1140,6 @@ Route::group(
             '/sales-rep/notloggedin-dealers/{user_id}',
             'SalesRepController@fetch_notloggedin_dealers'
         );
-
-
-
 
     }
 );

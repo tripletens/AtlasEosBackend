@@ -24,6 +24,42 @@ class PromotionalFlierController extends Controller
             'debug' => null,
         ];
     }
+
+    public function switch_promotional_flier_status($id)
+    {
+        $pro_flier = PromotionalFlier::where('id', $id)
+            ->get()
+            ->first();
+        $current_state = $pro_flier->status;
+
+        $switch_state = PromotionalFlier::where('id', $id)->update([
+            'status' => $current_state == '1' ? '0' : '1',
+        ]);
+
+        // if ($current_state == '1') {
+        //     $switch_state = PromotionalFlier::where('id', $id)->update([
+        //         'status' => '0',
+        //     ]);
+        // } else {
+        //     $switch_state = PromotionalFlier::where('id', $id)->update([
+        //         'status' => '1',
+        //     ]);
+        // }
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message =
+                'Deactivate promotional flier was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function create_promotional_flier(Request $request)
     {
         // 'vendor_id', 'name', 'pdf_url', 'description', 'image_url',
@@ -42,7 +78,6 @@ class PromotionalFlierController extends Controller
 
             return response()->json($this->result);
         } else {
-
             if ($request->hasFile('pdf')) {
                 // $filenameWithExt = $request
                 //     ->file('pdf')
@@ -62,7 +97,11 @@ class PromotionalFlierController extends Controller
 
                 // $imageName = time().'.'.$request->image->extension();
 
-                $path = Storage::disk('s3')->put('pdf', $request->pdf,'public');
+                $path = Storage::disk('s3')->put(
+                    'pdf',
+                    $request->pdf,
+                    'public'
+                );
 
                 $full_file_path = Storage::disk('s3')->url($path);
 
@@ -80,7 +119,7 @@ class PromotionalFlierController extends Controller
                 'pdf_url' => $request->hasFile('pdf') ? $full_file_path : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'description' => $description ? $description : null,
-                'image_url' => $image_url ? $image_url : null
+                'image_url' => $image_url ? $image_url : null,
             ]);
 
             if (!$createPromotionalFlier) {
@@ -104,7 +143,8 @@ class PromotionalFlierController extends Controller
         if (!$all_promotional_fliers) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the promotional fliers";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the promotional fliers";
             return response()->json($this->result);
         }
 
@@ -121,7 +161,8 @@ class PromotionalFlierController extends Controller
         if (!$one_promotional_flier) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch the promotional flier";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the promotional flier";
             return response()->json($this->result);
         } else {
             // edit the promotional flier
@@ -158,7 +199,12 @@ class PromotionalFlierController extends Controller
                     $extension = $request
                         ->file('pdf')
                         ->getClientOriginalExtension();
-                    $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
+                    $fileNameToStore =
+                        Str::slug($filename, '_', $language = 'en') .
+                        '_' .
+                        time() .
+                        '.' .
+                        $extension;
                     $filepath =
                         env('APP_URL') .
                         Storage::url(
@@ -173,7 +219,7 @@ class PromotionalFlierController extends Controller
                     'pdf_url' => $request->hasFile('pdf') ? $filepath : null,
                     'vendor_id' => $vendor_id ? $vendor_id : null,
                     'description' => $description ? $description : null,
-                    'image_url' => $image_url ? $image_url : null
+                    'image_url' => $image_url ? $image_url : null,
                 ]);
 
                 if (!$update_promotional_flier) {
@@ -186,7 +232,8 @@ class PromotionalFlierController extends Controller
 
                 $this->result->status = true;
                 $this->result->status_code = 200;
-                $this->result->message = 'Promotional Flier updated successfully';
+                $this->result->message =
+                    'Promotional Flier updated successfully';
                 return response()->json($this->result);
             }
         }
@@ -199,7 +246,8 @@ class PromotionalFlierController extends Controller
         if (!$one_promotional_flier) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch the promotional fliers";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the promotional fliers";
             return response()->json($this->result);
         } else {
         }
@@ -207,12 +255,16 @@ class PromotionalFlierController extends Controller
 
     public function show_promotional_flier_by_vendor_id($vendor_id)
     {
-        $one_promotional_flier = PromotionalFlier::where('vendor_id', $vendor_id)->get();
+        $one_promotional_flier = PromotionalFlier::where(
+            'vendor_id',
+            $vendor_id
+        )->get();
 
         if (!$one_promotional_flier) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch the promotional fliers";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the promotional fliers";
             return response()->json($this->result);
         } else {
             $this->result->status = true;
@@ -231,7 +283,8 @@ class PromotionalFlierController extends Controller
         if (!$promotional_flier) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch the promotional flier";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the promotional flier";
             return response()->json($this->result);
         }
 
@@ -240,7 +293,8 @@ class PromotionalFlierController extends Controller
         if (!$delete_promotional_flier) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't delete the promotional flier";
+            $this->result->message =
+                "An Error Ocurred, we couldn't delete the promotional flier";
             return response()->json($this->result);
         }
 
@@ -252,32 +306,37 @@ class PromotionalFlierController extends Controller
     }
 
     # get all the vendors that have promotional fliers
-    public  function get_all_vendors_with_promotional_fliers()
+    public function get_all_vendors_with_promotional_fliers()
     {
-        $all_vendors_with_promotional_fliers =
-            PromotionalFlier::select('vendor_id')
-            ->groupBy('vendor_id')->get();
+        $all_vendors_with_promotional_fliers = PromotionalFlier::select(
+            'vendor_id'
+        )
+            ->groupBy('vendor_id')
+            ->get();
         // ::distinct('vendor_id')
         // ->distinct()
-
 
         // return $all_vendors_with_promotional_fliers;
 
         if (!$all_vendors_with_promotional_fliers) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch all the vendors";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the vendors";
             return response()->json($this->result);
         }
 
         # get the vendor details
-        $vendors = Vendors::whereIn('vendor_code', $all_vendors_with_promotional_fliers)
-            ->get();
+        $vendors = Vendors::whereIn(
+            'vendor_code',
+            $all_vendors_with_promotional_fliers
+        )->get();
 
         if (!$vendors) {
             $this->result->status = true;
             $this->result->status_code = 400;
-            $this->result->message = "An Error Ocurred, we couldn't fetch the vendors";
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch the vendors";
             return response()->json($this->result);
         } else {
             $this->result->status = true;

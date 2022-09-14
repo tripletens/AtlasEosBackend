@@ -2422,6 +2422,14 @@ class AdminController extends Controller
             ->where('last_login', '!=', null)
             ->count();
 
+        $total_logged_in_dealers = Users::where('role', '4')
+            ->where('last_login', '!=', null)
+            ->count();
+
+        $total_not_logged_in_dealers = Users::where('role', '4')
+            ->where('last_login', '=', null)
+            ->count();
+
         $cart_data = Cart::all();
         $cart_total = 0;
         $total_item_ordered = 0;
@@ -2453,6 +2461,9 @@ class AdminController extends Controller
         $this->result->data->total_products = $total_products;
         $this->result->data->total_amount = $cart_total;
         $this->result->data->total_item_ordered = $total_item_ordered;
+
+        $this->result->data->total_logged_in_dealer = $total_logged_in_dealers;
+        $this->result->data->total_not_logged_in_dealer = $total_not_logged_in_dealers;
 
         $this->result->message = 'Analysis Admin Dashboard Data';
         return response()->json($this->result);

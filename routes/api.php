@@ -1131,5 +1131,15 @@ Route::group(
             '/sales-rep/dashboard/{user}',
             'SalesRepController@sales_rep_dashboard'
         );
+        Route::get(
+            '/sales-rep/loggedin-dealers/{user_id}',
+            'SalesRepController@fetch_loggedin_dealers'
+        );
+
+        Route::get(
+            '/sales-rep/notloggedin-dealers/{user_id}',
+            'SalesRepController@fetch_notloggedin_dealers'
+        );
+
     }
 );

@@ -696,4 +696,98 @@ class SalesRepController extends Controller
     public function dashboard()
     {
     }
+
+    public function fetch_loggedin_dealers($user_id){
+        $user_data = Users::where('id', $user_id)->get()->first();
+        $user_dealers_array = [];
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                    // ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')
+                    ->get();
+
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+        }
+        // lets fetch only logged in  users
+        $loggedin_users = [];
+        foreach ($user_dealers_array as $user){
+            if($user->last_login !== null){
+                array_push($loggedin_users,$user);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Logged in users fetched successfully';
+        $this->result->data->total_logged_in = count($loggedin_users);
+        $this->result->data->logged_in_users = $loggedin_users;
+        return response()->json($this->result);
+    }
+
+    public function fetch_notloggedin_dealers($user_id){
+        $user_data = Users::where('id', $user_id)->get()->first();
+        $user_dealers_array = [];
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                    ->select('*')
+                    ->get();
+
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+        }
+        // lets fetch only logged in  users
+        $loggedin_users = [];
+        foreach ($user_dealers_array as $user){
+            if($user->last_login === null){
+                array_push($loggedin_users,$user);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Logged in users fetched successfully';
+        $this->result->data->total_logged_in = count($loggedin_users);
+        $this->result->data->logged_in_users = $loggedin_users;
+        return response()->json($this->result);
+    }
 }

@@ -1899,8 +1899,12 @@ class AdminController extends Controller
             $email = $request->email;
             $password = $request->password;
 
-            if (strtolower($role) == '1') {
+            if (strtolower($role) == '7') {
                 $role_name = 'admin';
+            }
+
+            if (strtolower($role) == '1') {
+                $role_name = 'super admin';
             }
 
             if (strtolower($role) == '2') {
@@ -2226,8 +2230,12 @@ class AdminController extends Controller
                 $role = 0;
                 $role_name = $value[3];
 
-                if (strtolower($role_name) == 'admin') {
+                if (strtolower($role_name) == 'super admin') {
                     $role = 1;
+                }
+
+                if (strtolower($role_name) == 'admin') {
+                    $role = 7;
                 }
 
                 if (strtolower($role_name) == 'branch manager') {

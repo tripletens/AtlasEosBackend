@@ -3050,16 +3050,17 @@ class AdminController extends Controller
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
                         'location' => $location,
+                        'access_group' => $access_group,
                     ]);
-                }
 
-                // if (!$save_dealer) {
-                //     $this->result->status = false;
-                //     $this->result->status_code = 422;
-                //     $this->result->message =
-                //         'Sorry File could not be uploaded. Try again later.';
-                //     return response()->json($this->result);
-                // }
+                    if (!$save_dealer) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
             }
         }
 

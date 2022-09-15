@@ -2996,6 +2996,80 @@ class AdminController extends Controller
         }
     }
 
+    public function atlas_format_upload_dealer_users(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealer in csv format';
+            return response()->json($this->result);
+        }
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                $dealer_code = $value[0];
+                $password = bcrypt($value[1]);
+                $password_show = $value[1];
+                $dealer_name = $value[2];
+                $location = $value[3];
+                $access_group = $value[4];
+                $email = strtolower($value[5]);
+
+                // $first_name = strtolower($value[2]);
+                // $last_name = strtolower($value[3]);
+                // $privilege_vendors = $value[6];
+                // $privilege_dealers = $value[7];
+                // $full_name = $first_name . ' ' . $last_name;
+
+                $role = '4';
+                $role_name = 'dealer';
+
+                if (Users::where('email', $email)->exists()) {
+                } else {
+                    $save_dealer = Users::create([
+                        // 'first_name' => $first_name,
+                        // 'last_name' => $last_name,
+                        // 'full_name' => $full_name,
+                        'email' => $email,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        'role' => $role,
+                        'role_name' => $role_name,
+                        'dealer_name' => $dealer_name,
+                        // 'privileged_vendors' => $privilege_vendors,
+                        // 'privileged_dealers' => $privilege_dealers,
+                        'account_id' => $dealer_code,
+                        'dealer_code' => $dealer_code,
+                        'company_name' => $dealer_name,
+                        'location' => $location,
+                    ]);
+                }
+
+                // if (!$save_dealer) {
+                //     $this->result->status = false;
+                //     $this->result->status_code = 422;
+                //     $this->result->message =
+                //         'Sorry File could not be uploaded. Try again later.';
+                //     return response()->json($this->result);
+                // }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
     public function upload_dealer_users(Request $request)
     {
         $csv = $request->file('csv');

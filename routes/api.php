@@ -128,6 +128,11 @@ Route::group(
             'AdminController@upload_dealer_users'
         );
 
+        Route::post(
+            '/atlas-format-upload-dealer-users',
+            'AdminController@atlas_format_upload_dealer_users'
+        );
+
         Route::get(
             '/get-all-dealer-users',
             'AdminController@get_all_dealer_users'
@@ -1144,6 +1149,5 @@ Route::group(
             '/sales-rep/notloggedin-dealers/{user_id}',
             'SalesRepController@fetch_notloggedin_dealers'
         );
-
     }
 );

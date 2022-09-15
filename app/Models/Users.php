@@ -38,6 +38,7 @@ class Users extends Authenticatable implements JWTSubject
         'vendor_name',
         'dealer_name',
         'dealer_code',
+        'access_group',
         'access_level_first',
         'access_level_second',
         'region',

@@ -3232,9 +3232,9 @@ class AdminController extends Controller
             // remove the first row of the csv
 
             foreach ($csv_data as $key => $value) {
-                $dealer_code = $value[0];
-                $dealer_name = $value[1];
-                $location = $value[2];
+                $dealer_code = trim($value[0]);
+                $dealer_name = trim($value[1]);
+                $location = trim($value[2]);
                 $role_name = 'dealer';
                 $role_id = '4';
 

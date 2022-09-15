@@ -3234,6 +3234,7 @@ class AdminController extends Controller
             foreach ($csv_data as $key => $value) {
                 $dealer_code = $value[0];
                 $dealer_name = $value[1];
+                $location = $value[2];
                 $role_name = 'dealer';
                 $role_id = '4';
 
@@ -3241,6 +3242,7 @@ class AdminController extends Controller
                     $save_dealer = Dealer::create([
                         'dealer_name' => $dealer_name,
                         'dealer_code' => $dealer_code,
+                        'location' => $location,
                         'role_name' => $role_name,
                         'role_id' => $role_id,
                     ]);

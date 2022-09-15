@@ -87,6 +87,10 @@ Route::group(
             '/upload-vendor-users',
             'AdminController@upload_vendor_users'
         ); # working fine
+        Route::post(
+            '/atlas-format-upload-vendor-users',
+            'AdminController@atlas_format_upload_vendor_users'
+        ); # working fine
         Route::post('/upload-admin', 'AdminController@upload_admin'); # working fine
         Route::post('/edit-vendor-data', 'AdminController@edit_vendor_data');
         Route::get(

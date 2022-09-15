@@ -3662,6 +3662,88 @@ class AdminController extends Controller
         }
     }
 
+    public function atlas_format_upload_vendor_users(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealers in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                // `full_name`, `first_name`, `last_name`, `email`, `password`,
+                // `password_show`, `role`, `role_name`, `dealer`, `vendor`,
+                // `vendor_name`, `privileged_vendors`, `username`, `account_id`,
+                // `phone`, `status`, `order_status`, `location`, `company_name`,
+                // `last_login`,`login_device`, `place_order_date`, `created_at`,
+                // `updated_at`
+                $vendor_name = $value[0];
+                $username = $value[1];
+                $first_name = $value[2];
+
+                $ex = explode(' ', $first_name);
+
+                $int_first_name = isset($ex[0]) ? $ex[0] : null;
+                $int_last_name = isset($ex[1]) ? $ex[1] : null;
+
+                $password = bcrypt($value[3]);
+                // $password = bcrypt($value[4]);
+                $password_show = $value[3];
+                $privilege_vendors = $value[4];
+                $email = strtolower($value[5]);
+                $vendor_code = $value[7];
+                $role = '3';
+                $role_name = 'vendor';
+
+                if (Users::where('email', $email)->exists()) {
+                } else {
+                    $save_users = Users::create([
+                        'full_name' => $first_name,
+                        'first_name' => $int_first_name,
+                        'last_name' => $int_last_name,
+
+                        'email' => $email,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        'role' => $role,
+                        'role_name' => $role_name,
+                        // 'vendor' => $vendor,
+                        'vendor_name' => $vendor_name,
+                        'privileged_vendors' => $privilege_vendors,
+                        'username' => $email,
+                        'company_name' => $vendor_name,
+                        'vendor_code' => $vendor_code,
+                    ]);
+
+                    if (!$save_users) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor Users uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
     public function upload_vendor_users(Request $request)
     {
         $csv = $request->file('csv');

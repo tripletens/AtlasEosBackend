@@ -2497,6 +2497,10 @@ class AdminController extends Controller
             $description = $request->description;
             $new_state = $request->newState;
             $image = $request->image;
+            $grouping = $request->grouping;
+            $spec_data = isset($request->specData)
+                ? json_encode($request->specData)
+                : null;
 
             if (Products::where('atlas_id', $atlasId)->exists()) {
                 $this->result->status = false;
@@ -2517,6 +2521,8 @@ class AdminController extends Controller
                     'special' => $special,
                     'check_new' => $new_state ? '1' : '0',
                     'img' => $image,
+                    'grouping' => $grouping,
+                    'spec_data' => $spec_data != null ? $spec_data : null,
                 ]);
 
                 if (!$save_product) {

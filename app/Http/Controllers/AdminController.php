@@ -2673,6 +2673,11 @@ class AdminController extends Controller
     public function get_all_products()
     {
         $products = Products::where('status', '1')->get();
+
+        foreach ($products as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get all products was successful';

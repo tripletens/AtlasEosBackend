@@ -1020,6 +1020,10 @@ Route::group(
 
         Route::post('/edit_buck', 'BuckController@edit_buck');
 
+        Route::get('/fetch-all-vendor-show-bucks/{vendor_code}', 'BuckController@fetch_all_vendor_show_bucks');
+
+        Route::get('/fetch-all-show-bucks', 'BuckController@fetch_all_show_bucks');
+
         // ------------------- show bucks ends here  ------------------ //
 
         // ------------------ test apis --------------------------- //

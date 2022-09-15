@@ -285,4 +285,56 @@ class BuckController extends Controller
             return response()->json($this->result);
         }
     }
+
+    public function fetch_all_vendor_show_bucks($vendor_code)
+    {
+        $fetch_vendor_details = Vendors::where('vendor_code', $vendor_code)->get()->first();
+
+        if (!$fetch_vendor_details) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the vendor with that vendor code";
+            return response()->json($this->result);
+        }
+
+        $fetch_show_bucks = Bucks::where('vendor_code', $vendor_code)->get();
+
+        if (!$fetch_show_bucks) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the show bucks with that vendor code";
+            return response()->json($this->result);
+        } else {
+            $data = [
+                "vendor" => $fetch_vendor_details,
+                "vendor_code" => $vendor_code,
+                "bucks" => $fetch_show_bucks,
+            ];
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $data;
+            $this->result->message = 'All show bucks fetched Successfully';
+            return response()->json($this->result);
+        }
+    }
+
+    public function fetch_all_show_bucks()
+    {
+
+        $fetch_show_bucks = Bucks::get();
+
+        if (!$fetch_show_bucks) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message = "An Error Ocurred, we couldn't fetch the all the show bucks";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_show_bucks;
+        $this->result->message = 'All show bucks fetched Successfully';
+        return response()->json($this->result);
+    }
 }

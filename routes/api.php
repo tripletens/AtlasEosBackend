@@ -61,6 +61,12 @@ Route::group(
 
         Route::post('/upload-users', 'AdminController@upload_users');
         Route::post('/upload-vendors', 'AdminController@upload_vendors');
+
+        Route::post(
+            '/atlas-format-upload-vendors',
+            'AdminController@atlas_format_upload_vendors'
+        );
+
         Route::post('/register-vendors', 'AdminController@register_vendors');
         Route::post(
             '/register-vendor-users',

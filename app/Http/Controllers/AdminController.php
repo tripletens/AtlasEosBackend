@@ -2205,6 +2205,107 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public function atlas_format_upload_admin_csv(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload admin users in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            foreach ($csv_data as $key => $value) {
+                # code...
+                $name = $value[0];
+                $desgination = $value[1];
+                $email = $value[2];
+                $access_level_first = $value[4];
+                $password = bcrypt($value[5]);
+                $password_show = $value[5];
+
+                // $access_level_second = $value[5];
+
+                // $region = $value[7];
+                $extra_name = explode(' ', $name);
+                $first_name = isset($extra_name[0]) ? $extra_name[0] : null;
+                $last_name = isset($extra_name[1]) ? $extra_name[1] : null;
+
+                $role = 0;
+                $role_name = $value[3];
+
+                if (strtolower($role_name) == 'super admin') {
+                    $role = 1;
+                }
+
+                if (strtolower($role_name) == 'admin') {
+                    $role = 7;
+                }
+
+                if (strtolower($role_name) == 'branch manager') {
+                    $role = 2;
+                }
+
+                if (strtolower($role_name) == 'vendor') {
+                    $role = 3;
+                }
+
+                if (strtolower($role_name) == 'dealer') {
+                    $role = 4;
+                }
+                if (strtolower($role_name) == 'inside sales') {
+                    $role = 5;
+                }
+
+                if (strtolower($role_name) == 'outside sales') {
+                    $role = 6;
+                }
+
+                if (Users::where('email', $email)->exists()) {
+                    // post with the same slug already exists
+                } else {
+                    $save_admin = Users::create([
+                        'first_name' => $first_name,
+                        'last_name' => $last_name,
+                        'full_name' => $name,
+                        'designation' => $role_name,
+                        'email' => $email,
+                        'role_name' => $role_name,
+                        'role' => $role,
+                        'access_level_first' => $access_level_first,
+                        // 'access_level_second' => $access_level_second,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        // 'region' => $region,
+                    ]);
+
+                    if (!$save_admin) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Admin Users uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
     public function upload_admin_csv(Request $request)
     {
         $csv = $request->file('csv');
@@ -2227,7 +2328,7 @@ class AdminController extends Controller
             foreach ($csv_data as $key => $value) {
                 # code...
                 $name = $value[0];
-                ///  $desgination = $value[1];
+                // $desgination = $value[1];
                 $email = $value[2];
                 $access_level_first = $value[4];
                 $access_level_second = $value[5];

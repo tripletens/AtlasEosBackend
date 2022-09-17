@@ -207,6 +207,11 @@ Route::group(
         Route::post('/upload-admin-users', 'AdminController@upload_admin_csv');
 
         Route::post(
+            '/atlas-format-upload-admin-users',
+            'AdminController@atlas_format_upload_admin_csv'
+        );
+
+        Route::post(
             '/register-admin-users',
             'AdminController@register_admin_users'
         );

@@ -68,6 +68,12 @@ Route::group(
         );
 
         Route::post('/register-vendors', 'AdminController@register_vendors');
+
+        Route::post(
+            '/register-dealership',
+            'AdminController@register_dealership'
+        );
+
         Route::post(
             '/register-vendor-users',
             'AdminController@register_vendor_users'

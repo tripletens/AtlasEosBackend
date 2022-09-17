@@ -3030,14 +3030,15 @@ class AdminController extends Controller
                 $password_show = $value[1];
                 $dealer_name = $value[2];
                 $location = $value[3];
-                $access_group = $value[4];
-                $email = strtolower($value[5]);
 
-                // $first_name = strtolower($value[2]);
-                // $last_name = strtolower($value[3]);
-                // $privilege_vendors = $value[6];
-                // $privilege_dealers = $value[7];
-                // $full_name = $first_name . ' ' . $last_name;
+                $email = strtolower($value[4]);
+
+                $first_name = strtolower($value[5]);
+                $last_name = strtolower($value[6]);
+                $privilege_dealers = $value[7];
+                $privilege_vendors = $value[8];
+
+                $full_name = $first_name . ' ' . $last_name;
 
                 $role = '4';
                 $role_name = 'dealer';
@@ -3045,22 +3046,22 @@ class AdminController extends Controller
                 if (Users::where('email', $email)->exists()) {
                 } else {
                     $save_dealer = Users::create([
-                        // 'first_name' => $first_name,
-                        // 'last_name' => $last_name,
-                        // 'full_name' => $full_name,
+                        'first_name' => $first_name,
+                        'last_name' => $last_name,
+                        'full_name' => $full_name,
                         'email' => $email,
                         'password' => $password,
                         'password_show' => $password_show,
                         'role' => $role,
                         'role_name' => $role_name,
                         'dealer_name' => $dealer_name,
-                        // 'privileged_vendors' => $privilege_vendors,
-                        // 'privileged_dealers' => $privilege_dealers,
+                        'privileged_vendors' => $privilege_vendors,
+                        'privileged_dealers' => $privilege_dealers,
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
                         'location' => $location,
-                        'access_group' => $access_group,
+                        'designation' => 'dealer',
                     ]);
 
                     if (!$save_dealer) {

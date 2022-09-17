@@ -78,6 +78,48 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function register_dealership(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'dealerName' => 'required',
+            'dealerCode' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $response['response'] = $validator->messages();
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = $response;
+
+            return response()->json($this->result);
+        } else {
+            // process the request
+            $name = $request->dealerName;
+            $code = $request->dealerCode;
+
+            // save to the db
+            $save_vendor = Dealer::create([
+                'dealer_name' => $name,
+                'dealer_code' => $code,
+                'role_name' => 'dealer',
+                'role_id' => '4',
+            ]);
+
+            if ($save_vendor) {
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->message = 'Dealer Successfully Added';
+                return response()->json($this->result);
+            } else {
+                $this->result->status = true;
+                $this->result->status_code = 404;
+                $this->result->message =
+                    'An Error Ocurred, Dealer Addition failed';
+                return response()->json($this->result);
+            }
+        }
+    }
+
     public function dealer_detailed_report()
     {
         $cart = Cart::where('status', '1')
@@ -658,9 +700,7 @@ class AdminController extends Controller
                 ->first();
 
             $first_name = isset($user->first_name) ? $user->first_name : null;
-
             $last_name = isset($user->last_name) ? $user->last_name : null;
-
             $data = [
                 'account_id' => isset($user->account_id)
                     ? $user->account_id
@@ -877,6 +917,14 @@ class AdminController extends Controller
                 $show = $value->show_price;
                 $overide_price = $value->overide_price;
 
+                $first_name = isset($user_data->first_name)
+                    ? $user_data->first_name
+                    : null;
+
+                $last_name = isset($user_data->last_name)
+                    ? $user_data->last_name
+                    : null;
+
                 $data = [
                     'dealer_code' => $dealer_code,
                     'vendor_name' => isset($vendor_data->vendor_name)
@@ -893,11 +941,7 @@ class AdminController extends Controller
                     'regular' => $regular,
                     'show' => $show,
                     'overide_price' => $overide_price,
-                    'authorized_by' => (isset($user_data->first_name)
-                            ? $user_data->first_name
-                            : null . ' ' . isset($user_data->last_name))
-                        ? $user_data->last_name
-                        : null,
+                    'authorized_by' => $first_name . ' ' . $last_name,
                 ];
 
                 array_push($res_data, $data);
@@ -1442,34 +1486,6 @@ class AdminController extends Controller
         $days = floor(($secondsLeft / 60) * 60 * 24);
         $hours = floor((($secondsLeft - $days * 60 * 60 * 24) / 60) * 60);
 
-        // if ($now->lt($start_timer)) {
-        //     $this->result->data->years = 0;
-        //     $this->result->data->months = 0;
-        //     $this->result->data->weeks = 0;
-        //     $this->result->data->days = 0;
-        //     $this->result->data->hours = 0;
-        //     $this->result->data->minutes = 0;
-        //     $this->result->data->seconds = 0;
-        // } else {
-
-        // $years = $end_timer->diffInYears($start_timer);
-        // $months = $end_timer->diffInMonths($start_timer);
-        // $weeks = $end_timer->diffInWeeks($start_timer);
-        // $days = $end_timer->diffInDays($start_timer);
-        // $hours = $end_timer->diffInHours($start_timer);
-        // $minutes = $end_timer->diffInMinutes($start_timer);
-        // $seconds = $end_timer->diffInSeconds($start_timer);
-
-        // $human = $end_timer->diffForHumans($start_timer);
-
-        // $this->result->data->years = $years;
-        // $this->result->data->months = $months;
-        // $this->result->data->weeks = $weeks;
-        // $this->result->data->days = $days;
-        // $this->result->data->hours = $hours;
-        // $this->result->data->minutes = $minutes;
-        // $this->result->data->seconds = $seconds;
-
         $this->result->data->start_timer_timestamp = strtotime($start_timer);
 
         $this->result->data->end_timer_timestamp = strtotime($end_timer);
@@ -1486,12 +1502,6 @@ class AdminController extends Controller
         $this->result->data->inital_end_timer = $inital_end_timer;
 
         $this->result->data->real_start_timer = $inital_start_timer;
-
-        // echo $gameStart;
-        //    }
-
-        // $this->result->data->starter = $start_timer;
-        // $this->result->data->ender = $end_timer;
 
         $this->result->status = true;
         $this->result->message = 'Program Count Down Set Successfully';
@@ -3438,34 +3448,19 @@ class AdminController extends Controller
 
     public function deactivate_vendor($id)
     {
-        $curr = Vendors::where('id', $id)
-            ->get()
-            ->first();
-        $status = $curr->status;
+        // $curr = Vendors::where('id', $id)
+        //     ->get()
+        //     ->first();
+        // $status = $curr->status;
 
-        if ($status == '1') {
-            // update to the db
-            $update = Vendors::where('id', $id)->update([
-                'status' => '0',
-            ]);
-        } else {
-            // update to the db
-            $update = Vendors::where('id', $id)->update([
-                'status' => '1',
-            ]);
-        }
+        $delete_cart = Cart::where('vendor', $id)->delete();
+        $delete_vendor = Vendors::where('vendor_code', $id)->delete();
+        $delete_vendor_users = Users::where('vendor_code', $id)->delete();
 
-        if ($update) {
-            $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->message = 'Vendor Deactivated Successfully';
-            return response()->json($this->result);
-        } else {
-            $this->result->status = true;
-            $this->result->status_code = 404;
-            $this->result->message = 'An Error Ocurred, Vendor Update failed';
-            return response()->json($this->result);
-        }
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor Deleted Successfully';
+        return response()->json($this->result);
     }
 
     public function edit_vendor_data(Request $request)
@@ -3934,6 +3929,53 @@ class AdminController extends Controller
                     'vendor_name' => $vendor_name,
                     'role_name' => 'vendor',
                     'vendor_code' => $vendor_id,
+                    'role' => $role,
+                ]);
+
+                if (!$save_product) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendors uploaded successfully';
+        return response()->json($this->result);
+        fclose($file);
+    }
+
+    public function upload_dealeship(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload dealers in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+            array_shift($csv_data);
+            // remove the first row of the csv
+            foreach ($csv_data as $key => $value) {
+                $vendor_name = $value[0];
+                $vendor_id = $value[2];
+                $role = 4;
+
+                $save_product = Dealer::create([
+                    'dealer_name' => $vendor_name,
+                    'role_name' => 'vendor',
+                    'dealer_code' => $vendor_id,
                     'role' => $role,
                 ]);
 

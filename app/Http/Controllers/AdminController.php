@@ -1067,8 +1067,12 @@ class AdminController extends Controller
                     ->get()
                     ->first();
 
-                $value->dealership_name = $dealer_data->company_name;
-                $value->vendorship_name = $vendor_data->company_name;
+                $value->dealership_name = isset($dealer_data->company_name)
+                    ? $dealer_data->company_name
+                    : null;
+                $value->vendorship_name = isset($vendor_data->company_name)
+                    ? $vendor_data->company_name
+                    : null;
                 // $value->dealer_rep =
                 // $dealer_data->first_name . ' ' . $dealer_data->last_name;
 
@@ -1103,8 +1107,12 @@ class AdminController extends Controller
                     ->get()
                     ->first();
 
-                $value->dealership_name = $dealer_data->company_name;
-                $value->vendorship_name = $vendor_data->company_name;
+                $value->dealership_name = isset($dealer_data->company_name)
+                    ? $dealer_data->company_name
+                    : null;
+                $value->vendorship_name = isset($vendor_data->company_name)
+                    ? $vendor_data->company_name
+                    : null;
                 // $value->dealer_rep =
                 // $dealer_data->first_name . ' ' . $dealer_data->last_name;
 

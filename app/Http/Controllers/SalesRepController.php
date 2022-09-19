@@ -677,7 +677,7 @@ class SalesRepController extends Controller
             $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
                 ->select('last_login')
                 ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
-            array_push($last_login_array,array_values($dealer_inner_details));
+            array_push($last_login_array, array_values($dealer_inner_details));
         }
 
         // return $user_dealers_array;
@@ -699,7 +699,8 @@ class SalesRepController extends Controller
     {
     }
 
-    public function fetch_loggedin_dealers($user_id){
+    public function fetch_loggedin_dealers($user_id)
+    {
         $user_data = Users::where('id', $user_id)->get()->first();
         $user_dealers_array = [];
         if (!$user_data) {
@@ -712,6 +713,8 @@ class SalesRepController extends Controller
 
         // get all the privileged dealers under the person
         $user_privileged_dealers = $user_data->privileged_dealers;
+
+        $total_amount = 0;
 
         if ($user_privileged_dealers != null) {
 
@@ -725,6 +728,9 @@ class SalesRepController extends Controller
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
+                    $dealer_cart_total = Cart::where('dealer', $user_privileged_dealers_format)->get()->sum('price');
+
+                    $total_amount += $dealer_cart_total;
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
@@ -732,9 +738,9 @@ class SalesRepController extends Controller
         }
         // lets fetch only logged in  users
         $loggedin_users = [];
-        foreach ($user_dealers_array as $user){
-            if($user->last_login !== null){
-                array_push($loggedin_users,$user);
+        foreach ($user_dealers_array as $user) {
+            if ($user->last_login !== null) {
+                array_push($loggedin_users, $user);
             }
         }
 
@@ -743,10 +749,12 @@ class SalesRepController extends Controller
         $this->result->message = 'Logged in users fetched successfully';
         $this->result->data->total_logged_in = count($loggedin_users);
         $this->result->data->logged_in_users = $loggedin_users;
+        $this->result->total_amount = $total_amount;
         return response()->json($this->result);
     }
 
-    public function fetch_notloggedin_dealers($user_id){
+    public function fetch_notloggedin_dealers($user_id)
+    {
         $user_data = Users::where('id', $user_id)->get()->first();
         $user_dealers_array = [];
         if (!$user_data) {
@@ -760,6 +768,7 @@ class SalesRepController extends Controller
         // get all the privileged dealers under the person
         $user_privileged_dealers = $user_data->privileged_dealers;
 
+        $total_amount = 0;
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
@@ -772,24 +781,33 @@ class SalesRepController extends Controller
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
+
+                    $dealer_cart_total = Cart::where('dealer', $user_privileged_dealers_format)->get()->sum('price');
+
+                    $total_amount += $dealer_cart_total;
+
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
             }
         }
+
+
         // lets fetch only logged in  users
         $loggedin_users = [];
-        foreach ($user_dealers_array as $user){
-            if($user->last_login === null){
-                array_push($loggedin_users,$user);
+        foreach ($user_dealers_array as $user) {
+            if ($user->last_login === null) {
+                array_push($loggedin_users, $user);
             }
         }
 
+
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Logged in users fetched successfully';
+        $this->result->message = 'Not Logged in users fetched successfully';
         $this->result->data->total_logged_in = count($loggedin_users);
         $this->result->data->logged_in_users = $loggedin_users;
+        $this->result->total_amount = $total_amount;
         return response()->json($this->result);
     }
 }

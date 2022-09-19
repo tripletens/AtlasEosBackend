@@ -1292,8 +1292,8 @@ class VendorController extends Controller
                     $total_price += intval($kvalue->price);
                 }
 
-                $user_id = $item_cart->uid;
-                $dealer_code = $item_cart->dealer;
+                $user_id = $kvalue->uid;
+                $dealer_code = $kvalue->dealer;
 
                 $dealer_data = Dealer::where('dealer_code', $dealer_code)
                     ->get()

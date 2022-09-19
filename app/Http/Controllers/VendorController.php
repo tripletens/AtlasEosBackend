@@ -11,6 +11,7 @@ use App\Models\Products;
 use App\Models\Cart;
 use App\Models\Dealer;
 use App\Models\Faq;
+use App\Models\ProgramCountdown;
 use App\Models\ProgramNotes;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Models\SystemSettings;
@@ -1906,17 +1907,19 @@ class VendorController extends Controller
 
         $new_all_orders = array_map(function ($vendor_code) {
             $vendor_code_format = str_replace('\"', '-', $vendor_code);
-            $settings_id = 1;
+            // $settings_id = 1;
             # select the settings
-            $fetch_settings = SystemSettings::find($settings_id);
+            // $fetch_settings = SystemSettings::find($settings_id);
+
+            $fetch_settings = ProgramCountdown::where("status",1)->get()->first();
 
             $vendor_cart = DB::table('cart')
                 ->where('vendor', $vendor_code)
                 ->whereDate(
                     'created_at',
                     '>=',
-                    $fetch_settings->chart_start_date
-                        ? $fetch_settings->chart_start_date
+                    $fetch_settings->start_countdown_date
+                        ? $fetch_settings->start_countdown_date
                         : date('Y-m-d')
                 )
                 ->where('status', '1')

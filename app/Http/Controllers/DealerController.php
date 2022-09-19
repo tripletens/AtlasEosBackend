@@ -2182,19 +2182,20 @@ class DealerController extends Controller
     {
         // fetch all the orders
         // $all_orders = Cart::where('dealer', $account)->where('status', '1');
-        $settings_id = 1;
+        // $settings_id = 1;
         # select the settings
-        $fetch_settings = SystemSettings::find($settings_id);
+        // $fetch_settings = SystemSettings::find($settings_id);
 
-        // return $fetch_settings;
+        $fetch_settings = ProgramCountdown::where("status",1)->get()->first();
+        // return $fetch_settings->start_countdown_date;
 
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)
             ->whereDate(
                 'created_at',
                 '>=',
-                $fetch_settings->chart_start_date
-                    ? $fetch_settings->chart_start_date
+                $fetch_settings->start_countdown_date
+                    ? $fetch_settings->start_countdown_date
                     : date('Y-m-d')
             )
             ->where('status', '1')

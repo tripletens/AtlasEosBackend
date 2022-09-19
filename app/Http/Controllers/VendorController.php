@@ -1338,6 +1338,9 @@ class VendorController extends Controller
                     'dealership' => isset($dealer_data->dealer_name)
                         ? $dealer_data->dealer_name
                         : null,
+                    'dealership_code' => isset($dealer_code)
+                        ? $dealer_code
+                        : null,
                     'vendor_code' => $code,
                     'vendor_name' => isset($vendor_data->vendor_name)
                         ? $vendor_data->vendor_name

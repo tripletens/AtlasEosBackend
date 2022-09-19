@@ -87,6 +87,7 @@ class VendorController extends Controller
         $pdf_data = [
             'data' => $res_data,
             'dealer' => $dealer_data ? $dealer_data : null,
+            'vendor' => $vendor_data ? $vendor_data : null,
             'grand_total' => $over_all_total,
             'lang' => $lang,
             'printed_at' => $create_time,
@@ -146,6 +147,7 @@ class VendorController extends Controller
         $pdf_data = [
             'data' => $res_data,
             'dealer' => $dealer_data ? $dealer_data : null,
+            'vendor' => $vendor_data ? $vendor_data : null,
             'grand_total' => $over_all_total,
             'lang' => $lang,
             'printed_at' => $create_time,
@@ -1290,11 +1292,26 @@ class VendorController extends Controller
                     $total_price += intval($kvalue->price);
                 }
 
-                /// $user_id = $item_cart->uid;
+                $user_id = $item_cart->uid;
+                $dealer_code = $item_cart->dealer;
+
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+
                 ////  $product_id = $item_cart->product_id;
-                // $user = Users::where('id', $user_id)
-                //     ->get()
-                //     ->first();
+                $user = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+
+                $vendor_data = Vendors::where('vendor_code', $code)
+                    ->get()
+                    ->first();
+
+                $full_name = isset($user->full_name) ? $user->full_name : null;
+                // $last_name = isset($user->last_name) ? $user->last_name : null;
+                // $full_name =
+
                 $product = Products::where('atlas_id', $value)
                     ->get()
                     ->first();
@@ -1316,6 +1333,14 @@ class VendorController extends Controller
                         : null,
                     'booking' => isset($product->booking)
                         ? $product->booking
+                        : null,
+                    'entered_by' => $full_name,
+                    'dealership' => isset($dealer_data->dealer_name)
+                        ? $dealer_data->dealer_name
+                        : null,
+                    'vendor_code' => $code,
+                    'vendor_name' => isset($vendor_data->vendor_name)
+                        ? $vendor_data->vendor_name
                         : null,
                     'total' => $total_price,
                 ];

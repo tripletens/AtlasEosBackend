@@ -155,6 +155,16 @@
                 <br>
                 <h2 class="top-title" style="margin-top: 20px">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'PURCHASES BY DEALER (Detailed
                     display)') }} </h2>
+
+
+
+                @if($vendor != null && $vendor->vendor_name)
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Name:') }}   {{ $vendor->vendor_name }}</h2>
+                @else
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Name: No name found') }}  </h2>
+                @endif
+
+
                 @if($dealer != null && $dealer->dealer_name)
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
                 @else

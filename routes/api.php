@@ -27,6 +27,11 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::get(
+            '/admin/get-vendor-items',
+            'AdminController@get_vendors_with_items'
+        );
+
         Route::get('/admin/get-aims-export', 'AdminController@aims_exports');
 
         Route::get(

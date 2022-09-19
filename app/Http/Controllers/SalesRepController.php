@@ -132,6 +132,7 @@ class SalesRepController extends Controller
         $res_data = [];
         $grand_total = 0;
 
+        $all_vendors = Vendors::all();
         $dealer_data = Cart::where('dealer', $dealer)->get();
         $dealer_ship = Dealer::where('dealer_code', $dealer)
             ->get()
@@ -170,6 +171,7 @@ class SalesRepController extends Controller
                 'vendor_name' => $vendor_data->vendor_name,
                 'total' => floatval($total),
                 'data' => $cart_data,
+                'vendor_no' => count($all_vendors)
             ];
 
             $grand_total += $total;

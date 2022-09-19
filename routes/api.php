@@ -1087,9 +1087,5 @@ Route::group(
             '/sales-rep/notloggedin-dealers/{user_id}',
             'SalesRepController@fetch_notloggedin_dealers'
         );
-
-
-
-
     }
 );

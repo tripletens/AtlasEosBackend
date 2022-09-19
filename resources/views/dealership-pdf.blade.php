@@ -152,14 +152,14 @@
             <div class="col-6">
 
                 <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SUMMARY') }} </h2>
-                @if($dealer_ship != null && $dealer_ship->dealer_name)
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer_ship->dealer_name }}</h2>
+                @if($dealer != null && $dealer->dealer_name)
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
                 @else
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name: No name found') }}  </h2>
                 @endif
 
-                @if($dealer_ship != null && $dealer_ship->dealer_code)
-                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account') }}   #: {{ $dealer_ship->dealer_code }}</h2>
+                @if($dealer != null && $dealer->dealer_code)
+                <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account') }}   #: {{ $dealer->dealer_code }}</h2>
                 @else
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Account #: No dealer code found') }}  </h2>
                 @endif

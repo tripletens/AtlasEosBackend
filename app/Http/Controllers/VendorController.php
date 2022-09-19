@@ -189,7 +189,9 @@ class VendorController extends Controller
                 $value->vendor_name = isset($vendor_data->vendor_name)
                     ? $vendor_data->vendor_name
                     : null;
-                $value->user = $user_data->full_name;
+                $value->user = isset($user_data->full_name)
+                    ? $user_data->full_name
+                    : null;
             }
         }
 

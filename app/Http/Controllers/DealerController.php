@@ -760,6 +760,7 @@ class DealerController extends Controller
             $value->desc = $product_data->description;
             $value->booking = $product_data->booking;
             $value->regular = $product_data->regular;
+            $value->grouping = $product_data->grouping;
 
             $value->spec_data = json_decode($product_data->spec_data);
         }
@@ -1121,7 +1122,9 @@ class DealerController extends Controller
                 }
             }
 
-            Users::where('id', $uid)->where('account_id',$dealer)->update(['order_status' => 1]);
+            Users::where('id', $uid)
+                ->where('account_id', $dealer)
+                ->update(['order_status' => 1]);
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -1162,9 +1165,11 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
-                        Users::where('id', $uid)->where('account_id',$dealer)->update([
-                            'place_order_date' => Carbon::now(),
-                        ]);
+                        Users::where('id', $uid)
+                            ->where('account_id', $dealer)
+                            ->update([
+                                'place_order_date' => Carbon::now(),
+                            ]);
 
                         $current_vendor = $product->vendor_id;
                         $submitted_status = true;
@@ -1220,7 +1225,7 @@ class DealerController extends Controller
         }
     }
 
-    public function get_report_reply($ticket,$dealer)
+    public function get_report_reply($ticket, $dealer)
     {
         $selected = ReportReply::where('ticket', $ticket)->get();
 
@@ -1229,7 +1234,7 @@ class DealerController extends Controller
             foreach ($selected as $value) {
                 $user = $value->user;
                 $user_data = Users::where('id', $user)
-                    ->where('account_id',$dealer)
+                    ->where('account_id', $dealer)
                     ->get()
                     ->first();
 
@@ -1307,7 +1312,7 @@ class DealerController extends Controller
         }
     }
 
-    public function get_first_ticket($ticket,$dealer_id)
+    public function get_first_ticket($ticket, $dealer_id)
     {
         $selected = Report::where('ticket_id', $ticket)
             ->get()
@@ -1315,7 +1320,7 @@ class DealerController extends Controller
 
         $user_id = $selected->user_id;
         $user_data = Users::where('id', $user_id)
-            ->where('account_id',$dealer_id)
+            ->where('account_id', $dealer_id)
             ->get()
             ->first();
 
@@ -2356,7 +2361,9 @@ class DealerController extends Controller
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('photo') ? $full_file_path : null,
+                'file_url' => $request->hasFile('photo')
+                    ? $full_file_path
+                    : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,

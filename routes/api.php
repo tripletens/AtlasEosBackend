@@ -829,6 +829,13 @@ Route::group(
             'VendorController@change_user_bell_status'
         );
 
+        ////// Export /////
+
+        Route::get(
+            '/vendor/get-sales-by-item-detailed-export/{code}',
+            'VendorController@sales_by_item_detailed_export'
+        );
+
         Route::get(
             '/vendor/get-sales-by-item-detailed/{code}',
             'VendorController@sales_by_item_detailed'

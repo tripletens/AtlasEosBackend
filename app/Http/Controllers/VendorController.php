@@ -1653,6 +1653,10 @@ class VendorController extends Controller
             ->get()
             ->first();
 
+        $dealer = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
@@ -1669,6 +1673,10 @@ class VendorController extends Controller
                     'special' => $pro_data->booking,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
+                    'dealer_name' => $dealer->dealer_name,
+                    'dealer_code' => $dealer->dealer_code,
+                    'vendor_name' => $vendor_data->vendor_name,
+                    'vendor_code' => $vendor_data->vendor_code,
                 ];
 
                 array_push($res_data, $data);

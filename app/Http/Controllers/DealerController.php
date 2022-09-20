@@ -277,10 +277,18 @@ class DealerController extends Controller
             'printed_at' => $current_time,
         ];
 
+        $d_name = isset($dealer_ship->dealer_name)
+            ? $dealer_ship->dealer_name
+            : null;
+        $d_code = isset($dealer_ship->dealer_code)
+            ? $dealer_ship->dealer_code
+            : null;
+        $filename = $d_name . $d_code;
+
         /////  return $pdf_data;
 
         $pdf = PDF::loadView('dealership-pdf', $pdf_data);
-        return $pdf->stream('dealership.pdf');
+        return $pdf->stream($filename . '.pdf');
         // return $pdf->download('dealership.pdf');
     }
 

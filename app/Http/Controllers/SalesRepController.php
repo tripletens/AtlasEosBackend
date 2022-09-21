@@ -714,8 +714,6 @@ class SalesRepController extends Controller
         // get all the privileged dealers under the person
         $user_privileged_dealers = $user_data->privileged_dealers;
 
-        $total_amount = 0;
-
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
@@ -752,7 +750,6 @@ class SalesRepController extends Controller
         $this->result->message = 'Logged in users fetched successfully';
         $this->result->data->total_logged_in = count($loggedin_users);
         $this->result->data->logged_in_users = $loggedin_users;
-        $this->result->total_amount = $total_amount;
         return response()->json($this->result);
     }
 
@@ -771,7 +768,6 @@ class SalesRepController extends Controller
         // get all the privileged dealers under the person
         $user_privileged_dealers = $user_data->privileged_dealers;
 
-        $total_amount = 0;
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
@@ -784,11 +780,6 @@ class SalesRepController extends Controller
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
-
-                    $dealer_cart_total = Cart::where('dealer', $user_privileged_dealers_format)->get()->sum('price');
-
-                    $total_amount += $dealer_cart_total;
-
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
@@ -799,6 +790,9 @@ class SalesRepController extends Controller
         // lets fetch only logged in  users
         $loggedin_users = [];
         foreach ($user_dealers_array as $user) {
+            $dealer_cart_total = Cart::where('uid', $user->id)->get()->sum('price');
+
+            $user->total_amount = $dealer_cart_total;
             if ($user->last_login === null) {
                 array_push($loggedin_users, $user);
             }
@@ -810,7 +804,6 @@ class SalesRepController extends Controller
         $this->result->message = 'Not Logged in users fetched successfully';
         $this->result->data->total_logged_in = count($loggedin_users);
         $this->result->data->logged_in_users = $loggedin_users;
-        $this->result->total_amount = $total_amount;
         return response()->json($this->result);
     }
 }

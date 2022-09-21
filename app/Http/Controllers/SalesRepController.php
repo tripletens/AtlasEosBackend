@@ -728,17 +728,20 @@ class SalesRepController extends Controller
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
-                    $dealer_cart_total = Cart::where('dealer', $user_privileged_dealers_format)->get()->sum('price');
 
-                    $total_amount += $dealer_cart_total;
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
             }
         }
+
         // lets fetch only logged in  users
         $loggedin_users = [];
         foreach ($user_dealers_array as $user) {
+            $dealer_cart_total = Cart::where('uid', $user->id)->get()->sum('price');
+
+            $user->total_amount = $dealer_cart_total;
+
             if ($user->last_login !== null) {
                 array_push($loggedin_users, $user);
             }

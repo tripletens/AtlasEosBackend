@@ -54,7 +54,7 @@ class UserController extends Controller
         //valid credential
         $this->validate($request, [
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required',
         ]);
 
         if (

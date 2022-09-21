@@ -1610,7 +1610,7 @@ class VendorController extends Controller
                     ->first();
 
                 $data = [
-                    'id' => $pro_data->product_id,
+                    'id' => $pro_data->id,
                     'dealer_rep_name' =>
                         $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'user_id' => $user,

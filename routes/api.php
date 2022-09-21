@@ -180,6 +180,11 @@ Route::group(
             'AdminController@deactivate_product'
         );
 
+        Route::get(
+            '/get-edit-product/{id}',
+            'AdminController@get_edit_product'
+        );
+
         Route::get('/get-product/{id}', 'AdminController@get_product');
         Route::get(
             '/get-product-atlas-id/{id}',

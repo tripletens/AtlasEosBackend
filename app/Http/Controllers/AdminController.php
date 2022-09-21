@@ -78,6 +78,37 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function get_edit_product($id)
+    {
+        $product = Products::where('id', $id)
+            ->get()
+            ->first();
+
+        $grouping = $product->grouping;
+
+        $assoc = [];
+
+        if ($grouping != null) {
+            $assoc = Products::where('grouping', $grouping)
+                ->where('id', '!=', $id)
+                ->get();
+
+            foreach ($assoc as $value) {
+                $value->spec_data = json_decode($value->spec_data);
+            }
+        }
+
+        $product->spec_data = json_decode($product->spec_data);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get products was successful';
+        $this->result->data->current = $product;
+        $this->result->data->assoc = $assoc;
+
+        return response()->json($this->result);
+    }
+
     public function get_vendors_with_items()
     {
         $get_all_vendors = Vendors::get();

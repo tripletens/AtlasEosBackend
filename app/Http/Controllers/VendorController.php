@@ -1062,7 +1062,9 @@ class VendorController extends Controller
             ->get()
             ->first();
 
-        $user_vendor_code = $selected_user->vendor_code;
+        $user_vendor_code = isset($selected_user->vendor_code)
+            ? $selected_user->vendor_code
+            : null;
         $privilaged_vendors = isset($selected_user->privileged_vendors)
             ? $selected_user->privileged_vendors
             : null;
@@ -1072,9 +1074,13 @@ class VendorController extends Controller
             if ($separator[1] == '') {
                 $pri_vendor_code = $separator[0];
 
-                array_push($separator, $user_vendor_code);
+                if ($user_vendor_code != null && $user_vendor_code != '') {
+                    array_push($separator, $user_vendor_code);
+                }
 
                 array_unique($separator);
+
+                // return $separator;
 
                 ///array_uniqe();
 
@@ -1096,7 +1102,7 @@ class VendorController extends Controller
                         }
                     }
 
-                    if ($value) {
+                    if ($value && $value != '') {
                         $total_sales += Cart::where(
                             'vendor',
                             $vendor_code

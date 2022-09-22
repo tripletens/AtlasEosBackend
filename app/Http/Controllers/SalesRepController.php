@@ -726,7 +726,6 @@ class SalesRepController extends Controller
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
-
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }

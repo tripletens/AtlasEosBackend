@@ -802,7 +802,6 @@ class AdminController extends Controller
     public function fetch_all_orders_per_day()
     {
         $fetch_settings = ProgramCountdown::where("status", 1)->get()->first();
-        // return $fetch_settings->start_countdown_date;
 
         $new_all_orders = DB::table('cart')
             ->whereDate(

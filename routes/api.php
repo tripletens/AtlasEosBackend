@@ -964,7 +964,7 @@ Route::group(
 
         // fetch the dealer purchases per day
         Route::get(
-            '/fetch-all-orders-per-day',
+            '/admin/fetch-all-orders-per-day',
             'AdminController@fetch_all_orders_per_day'
         );
 

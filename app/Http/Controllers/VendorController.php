@@ -1075,9 +1075,9 @@ class VendorController extends Controller
             if ($separator[1] == '') {
                 $pri_vendor_code = $separator[0];
 
-                if ($user_vendor_code != null && $user_vendor_code != '') {
-                    array_push($separator, $user_vendor_code);
-                }
+                // if ($user_vendor_code != null && $user_vendor_code != '') {
+                //     array_push($separator, $user_vendor_code);
+                // }
 
                 array_unique($separator);
 
@@ -1110,10 +1110,7 @@ class VendorController extends Controller
                 $total_orders = count($uni_arr);
             } else {
                 $ar = [];
-                if ($user_vendor_code != null && $user_vendor_code != '') {
-                    array_push($separator, $user_vendor_code);
-                }
-
+                /// array_push($separator, $user_vendor_code);
                 array_unique($separator);
 
                 $uni_arr = [];

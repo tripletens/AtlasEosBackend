@@ -1096,9 +1096,12 @@ class VendorController extends Controller
                         }
                     }
 
-                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
-                        'price'
-                    );
+                    if ($value) {
+                        $total_sales += Cart::where(
+                            'vendor',
+                            $vendor_code
+                        )->sum('price');
+                    }
                 }
 
                 $total_orders = count($uni_arr);

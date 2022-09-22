@@ -829,6 +829,42 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    // fetch the sum of order price per dealer per day
+    public function fetch_all_orders_per_day()
+    {
+        $fetch_settings = ProgramCountdown::where("status", 1)->get()->first();
+
+        $new_all_orders = DB::table('cart')
+            ->whereDate(
+                'created_at',
+                '>=',
+                $fetch_settings->start_countdown_date
+                    ? $fetch_settings->start_countdown_date
+                    : date('Y-m-d')
+            )
+            ->where('status', '1')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('sum(price) as amount')
+            )
+            ->groupBy('date')
+            ->get();
+
+        if (!$new_all_orders) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't fetch all the orders";
+            return response()->json($this->result);
+        }
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data->order_count = count($new_all_orders);
+        $this->result->data = $new_all_orders;
+        $this->result->message = 'All orders per day fetched successfully';
+        return response()->json($this->result);
+    }
+
     public function get_vendor_products($code)
     {
         if (Products::where('vendor', $code)->exists()) {
@@ -1076,8 +1112,8 @@ class AdminController extends Controller
     {
         if (
             Cart::where('dealer', $dealer)
-                ->where('atlas_id', $atlas_id)
-                ->exists()
+            ->where('atlas_id', $atlas_id)
+            ->exists()
         ) {
             $cart_data = Cart::where('dealer', $dealer)
                 ->where('atlas_id', $atlas_id)
@@ -3433,8 +3469,8 @@ class AdminController extends Controller
             $vendor = $request->vendor;
             $vendorName =
                 isset($request->vendorName) && $request->vendorName != ''
-                    ? $request->vendorName
-                    : null;
+                ? $request->vendorName
+                : null;
             $setVendor = '';
             if ($vendorName == null) {
                 $vendors = Vendors::where('vendor_code', $vendor)
@@ -4259,9 +4295,9 @@ class AdminController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' =>
-                auth()
-                    ->factory()
-                    ->getTTL() * 60,
+            auth()
+                ->factory()
+                ->getTTL() * 60,
         ]);
     }
 

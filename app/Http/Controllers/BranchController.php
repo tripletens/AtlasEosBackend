@@ -33,7 +33,56 @@ class BranchController extends Controller
         ];
     }
 
-    public function get_dealers_in_branch ($uid){
+    public function get_privileged_dealers($user)
+    {
+        $res_data = [];
+
+        $selected_user = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        // $user_vendor_code = $selected_user->vendor_code;
+        $privileged_dealers = isset($selected_user->privileged_dealers)
+            ? $selected_user->privileged_dealers
+            : null;
+
+        if ($privileged_dealers != null) {
+            $separator = explode(',', $privileged_dealers);
+            if ($separator[1] == '') {
+                array_unique($separator);
+
+                $all_dealers_data = Dealer::all();
+                foreach ($all_dealers_data as $value) {
+                    $dealer_code = $value->dealer_code;
+
+                    if (in_array($dealer_code, $separator)) {
+                        array_push($res_data, $value);
+                    }
+                }
+            } else {
+                array_unique($separator);
+
+                $all_dealers_data = Dealer::all();
+                foreach ($all_dealers_data as $value) {
+                    $dealer_code = $value->dealer_code;
+
+                    if (in_array($dealer_code, $separator)) {
+                        array_push($res_data, $value);
+                    }
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get branch privileged dealers';
+
+        $this->result->data = $res_data;
+        return response()->json($this->result);
+    }
+
+    public function get_dealers_in_branch($uid)
+    {
         # get all the dealers attached to the branch
         # 1688  achawayne account on my local
 
@@ -50,9 +99,11 @@ class BranchController extends Controller
 
         # get all the priviledged dealer account ids
         if ($branch_detail->privileged_dealers !== null) {
-            $get_priviledged_account_ids_array = explode(',', $branch_detail->privileged_dealers);
-        }
-        else {
+            $get_priviledged_account_ids_array = explode(
+                ',',
+                $branch_detail->privileged_dealers
+            );
+        } else {
             $get_priviledged_account_ids_array = [];
         }
 
@@ -60,24 +111,30 @@ class BranchController extends Controller
         $dealer_summary_result = [];
 
         # get all the orders for each of the priviledged dealers
-        foreach ($get_priviledged_account_ids_array as  $priviledged_dealer) {
+        foreach ($get_priviledged_account_ids_array as $priviledged_dealer) {
             # get all dealers with the dealer details
             // $dealer_details = Users::where('account_id', $priviledged_dealer)
             //     ->select('id','full_name', 'first_name', 'last_name', 'account_id','last_login')
             //     ->get();
 
-            $user_privileged_dealers_format = str_replace('"', '', $priviledged_dealer);
+            $user_privileged_dealers_format = str_replace(
+                '"',
+                '',
+                $priviledged_dealer
+            );
 
-            $dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
+            $dealer_details = Dealer::where(
+                'dealer_code',
+                $user_privileged_dealers_format
+            )->get();
             # add the dealer info to the result array
-            array_push($dealer_summary_result,json_decode($dealer_details));
+            array_push($dealer_summary_result, json_decode($dealer_details));
         }
 
+        $result_arr = [];
 
-        $result_arr = array();
-
-        foreach ($dealer_summary_result as $sub_arr){
-            $result_arr = array_merge($result_arr,$sub_arr);
+        foreach ($dealer_summary_result as $sub_arr) {
+            $result_arr = array_merge($result_arr, $sub_arr);
         }
         return $result_arr;
     }
@@ -111,7 +168,8 @@ class BranchController extends Controller
     // }
 
     # get all the dealers under a branch with account id
-    public function get_dealers_with_account_id_under_branch($uid, $account_id){
+    public function get_dealers_with_account_id_under_branch($uid, $account_id)
+    {
         $dealer_summary_result = $this->get_dealers_in_branch($uid);
 
         return $dealer_summary_result;
@@ -121,13 +179,14 @@ class BranchController extends Controller
     }
 
     # get all the dealers under a branch with account id
-    public function get_dealers_with_account_id_under_branch_with_orders($uid){
+    public function get_dealers_with_account_id_under_branch_with_orders($uid)
+    {
         $dealers = $this->get_dealers_in_branch($uid);
 
         $vendor_array = [];
         #get all the dealers with account id orders
-        if($dealers && count($dealers) > 0){
-            foreach($dealers as $key => $dealer){
+        if ($dealers && count($dealers) > 0) {
+            foreach ($dealers as $key => $dealer) {
                 # get dealer orders with id
                 $dealer_orders_query = Cart::where('uid', $dealer->id);
                 # get the total price of items ordered by dealer
@@ -137,14 +196,26 @@ class BranchController extends Controller
 
                 // $dealer->orders = $dealer_orders_query->get();
 
-                $dealer->vendors = $dealer_orders_query->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
-                    ->select('vendors.id', 'vendors.vendor_name','vendors.vendor_code')
+                $dealer->vendors = $dealer_orders_query
+                    ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+                    ->select(
+                        'vendors.id',
+                        'vendors.vendor_name',
+                        'vendors.vendor_code'
+                    )
                     ->groupBy('vendors.id')
                     ->get();
 
-                foreach($dealer->vendors as $vendor){
-                    $vendor->orders = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->get();
-                    $vendor->orders->total_price = Cart::where('uid', $dealer->id)->where('vendor', $vendor->vendor_code)->sum('price');
+                foreach ($dealer->vendors as $vendor) {
+                    $vendor->orders = Cart::where('uid', $dealer->id)
+                        ->where('vendor', $vendor->vendor_code)
+                        ->get();
+                    $vendor->orders->total_price = Cart::where(
+                        'uid',
+                        $dealer->id
+                    )
+                        ->where('vendor', $vendor->vendor_code)
+                        ->sum('price');
                 }
             }
         }
@@ -152,15 +223,19 @@ class BranchController extends Controller
         $this->result->status = true;
         $this->result->data = $dealers;
         $this->result->status_code = 200;
-        $this->result->message = 'Branch dealers with orders fetched successfully';
+        $this->result->message =
+            'Branch dealers with orders fetched successfully';
         return response()->json($this->result);
     }
 
     # fetch all the dealers in a branch
-    public function branch_dealers($uid){
+    public function branch_dealers($uid)
+    {
         // $dealers = $this->get_dealers_in_branch($uid);
         $user_dealers_array = [];
-        $user_data = Users::where('id', $uid)->get()->first();
+        $user_data = Users::where('id', $uid)
+            ->get()
+            ->first();
 
         if (!$user_data) {
             $this->result->status = false;
@@ -174,17 +249,32 @@ class BranchController extends Controller
         $user_privileged_dealers = $user_data->privileged_dealers;
 
         if ($user_privileged_dealers != null) {
+            $user_privileged_dealers_array = explode(
+                ',',
+                $user_privileged_dealers
+            );
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            foreach (
+                $user_privileged_dealers_array
+                as $user_privilaged_dealer
+            ) {
+                $user_privileged_dealers_format = str_replace(
+                    '"',
+                    '',
+                    $user_privilaged_dealer
+                );
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
-                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
-
-                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
+                $get_priviledged_dealer_details = Dealer::where(
+                    'dealer_code',
+                    $user_privileged_dealers_format
+                )->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
-                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                    array_push(
+                        $user_dealers_array,
+                        ...$get_priviledged_dealer_details
+                    );
                 }
             }
         }
@@ -199,7 +289,9 @@ class BranchController extends Controller
     public function get_dealer_order_summary($uid)
     {
         $user_dealers_array = [];
-        $user_data = Users::where('id', $uid)->get()->first();
+        $user_data = Users::where('id', $uid)
+            ->get()
+            ->first();
 
         if (!$user_data) {
             $this->result->status = false;
@@ -213,19 +305,34 @@ class BranchController extends Controller
         $user_privileged_dealers = $user_data->privileged_dealers;
 
         if ($user_privileged_dealers != null) {
+            $user_privileged_dealers_array = explode(
+                ',',
+                $user_privileged_dealers
+            );
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            foreach (
+                $user_privileged_dealers_array
+                as $user_privilaged_dealer
+            ) {
+                $user_privileged_dealers_format = str_replace(
+                    '"',
+                    '',
+                    $user_privilaged_dealer
+                );
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
-                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
-
-                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                $get_priviledged_dealer_details = Users::where(
+                    'account_id',
+                    $user_privileged_dealers_format
+                )
                     // ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
-                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                    array_push(
+                        $user_dealers_array,
+                        ...$get_priviledged_dealer_details
+                    );
                 }
             }
         }
@@ -236,7 +343,7 @@ class BranchController extends Controller
 
         foreach ($user_dealers_array as $user_dealer) {
             if (!in_array($user_dealer->account_id, $unique_dealers)) {
-                array_push($unique_dealers, (string)$user_dealer->account_id);
+                array_push($unique_dealers, (string) $user_dealer->account_id);
             }
         }
 
@@ -245,9 +352,16 @@ class BranchController extends Controller
         $dealer_info_array = [];
 
         foreach ($unique_dealers as $unique_user_dealer) {
-            $dealer_info = Dealer::where('dealer_code', $unique_user_dealer)->get();
-            $dealer_inner_details = Users::where('account_id', $unique_user_dealer)
-                ->orderby('created_at', 'desc')->get();
+            $dealer_info = Dealer::where(
+                'dealer_code',
+                $unique_user_dealer
+            )->get();
+            $dealer_inner_details = Users::where(
+                'account_id',
+                $unique_user_dealer
+            )
+                ->orderby('created_at', 'desc')
+                ->get();
 
             array_push($dealer_info_array, ...$dealer_info);
         }
@@ -261,9 +375,15 @@ class BranchController extends Controller
         $new_dealers_array = [];
 
         foreach ($dealer_info_array as $_dealer) {
-            $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
+            $dealer_inner_details = Users::where(
+                'account_id',
+                $_dealer->dealer_code
+            )
                 ->select('last_login')
-                ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
+                ->orderby('created_at', 'desc')
+                ->get()
+                ->pluck('last_login')
+                ->toArray();
 
             $_dealer->login_array = array_values($dealer_inner_details);
 
@@ -287,7 +407,9 @@ class BranchController extends Controller
     public function branch_dashboard($uid)
     {
         $user_dealers_array = [];
-        $user_data = Users::where('id', $uid)->get()->first();
+        $user_data = Users::where('id', $uid)
+            ->get()
+            ->first();
 
         if (!$user_data) {
             $this->result->status = false;
@@ -305,27 +427,48 @@ class BranchController extends Controller
         $total_price = 0;
 
         if ($user_privileged_dealers != null) {
+            $user_privileged_dealers_array = explode(
+                ',',
+                $user_privileged_dealers
+            );
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            foreach (
+                $user_privileged_dealers_array
+                as $user_privilaged_dealer
+            ) {
+                $user_privileged_dealers_format = str_replace(
+                    '"',
+                    '',
+                    $user_privilaged_dealer
+                );
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
-                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
-
-                $cart_data_total = Cart::where('dealer', $user_privileged_dealers_format)->sum('price');
+                $cart_data_total = Cart::where(
+                    'dealer',
+                    $user_privileged_dealers_format
+                )->sum('price');
 
                 $total_price += $cart_data_total;
 
-                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
-                    ->get();
+                $get_priviledged_dealer_details = Dealer::where(
+                    'dealer_code',
+                    $user_privileged_dealers_format
+                )->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
-                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                    array_push(
+                        $user_dealers_array,
+                        ...$get_priviledged_dealer_details
+                    );
                 }
             }
         }
 
-        $user_privileged_dealers_format = str_replace('\"', '', $user_privilaged_dealer);
+        $user_privileged_dealers_format = str_replace(
+            '\"',
+            '',
+            $user_privilaged_dealer
+        );
 
         $number_of_dealers = count($user_privileged_dealers_array);
 
@@ -336,18 +479,24 @@ class BranchController extends Controller
         $last_login_array = [];
 
         foreach ($user_dealers_array as $_dealer) {
-            $dealer_inner_details = Users::where('account_id', $_dealer->dealer_code)
+            $dealer_inner_details = Users::where(
+                'account_id',
+                $_dealer->dealer_code
+            )
                 ->select('last_login')
-                ->orderby('created_at', 'desc')->get()->pluck('last_login')->toArray();
-            array_push($last_login_array,array_values($dealer_inner_details));
+                ->orderby('created_at', 'desc')
+                ->get()
+                ->pluck('last_login')
+                ->toArray();
+            array_push($last_login_array, array_values($dealer_inner_details));
         }
 
         // return $user_dealers_array;
 
-
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Branch dashboard details fetched successfully';
+        $this->result->message =
+            'Branch dashboard details fetched successfully';
         $this->result->data->total_sales = $total_price;
         $this->result->data->total_dealers = $number_of_dealers;
         $this->result->data->login_array = $last_login_array;

@@ -998,6 +998,11 @@ Route::group(
             'BranchController@branch_dashboard'
         );
 
+        Route::get(
+            '/branch/get-privileged-dealer/{user}',
+            'BranchController@get_privileged_dealers'
+        );
+
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //

@@ -1074,11 +1074,7 @@ class VendorController extends Controller
                 $pri_vendor_code = $separator[0];
 
                 array_push($separator, $user_vendor_code);
-
                 array_unique($separator);
-
-                ///array_uniqe();
-
                 $uni_arr = [];
 
                 foreach ($separator as $value) {
@@ -2098,7 +2094,9 @@ class VendorController extends Controller
             # select the settings
             // $fetch_settings = SystemSettings::find($settings_id);
 
-            $fetch_settings = ProgramCountdown::where("status",1)->get()->first();
+            $fetch_settings = ProgramCountdown::where('status', 1)
+                ->get()
+                ->first();
 
             $vendor_cart = DB::table('cart')
                 ->where('vendor', $vendor_code)

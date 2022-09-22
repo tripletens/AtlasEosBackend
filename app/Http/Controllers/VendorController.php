@@ -1075,6 +1075,10 @@ class VendorController extends Controller
 
                 array_push($separator, $user_vendor_code);
 
+                array_unique($separator);
+
+                ///array_uniqe();
+
                 $uni_arr = [];
 
                 foreach ($separator as $value) {
@@ -1102,6 +1106,8 @@ class VendorController extends Controller
             } else {
                 $ar = [];
                 array_push($separator, $user_vendor_code);
+                array_unique($separator);
+
                 $uni_arr = [];
 
                 foreach ($separator as $value) {

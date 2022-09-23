@@ -2019,16 +2019,18 @@ class VendorController extends Controller
                     //     ->where('status', '0')
                     //     ->count();
 
-                    $each_data = [
-                        'id' => $sender_data['id'],
-                        'first_name' => $value['first_name'],
-                        'last_name' => $value['last_name'],
-                        'full_name' => $value['full_name'],
-                        'email' => $value['email'],
-                        'notification' => $count_notification,
-                    ];
+                    if ($sender != $user) {
+                        $each_data = [
+                            'id' => $sender_data['id'],
+                            'first_name' => $value['first_name'],
+                            'last_name' => $value['last_name'],
+                            'full_name' => $value['full_name'],
+                            'email' => $value['email'],
+                            'notification' => $count_notification,
+                        ];
 
-                    array_push($data, $each_data);
+                        array_push($data, $each_data);
+                    }
                 }
             }
         }

@@ -1363,12 +1363,10 @@ class VendorController extends Controller
                                 ' ' .
                                 $dealer_db->last_name,
                             'total' => $value->price,
-                            'item_total' =>
-                                intval($qty) * floatval($value->price),
+                            'item_total' => floatval($value->price),
                         ];
 
-                        $total_atlas_amount +=
-                            intval($qty) * floatval($value->price);
+                        $total_atlas_amount += floatval($value->price);
 
                         array_push($dealer_data, $data);
                     }

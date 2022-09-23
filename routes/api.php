@@ -450,6 +450,16 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::get(
+            '/dealer/get-branch-manager-users/{user}',
+            'DealerController@get_branch_manager_users'
+        );
+
+        Route::get(
+            '/dealer/get-sales-rep-users/{user}',
+            'DealerController@get_sales_rep_users'
+        );
+
+        Route::get(
             '/dealer/dealer-privileged-dealers/{user}',
             'DealerController@get_dealers_privileged_dealers'
         );

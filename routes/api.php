@@ -27,6 +27,11 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::post(
+            '/admin/atlas-product-upload-format',
+            'AdminController@atlas_format_upload_new_product_csv'
+        );
+
         Route::get(
             '/admin/get-vendor-items',
             'AdminController@get_vendors_with_items'

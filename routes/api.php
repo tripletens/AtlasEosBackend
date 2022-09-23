@@ -27,6 +27,16 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::get(
+            '/admin/get-sales-rep-users/{user}',
+            'AdminController@get_sales_rep_users'
+        );
+
+        Route::get(
+            '/admin/get-branch-manager-users/{user}',
+            'AdminController@get_branch_manager_users'
+        );
+
         Route::post(
             '/admin/atlas-product-upload-format',
             'AdminController@atlas_format_upload_new_product_csv'
@@ -438,6 +448,16 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
+        Route::get(
+            '/dealer/get-branch-manager-users/{user}',
+            'DealerController@get_branch_manager_users'
+        );
+
+        Route::get(
+            '/dealer/get-sales-rep-users/{user}',
+            'DealerController@get_sales_rep_users'
+        );
 
         Route::get(
             '/dealer/dealer-privileged-dealers/{user}',

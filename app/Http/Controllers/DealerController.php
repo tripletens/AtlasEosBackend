@@ -60,6 +60,94 @@ class DealerController extends Controller
         ];
     }
 
+    public function get_branch_manager_users($user)
+    {
+        $branch = User::where('role', '2')->get();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($branch) {
+            foreach ($branch as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'Get Branch Manager Users successfully';
+
+        return response()->json($this->result);
+    }
+
+    public function get_sales_rep_users($user)
+    {
+        $sales_rep = Users::orWhere('role', '5')
+            ->orWhere('role', '6')
+            ->get();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($sales_rep) {
+            foreach ($sales_rep as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'Get Sales Rep Users successfully';
+
+        return response()->json($this->result);
+    }
+
     public function get_dealers_privileged_dealers($user)
     {
         $user_data = Users::where('id', $user)
@@ -1830,16 +1918,20 @@ class DealerController extends Controller
                     ->where('status', '0')
                     ->count();
 
-                $each_data = [
-                    'id' => $value['id'],
-                    'first_name' => $value['first_name'],
-                    'last_name' => $value['last_name'],
-                    'full_name' => $value['full_name'],
-                    'email' => $value['email'],
-                    'notification' => $count_notification,
-                ];
+                $uid = $value['id'];
 
-                array_push($data, $each_data);
+                if ($uid != $user) {
+                    $each_data = [
+                        'id' => $value['id'],
+                        'first_name' => $value['first_name'],
+                        'last_name' => $value['last_name'],
+                        'full_name' => $value['full_name'],
+                        'email' => $value['email'],
+                        'notification' => $count_notification,
+                    ];
+
+                    array_push($data, $each_data);
+                }
             }
         }
 

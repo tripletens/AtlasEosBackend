@@ -981,7 +981,9 @@ class AdminController extends Controller
     // fetch the sum of order price per dealer per day
     public function fetch_all_orders_per_day()
     {
-        $fetch_settings = ProgramCountdown::where("status", 1)->get()->first();
+        $fetch_settings = ProgramCountdown::where('status', 1)
+            ->get()
+            ->first();
 
         $new_all_orders = DB::table('cart')
             ->whereDate(
@@ -1261,8 +1263,8 @@ class AdminController extends Controller
     {
         if (
             Cart::where('dealer', $dealer)
-            ->where('atlas_id', $atlas_id)
-            ->exists()
+                ->where('atlas_id', $atlas_id)
+                ->exists()
         ) {
             $cart_data = Cart::where('dealer', $dealer)
                 ->where('atlas_id', $atlas_id)
@@ -3618,8 +3620,8 @@ class AdminController extends Controller
             $vendor = $request->vendor;
             $vendorName =
                 isset($request->vendorName) && $request->vendorName != ''
-                ? $request->vendorName
-                : null;
+                    ? $request->vendorName
+                    : null;
             $setVendor = '';
             if ($vendorName == null) {
                 $vendors = Vendors::where('vendor_code', $vendor)
@@ -4444,9 +4446,9 @@ class AdminController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' =>
-            auth()
-                ->factory()
-                ->getTTL() * 60,
+                auth()
+                    ->factory()
+                    ->getTTL() * 60,
         ]);
     }
 

@@ -169,6 +169,14 @@ class AdminController extends Controller
                                 'full_desc' => $full_desc,
                                 'check_new' => 1,
                             ]);
+
+                            if (!$save_product) {
+                                $this->result->status = false;
+                                $this->result->status_code = 422;
+                                $this->result->message =
+                                    'Sorry File could not be uploaded. Try again later.';
+                                return response()->json($this->result);
+                            }
                         }
 
                         // if (!$save_product) {
@@ -197,15 +205,16 @@ class AdminController extends Controller
                                 'full_desc' => $full_desc,
                                 // 'check_new' => $type,
                             ]);
+
+                            if (!$save_product) {
+                                $this->result->status = false;
+                                $this->result->status_code = 422;
+                                $this->result->message =
+                                    'Sorry File could not be uploaded. Try again later.';
+                                return response()->json($this->result);
+                            }
                         }
 
-                        // if (!$save_product) {
-                        //     $this->result->status = false;
-                        //     $this->result->status_code = 422;
-                        //     $this->result->message =
-                        //         'Sorry File could not be uploaded. Try again later.';
-                        //     return response()->json($this->result);
-                        // }
                         break;
                 }
             }

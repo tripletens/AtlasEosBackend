@@ -78,6 +78,94 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function get_sales_rep_users($user)
+    {
+        $sales_rep = Users::orWhere('role', '5')
+            ->orWhere('role', '6')
+            ->get();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($sales_rep) {
+            foreach ($sales_rep as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'Get Sales Rep Users successfully';
+
+        return response()->json($this->result);
+    }
+
+    public function get_branch_manager_users($user)
+    {
+        $branch = User::where('role', '2')->get();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($branch) {
+            foreach ($branch as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'Get Branch Manager Users successfully';
+
+        return response()->json($this->result);
+    }
+
     public function atlas_format_upload_new_product_csv(Request $request)
     {
         $csv = $request->file('csv');

@@ -27,6 +27,16 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::get(
+            '/admin/get-sales-rep-users/{user}',
+            'AdminController@get_sales_rep_users'
+        );
+
+        Route::get(
+            '/admin/get-branch-manager-users/{user}',
+            'AdminController@get_branch_manager_users'
+        );
+
         Route::post(
             '/admin/atlas-product-upload-format',
             'AdminController@atlas_format_upload_new_product_csv'

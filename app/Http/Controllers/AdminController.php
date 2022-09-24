@@ -125,7 +125,7 @@ class AdminController extends Controller
 
     public function get_branch_manager_users($user)
     {
-        $branch = User::where('role', '2')->get();
+        $branch = Users::where('role', '2')->get();
 
         $user_data = Users::where('id', $user)
             ->get()

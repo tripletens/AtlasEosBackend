@@ -190,41 +190,8 @@ class AdminController extends Controller
             $test = [];
 
             foreach ($csv_data as $key => $value) {
-                # code...
-
                 $spec_arr = [];
                 $atlas_id = $value[0];
-                $vendor_product_code = $value[1];
-                $xref = $value[2];
-                $vendor_code = $value[3];
-                $description = $value[4];
-                $regular_price = $value[5];
-                $booking_price = $value[6];
-                $full_desc = $value[7];
-                $type = $value[11];
-
-                $full_desc = str_replace(' ', '', $full_desc);
-                $full_desc = preg_replace('/[^A-Za-z0-9\-]/', '', $full_desc);
-                $full_desc = trim($full_desc);
-
-                $description = str_replace(' ', '', $description);
-                $description = preg_replace(
-                    '/[^A-Za-z0-9\-]/',
-                    '',
-                    $description
-                );
-                $description = trim($description);
-
-                $type = str_replace(' ', '', $type);
-                $type = preg_replace('/[^A-Za-z0-9\-]/', '', $type);
-                $type = trim($type);
-
-                $vendor_data = Vendors::where('vendor_code', $vendor_code)
-                    ->get()
-                    ->first();
-                $vendor_name = isset($vendor_data->vendor_name)
-                    ? $vendor_data->vendor_name
-                    : null;
 
                 /// $vendor_name = $value[1];
                 // $type = $value[9] ? $value[9] : '';
@@ -232,84 +199,58 @@ class AdminController extends Controller
 
                 $exists = Products::where('atlas_id', $atlas_id)->exists();
 
-                switch ($type) {
-                    case 'special':
-                        # code...
-                        break;
+                $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
 
-                    case 'assorted':
-                        # code...
-                        break;
+                if ($exists) {
+                    $desc = $value[3];
+                    $special_price = $value[5];
+                    $ass_price = $value[6];
+                    $cond = $value[7];
+                    $grouping = $value[8];
+                    $spec_type = 'assorted';
 
-                    case 'new':
-                        if (!$exists) {
-                            $save_product = Products::create([
-                                'atlas_id' => $atlas_id,
-                                'description' => $description,
-                                'status' => '1',
-                                'vendor_code' => $vendor_code,
-                                'vendor' => $vendor_code,
-                                'vendor_name' => $vendor_name,
-                                'vendor_product_code' => $vendor_product_code,
-                                'xref' => $xref,
-                                'regular' => $regular_price,
-                                'booking' => $booking_price,
-                                'full_desc' => $full_desc,
-                                'check_new' => 1,
-                            ]);
+                    // $desc = str_replace(' ', '', $desc);
+                    // $desc = preg_replace('/[^A-Za-z0-9\-]/', '', $desc);
+                    // $desc = trim($desc);
 
-                            if (!$save_product) {
-                                $this->result->status = false;
-                                $this->result->status_code = 422;
-                                $this->result->message =
-                                    'Sorry File could not be uploaded. Try again later.';
-                                return response()->json($this->result);
-                            }
-                        }
+                    $spec_data = [
+                        'booking' => floatval($special_price),
+                        'special' => floatval($ass_price),
+                        'cond' => intval($cond),
+                        'type' => strtolower($spec_type),
+                        'desc' => strtolower($desc),
+                    ];
 
-                        // if (!$save_product) {
-                        //     $this->result->status = false;
-                        //     $this->result->status_code = 422;
-                        //     $this->result->message =
-                        //         'Sorry File could not be uploaded. Try again later.';
-                        //     return response()->json($this->result);
-                        // }
+                    if (!empty($check_atlas_id->spec_data)) {
+                        $spec = json_decode($check_atlas_id->spec_data, true);
+                        array_push($spec, $spec_data);
+                        $new_spec = json_encode($spec);
 
-                        break;
-
-                    default:
-                        if (!$exists) {
-                            $save_product = Products::create([
-                                'atlas_id' => $atlas_id,
-                                'description' => $description,
-                                'status' => '1',
-                                'vendor_code' => $vendor_code,
-                                'vendor' => $vendor_code,
-                                'vendor_name' => $vendor_name,
-                                'vendor_product_code' => $vendor_product_code,
-                                'xref' => $xref,
-                                'regular' => $regular_price,
-                                'booking' => $booking_price,
-                                'full_desc' => $full_desc,
-                                // 'check_new' => $type,
-                            ]);
-
-                            if (!$save_product) {
-                                $this->result->status = false;
-                                $this->result->status_code = 422;
-                                $this->result->message =
-                                    'Sorry File could not be uploaded. Try again later.';
-                                return response()->json($this->result);
-                            }
-                        }
-
-                        break;
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'grouping' => $grouping,
+                        ]);
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'spec_data' => $new_spec,
+                        ]);
+                    } else {
+                        $data = [];
+                        array_push($data, $spec_data);
+                        $new_spec = json_encode($data);
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'grouping' => $grouping,
+                        ]);
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'spec_data' => $new_spec,
+                        ]);
+                    }
                 }
             }
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'Products uploaded successfully';
+            $this->result->message = 'Assorted Products uploaded successfully';
             return response()->json($this->result);
             fclose($file);
         }

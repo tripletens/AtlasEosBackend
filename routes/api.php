@@ -27,6 +27,11 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::post(
+            '/admin/atlas-format-assorted-product-upload',
+            'AdminController@atlas_format_assorted_product_upload'
+        );
+
         Route::get(
             '/admin/get-sales-rep-users/{user}',
             'AdminController@get_sales_rep_users'
@@ -1097,9 +1102,15 @@ Route::group(
 
         Route::post('/edit_buck', 'BuckController@edit_buck');
 
-        Route::get('/fetch-all-vendor-show-bucks/{vendor_code}', 'BuckController@fetch_all_vendor_show_bucks');
+        Route::get(
+            '/fetch-all-vendor-show-bucks/{vendor_code}',
+            'BuckController@fetch_all_vendor_show_bucks'
+        );
 
-        Route::get('/fetch-all-show-bucks', 'BuckController@fetch_all_show_bucks');
+        Route::get(
+            '/fetch-all-show-bucks',
+            'BuckController@fetch_all_show_bucks'
+        );
 
         // ------------------- show bucks ends here  ------------------ //
 

@@ -166,6 +166,155 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public function atlas_format_assorted_product_upload(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            $test = [];
+
+            foreach ($csv_data as $key => $value) {
+                # code...
+
+                $spec_arr = [];
+                $atlas_id = $value[0];
+                $vendor_product_code = $value[1];
+                $xref = $value[2];
+                $vendor_code = $value[3];
+                $description = $value[4];
+                $regular_price = $value[5];
+                $booking_price = $value[6];
+                $full_desc = $value[7];
+                $type = $value[11];
+
+                $full_desc = str_replace(' ', '', $full_desc);
+                $full_desc = preg_replace('/[^A-Za-z0-9\-]/', '', $full_desc);
+                $full_desc = trim($full_desc);
+
+                $description = str_replace(' ', '', $description);
+                $description = preg_replace(
+                    '/[^A-Za-z0-9\-]/',
+                    '',
+                    $description
+                );
+                $description = trim($description);
+
+                $type = str_replace(' ', '', $type);
+                $type = preg_replace('/[^A-Za-z0-9\-]/', '', $type);
+                $type = trim($type);
+
+                $vendor_data = Vendors::where('vendor_code', $vendor_code)
+                    ->get()
+                    ->first();
+                $vendor_name = isset($vendor_data->vendor_name)
+                    ? $vendor_data->vendor_name
+                    : null;
+
+                /// $vendor_name = $value[1];
+                // $type = $value[9] ? $value[9] : '';
+                /// $type = array_key_exists('9', $value) ? $value[9] : '';
+
+                $exists = Products::where('atlas_id', $atlas_id)->exists();
+
+                switch ($type) {
+                    case 'special':
+                        # code...
+                        break;
+
+                    case 'assorted':
+                        # code...
+                        break;
+
+                    case 'new':
+                        if (!$exists) {
+                            $save_product = Products::create([
+                                'atlas_id' => $atlas_id,
+                                'description' => $description,
+                                'status' => '1',
+                                'vendor_code' => $vendor_code,
+                                'vendor' => $vendor_code,
+                                'vendor_name' => $vendor_name,
+                                'vendor_product_code' => $vendor_product_code,
+                                'xref' => $xref,
+                                'regular' => $regular_price,
+                                'booking' => $booking_price,
+                                'full_desc' => $full_desc,
+                                'check_new' => 1,
+                            ]);
+
+                            if (!$save_product) {
+                                $this->result->status = false;
+                                $this->result->status_code = 422;
+                                $this->result->message =
+                                    'Sorry File could not be uploaded. Try again later.';
+                                return response()->json($this->result);
+                            }
+                        }
+
+                        // if (!$save_product) {
+                        //     $this->result->status = false;
+                        //     $this->result->status_code = 422;
+                        //     $this->result->message =
+                        //         'Sorry File could not be uploaded. Try again later.';
+                        //     return response()->json($this->result);
+                        // }
+
+                        break;
+
+                    default:
+                        if (!$exists) {
+                            $save_product = Products::create([
+                                'atlas_id' => $atlas_id,
+                                'description' => $description,
+                                'status' => '1',
+                                'vendor_code' => $vendor_code,
+                                'vendor' => $vendor_code,
+                                'vendor_name' => $vendor_name,
+                                'vendor_product_code' => $vendor_product_code,
+                                'xref' => $xref,
+                                'regular' => $regular_price,
+                                'booking' => $booking_price,
+                                'full_desc' => $full_desc,
+                                // 'check_new' => $type,
+                            ]);
+
+                            if (!$save_product) {
+                                $this->result->status = false;
+                                $this->result->status_code = 422;
+                                $this->result->message =
+                                    'Sorry File could not be uploaded. Try again later.';
+                                return response()->json($this->result);
+                            }
+                        }
+
+                        break;
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Products uploaded successfully';
+            return response()->json($this->result);
+            fclose($file);
+        }
+    }
+
     public function atlas_format_upload_new_product_csv(Request $request)
     {
         $csv = $request->file('csv');

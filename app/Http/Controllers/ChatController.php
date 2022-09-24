@@ -43,14 +43,16 @@ class ChatController extends Controller
                     ->get()
                     ->first();
 
-                $data = [
-                    'id' => isset($user_data->id) ? $user_data->id : null,
-                    'first_name' => $user_data->first_name,
-                    'last_name' => $user_data->last_name,
-                    'email' => $user_data->email,
-                ];
+                if (isset($user_data->id)) {
+                    $data = [
+                        'id' => isset($user_data->id) ? $user_data->id : null,
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'email' => $user_data->email,
+                    ];
 
-                array_push($res_data, $data);
+                    array_push($res_data, $data);
+                }
             }
         }
 

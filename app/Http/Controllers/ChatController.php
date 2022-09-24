@@ -90,7 +90,7 @@ class ChatController extends Controller
 
         $unread_sales_rep__msg = Chat::where('chat_to', $user)
             ->where('status', '0')
-            ->where('role', '5')
+            ->orWhere('role', '5')
             ->orWhere('role', '6')
             ->count();
 

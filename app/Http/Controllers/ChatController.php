@@ -44,7 +44,7 @@ class ChatController extends Controller
                     ->first();
 
                 $data = [
-                    'id' => $user_data->id,
+                    'id' => isset($user_data->id) ? $user_data->id : null,
                     'first_name' => $user_data->first_name,
                     'last_name' => $user_data->last_name,
                     'email' => $user_data->email,

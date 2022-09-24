@@ -62,7 +62,7 @@ class DealerController extends Controller
 
     public function get_branch_manager_users($user)
     {
-        $branch = User::where('role', '2')->get();
+        $branch = Users::where('role', '2')->get();
 
         $user_data = Users::where('id', $user)
             ->get()
@@ -1887,9 +1887,7 @@ class DealerController extends Controller
 
     public function get_dealer_coworkers($code, $user)
     {
-        $dealers = Users::where('account_id', $code)
-            ->get()
-            ->toArray();
+        $dealers = Users::where('account_id', $code)->get();
 
         $user_data = Users::where('id', $user)
             ->get()
@@ -1899,30 +1897,19 @@ class DealerController extends Controller
 
         if ($dealers) {
             foreach ($dealers as $value) {
-                $phase_one_unique_id =
-                    $user_data->id .
-                    $user_data->first_name .
-                    $value['id'] .
-                    $value['first_name'];
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
 
-                $phase_two_unique_id =
-                    $value['id'] .
-                    $value['first_name'] .
-                    $user_data['id'] .
-                    $user_data['first_name'];
-
-                $count_notification = Chat::orWhere(
-                    'unique_id',
-                    $phase_two_unique_id
-                )
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
                     ->where('status', '0')
                     ->count();
 
-                $uid = $value['id'];
-
-                if ($uid != $user) {
+                if ($sender != $user) {
                     $each_data = [
-                        'id' => $value['id'],
+                        'id' => $sender_data['id'],
                         'first_name' => $value['first_name'],
                         'last_name' => $value['last_name'],
                         'full_name' => $value['full_name'],

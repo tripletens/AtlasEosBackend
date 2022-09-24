@@ -83,11 +83,25 @@ class ChatController extends Controller
             ->where('role', '1')
             ->count();
 
+        $unread_branch_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '2')
+            ->count();
+
+        $unread_sales_rep__msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '5')
+            ->orWhere('role', '6')
+            ->count();
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data->dealer = $unread_dealer_msg;
         $this->result->data->vendor = $unread_vendor_msg;
         $this->result->data->admin = $unread_admin_msg;
+
+        $this->result->data->branch = $unread_branch_msg;
+        $this->result->data->sales = $unread_sales_rep__msg;
 
         $this->result->message = 'count unread msg chat based on their role';
         return response()->json($this->result);

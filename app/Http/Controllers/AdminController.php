@@ -166,6 +166,97 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public function atlas_format_special_product_upload(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        if ($csv->getSize() > 0) {
+            $file = fopen($_FILES['csv']['tmp_name'], 'r');
+            $csv_data = [];
+            while (($col = fgetcsv($file, 1000, ',')) !== false) {
+                $csv_data[] = $col;
+            }
+
+            array_shift($csv_data);
+            // remove the first row of the csv
+
+            $test = [];
+
+            foreach ($csv_data as $key => $value) {
+                $spec_arr = [];
+                $atlas_id = $value[0];
+
+                /// $vendor_name = $value[1];
+                // $type = $value[9] ? $value[9] : '';
+                /// $type = array_key_exists('9', $value) ? $value[9] : '';
+
+                $exists = Products::where('atlas_id', $atlas_id)->exists();
+
+                $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                if ($exists) {
+                    $desc = $value[3];
+                    $special_price = $value[5];
+                    $ass_price = $value[6];
+                    $cond = $value[7];
+                    // $grouping = $value[8];
+                    $spec_type = 'special';
+
+                    // $desc = str_replace(' ', '', $desc);
+                    // $desc = preg_replace('/[^A-Za-z0-9\-]/', '', $desc);
+                    // $desc = trim($desc);
+
+                    $spec_data = [
+                        'booking' => floatval($special_price),
+                        'special' => floatval($ass_price),
+                        'cond' => intval($cond),
+                        'type' => strtolower($spec_type),
+                        'desc' => $desc,
+                    ];
+
+                    if (!empty($check_atlas_id->spec_data)) {
+                        $spec = json_decode($check_atlas_id->spec_data, true);
+                        array_push($spec, $spec_data);
+                        $new_spec = json_encode($spec);
+
+                        // Products::where('atlas_id', $atlas_id)->update([
+                        //     'grouping' => $grouping,
+                        // ]);
+
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'spec_data' => $new_spec,
+                        ]);
+                    } else {
+                        $data = [];
+                        array_push($data, $spec_data);
+                        $new_spec = json_encode($data);
+                        // Products::where('atlas_id', $atlas_id)->update([
+                        //     'grouping' => $grouping,
+                        // ]);
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'spec_data' => $new_spec,
+                        ]);
+                    }
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Special Products uploaded successfully';
+            return response()->json($this->result);
+            fclose($file);
+        }
+    }
+
     public function atlas_format_assorted_product_upload(Request $request)
     {
         $csv = $request->file('csv');
@@ -220,7 +311,7 @@ class AdminController extends Controller
                         'special' => floatval($ass_price),
                         'cond' => intval($cond),
                         'type' => strtolower($spec_type),
-                        'desc' => strtolower($desc),
+                        'desc' => $desc,
                     ];
 
                     if (!empty($check_atlas_id->spec_data)) {

@@ -28,6 +28,11 @@ Route::group(
         Route::post('/admin-login', 'AdminController@admin_login');
 
         Route::post(
+            '/admin/atlas-format-special-product-upload',
+            'AdminController@atlas_format_special_product_upload'
+        );
+
+        Route::post(
             '/admin/atlas-format-assorted-product-upload',
             'AdminController@atlas_format_assorted_product_upload'
         );

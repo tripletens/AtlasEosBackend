@@ -346,8 +346,12 @@ class DealerController extends Controller
             }
 
             $data = [
-                'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+                'vendor_code' => isset($vendor_data->vendor_code)
+                    ? $vendor_data->vendor_code
+                    : null,
+                'vendor_name' => isset($vendor_data->vendor_name)
+                    ? $vendor_data->vendor_name
+                    : null,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -2278,7 +2282,9 @@ class DealerController extends Controller
         # select the settings
         // $fetch_settings = SystemSettings::find($settings_id);
 
-        $fetch_settings = ProgramCountdown::where("status",1)->get()->first();
+        $fetch_settings = ProgramCountdown::where('status', 1)
+            ->get()
+            ->first();
         // return $fetch_settings->start_countdown_date;
 
         $new_all_orders = DB::table('cart')

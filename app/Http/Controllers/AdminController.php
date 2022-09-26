@@ -328,7 +328,30 @@ class AdminController extends Controller
                         break;
 
                     case 'assorted':
-                        # code...
+                        if (!$exists) {
+                            $save_product = Products::create([
+                                'atlas_id' => $atlas_id,
+                                'description' => $description,
+                                'status' => '1',
+                                'vendor_code' => $vendor_code,
+                                'vendor' => $vendor_code,
+                                'vendor_name' => $vendor_name,
+                                'vendor_product_code' => $vendor_product_code,
+                                'xref' => $xref,
+                                'regular' => $regular_price,
+                                'booking' => $booking_price,
+                                'full_desc' => $full_desc,
+                                // 'check_new' => $type,
+                            ]);
+
+                            if (!$save_product) {
+                                $this->result->status = false;
+                                $this->result->status_code = 422;
+                                $this->result->message =
+                                    'Sorry File could not be uploaded. Try again later.';
+                                return response()->json($this->result);
+                            }
+                        }
                         break;
 
                     case 'new':

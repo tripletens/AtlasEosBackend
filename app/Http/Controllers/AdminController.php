@@ -3207,6 +3207,8 @@ class AdminController extends Controller
                     'product with atlas id ' .
                     $atlasId .
                     ' has been add already';
+
+                return response()->json($this->result);
             } else {
                 $save_product = Products::create([
                     'atlas_id' => $atlasId,

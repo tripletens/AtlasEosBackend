@@ -60,6 +60,89 @@ class DealerController extends Controller
         ];
     }
 
+    public function get_all_admin_users($user)
+    {
+        $admin_users = Users::where('role', '1')
+            ->orWhere('role', '5')
+            ->orWhere('role', '6')
+            ->get()
+            ->toArray();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($admin_users) {
+            foreach ($admin_users as $value) {
+                $sender = $value['id'];
+                $role = $value['role'];
+
+                $role_name = '';
+
+                switch ($role) {
+                    case '1':
+                        $role_name = 'Super Admin';
+                        break;
+
+                    case '2':
+                        $role_name = 'Branch Manager';
+
+                        break;
+
+                    case '5':
+                        $role_name = 'Inside Sales';
+
+                        break;
+
+                    case '6':
+                        $role_name = 'Outside Sales';
+
+                        break;
+
+                    case '7':
+                        $role_name = 'Admin';
+
+                        break;
+
+                    default:
+                        # code...
+                        break;
+                }
+
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                if ($sender != $user) {
+                    $each_data = [
+                        'id' => $sender_data['id'],
+                        'first_name' => $value['first_name'],
+                        'last_name' => $value['last_name'],
+                        'full_name' => $value['full_name'],
+                        'email' => $value['email'],
+                        'notification' => $count_notification,
+                        'role' => $role_name,
+                    ];
+
+                    array_push($data, $each_data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'All Admin Users Data';
+        return response()->json($this->result);
+    }
+
     public function get_branch_manager_users($user)
     {
         $branch = Users::where('role', '2')->get();

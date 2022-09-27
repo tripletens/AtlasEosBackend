@@ -2361,6 +2361,7 @@ class AdminController extends Controller
     public function get_all_admin_users($user)
     {
         $admin_users = Users::where('role', '1')
+
             ->get()
             ->toArray();
 

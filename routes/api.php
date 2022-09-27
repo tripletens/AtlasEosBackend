@@ -38,6 +38,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/delete-dealership/{id}',
+            'AdminController@delete_dealership'
+        );
+
+        Route::get(
             '/admin/get-sales-rep-users/{user}',
             'AdminController@get_sales_rep_users'
         );

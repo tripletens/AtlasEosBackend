@@ -78,6 +78,26 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function delete_dealership($id)
+    {
+        if (Dealer::where('id', $id)->exists()) {
+            $delete_dealer = Dealer::where('id', $id)->delete();
+
+            if ($delete_dealer) {
+                $this->result->message = 'Dealer deleted successfully';
+            } else {
+                $this->result->message = 'Something went wrong, try again';
+            }
+        } else {
+            $this->result->message = 'Dealer Not found';
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+
+        return response()->json($this->result);
+    }
+
     public function get_sales_rep_users($user)
     {
         $sales_rep = Users::orWhere('role', '5')
@@ -587,6 +607,7 @@ class AdminController extends Controller
         $validator = Validator::make($request->all(), [
             'dealerName' => 'required',
             'dealerCode' => 'required',
+            'location' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -600,11 +621,13 @@ class AdminController extends Controller
             // process the request
             $name = $request->dealerName;
             $code = $request->dealerCode;
+            $location = $request->location;
 
             // save to the db
             $save_vendor = Dealer::create([
                 'dealer_name' => $name,
                 'dealer_code' => $code,
+                'location' => $location,
                 'role_name' => 'dealer',
                 'role_id' => '4',
             ]);
@@ -3165,6 +3188,17 @@ class AdminController extends Controller
                 ? json_encode($request->specData)
                 : null;
 
+            $vendor_data = Vendors::where('vendor_code', $vendorAccount)
+                ->get()
+                ->first();
+            $vendor_name = null;
+
+            if ($vendor_data) {
+                $vendor_name = isset($vendor_data->vendor_name)
+                    ? $vendor_data->vendor_name
+                    : null;
+            }
+
             if (Products::where('atlas_id', $atlasId)->exists()) {
                 $this->result->status = false;
                 $this->result->status_code = 200;
@@ -3179,6 +3213,7 @@ class AdminController extends Controller
                     'status' => '1',
                     'vendor_code' => $vendorAccount,
                     'vendor' => $vendorAccount,
+                    'vendor_name' => $vendor_name,
                     'vendor_product_code' => $vendorItemId,
                     'booking' => $regular,
                     'special' => $special,
@@ -3253,7 +3288,7 @@ class AdminController extends Controller
                 'atlas_id' => $atlasId,
                 'description' => $desc,
                 'booking' => $regular,
-                'vendor' => $vendor,
+                'vendor_product_code' => $vendor,
                 'spec_data' => json_encode($spec),
             ]);
 

@@ -1078,8 +1078,12 @@ class AdminController extends Controller
             }
 
             $data = [
-                'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+                'vendor_code' => isset($vendor_data->vendor_code)
+                    ? $vendor_data->vendor_code
+                    : null,
+                'vendor_name' => isset($vendor_data->vendor_name)
+                    ? $vendor_data->vendor_name
+                    : null,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];

@@ -1559,11 +1559,25 @@ class AdminController extends Controller
         ]);
 
         if ($new_price != '') {
-            $update = Cart::where('dealer', $dealer_code)
-                ->where('atlas_id', $atlas_code)
-                ->update([
-                    'price' => $new_price,
-                ]);
+            if ($new_qty != '') {
+                $total = intval($new_qty) * intval($new_price);
+
+                $update = Cart::where('dealer', $dealer_code)
+                    ->where('atlas_id', $atlas_code)
+                    ->update([
+                        'unit_price' => $new_price,
+                        'price' => $total,
+                    ]);
+            } else {
+                $total = intval($old_qty) * intval($new_price);
+
+                $update = Cart::where('dealer', $dealer_code)
+                    ->where('atlas_id', $atlas_code)
+                    ->update([
+                        'unit_price' => $new_price,
+                        'price' => $total,
+                    ]);
+            }
         }
 
         if ($new_qty != '') {
@@ -1601,7 +1615,7 @@ class AdminController extends Controller
                 'atlas_id' => $atlas_id,
                 'vendor' => $pro_data->vendor_product_code,
                 'description' => $pro_data->description,
-                'price' => $cart_data->price,
+                'price' => $pro_data->special,
                 'dealer' => $dealer,
             ];
 

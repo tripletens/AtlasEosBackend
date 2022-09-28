@@ -2089,6 +2089,28 @@ class DealerController extends Controller
 
         $order_remaining = Vendors::count();
 
+        // get all the dealers; 
+
+        $all_dealers = Users::where('role','4')->get();
+
+
+        // return $all_dealers;
+
+        $all_dealers_without_orders = [];
+
+        if(count($all_dealers) > 0){
+            foreach($all_dealers as $dealer){
+                $dealer_account_id = $dealer['account_id'];
+                
+                $dealer_cart = Cart::where('dealer',$dealer_account_id)->count();
+    
+                if($dealer_cart == 0){
+                    // dealer has orders 
+                    array_push($all_dealers_without_orders,$dealer);
+                }
+            }
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
 
@@ -2101,6 +2123,9 @@ class DealerController extends Controller
             $all_uncompleted_orders_vendors
         );
         $this->result->message = 'Dealer Dashboard Data';
+
+        $this->result->data->dealers_without_orders = $all_dealers_without_orders;
+        $this->result->data->dealers_without_orders_count = count($all_dealers_without_orders);
 
         return response()->json($this->result);
     }

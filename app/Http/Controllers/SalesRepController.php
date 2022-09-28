@@ -610,6 +610,25 @@ class SalesRepController extends Controller
             }
         }
 
+        // need some fix though 
+
+        // get all the dealers; 
+
+        $all_dealers = Users::where('role','4')->get();
+
+        $filter_dealers_without_orders = array_map(function($record){
+            $dealers_without_orders = [];
+            $get_dealer_cart_record = Cart::where('dealer',$record->account_id)->count();
+
+            if($get_dealer_cart_record && $get_dealer_cart_record == 0){
+                // dealer doesnt have an order
+                array_push($dealers_without_orders,$record);
+            }
+
+            return $dealers_without_orders;
+
+        },$all_dealers);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get sales rep dashboard analysis';
@@ -619,6 +638,9 @@ class SalesRepController extends Controller
 
         $this->result->data->total_logged_in = $total_logged_in;
         $this->result->data->total_not_logged_in = $total_not_logged_in;
+        $this->result->data->dealers_without_orders = $filter_dealers_without_orders;
+        $this->result->data->dealers_without_orders_count = count($filter_dealers_without_orders);
+        
         return response()->json($this->result);
     }
 

@@ -1464,7 +1464,7 @@ class AdminController extends Controller
 
     public function get_price_overide_report()
     {
-        $all_report = PriceOverideReport::all();
+        $all_report = PriceOverideReport::orderBy('id', 'desc');
         $res_data = [];
 
         if ($all_report) {

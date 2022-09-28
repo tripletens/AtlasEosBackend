@@ -67,6 +67,8 @@ class AdminController extends Controller
             'token' => null,
             'debug' => null,
         ];
+
+        /// ewawunmyadejoke@gmail.com
     }
 
     ///// Permission Role Access
@@ -1597,7 +1599,7 @@ class AdminController extends Controller
             $data = [
                 'qty' => $cart_data->qty,
                 'atlas_id' => $atlas_id,
-                'vendor' => $pro_data->vendor_code,
+                'vendor' => $pro_data->vendor_product_code,
                 'description' => $pro_data->description,
                 'price' => $cart_data->price,
                 'dealer' => $dealer,

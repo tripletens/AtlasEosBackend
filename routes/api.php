@@ -990,6 +990,18 @@ Route::group(
             'BranchController@branch_dashboard'
         );
 
+        Route::get(
+            '/branch/dealers-with-orders/{uid}',
+            'BranchController@branch_dealers_with_orders'
+        );
+
+        Route::get(
+            '/branch/dealers-without-orders/{uid}',
+            'BranchController@branch_dealers_without_orders'
+        );
+        
+
+        // branch_dealers_with_orders
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //
@@ -1179,5 +1191,17 @@ Route::group(
             '/sales-rep/notloggedin-dealers/{user_id}',
             'SalesRepController@fetch_notloggedin_dealers'
         );
+
+        Route::get(
+            '/sales-rep/dealers_without_orders/{user_id}',
+            'SalesRepController@salesrep_dealers_without_orders'
+        );
+
+        Route::get(
+            '/sales-rep/dealers_with_orders/{user_id}',
+            'SalesRepController@salesrep_dealers_with_orders'
+        );
+        
+
     }
 );

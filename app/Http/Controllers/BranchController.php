@@ -367,7 +367,152 @@ class BranchController extends Controller
 
         $this->result->data->total_logged_in = $last_loggedin_dealer_count;
         $this->result->data->total_not_logged_in = $last_not_loggedin_dealer_count;
+
+        $this->result->data->all_dealers_without_orders = $all_dealers_without_orders;
+        $this->result->data->all_dealers_with_orders = $all_dealers_with_orders;
+        
+        $this->result->data->all_dealers_with_orders_count = count($all_dealers_with_orders);
+        $this->result->data->all_dealers_without_orders_count = count($all_dealers_without_orders);
+
         return response()->json($this->result);
+    }
+
+    // get dealers that have orders 
+    public function branch_dealers_with_orders($uid){
+        $user_data = Users::where('id', $uid)->get()->first();
+
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        $user_privilaged_dealer_last_login = 0;
+
+        $total_price = 0;
+
+        $all_dealers_with_orders = [];
+
+        $user_dealers_array = [];
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            // return $user_privileged_dealers_array[0];
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                    ->get();
+
+                    
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+
+            // return $user_dealers_array;
+
+            foreach($user_dealers_array as $_dealer){
+                $account_id = $_dealer->dealer_code;
+                
+                $dealer_cart = Cart::where('dealer',$account_id)->count();
+                    
+                $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
+
+                $_dealer->total = $cart_data_total;
+
+                if($dealer_cart > 0){
+                    array_push($all_dealers_with_orders, $_dealer);
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $all_dealers_with_orders;
+            $this->result->message = 'Branch dealers with orders fetched successsfully';
+            // $this->result->data->dealers_with_orders_count = count($all_dealers_with_orders);
+
+            return response()->json($this->result);
+        }
+
+    }
+
+    // get dealers that dont have orders
+    public function branch_dealers_without_orders($uid){
+        $user_data = Users::where('id', $uid)->get()->first();
+
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        $user_privilaged_dealer_last_login = 0;
+
+        $total_price = 0;
+
+        $all_dealers_without_orders = [];
+
+        $user_dealers_array = [];
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            // return $user_privileged_dealers_array[0];
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                    ->get();
+
+                    
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+
+            // return $user_dealers_array;
+
+            foreach($user_dealers_array as $_dealer){
+                $account_id = $_dealer->dealer_code;
+                
+                $dealer_cart = Cart::where('dealer',$account_id)->count();
+                
+                $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
+
+                $_dealer->total = $cart_data_total;
+
+                if($dealer_cart == 0){
+                    array_push($all_dealers_without_orders, $_dealer);
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $all_dealers_without_orders;
+            $this->result->message = 'Branch dealers without orders fetched successsfully';
+            // $this->result->data->dealers_with_orders_count = count($all_dealers_with_orders);
+
+            return response()->json($this->result);
+        }
+
     }
     // public function branch_dashboard($uid){
     //     //

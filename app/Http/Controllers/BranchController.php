@@ -304,6 +304,10 @@ class BranchController extends Controller
 
         $total_price = 0;
 
+        $all_dealers_without_orders = [];
+
+        $all_dealers_with_orders = [];
+
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
@@ -320,6 +324,15 @@ class BranchController extends Controller
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
+
+                    $dealer_cart = Cart::where('dealer',$user_privileged_dealers_format)->count();
+            
+                    if($dealer_cart > 0){
+                        array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
+                    }else{
+                        array_push($all_dealers_with_orders, ...$get_priviledged_dealer_details);
+                    }
+
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
             }

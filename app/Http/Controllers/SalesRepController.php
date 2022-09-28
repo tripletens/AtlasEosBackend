@@ -576,6 +576,8 @@ class SalesRepController extends Controller
 
                 $dealers_array = [];
 
+                return $separator; 
+
                 foreach ($separator as $value) {
                     $separator_format = str_replace('"', '', $value);
 
@@ -616,18 +618,20 @@ class SalesRepController extends Controller
 
         $all_dealers = Users::where('role','4')->get();
 
-        $filter_dealers_without_orders = array_map(function($record){
-            $dealers_without_orders = [];
-            $get_dealer_cart_record = Cart::where('dealer',$record->account_id)->count();
+        $all_dealers_without_orders = [];
 
-            if($get_dealer_cart_record && $get_dealer_cart_record == 0){
-                // dealer doesnt have an order
-                array_push($dealers_without_orders,$record);
+        if(count($all_dealers) > 0){
+            foreach($all_dealers as $dealer){
+                $dealer_account_id = $dealer['account_id'];
+                
+                $dealer_cart = Cart::where('dealer',$dealer_account_id)->count();
+    
+                if($dealer_cart == 0){
+                    // dealer has orders 
+                    array_push($all_dealers_without_orders,$dealer);
+                }
             }
-
-            return $dealers_without_orders;
-
-        },$all_dealers);
+        }
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -638,8 +642,8 @@ class SalesRepController extends Controller
 
         $this->result->data->total_logged_in = $total_logged_in;
         $this->result->data->total_not_logged_in = $total_not_logged_in;
-        $this->result->data->dealers_without_orders = $filter_dealers_without_orders;
-        $this->result->data->dealers_without_orders_count = count($filter_dealers_without_orders);
+        $this->result->data->dealers_without_orders = $all_dealers_without_orders;
+        $this->result->data->dealers_without_orders_count = count($all_dealers_without_orders);
         
         return response()->json($this->result);
     }
@@ -664,12 +668,23 @@ class SalesRepController extends Controller
 
         $total_price = 0;
 
+        $all_dealers_without_orders = [];
+
+        $all_dealers_with_orders = [];
+
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
+            // return $user_privileged_dealers_format = str_replace('"', '', $user_privileged_dealers_array[0]);
+
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                // $user_privileged_dealers_format = str_replace('\"', '', $user_privilaged_dealer);
+                
+                // return $user_privileged_dealers_format;
 
                 $cart_data_total = Cart::where('dealer', $user_privileged_dealers_format)->sum('price');
 
@@ -680,12 +695,18 @@ class SalesRepController extends Controller
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
+                    $dealer_cart = Cart::where('dealer',$user_privileged_dealers_format)->count();
+            
+                    if($dealer_cart > 0){
+                        array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
+                    }else{
+                        array_push($all_dealers_with_orders, ...$get_priviledged_dealer_details);
+                    }
+
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
                 }
             }
         }
-
-        $user_privileged_dealers_format = str_replace('\"', '', $user_privilaged_dealer);
 
         $number_of_dealers = count($user_privileged_dealers_array);
 
@@ -714,6 +735,12 @@ class SalesRepController extends Controller
 
         $this->result->data->total_logged_in = $last_loggedin_dealer_count;
         $this->result->data->total_not_logged_in = $last_not_loggedin_dealer_count;
+        $this->result->data->all_dealers_without_orders = $all_dealers_without_orders;
+        $this->result->data->all_dealers_with_orders = $all_dealers_with_orders;
+        
+        $this->result->data->all_dealers_with_orders_count = count($all_dealers_with_orders);
+        $this->result->data->all_dealers_without_orders_count = count($all_dealers_without_orders);
+
         return response()->json($this->result);
     }
 
@@ -826,5 +853,143 @@ class SalesRepController extends Controller
         $this->result->data->total_logged_in = count($loggedin_users);
         $this->result->data->logged_in_users = $loggedin_users;
         return response()->json($this->result);
+    }
+
+    // get dealers that dont have orders
+    public function salesrep_dealers_without_orders($uid){
+        $user_data = Users::where('id', $uid)->get()->first();
+
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        $user_privilaged_dealer_last_login = 0;
+
+        $total_price = 0;
+
+        $all_dealers_without_orders = [];
+
+        $user_dealers_array = [];
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            // return $user_privileged_dealers_array[0];
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                    ->get();
+
+                    
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+
+            // return $user_dealers_array;
+
+            foreach($user_dealers_array as $_dealer){
+                $account_id = $_dealer->dealer_code;
+                
+                $dealer_cart = Cart::where('dealer',$account_id)->count();
+                
+                $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
+
+                $_dealer->total = $cart_data_total;
+
+                if($dealer_cart == 0){
+                    array_push($all_dealers_without_orders, $_dealer);
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $all_dealers_without_orders;
+            $this->result->message = 'Sales Rep with dealers without orders fetched successsfully';
+            // $this->result->data->dealers_with_orders_count = count($all_dealers_with_orders);
+
+            return response()->json($this->result);
+        }
+
+    }
+
+    // get dealers that dont have orders
+    public function salesrep_dealers_with_orders($uid){
+        $user_data = Users::where('id', $uid)->get()->first();
+
+        if (!$user_data) {
+            $this->result->status = false;
+            $this->result->status_code = 400;
+            $this->result->data = [];
+            $this->result->message = 'sorry user could not be found';
+            return response()->json($this->result);
+        }
+
+        // get all the privileged dealers under the person
+        $user_privileged_dealers = $user_data->privileged_dealers;
+
+        $user_privilaged_dealer_last_login = 0;
+
+        $total_price = 0;
+
+        $all_dealers_without_orders = [];
+
+        $user_dealers_array = [];
+
+        if ($user_privileged_dealers != null) {
+
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+
+            // return $user_privileged_dealers_array[0];
+
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                    ->get();
+
+                    
+                if (count($get_priviledged_dealer_details) > 0) {
+                    // yay its an array
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+                }
+            }
+
+            // return $user_dealers_array;
+
+            foreach($user_dealers_array as $_dealer){
+                $account_id = $_dealer->dealer_code;
+                
+                $dealer_cart = Cart::where('dealer',$account_id)->count();
+                
+                $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
+
+                $_dealer->total = $cart_data_total;
+
+                if($dealer_cart > 0){
+                    array_push($all_dealers_without_orders, $_dealer);
+                }
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = $all_dealers_without_orders;
+            $this->result->message = 'Sales rep dealers with orders fetched successsfully';
+            // $this->result->data->dealers_with_orders_count = count($all_dealers_with_orders);
+
+            return response()->json($this->result);
+        }
+
     }
 }

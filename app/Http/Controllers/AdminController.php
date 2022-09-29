@@ -1690,27 +1690,17 @@ class AdminController extends Controller
             ->first();
 
         $old_qty = $current_cart_data->qty;
-        $old_price = $current_cart_data->price;
-        $unit_price = $current_cart_data->unit_price;
+        $old_total = $current_cart_data->price;
+        $old_unit_price = $current_cart_data->unit_price;
+
         $vendor = $current_cart_data->vendor;
         $authorised_by = $request->authorizer;
+
         $product_data = Products::where('atlas_id', $atlas_code)
             ->get()
             ->first();
 
-        PriceOverideReport::create([
-            'dealer_code' => $dealer_code,
-            'vendor_code' => $vendor,
-            'atlas_id' => $atlas_code,
-            'qty' => $old_qty,
-            'new_qty' => $new_qty != '' ? $new_qty : $old_qty,
-            'regular' => $product_data->regular,
-            'show_price' => $old_price,
-            'overide_price' => $new_price != '' ? $new_price : $old_price,
-            'authorised_by' => $authorised_by,
-        ]);
-
-        $unit_price = $new_price != '' ? $new_price : $old_price;
+        $unit_price = $new_price != '' ? $new_price : $unit_price;
         $qty = $new_qty != '' ? $new_qty : $old_qty;
 
         $total = intval($qty) * floatval($unit_price);
@@ -1722,6 +1712,18 @@ class AdminController extends Controller
                 'price' => $total,
                 'qty' => $qty,
             ]);
+
+        PriceOverideReport::create([
+            'dealer_code' => $dealer_code,
+            'vendor_code' => $vendor,
+            'atlas_id' => $atlas_code,
+            'qty' => $old_qty,
+            'new_qty' => $new_qty != '' ? $new_qty : $old_qty,
+            'regular' => $product_data->regular,
+            'show_price' => $total,
+            'overide_price' => $new_price != '' ? $new_price : $old_unit_price,
+            'authorised_by' => $authorised_by,
+        ]);
 
         $this->result->status = true;
         $this->result->status_code = 200;

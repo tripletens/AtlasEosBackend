@@ -75,9 +75,17 @@ class VendorController extends Controller
                     //     $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
-                    'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
-                    'desc' => $pro_data->description,
+                    'vendor_product_code' => isset(
+                        $pro_data->vendor_product_code
+                    )
+                        ? $pro_data->vendor_product_code
+                        : null,
+                    'special' => isset($pro_data->booking)
+                        ? $pro_data->booking
+                        : null,
+                    'desc' => isset($pro_data->description)
+                        ? $pro_data->description
+                        : null,
                     'total' => $value->price,
                 ];
 
@@ -135,9 +143,17 @@ class VendorController extends Controller
                     'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
-                    'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
-                    'desc' => $pro_data->description,
+                    'vendor_product_code' => isset(
+                        $pro_data->vendor_product_code
+                    )
+                        ? $pro_data->vendor_product_code
+                        : null,
+                    'special' => isset($pro_data->booking)
+                        ? $pro_data->booking
+                        : null,
+                    'desc' => isset($pro_data->description)
+                        ? $pro_data->description
+                        : null,
                     'total' => $value->price,
                 ];
 

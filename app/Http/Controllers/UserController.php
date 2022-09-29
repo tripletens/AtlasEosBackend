@@ -111,6 +111,8 @@ class UserController extends Controller
             if (!$end_program->gt($current)) {
                 $this->result->status = false;
                 $this->result->message = 'Program has closed';
+                $this->result->data->mount = $end_program;
+
                 return response()->json($this->result);
             }
         }

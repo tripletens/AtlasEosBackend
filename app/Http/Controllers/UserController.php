@@ -87,11 +87,6 @@ class UserController extends Controller
             $end_date = $count_down->end_countdown_date;
             $end_time = $count_down->end_countdown_time;
 
-            // $end_timer = Carbon::createFromFormat(
-            //     'Y-m-d H:s:i',
-            //     $end_date . ' ' . $end_time . ':00'
-            // );
-
             // $inital_end_timer = Carbon::parse(
             //     $end_date . ' ' . $end_time,
             //     'America/Edmonton'
@@ -103,19 +98,17 @@ class UserController extends Controller
             // );
 
             $end_count = $end_date . ' ' . $end_time;
+            ///  $ch = Carbon::parse($end_count, 'America/Edmonton');
 
-            $ch = Carbon::parse($end_count, 'America/Edmonton');
-
-            // $end_program = Carbon::createFromFormat(
-            //     'Y-m-d H:i',
-            //     $end_count,
-            //     'America/Edmonton'
-            // )->format('Y-m-d H:i');
+            $end_program = Carbon::createFromFormat(
+                'Y-m-d H:i',
+                $end_count
+            )->setTimezone('America/Edmonton');
 
             // $ch = new Carbon($end_program);
             $current = $request->timer;
 
-            if (!$ch->gt($current)) {
+            if (!$end_program->gt($current)) {
                 $this->result->status = false;
                 $this->result->message = 'Program has closed';
                 return response()->json($this->result);

@@ -1752,7 +1752,7 @@ class AdminController extends Controller
                 'atlas_id' => $atlas_id,
                 'vendor' => $pro_data->vendor_product_code,
                 'description' => $pro_data->description,
-                'price' => $pro_data->booking,
+                'price' => $cart_data->unit_price,
                 'dealer' => $dealer,
             ];
 

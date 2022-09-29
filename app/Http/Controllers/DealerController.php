@@ -420,11 +420,15 @@ class DealerController extends Controller
 
                 $value->description = $this->translateToLocal(
                     $lang,
-                    $pro_data->description
+                    isset($pro_data->description)
+                        ? $pro_data->description
+                        : null
                 );
                 $value->vendor_product_code = $this->translateToLocal(
                     $lang,
-                    $pro_data->vendor_product_code
+                    isset($pro_data->vendor_product_code)
+                        ? $pro_data->vendor_product_code
+                        : null
                 );
             }
 

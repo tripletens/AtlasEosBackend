@@ -1767,7 +1767,7 @@ class AdminController extends Controller
                 'atlas_id' => $atlas_id,
                 'vendor' => $pro_data->vendor_product_code,
                 'description' => $pro_data->description,
-                'price' => $pro_data->special,
+                'price' => $pro_data->booking,
                 'dealer' => $dealer,
             ];
 

@@ -1393,8 +1393,8 @@ class VendorController extends Controller
 
                 $data = [
                     'pro_id' => isset($pro_data->id) ? $pro_data->id : null,
-                    'vendor' => isset($pro_data->product_vendor_code)
-                        ? $pro_data->product_vendor_code
+                    'vendor' => isset($pro_data->vendor_product_code)
+                        ? $pro_data->vendor_product_code
                         : null,
 
                     'description' => $desc,

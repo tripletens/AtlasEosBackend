@@ -1706,39 +1706,22 @@ class AdminController extends Controller
             'new_qty' => $new_qty != '' ? $new_qty : $old_qty,
             'regular' => $product_data->regular,
             'show_price' => $old_price,
-            'overide_price' => $new_price,
+            'overide_price' => $new_price != '' ? $new_price : $old_price,
             'authorised_by' => $authorised_by,
         ]);
 
-        if ($new_price != '') {
-            if ($new_qty != '') {
-                $total = intval($new_qty) * intval($new_price);
+        $unit_price = $new_price != '' ? $new_price : $old_price;
+        $qty = $new_qty != '' ? $new_qty : $old_qty;
 
-                $update = Cart::where('dealer', $dealer_code)
-                    ->where('atlas_id', $atlas_code)
-                    ->update([
-                        'unit_price' => $new_price,
-                        'price' => $total,
-                    ]);
-            } else {
-                $total = intval($old_qty) * intval($new_price);
+        $total = intval($qty) * floatval($unit_price);
 
-                $update = Cart::where('dealer', $dealer_code)
-                    ->where('atlas_id', $atlas_code)
-                    ->update([
-                        'unit_price' => $new_price,
-                        'price' => $total,
-                    ]);
-            }
-        }
-
-        if ($new_qty != '') {
-            $update = Cart::where('dealer', $dealer_code)
-                ->where('atlas_id', $atlas_code)
-                ->update([
-                    'qty' => $new_qty,
-                ]);
-        }
+        $update = Cart::where('dealer', $dealer_code)
+            ->where('atlas_id', $atlas_code)
+            ->update([
+                'unit_price' => $unit_price,
+                'price' => $total,
+                'qty' => $qty,
+            ]);
 
         $this->result->status = true;
         $this->result->status_code = 200;

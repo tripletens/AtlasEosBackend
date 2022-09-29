@@ -724,12 +724,14 @@ class DealerController extends Controller
 
                 $data = [
                     'id' => $pro_id,
-                    'desc' => $product_data->description,
+                    'desc' => isset($product_data->description)
+                        ? $product_data->description
+                        : null,
                     'spec_data' => $product_data->spec_data
                         ? json_decode($product_data->spec_data)
                         : null,
                     'grouping' => $product_data->grouping,
-                    'vendor' => $product_data->vendor,
+                    'vendor' => $product_data->vendor_product_code,
                     'atlas_id' => $product_data->atlas_id,
                     'regular' => $product_data->regular,
                     'booking' => $product_data->booking,

@@ -1075,8 +1075,14 @@ class AdminController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $pro_data->description;
-                $value->vendor_product_code = $pro_data->vendor_product_code;
+                $value->description = isset($pro_data->description)
+                    ? $pro_data->description
+                    : null;
+                $value->vendor_product_code = isset(
+                    $pro_data->vendor_product_code
+                )
+                    ? $pro_data->vendor_product_code
+                    : null;
             }
 
             $data = [

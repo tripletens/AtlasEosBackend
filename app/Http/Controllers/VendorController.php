@@ -1430,7 +1430,9 @@ class VendorController extends Controller
                 $value->entered_by = isset($dealer_db->full_name)
                     ? $dealer_db->full_name
                     : null;
-                $value->desc = $pro_data->description;
+                $value->desc = isset($pro_data->description)
+                    ? $pro_data->description
+                    : null;
                 $value->dealer_name = $dealer_data->dealer_name;
                 $value->vendor_name = $vendor_data->vendor_name;
             }

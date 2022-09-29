@@ -175,6 +175,11 @@ Route::group(
         );
 
         Route::post(
+            '/edit-dealer-user',
+            'AdminController@edit_dealer_user_data'
+        );
+
+        Route::post(
             '/upload-dealer-users',
             'AdminController@upload_dealer_users'
         );
@@ -1056,7 +1061,6 @@ Route::group(
             '/branch/dealers-without-orders/{uid}',
             'BranchController@branch_dealers_without_orders'
         );
-        
 
         // branch_dealers_with_orders
         Route::post(
@@ -1268,7 +1272,5 @@ Route::group(
             '/sales-rep/dealers_with_orders/{user_id}',
             'SalesRepController@salesrep_dealers_with_orders'
         );
-        
-
     }
 );

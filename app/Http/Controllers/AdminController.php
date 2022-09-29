@@ -80,6 +80,152 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function edit_dealer_user_data(Request $request)
+    {
+        // process the request
+        $username = $request->username;
+        $email = $request->email;
+        $firstName = $request->firstName;
+        $lastName = $request->lastName;
+        $password = $request->password;
+        $phone = $request->phone;
+        $privilegeVendor = $request->privilegeVendor;
+        $privilegeDealer = $request->privilegeDealer;
+        $role = $request->role;
+        $status = $request->status;
+        $vendor = $request->vendor;
+        $vendorId = $request->vendorId;
+        $location = $request->location;
+        $dealerCode = $request->dealerCode;
+        $dealerName = $request->dealerName;
+
+        if ($firstName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'first_name' => $firstName,
+            ]);
+        }
+
+        if ($dealerCode != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'company_name' => $dealerName,
+                'dealer_name' => $dealerName,
+                'account_id' => $dealerCode,
+                'company_code' => $dealerCode,
+            ]);
+        }
+
+        if ($role != '') {
+            if ($role == '1') {
+                $role_name = 'admin';
+            }
+            if ($role == '2') {
+                $role_name = 'branch manager';
+            }
+            if ($role == '3') {
+                $role_name = 'vendor';
+            }
+            if ($role == '4') {
+                $role_name = 'dealer';
+            }
+            if ($role == '5') {
+                $role_name = 'inside sales';
+            }
+            if ($role == '6') {
+                $role_name = 'outside sales';
+            }
+
+            $update = Users::where('id', $vendorId)->update([
+                'role' => $role,
+                'role_name' => $role_name,
+            ]);
+        }
+
+        if ($privilegeDealer != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'privileged_dealers' => $privilegeDealer,
+            ]);
+        }
+
+        if ($privilegeVendor != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'privileged_vendors' => $privilegeVendor,
+            ]);
+        }
+
+        if ($status != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'status' => $status,
+            ]);
+        }
+
+        if ($phone != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'phone' => $phone,
+            ]);
+        }
+
+        if ($password != '') {
+            $hash_password = bcrypt($password);
+
+            $update = Users::where('id', $vendorId)->update([
+                'password' => $hash_password,
+                'password_show' => $password,
+            ]);
+        }
+
+        if ($lastName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'last_name' => $lastName,
+            ]);
+        }
+
+        if ($email != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'email' => $email,
+            ]);
+        }
+
+        if ($vendor != '') {
+            $vendor = $request->vendor;
+            $vendorName =
+                isset($request->vendorName) && $request->vendorName != ''
+                    ? $request->vendorName
+                    : null;
+            $setVendor = '';
+            if ($vendorName == null) {
+                $vendors = Vendors::where('vendor_code', $vendor)
+                    ->get()
+                    ->first();
+                $setVendor = $vendors->vendor_name;
+            } else {
+                $setVendor = $vendorName;
+            }
+
+            $update = Users::where('id', $vendorId)->update([
+                'vendor_name' => $setVendor,
+                'vendor_code' => $vendor,
+                'company_name' => $setVendor,
+            ]);
+        }
+
+        if ($username != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'username' => $username,
+            ]);
+        }
+
+        if ($location != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'location' => $location,
+            ]);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Vendor User Updated Successfully';
+        return response()->json($this->result);
+    }
+
     public function delete_dealership($id)
     {
         if (Dealer::where('id', $id)->exists()) {

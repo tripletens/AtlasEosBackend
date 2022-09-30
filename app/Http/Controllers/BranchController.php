@@ -177,7 +177,9 @@ class BranchController extends Controller
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+            $filter_users_priviledged_dealers_array = array_filter($user_privileged_dealers_array);
+
+            foreach ($filter_users_priviledged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
                 $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
@@ -216,7 +218,9 @@ class BranchController extends Controller
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+            $filter_users_priviledged_dealers_array = array_filter($user_privileged_dealers_array);
+
+            foreach ($filter_users_priviledged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
                 $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
@@ -314,7 +318,9 @@ class BranchController extends Controller
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+            $filter_users_priviledged_dealers_array = array_filter($user_privileged_dealers_array);
+
+            foreach ($filter_users_priviledged_dealers_array as $user_privilaged_dealer) {
                 // $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
                 // return $user_privilaged_dealer;
@@ -418,7 +424,7 @@ class BranchController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             // return $user_privileged_dealers_array[0];
 
@@ -487,7 +493,7 @@ class BranchController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             // return $user_privileged_dealers_array[0];
 

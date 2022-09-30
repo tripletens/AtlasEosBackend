@@ -192,7 +192,7 @@ class BuckController extends Controller
             'title' => 'required|string',
             // 'description' => 'required',
             'status' => 'required|boolean',
-            'pdf' => 'required|mimes:pdf,doc,docx',
+            // 'pdf' => 'required|mimes:pdf,doc,docx',
             // 'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
 

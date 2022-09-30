@@ -138,6 +138,17 @@ class SalesRepController extends Controller
             ->get()
             ->first();
 
+        $completed_orders_vendors = Cart::where('dealer', $dealer)
+            ->where('status', 1)
+            ->groupBy('vendor')
+            ->pluck('vendor')
+            ->toArray();
+
+        $all_uncompleted_orders_vendors = DB::table('vendors')
+            ->whereNotIn('vendor_code', $completed_orders_vendors)
+            ->where('status', 1)
+            ->get();
+
         foreach ($dealer_data as $value) {
             $vendor_code = $value->vendor;
             if (!\in_array($vendor_code, $vendors)) {
@@ -155,6 +166,9 @@ class SalesRepController extends Controller
 
             $total = 0;
 
+            
+
+
             foreach ($cart_data as $value) {
                 $total += $value->price;
                 $atlas_id = $value->atlas_id;
@@ -166,6 +180,17 @@ class SalesRepController extends Controller
                 $value->vendor_product_code = $pro_data->vendor_product_code;
             }
 
+            $completed_orders_vendors = Cart::where('dealer', $account)
+            ->where('status', 1)
+            ->groupBy('vendor')
+            ->pluck('vendor')
+            ->toArray();
+
+            $all_uncompleted_orders_vendors = DB::table('vendors')
+                ->whereNotIn('vendor_code', $completed_orders_vendors)
+                ->where('status', 1)
+                ->get();
+
             $data = [
                 'vendor_code' => $vendor_data ? $vendor_data->vendor_code : null,
                 'vendor_name' => $vendor_data ? $vendor_data->vendor_name : null,
@@ -175,16 +200,16 @@ class SalesRepController extends Controller
             ];
 
             $grand_total += $total;
-
             array_push($res_data, $data);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'all dealer sales';
-        $this->result->data = $res_data;
+        $this->result->data->orders = $res_data;
+        $this->result->data->orders_remaining = count($all_uncompleted_orders_vendors);
         // $this->result->data->atlas_id = $atlas_id_data;
-
+        
         return response()->json($this->result);
     }
 

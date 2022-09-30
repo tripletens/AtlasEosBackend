@@ -150,7 +150,7 @@ class SalesRepController extends Controller
                 ->get()
                 ->first();
             $cart_data = Cart::where('vendor', $value)
-                ->where('dealer', $dealer)
+                ->where('dealer', $dealer)->orderBy('atlas_id','asc')
                 ->get();
 
             $total = 0;

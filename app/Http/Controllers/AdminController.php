@@ -4130,6 +4130,13 @@ class AdminController extends Controller
             ]);
         }
 
+        if ($firstName != '' && $lastName != '') {
+            $full_name = $firstName . ' ' . $lastName;
+            $update = Users::where('id', $vendorId)->update([
+                'full_name' => $full_name,
+            ]);
+        }
+
         if ($lastName != '') {
             $update = Users::where('id', $vendorId)->update([
                 'last_name' => $lastName,

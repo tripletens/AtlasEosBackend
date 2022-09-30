@@ -337,9 +337,9 @@ class BranchController extends Controller
                     $dealer_cart = Cart::where('dealer',$user_privilaged_dealer)->count();
             
                     if($dealer_cart > 0){
-                        array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
-                    }else{
                         array_push($all_dealers_with_orders, ...$get_priviledged_dealer_details);
+                    }else{
+                        array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
                     }
 
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);

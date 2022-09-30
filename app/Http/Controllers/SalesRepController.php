@@ -180,7 +180,7 @@ class SalesRepController extends Controller
                 $value->vendor_product_code = $pro_data->vendor_product_code;
             }
 
-            $completed_orders_vendors = Cart::where('dealer', $account)
+            $completed_orders_vendors = Cart::where('dealer', $dealer)
             ->where('status', 1)
             ->groupBy('vendor')
             ->pluck('vendor')
@@ -209,7 +209,7 @@ class SalesRepController extends Controller
         $this->result->data->orders = $res_data;
         $this->result->data->orders_remaining = count($all_uncompleted_orders_vendors);
         // $this->result->data->atlas_id = $atlas_id_data;
-        
+
         return response()->json($this->result);
     }
 

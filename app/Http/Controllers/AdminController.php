@@ -122,12 +122,6 @@ class AdminController extends Controller
         $dealerCode = $request->dealerCode;
         $dealerName = $request->dealerName;
 
-        if ($firstName != '') {
-            $update = Users::where('id', $vendorId)->update([
-                'first_name' => $firstName,
-            ]);
-        }
-
         if ($dealerCode != '') {
             $update = Users::where('id', $vendorId)->update([
                 'company_name' => $dealerName,
@@ -199,6 +193,19 @@ class AdminController extends Controller
         if ($lastName != '') {
             $update = Users::where('id', $vendorId)->update([
                 'last_name' => $lastName,
+            ]);
+        }
+
+        if ($firstName != '') {
+            $update = Users::where('id', $vendorId)->update([
+                'first_name' => $firstName,
+            ]);
+        }
+
+        if ($firstName != '' && $lastName != '') {
+            $full_name = $firstName . ' ' . $lastName;
+            $update = Users::where('id', $vendorId)->update([
+                'full_name' => $full_name,
             ]);
         }
 

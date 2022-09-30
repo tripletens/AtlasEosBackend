@@ -4056,7 +4056,22 @@ class AdminController extends Controller
         $dealerCode = $request->dealerCode;
         $dealerName = $request->dealerName;
 
+        $current_user_data = Users::where('id', $vendorId)
+            ->get()
+            ->first();
+
         if ($firstName != '') {
+            $full_name = $current_user_data->full_name;
+            $ex = explode(' ', $full_name);
+
+            if (isset($ex[0])) {
+                $ex[0] = $firstName;
+                $imp = implode(' ', $ex);
+                $update = Users::where('id', $vendorId)->update([
+                    'full_name' => $imp,
+                ]);
+            }
+
             $update = Users::where('id', $vendorId)->update([
                 'first_name' => $firstName,
             ]);
@@ -4141,6 +4156,17 @@ class AdminController extends Controller
             $update = Users::where('id', $vendorId)->update([
                 'last_name' => $lastName,
             ]);
+
+            $full_name = $current_user_data->full_name;
+            $ex = explode(' ', $full_name);
+
+            if (isset($ex[1])) {
+                $ex[1] = $lastName;
+                $imp = implode(' ', $ex);
+                $update = Users::where('id', $vendorId)->update([
+                    'full_name' => $imp,
+                ]);
+            }
         }
 
         if ($email != '') {

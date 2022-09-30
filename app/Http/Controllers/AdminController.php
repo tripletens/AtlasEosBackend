@@ -41,6 +41,8 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 use App;
 use App\Models\SystemSettings;
 use DateTime;
+use App\Models\Bucks;
+
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -79,6 +81,25 @@ class AdminController extends Controller
     // inside sales == 5
     // outside == 6
     // admin == 7
+
+    public function get_each_show_buck($id)
+    {
+        $fetch_show_bucks = Bucks::where('id', $id)->get();
+
+        if (!$fetch_show_bucks) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, Can't find the show bucks";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $fetch_show_bucks;
+        $this->result->message = 'Show bucks fetched Successfully';
+        return response()->json($this->result);
+    }
 
     public function edit_dealer_user_data(Request $request)
     {

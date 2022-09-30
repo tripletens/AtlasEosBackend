@@ -43,6 +43,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/get-each-show-buck/{id}',
+            'AdminController@get_each_show_buck'
+        );
+
+        Route::get(
             '/admin/get-sales-rep-users/{user}',
             'AdminController@get_sales_rep_users'
         );

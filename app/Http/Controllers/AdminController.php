@@ -3249,7 +3249,8 @@ class AdminController extends Controller
 
     public function admin_dashboard_analysis()
     {
-        $total_vendors = Users::where('role', '3')->count();
+        $total_vendor = Vendor::count();
+        $total_vendors_users = Users::where('role', '3')->count();
         $total_dealers = Users::where('role', '4')->count();
         $total_products = Products::count();
         $total_order = Cart::where('status', '1')->count();
@@ -3304,6 +3305,9 @@ class AdminController extends Controller
         $this->result->data->total_logged_dealers = $logged_dealers;
 
         $this->result->data->total_vendors = $total_vendors;
+
+        $this->result->data->total_vendor_users = $total_vendors_users;
+
         $this->result->data->total_dealers = $total_dealers;
         $this->result->data->total_products = $total_products;
         $this->result->data->total_amount = $cart_total;

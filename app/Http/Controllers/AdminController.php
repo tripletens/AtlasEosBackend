@@ -84,7 +84,9 @@ class AdminController extends Controller
 
     public function get_each_show_buck($id)
     {
-        $fetch_show_bucks = Bucks::where('id', $id)->get();
+        $fetch_show_bucks = Bucks::where('id', $id)
+            ->get()
+            ->first();
 
         if (!$fetch_show_bucks) {
             $this->result->status = true;

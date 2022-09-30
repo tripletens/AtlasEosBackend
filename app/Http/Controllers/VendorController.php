@@ -75,9 +75,17 @@ class VendorController extends Controller
                     //     $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
-                    'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
-                    'desc' => $pro_data->description,
+                    'vendor_product_code' => isset(
+                        $pro_data->vendor_product_code
+                    )
+                        ? $pro_data->vendor_product_code
+                        : null,
+                    'special' => isset($pro_data->booking)
+                        ? $pro_data->booking
+                        : null,
+                    'desc' => isset($pro_data->description)
+                        ? $pro_data->description
+                        : null,
                     'total' => $value->price,
                 ];
 
@@ -135,9 +143,17 @@ class VendorController extends Controller
                     'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
-                    'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
-                    'desc' => $pro_data->description,
+                    'vendor_product_code' => isset(
+                        $pro_data->vendor_product_code
+                    )
+                        ? $pro_data->vendor_product_code
+                        : null,
+                    'special' => isset($pro_data->booking)
+                        ? $pro_data->booking
+                        : null,
+                    'desc' => isset($pro_data->description)
+                        ? $pro_data->description
+                        : null,
                     'total' => $value->price,
                 ];
 
@@ -1063,7 +1079,9 @@ class VendorController extends Controller
             ->get()
             ->first();
 
-        $user_vendor_code = $selected_user->vendor_code;
+        $user_vendor_code = isset($selected_user->vendor_code)
+            ? $selected_user->vendor_code
+            : null;
         $privilaged_vendors = isset($selected_user->privileged_vendors)
             ? $selected_user->privileged_vendors
             : null;
@@ -1073,7 +1091,11 @@ class VendorController extends Controller
             if ($separator[1] == '') {
                 $pri_vendor_code = $separator[0];
 
-                array_push($separator, $user_vendor_code);
+                // if ($user_vendor_code != null && $user_vendor_code != '') {
+                //     array_push($separator, $user_vendor_code);
+                // }
+
+                array_unique($separator);
 
                 $uni_arr = [];
 
@@ -1093,15 +1115,20 @@ class VendorController extends Controller
                         }
                     }
 
-                    $total_sales += Cart::where('vendor', $vendor_code)->sum(
-                        'price'
-                    );
+                    if ($value && $value != '') {
+                        $total_sales += Cart::where(
+                            'vendor',
+                            $vendor_code
+                        )->sum('price');
+                    }
                 }
 
                 $total_orders = count($uni_arr);
             } else {
                 $ar = [];
-                array_push($separator, $user_vendor_code);
+                /// array_push($separator, $user_vendor_code);
+                array_unique($separator);
+
                 $uni_arr = [];
 
                 foreach ($separator as $value) {
@@ -1162,7 +1189,7 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
-    public function sales_by_item_detailed($code)
+    public function sales_by_item_detailed_export($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
             ->orderBy('product_id', 'asc')
@@ -1170,6 +1197,37 @@ class VendorController extends Controller
         $res_data = [];
         $atlas_id_data = [];
         $unique_array = [];
+
+        foreach ($vendor_purchases as $value) {
+            $user_id = $value->uid;
+            $pro_id = $value->product_id;
+            $dealer_code = $value->dealer;
+
+            $pro_data = Products::where('id', $pro_id)
+                ->get()
+                ->first();
+
+            $dealer_db = Users::where('id', $user_id)
+                ->get()
+                ->first();
+
+            $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                ->get()
+                ->first();
+
+            $vendor_data = Vendors::where('vendor_code', $code)
+                ->get()
+                ->first();
+
+            $value->entered_by = isset($dealer_db->full_name)
+                ? $dealer_db->full_name
+                : null;
+            $value->desc = $pro_data->description;
+            $value->dealer_name = $dealer_data->dealer_name;
+            $value->vendor_name = $vendor_data->vendor_name;
+        }
+
+        return $vendor_purchases;
 
         if ($vendor_purchases) {
             $user_id = '';
@@ -1259,6 +1317,138 @@ class VendorController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
         $this->result->data->res = $res;
+        // $this->result->data->atlas_id = $atlas_id_data;
+
+        return response()->json($this->result);
+    }
+
+    public function sales_by_item_detailed($code)
+    {
+        $vendor_purchases = Cart::where('vendor', $code)
+            ->orderBy('product_id', 'asc')
+            ->get();
+        $res_data = [];
+        $atlas_id_data = [];
+        $unique_array = [];
+
+        if ($vendor_purchases) {
+            $user_id = '';
+            foreach ($vendor_purchases as $value) {
+                $atlas_id = $value->atlas_id;
+                ///$user_id = $value->uid;
+
+                if (!in_array($atlas_id, $unique_array)) {
+                    array_push($unique_array, $atlas_id);
+                }
+            }
+
+            sort($unique_array);
+            for ($i = 0; $i < count($unique_array); $i++) {
+                $each_id = $unique_array[$i];
+
+                $atlas_filter = Cart::where('vendor', $code)
+                    ->where('atlas_id', $each_id)
+                    ->get();
+
+                $pro_data = Products::where('atlas_id', $each_id)
+                    ->get()
+                    ->first();
+
+                $total_atlas_product = 0;
+                $total_atlas_amount = 0;
+
+                $dealer_data = [];
+                foreach ($atlas_filter as $value) {
+                    $qty = $value->qty;
+                    $dealer_db = Users::where('id', $value->uid)
+                        ->get()
+                        ->first();
+
+                    $price = $value->price;
+                    $total_atlas_product += $qty;
+
+                    if ($dealer_db) {
+                        $data = [
+                            'atlas_id' => $value->atlas_id,
+                            'dealer_name' => $dealer_db->company_name,
+                            'qty' => $qty,
+                            'account_id' => $dealer_db->account_id,
+                            'user' =>
+                                $dealer_db->first_name .
+                                ' ' .
+                                $dealer_db->last_name,
+                            'total' => $value->price,
+                            'item_total' => floatval($value->price),
+                        ];
+
+                        $total_atlas_amount += floatval($value->price);
+
+                        array_push($dealer_data, $data);
+                    }
+                }
+
+                $desc = isset($pro_data->description)
+                    ? $pro_data->description
+                    : null;
+
+                $data = [
+                    'pro_id' => isset($pro_data->id) ? $pro_data->id : null,
+                    'vendor' => isset($pro_data->vendor_product_code)
+                        ? $pro_data->vendor_product_code
+                        : null,
+
+                    'description' => $desc,
+                    'overall_total' => $total_atlas_amount,
+                    'qty_total' => $total_atlas_product,
+                    'atlas_id' => $each_id,
+                    'extra_data' => $dealer_data,
+                ];
+
+                array_push($res_data, $data);
+            }
+
+            //////// Export section //////
+
+            foreach ($vendor_purchases as $value) {
+                $user_id = $value->uid;
+                $pro_id = $value->product_id;
+                $dealer_code = $value->dealer;
+
+                $pro_data = Products::where('id', $pro_id)
+                    ->get()
+                    ->first();
+
+                $dealer_db = Users::where('id', $user_id)
+                    ->get()
+                    ->first();
+
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+
+                $vendor_data = Vendors::where('vendor_code', $code)
+                    ->get()
+                    ->first();
+
+                $value->entered_by = isset($dealer_db->full_name)
+                    ? $dealer_db->full_name
+                    : null;
+                $value->desc = isset($pro_data->description)
+                    ? $pro_data->description
+                    : null;
+                $value->dealer_name = $dealer_data->dealer_name;
+                $value->vendor_name = $vendor_data->vendor_name;
+            }
+        }
+
+        $res = $this->sort_according_atlas_id($res_data);
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Sales By Detailed';
+        $this->result->data->res = $res;
+        $this->result->data->export = $vendor_purchases;
+
         // $this->result->data->atlas_id = $atlas_id_data;
 
         return response()->json($this->result);
@@ -1427,6 +1617,7 @@ class VendorController extends Controller
     {
         $dealer_cart = Cart::where('uid', $user)
             ->where('vendor', $vendor)
+            ->orderBy('product_id', 'asc')
             ->get();
 
         $res_data = [];
@@ -1438,6 +1629,10 @@ class VendorController extends Controller
             ->get()
             ->first();
 
+        $dealer = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
@@ -1446,6 +1641,7 @@ class VendorController extends Controller
                     ->first();
 
                 $data = [
+                    'id' => $pro_data->id,
                     'dealer_rep_name' =>
                         $dealer_data->full_name . ' ' . $dealer_data->last_name,
                     'user_id' => $user,
@@ -1455,6 +1651,10 @@ class VendorController extends Controller
                     'special' => $pro_data->booking,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
+                    'dealer_name' => $dealer->dealer_name,
+                    'dealer_code' => $dealer->dealer_code,
+                    'vendor_name' => $vendor_data->vendor_name,
+                    'vendor_code' => $vendor_data->vendor_code,
                 ];
 
                 array_push($res_data, $data);
@@ -1486,6 +1686,10 @@ class VendorController extends Controller
             ->get()
             ->first();
 
+        $dealer = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
@@ -1502,6 +1706,10 @@ class VendorController extends Controller
                     'special' => $pro_data->booking,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
+                    'dealer_name' => $dealer->dealer_name,
+                    'dealer_code' => $dealer->dealer_code,
+                    'vendor_name' => $vendor_data->vendor_name,
+                    'vendor_code' => $vendor_data->vendor_code,
                 ];
 
                 array_push($res_data, $data);
@@ -1831,16 +2039,18 @@ class VendorController extends Controller
                     //     ->where('status', '0')
                     //     ->count();
 
-                    $each_data = [
-                        'id' => $sender_data['id'],
-                        'first_name' => $value['first_name'],
-                        'last_name' => $value['last_name'],
-                        'full_name' => $value['full_name'],
-                        'email' => $value['email'],
-                        'notification' => $count_notification,
-                    ];
+                    if ($sender != $user) {
+                        $each_data = [
+                            'id' => $sender_data['id'],
+                            'first_name' => $value['first_name'],
+                            'last_name' => $value['last_name'],
+                            'full_name' => $value['full_name'],
+                            'email' => $value['email'],
+                            'notification' => $count_notification,
+                        ];
 
-                    array_push($data, $each_data);
+                        array_push($data, $each_data);
+                    }
                 }
             }
         }
@@ -1911,7 +2121,9 @@ class VendorController extends Controller
             # select the settings
             // $fetch_settings = SystemSettings::find($settings_id);
 
-            $fetch_settings = ProgramCountdown::where("status",1)->get()->first();
+            $fetch_settings = ProgramCountdown::where('status', 1)
+                ->get()
+                ->first();
 
             $vendor_cart = DB::table('cart')
                 ->where('vendor', $vendor_code)

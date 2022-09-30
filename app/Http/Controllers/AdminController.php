@@ -3249,7 +3249,7 @@ class AdminController extends Controller
 
     public function admin_dashboard_analysis()
     {
-        $total_vendor = Vendor::count();
+        $total_vendor = Vendors::count();
         $total_vendors_users = Users::where('role', '3')->count();
         $total_dealers = Users::where('role', '4')->count();
         $total_products = Products::count();

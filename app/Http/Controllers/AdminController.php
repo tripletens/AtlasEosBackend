@@ -3304,7 +3304,7 @@ class AdminController extends Controller
         $this->result->data->total_logged_admin = $logged_admin;
         $this->result->data->total_logged_dealers = $logged_dealers;
 
-        $this->result->data->total_vendors = $total_vendors;
+        $this->result->data->total_vendors = $total_vendor;
 
         $this->result->data->total_vendor_users = $total_vendors_users;
 

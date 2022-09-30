@@ -190,10 +190,10 @@ class BuckController extends Controller
             'vendor_name' => 'required',
             'vendor_code' => 'required|string',
             'title' => 'required|string',
-            'description' => 'required',
+            // 'description' => 'required',
             'status' => 'required|boolean',
             'pdf' => 'required|mimes:pdf,doc,docx',
-            'image' => 'required|mimes:jpg,jpeg,png,gif',
+            // 'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {

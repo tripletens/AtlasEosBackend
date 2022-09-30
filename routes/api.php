@@ -470,6 +470,11 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::get(
+            '/vendor/get-all-admin-users/{user}',
+            'VendorController@get_all_admin_users'
+        );
+
+        Route::get(
             '/dealer/get-all-admin-users/{user}',
             'DealerController@get_all_admin_users'
         );

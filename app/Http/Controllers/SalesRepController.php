@@ -355,7 +355,7 @@ class SalesRepController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
@@ -394,7 +394,7 @@ class SalesRepController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
@@ -678,9 +678,11 @@ class SalesRepController extends Controller
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
+            $filter_users_priviledged_dealers_array = array_filter($user_privileged_dealers_array);
+
             // return $user_privileged_dealers_format = str_replace('"', '', $user_privileged_dealers_array[0]);
 
-            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+            foreach ($filter_users_priviledged_dealers_array as $user_privilaged_dealer) {
 
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
@@ -779,7 +781,7 @@ class SalesRepController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
@@ -832,7 +834,7 @@ class SalesRepController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
@@ -894,7 +896,7 @@ class SalesRepController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             // return $user_privileged_dealers_array[0];
 
@@ -964,7 +966,7 @@ class SalesRepController extends Controller
 
         if ($user_privileged_dealers != null) {
 
-            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
+            $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             // return $user_privileged_dealers_array[0];
 

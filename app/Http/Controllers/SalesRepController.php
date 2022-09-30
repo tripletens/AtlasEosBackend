@@ -925,6 +925,7 @@ class SalesRepController extends Controller
     }
 
     // get dealers that dont have orders
+    
     public function salesrep_dealers_with_orders($uid){
         $user_data = Users::where('id', $uid)->get()->first();
 

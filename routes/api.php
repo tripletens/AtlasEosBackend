@@ -1078,7 +1078,7 @@ Route::group(
         );
 
         // branch_dealers_with_orders
-        Route::post(
+        Route::get(
             '/branch/get-privileged-dealer/{user}',
             'BranchController@get_privileged_dealers'
         );

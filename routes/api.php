@@ -1048,6 +1048,11 @@ Route::group(
         );
 
         Route::get(
+            '/branch/get-all-admin-users/{user}',
+            'BranchController@get_all_admin_users'
+        );
+
+        Route::get(
             '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}',
             'BranchController@get_dealers_with_account_id_under_branch'
         );

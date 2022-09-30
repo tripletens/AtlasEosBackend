@@ -430,38 +430,34 @@ class BranchController extends Controller
 
         $all_dealers_with_orders = [];
 
+        $all_user_dealers = [];
+        
         if ($user_privileged_dealers != null) {
-            $user_privileged_dealers_array = explode(
-                ',',
-                $user_privileged_dealers
-            );
 
-            foreach (
-                $user_privileged_dealers_array
-                as $user_privilaged_dealer
-            ) {
-                $user_privileged_dealers_format = str_replace(
-                    '"',
-                    '',
-                    $user_privilaged_dealer
-                );
+            $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
 
-                $cart_data_total = Cart::where(
-                    'dealer',
-                    $user_privileged_dealers_format
-                )->sum('price');
+            foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+                // $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
+
+                // return $user_privilaged_dealer;
+
+                $cart_data_total = Cart::where('dealer', $user_privilaged_dealer)->sum('price');
 
                 $total_price += $cart_data_total;
 
-                $get_priviledged_dealer_details = Dealer::where(
-                    'dealer_code',
-                    $user_privileged_dealers_format
-                )->get();
+                // get the dealerships 
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privilaged_dealer)
+                    ->get();
+
+
+                $get_total_user_dealers = Users::where('account_id', $user_privilaged_dealer)->get();
+
+                // return $get_total_user_dealers;
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
 
-                    $dealer_cart = Cart::where('dealer',$user_privileged_dealers_format)->count();
+                    $dealer_cart = Cart::where('dealer',$user_privilaged_dealer)->count();
             
                     if($dealer_cart > 0){
                         array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
@@ -470,16 +466,16 @@ class BranchController extends Controller
                     }
 
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+              }
 
-                }
+                array_push($all_user_dealers, ...$get_total_user_dealers);
             }
         }
 
-        $user_privileged_dealers_format = str_replace(
-            '\"',
-            '',
-            $user_privilaged_dealer
-        );
+
+        // return $all_user_dealers;
+
+        $user_privileged_dealers_format = str_replace('\"', '', $user_privilaged_dealer);
 
         $number_of_dealers = count($user_privileged_dealers_array);
 
@@ -517,9 +513,11 @@ class BranchController extends Controller
 
         $this->result->data->all_dealers_without_orders = $all_dealers_without_orders;
         $this->result->data->all_dealers_with_orders = $all_dealers_with_orders;
-        
+        $this->result->data->all_dealer_users = $all_user_dealers;
+
         $this->result->data->all_dealers_with_orders_count = count($all_dealers_with_orders);
         $this->result->data->all_dealers_without_orders_count = count($all_dealers_without_orders);
+        $this->result->data->all_dealer_users_count = count($all_user_dealers);
 
         return response()->json($this->result);
     }

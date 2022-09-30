@@ -167,11 +167,11 @@ class SalesRepController extends Controller
             }
 
             $data = [
-                'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+                'vendor_code' => $vendor_data->vendor_code ? $vendor_data->vendor_code : null,
+                'vendor_name' => $vendor_data->vendor_name ? $vendor_data->vendor_name : null,
                 'total' => floatval($total),
-                'data' => $cart_data,
-                'vendor_no' => count($all_vendors)
+                'data' => $cart_data ? $cart_data : [],
+                'vendor_no' => $all_vendors ? count($all_vendors) : 0
             ];
 
             $grand_total += $total;

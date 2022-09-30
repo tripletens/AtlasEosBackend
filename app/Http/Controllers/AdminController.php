@@ -1777,18 +1777,23 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
-            $data = [
-                'qty' => $cart_data->qty,
-                'atlas_id' => $atlas_id,
-                'vendor' => $pro_data->vendor_product_code,
-                'description' => $pro_data->description,
-                'price' => $cart_data->unit_price,
-                'dealer' => $dealer,
-            ];
+            if ($pro_data->spec_data == null) {
+                $data = [
+                    'qty' => $cart_data->qty,
+                    'atlas_id' => $atlas_id,
+                    'vendor' => $pro_data->vendor_product_code,
+                    'description' => $pro_data->description,
+                    'price' => $cart_data->unit_price,
+                    'dealer' => $dealer,
+                ];
 
-            $this->result->status = true;
-            $this->result->data = $data;
-            $this->result->message = 'Selected Cart Item';
+                $this->result->status = true;
+                $this->result->data = $data;
+                $this->result->message = 'Selected Cart Item';
+            } else {
+                $this->result->status = false;
+                $this->result->message = 'Item is an assorted or special Item';
+            }
         } else {
             $this->result->status = true;
             $this->result->data = [];

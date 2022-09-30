@@ -17,6 +17,7 @@ use App\Models\Cart;
 use App\Models\Orders;
 use App\Models\Users;
 use DB;
+use App\Models\Chat;
 
 class BranchController extends Controller
 {

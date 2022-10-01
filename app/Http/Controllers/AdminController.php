@@ -3263,7 +3263,7 @@ class AdminController extends Controller
 
                 $data = [
                     'account_id' => $dealer_code,
-                    // 'dealer' => $dealer_data,
+                    'dealer' => $value,
                     'total_sales' => $total_sales,
                     'trend' => '0%',
                 ];

@@ -1292,37 +1292,52 @@ class AdminController extends Controller
 
     public function dealer_single_summary($code)
     {
-        $dealers = Dealer::where('dealer_code', $code)->get();
+        $dealers = Dealer::where('dealer_code', $code)
+            ->get()
+            ->first();
+        $dealers_sales = Cart::where('dealer', $code)->sum('price');
+
         $dealer_count = Dealer::count();
         $total_sales = 0;
         $res_data = [];
 
         if ($dealers) {
-            foreach ($dealers as $value) {
-                $dealer_code = $value->dealer_code;
-                $dealer_name = $value->dealer_name;
-                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
-                    'price'
-                );
-                $total_sales += Cart::where('dealer', $dealer_code)->sum(
-                    'price'
-                );
+            $dealer_code = $dealers->dealer_code;
+            $dealer_name = $dealers->dealer_name;
 
-                $data = [
-                    'dealer_name' => $dealer_name,
-                    'dealer_code' => $dealer_code,
-                    'sales' => $dealer_sales,
-                ];
+            $data = [
+                'dealer_name' => $dealer_name,
+                'dealer_code' => $dealer_code,
+                'sales' => $dealers_sales,
+            ];
 
-                array_push($res_data, $data);
-            }
+            array_push($res_data, $data);
+
+            // foreach ($dealers as $value) {
+            //     $dealer_code = $value->dealer_code;
+            //     $dealer_name = $value->dealer_name;
+            //     $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+            //         'price'
+            //     );
+            //     $total_sales += Cart::where('dealer', $dealer_code)->sum(
+            //         'price'
+            //     );
+
+            //     $data = [
+            //         'dealer_name' => $dealer_name,
+            //         'dealer_code' => $dealer_code,
+            //         'sales' => $dealer_sales,
+            //     ];
+
+            //     array_push($res_data, $data);
+            // }
         }
 
         /////// Sorting //////////
-        usort($res_data, function ($a, $b) {
-            //Sort the array using a user defined function
-            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
-        });
+        // usort($res_data, function ($a, $b) {
+        //     //Sort the array using a user defined function
+        //     return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        // });
 
         $this->result->status = true;
         $this->result->status_code = 200;

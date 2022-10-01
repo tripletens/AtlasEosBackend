@@ -3248,20 +3248,22 @@ class AdminController extends Controller
     {
         ///// Most orders Dealers ///////
         $most_sale_dealer = [];
-        $all_dealer_users = Users::where('role', '4')->get();
+        $all_dealer_users = Dealer::all();
 
         if ($all_dealer_users) {
             foreach ($all_dealer_users as $value) {
-                $user_id = $value->id;
-                $total_sales = Cart::where('uid', $user_id)->sum('price');
-                $dealer_code = $value->account_id;
-                $dealer_data = Dealer::where('dealer_code', $dealer_code)
-                    ->get()
-                    ->first();
+                $dealer_code = $value->dealer_code;
+                $total_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                //// $dealer_code = $value->account_id;
+                // $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                //     ->get()
+                //     ->first();
 
                 $data = [
-                    'account_id' => $value->account_id,
-                    'dealer' => $dealer_data,
+                    'account_id' => $dealer_code,
+                    // 'dealer' => $dealer_data,
                     'total_sales' => $total_sales,
                     'trend' => '0%',
                 ];

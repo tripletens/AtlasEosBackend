@@ -582,20 +582,19 @@ class AdminController extends Controller
                 $full_desc = $value[7];
                 $type = $value[11];
 
-                $full_desc = str_replace(' ', '', $full_desc);
-                $full_desc = preg_replace('/[^A-Za-z0-9\-]/', '', $full_desc);
-                $full_desc = trim($full_desc);
+                // $full_desc = preg_replace('/[^A-Za-z0-9\-]/', '', $full_desc);
+                // $full_desc = trim($full_desc);
 
-                $description = str_replace(' ', '', $description);
-                $description = preg_replace(
-                    '/[^A-Za-z0-9\-]/',
-                    '',
-                    $description
-                );
+                // $description = preg_replace(
+                //     '/[^A-Za-z0-9\-]/',
+                //     '',
+                //     $description
+                // );
+
                 $description = trim($description);
 
-                $type = str_replace(' ', '', $type);
-                $type = preg_replace('/[^A-Za-z0-9\-]/', '', $type);
+                // $type = str_replace(' ', '', $type);
+                // $type = preg_replace('/[^A-Za-z0-9\-]/', '', $type);
                 $type = trim($type);
 
                 $vendor_data = Vendors::where('vendor_code', $vendor_code)

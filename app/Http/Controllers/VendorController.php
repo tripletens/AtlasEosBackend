@@ -953,10 +953,12 @@ class VendorController extends Controller
             return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
         });
 
+        $purchaser = array_slice($purchasers, 0, 5, true);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor single dashboard';
-        $this->result->data = $purchasers;
+        $this->result->data = $purchaser;
 
         return response()->json($this->result);
     }
@@ -1141,10 +1143,12 @@ class VendorController extends Controller
             array_push($resx, $value);
         }
 
+        $purchaser = array_slice($resx, 0, 5, true);
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'get vendor dashboard';
-        $this->result->data = $resx;
+        $this->result->data = $purchaser;
         // $this->result->data = $dealers;
 
         return response()->json($this->result);

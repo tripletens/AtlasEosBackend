@@ -1226,9 +1226,7 @@ class VendorController extends Controller
                 }
 
                 foreach ($uni_arr as $value) {
-                    $total_sales += Cart::where('dealer', $vendor_code)->sum(
-                        'price'
-                    );
+                    $total_sales += Cart::where('dealer', $value)->sum('price');
                 }
 
                 $total_orders = count($uni_arr);
@@ -1561,7 +1559,7 @@ class VendorController extends Controller
             if ($item_cart) {
                 foreach ($item_cart as $kvalue) {
                     $total_qty += intval($kvalue->qty);
-                    $total_price += intval($kvalue->price);
+                    $total_price += floatval($kvalue->price);
                 }
 
                 $user_id = $kvalue->uid;

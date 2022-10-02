@@ -63,6 +63,7 @@ class DealerController extends Controller
     public function get_all_admin_users($user)
     {
         $admin_users = Users::where('role', '1')
+            ->orWhere('role', '2')
             ->orWhere('role', '5')
             ->orWhere('role', '6')
             ->get()

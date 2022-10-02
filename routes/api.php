@@ -1233,6 +1233,11 @@ Route::group(
         );
 
         Route::get(
+            '/sales-rep/get-all-admin-users/{user}',
+            'SalesRepController@get_all_admin_users'
+        );
+
+        Route::get(
             '/sales-rep/get-purchasers-dealer/{user}',
             'SalesRepController@get_purchases_dealers'
         );

@@ -666,7 +666,7 @@ class VendorController extends Controller
         $res_data = [];
         if ($altas_notes) {
             foreach ($altas_notes as $value) {
-                $user = $value->dealer_uid;
+                $user = $value->vendor_uid;
                 $user_data = Users::where('id', $user)
                     ->get()
                     ->first();
@@ -698,7 +698,7 @@ class VendorController extends Controller
         $res_data = [];
         if ($altas_notes) {
             foreach ($altas_notes as $value) {
-                $user = $value->dealer_uid;
+                $user = $value->vendor_uid;
                 $user_data = Users::where('id', $user)
                     ->get()
                     ->first();

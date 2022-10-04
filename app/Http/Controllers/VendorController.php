@@ -2005,47 +2005,105 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
-    public function get_purchases_dealers($code)
+    public function get_purchases_dealers($code, $user)
     {
-        $vendor_purchases = Cart::where('vendor', $code)->get();
         $res_data = [];
         $users = [];
         $dealers = [];
 
-        foreach ($vendor_purchases as $value) {
-            $user_id = $value->uid;
-            $product_id = $value->product_id;
+        if ($code == 'All') {
+            $user_data = Users::where('id', $user)
+                ->get()
+                ->first();
+            $privilaged_vendors = $user_data->privileged_vendors;
 
-            if (!in_array($user_id, $users)) {
-                array_push($users, $user_id);
+            if ($privilaged_dealers) {
+                $separator = explode(',', $privilaged_vendors);
+
+                $vendor_purchases = [];
+
+                foreach ($separator as $value) {
+                    $vendor_pur = Cart::where('vendor', $value)->get();
+                    foreach ($vendor_pur as $vendor_value) {
+                        array_push($vendor_purchases, $value);
+                    }
+                }
+
+                foreach ($vendor_purchases as $value) {
+                    $user_id = $value->uid;
+                    $product_id = $value->product_id;
+
+                    if (!in_array($user_id, $users)) {
+                        array_push($users, $user_id);
+                    }
+                }
+
+                foreach ($users as $value) {
+                    $cart_user = Cart::where('vendor', $code)
+                        ->where('uid', $value)
+                        ->get()
+                        ->first();
+                    $sum_user_total = Cart::where('vendor', $code)
+                        ->where('uid', $value)
+                        ->get()
+                        ->sum('price');
+                    $user = Users::where('id', $value)
+                        ->get()
+                        ->first();
+
+                    if ($user) {
+                        $data = [
+                            'account_id' => $user->account_id,
+                            'dealer_name' => $user->company_name,
+                            'user' => $value,
+                            'vendor_code' => $code,
+                            'purchaser_name' =>
+                                $user->first_name . ' ' . $user->last_name,
+                            'amount' => $sum_user_total,
+                        ];
+
+                        array_push($res_data, $data);
+                    }
+                }
             }
-        }
+        } else {
+            $vendor_purchases = Cart::where('vendor', $code)->get();
 
-        foreach ($users as $value) {
-            $cart_user = Cart::where('vendor', $code)
-                ->where('uid', $value)
-                ->get()
-                ->first();
-            $sum_user_total = Cart::where('vendor', $code)
-                ->where('uid', $value)
-                ->get()
-                ->sum('price');
-            $user = Users::where('id', $value)
-                ->get()
-                ->first();
+            foreach ($vendor_purchases as $value) {
+                $user_id = $value->uid;
+                $product_id = $value->product_id;
 
-            if ($user) {
-                $data = [
-                    'account_id' => $user->account_id,
-                    'dealer_name' => $user->company_name,
-                    'user' => $value,
-                    'vendor_code' => $code,
-                    'purchaser_name' =>
-                        $user->first_name . ' ' . $user->last_name,
-                    'amount' => $sum_user_total,
-                ];
+                if (!in_array($user_id, $users)) {
+                    array_push($users, $user_id);
+                }
+            }
 
-                array_push($res_data, $data);
+            foreach ($users as $value) {
+                $cart_user = Cart::where('vendor', $code)
+                    ->where('uid', $value)
+                    ->get()
+                    ->first();
+                $sum_user_total = Cart::where('vendor', $code)
+                    ->where('uid', $value)
+                    ->get()
+                    ->sum('price');
+                $user = Users::where('id', $value)
+                    ->get()
+                    ->first();
+
+                if ($user) {
+                    $data = [
+                        'account_id' => $user->account_id,
+                        'dealer_name' => $user->company_name,
+                        'user' => $value,
+                        'vendor_code' => $code,
+                        'purchaser_name' =>
+                            $user->first_name . ' ' . $user->last_name,
+                        'amount' => $sum_user_total,
+                    ];
+
+                    array_push($res_data, $data);
+                }
             }
         }
 

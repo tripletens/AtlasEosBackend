@@ -1888,25 +1888,25 @@ class VendorController extends Controller
             str_replace('"', ' ', $vendor_details[0]->privileged_vendors)
         );
 
+        // return $vendor_details[0]->privileged_vendors;
+
         $vendor_code = $vendor_details[0]->vendor_code;
 
         $all_priviledged_vendor_code_array = [];
 
         # get all the priviledged vendor vendor_codes
-        if ($privileged_vendors !== null) {
-            $all_priviledged_vendor_code_array = explode(
-                ',',
-                $privileged_vendors
-            );
-            array_push($all_priviledged_vendor_code_array, $vendor_code);
-        } else {
-            array_push($all_priviledged_vendor_code_array, $vendor_code);
-        }
+        // if ($privileged_vendors !== null) {
+        //     $all_priviledged_vendor_code_array = array_filter(explode(
+        //         ',',
+        //         $vendor_details[0]->privileged_vendors
+        //     ));
+        //     array_push($all_priviledged_vendor_code_array, $vendor_code);
+        // }
 
-        // return $all_priviledged_vendor_code_array;
+        $all_priviledged_vendor_code_array = array_filter(explode(',', $vendor_details[0]->privileged_vendors));
+    
 
         $new_all_orders = array_map(function ($vendor_code) {
-            $vendor_code_format = str_replace('\"', '-', $vendor_code);
             // $settings_id = 1;
             # select the settings
             // $fetch_settings = SystemSettings::find($settings_id);
@@ -1917,7 +1917,7 @@ class VendorController extends Controller
                 ->where('vendor', $vendor_code)
                 ->whereDate(
                     'created_at',
-                    '>=',
+                    '<=',
                     $fetch_settings->start_countdown_date
                         ? $fetch_settings->start_countdown_date
                         : date('Y-m-d')
@@ -1937,7 +1937,7 @@ class VendorController extends Controller
 
             // return $get_vendor_details;
         }, $all_priviledged_vendor_code_array);
-
+        
         $new_david_array = [];
 
         foreach ($new_all_orders as $key => $order) {

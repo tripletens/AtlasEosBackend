@@ -166,9 +166,6 @@ class SalesRepController extends Controller
 
             $total = 0;
 
-            
-
-
             foreach ($cart_data as $value) {
                 $total += $value->price;
                 $atlas_id = $value->atlas_id;

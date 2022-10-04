@@ -2051,8 +2051,6 @@ class VendorController extends Controller
 
                 $counter = 0;
                 while ($counter < count($separator)) {
-                    $this->result->data->fr = 'we came in';
-
                     if ($separator[$counter] != '') {
                         // foreach ($separator as $Vendor_value) {
                         foreach ($users as $value) {
@@ -2141,7 +2139,7 @@ class VendorController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data->de = $res_data;
+        $this->result->data = $res_data;
         return response()->json($this->result);
     }
 

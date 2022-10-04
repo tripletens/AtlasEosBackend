@@ -1383,9 +1383,9 @@ class VendorController extends Controller
 
                 foreach ($uni_arr as $value) {
                     if ($value && $value != '') {
-                        $total_sales += Cart::where('dealer', $value)->sum(
-                            'price'
-                        );
+                        $total_sales += Cart::where('dealer', $value)
+                            ->where('vendor', $user_vendor_code)
+                            ->sum('price');
                     }
                 }
 

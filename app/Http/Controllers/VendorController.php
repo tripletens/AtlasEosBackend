@@ -1806,6 +1806,11 @@ class VendorController extends Controller
                     'booking' => isset($product->booking)
                         ? $product->booking
                         : null,
+
+                    'unit_price' => isset($item_cart->unit_price)
+                        ? $item_cart->unit_price
+                        : null,
+
                     'entered_by' => $full_name,
                     'dealership' => isset($dealer_data->dealer_name)
                         ? $dealer_data->dealer_name
@@ -2450,8 +2455,9 @@ class VendorController extends Controller
         //     array_push($all_priviledged_vendor_code_array, $vendor_code);
         // }
 
-        $all_priviledged_vendor_code_array = array_filter(explode(',', $vendor_details[0]->privileged_vendors));
-    
+        $all_priviledged_vendor_code_array = array_filter(
+            explode(',', $vendor_details[0]->privileged_vendors)
+        );
 
         $new_all_orders = array_map(function ($vendor_code) {
             // $settings_id = 1;
@@ -2486,7 +2492,7 @@ class VendorController extends Controller
 
             // return $get_vendor_details;
         }, $all_priviledged_vendor_code_array);
-        
+
         $new_david_array = [];
 
         foreach ($new_all_orders as $key => $order) {

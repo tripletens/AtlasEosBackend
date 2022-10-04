@@ -2030,9 +2030,11 @@ class VendorController extends Controller
                 foreach ($separator as $value) {
                     $vendor_pur = Cart::where('vendor', $value)->get();
                     foreach ($vendor_pur as $vendor_value) {
-                        array_push($vendor_purchases, $value);
+                        array_push($vendor_purchases, $vendor_value);
                     }
                 }
+
+                ///return $separator;
 
                 foreach ($vendor_purchases as $value) {
                     $user_id = $value->uid;
@@ -2043,32 +2045,56 @@ class VendorController extends Controller
                     }
                 }
 
-                foreach ($users as $value) {
-                    $cart_user = Cart::where('vendor', $code)
-                        ->where('uid', $value)
-                        ->get()
-                        ->first();
-                    $sum_user_total = Cart::where('vendor', $code)
-                        ->where('uid', $value)
-                        ->get()
-                        ->sum('price');
-                    $user = Users::where('id', $value)
-                        ->get()
-                        ->first();
+                // for ($i=0; $i < ; $i++) {
+                //     # code...
+                // }
 
-                    if ($user) {
-                        $data = [
-                            'account_id' => $user->account_id,
-                            'dealer_name' => $user->company_name,
-                            'user' => $value,
-                            'vendor_code' => $code,
-                            'purchaser_name' =>
-                                $user->first_name . ' ' . $user->last_name,
-                            'amount' => $sum_user_total,
-                        ];
+                $counter = 0;
+                while ($counter < count($separator)) {
+                    $this->result->data->fr = 'we came in';
 
-                        array_push($res_data, $data);
+                    if ($separator[$counter] != '') {
+                        // foreach ($separator as $Vendor_value) {
+                        foreach ($users as $value) {
+                            $cart_user = Cart::where(
+                                'vendor',
+                                $separator[$counter]
+                            )
+                                ->where('uid', $value)
+                                ->get()
+                                ->first();
+                            $sum_user_total = Cart::where(
+                                'vendor',
+                                $separator[$counter]
+                            )
+                                ->where('uid', $value)
+                                ->get()
+                                ->sum('price');
+                            $user = Users::where('id', $value)
+                                ->get()
+                                ->first();
+
+                            if ($user) {
+                                $data = [
+                                    'account_id' => $user->account_id,
+                                    'dealer_name' => $user->company_name,
+                                    'user' => $value,
+                                    'vendor_code' => $separator[$counter],
+                                    'purchaser_name' =>
+                                        $user->first_name .
+                                        ' ' .
+                                        $user->last_name,
+                                    'amount' => $sum_user_total,
+                                ];
+
+                                array_push($res_data, $data);
+                            }
+                        }
                     }
+
+                    $counter++;
+
+                    // }
                 }
             }
         } else {
@@ -2115,7 +2141,7 @@ class VendorController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data = $res_data;
+        $this->result->data->de = $res_data;
         return response()->json($this->result);
     }
 

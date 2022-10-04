@@ -2017,7 +2017,7 @@ class VendorController extends Controller
                 ->first();
             $privilaged_vendors = $user_data->privileged_vendors;
 
-            if ($privilaged_dealers) {
+            if ($privilaged_vendors) {
                 $separator = explode(',', $privilaged_vendors);
 
                 $vendor_purchases = [];

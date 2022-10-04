@@ -1110,6 +1110,11 @@ class AdminController extends Controller
                 'location' => $location,
             ]);
 
+            Users::where('dealer_code', $code)->update([
+                'dealer_name' => $name,
+                'company_name' => $name,
+            ]);
+
             if ($update) {
                 $this->result->status = true;
                 $this->result->status_code = 200;

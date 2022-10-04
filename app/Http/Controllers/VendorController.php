@@ -1704,6 +1704,7 @@ class VendorController extends Controller
                     : null;
                 $value->dealer_name = $dealer_data->dealer_name;
                 $value->vendor_name = $vendor_data->vendor_name;
+                $value->vendor_pro_code = $pro_data->vendor_product_code;
             }
         }
 

@@ -912,7 +912,7 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/get-purchases-dealers/{code}',
+            '/vendor/get-purchases-dealers/{code}/{user}',
             'VendorController@get_purchases_dealers'
         );
 

@@ -1381,13 +1381,17 @@ class VendorController extends Controller
                     }
                 }
 
-                foreach ($uni_arr as $value) {
-                    if ($value && $value != '') {
-                        $total_sales += Cart::where('dealer', $value)
-                            ->where('vendor', $user_vendor_code)
-                            ->sum('price');
-                    }
+                foreach ($separator as $value) {
+                    $total_sales += Cart::where('vendor', $value)->sum('price');
                 }
+
+                // foreach ($uni_arr as $value) {
+                //     if ($value && $value != '') {
+                //         $total_sales += Cart::where('dealer', $value)
+                //             ->where('vendor', $user_vendor_code)
+                //             ->sum('price');
+                //     }
+                // }
 
                 $total_orders = count($uni_arr);
             } else {
@@ -1414,9 +1418,17 @@ class VendorController extends Controller
                     }
                 }
 
-                foreach ($uni_arr as $value) {
-                    $total_sales += Cart::where('dealer', $value)->sum('price');
+                foreach ($separator as $value) {
+                    if ($value != '') {
+                        $total_sales += Cart::where('vendor', $value)->sum(
+                            'price'
+                        );
+                    }
                 }
+
+                // foreach ($uni_arr as $value) {
+                //     $total_sales += Cart::where('dealer', $value)->sum('price');
+                // }
 
                 $total_orders = count($uni_arr);
             }

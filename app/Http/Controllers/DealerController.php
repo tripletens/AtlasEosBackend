@@ -65,7 +65,7 @@ class DealerController extends Controller
     {
         $check_special_order_exists = SpecialOrder::where(
             'dealer_id',
-            $dealer_id
+            $dealer
         )->get();
 
         $check_special_order = DB::table('special_orders')
@@ -75,7 +75,7 @@ class DealerController extends Controller
                 '=',
                 'special_orders.vendor_code'
             )
-            ->where('special_orders.dealer_id', $dealer_id)
+            ->where('special_orders.dealer_id', $dealer)
             ->select('vendors.*', 'special_orders.*')
             ->get();
 

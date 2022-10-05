@@ -2294,6 +2294,10 @@ class DealerController extends Controller
             ->orWhere('vendor_product_code', 'LIKE', '%' . $search . '%')
             ->get();
 
+        foreach ($product as $value) {
+            $value->spec_data = json_decode($value->spec_data);
+        }
+
         $search_result = [
             'products' => count($product) > 0 ? $product : null,
             'vendor' => count($vendor) > 0 ? $vendor : null,

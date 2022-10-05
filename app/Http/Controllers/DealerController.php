@@ -44,6 +44,7 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\ProgramCountdown;
 
 use App\Models\VendorOrderNotify;
+use App\Models\SpecialOrder;
 
 class DealerController extends Controller
 {

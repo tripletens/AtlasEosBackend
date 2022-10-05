@@ -1287,42 +1287,51 @@ class VendorController extends Controller
 
         if ($privilaged_vendors != null) {
             $separator = explode(',', $privilaged_vendors);
+
             if ($separator[1] == '') {
                 $uni_arr = [];
 
-                if ($user_vendor_code != null) {
-                    $items = DB::table('cart')
-                        ->where('vendor', $user_vendor_code)
-                        ->select('dealer')
-                        ->distinct()
-                        ->get();
+                foreach ($separator as $value) {
+                    $vendor_code = $value;
+                    if ($value != '') {
+                        $items = DB::table('cart')
+                            ->where('vendor', $value)
+                            ->select('dealer')
+                            ->distinct()
+                            ->get();
 
-                    foreach ($items as $value) {
-                        if (!in_array($value->dealer, $uni_arr)) {
-                            array_push($uni_arr, $value->dealer);
+                        foreach ($items as $value) {
+                            if (!in_array($value->dealer, $uni_arr)) {
+                                array_push($uni_arr, $value->dealer);
+                            }
                         }
                     }
                 }
+
+                // if ($user_vendor_code != null) {
+                //     $items = DB::table('cart')
+                //         ->where('vendor', $user_vendor_code)
+                //         ->select('dealer')
+                //         ->distinct()
+                //         ->get();
+
+                //     foreach ($items as $value) {
+                //         if (!in_array($value->dealer, $uni_arr)) {
+                //             array_push($uni_arr, $value->dealer);
+                //         }
+                //     }
+                // }
 
                 foreach ($separator as $value) {
                     $total_sales += Cart::where('vendor', $value)->sum('price');
                 }
 
-                // foreach ($uni_arr as $value) {
-                //     if ($value && $value != '') {
-                //         $total_sales += Cart::where('dealer', $value)
-                //             ->where('vendor', $user_vendor_code)
-                //             ->sum('price');
-                //     }
-                // }
-
                 $total_orders = count($uni_arr);
             } else {
                 $ar = [];
-                /// array_push($separator, $user_vendor_code);
-                array_unique($separator);
-
                 $uni_arr = [];
+
+                /// return $separator;
 
                 foreach ($separator as $value) {
                     $vendor_code = $value;
@@ -1348,10 +1357,6 @@ class VendorController extends Controller
                         );
                     }
                 }
-
-                // foreach ($uni_arr as $value) {
-                //     $total_sales += Cart::where('dealer', $value)->sum('price');
-                // }
 
                 $total_orders = count($uni_arr);
             }

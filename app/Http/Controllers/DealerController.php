@@ -75,8 +75,9 @@ class DealerController extends Controller
                 '=',
                 'special_orders.vendor_code'
             )
+            ->join('users', 'users.id', '=', 'special_orders.uid')
             ->where('special_orders.dealer_id', $dealer)
-            ->select('vendors.*', 'special_orders.*')
+            ->select('vendors.*', 'special_orders.*', 'users.full_name')
             ->get();
 
         $dealer_ship = Dealer::where('dealer_code', $dealer)

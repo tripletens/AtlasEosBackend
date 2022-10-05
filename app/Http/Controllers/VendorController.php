@@ -1707,8 +1707,6 @@ class VendorController extends Controller
                     ->first();
 
                 $full_name = isset($user->full_name) ? $user->full_name : null;
-                // $last_name = isset($user->last_name) ? $user->last_name : null;
-                // $full_name =
 
                 $product = Products::where('atlas_id', $value)
                     ->get()
@@ -1733,8 +1731,8 @@ class VendorController extends Controller
                         ? $product->booking
                         : null,
 
-                    'unit_price' => isset($item_cart->unit_price)
-                        ? $item_cart->unit_price
+                    'unit_price' => isset($product->booking)
+                        ? $product->booking
                         : null,
 
                     'entered_by' => $full_name,

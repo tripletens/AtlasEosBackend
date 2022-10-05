@@ -4405,7 +4405,7 @@ class AdminController extends Controller
         $delete_cart = Cart::where('vendor', $id)->delete();
         $delete_vendor = Vendors::where('vendor_code', $id)->delete();
         $delete_vendor_users = Users::where('vendor_code', $id)->delete();
-        $delete_vendor_users = Products::where('vendor_code', $id)->delete();
+        $delete_vendor_pro = Products::where('vendor_code', $id)->delete();
 
         $this->result->status = true;
         $this->result->status_code = 200;

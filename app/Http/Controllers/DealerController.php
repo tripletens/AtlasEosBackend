@@ -60,6 +60,59 @@ class DealerController extends Controller
         ];
     }
 
+    public function generate_special_order_pdf($dealer, $lang, $current_time)
+    {
+        $check_special_order_exists = SpecialOrder::where(
+            'dealer_id',
+            $dealer_id
+        )->get();
+
+        $check_special_order = DB::table('special_orders')
+            ->join(
+                'vendors',
+                'vendors.vendor_code',
+                '=',
+                'special_orders.vendor_code'
+            )
+            ->where('special_orders.dealer_id', $dealer_id)
+            ->select('vendors.*', 'special_orders.*')
+            ->get();
+
+        $dealer_ship = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
+        foreach ($check_special_order as $value) {
+            $uid = $value->uid;
+            $user = Users::where('id', $uid)
+                ->get()
+                ->first();
+
+            $check_special_order->full_name = isset($user->full_name)
+                ? $user->full_name
+                : null;
+        }
+
+        $pdf_data = [
+            'data' => $check_special_order,
+            'dealer' => $dealer_ship ? $dealer_ship : null,
+            'lang' => $lang,
+            'printed_at' => $current_time,
+        ];
+
+        $d_name = isset($dealer_ship->dealer_name)
+            ? $dealer_ship->dealer_name
+            : null;
+        $d_code = isset($dealer_ship->dealer_code)
+            ? $dealer_ship->dealer_code
+            : null;
+        $filename = $d_name . $d_code . 'special-order';
+
+        $pdf = PDF::loadView('special-orders-pdf', $pdf_data);
+        return $pdf->stream($filename . '.pdf');
+        // return $pdf->download('dealership.pdf');
+    }
+
     public function get_all_admin_users($user)
     {
         $admin_users = Users::where('role', '1')

@@ -214,9 +214,9 @@
                                     <td class="table-value-custom center-text">
                                         {{ $item->vendor_name }}
                                     </td>
-                                    {{-- <td class="table-value-custom right-align">
+                                    <td class="table-value-custom right-align">
                                         {{ $item->full_name }}
-                                    </td> --}}
+                                    </td>
                                   
                                 </tr>
 

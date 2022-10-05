@@ -1658,6 +1658,7 @@ class VendorController extends Controller
                                 ' ' .
                                 $dealer_db->last_name,
                             'total' => $value->price,
+                            'unit_price' => $value->unit_price,
                             'item_total' => floatval($value->price),
                         ];
 

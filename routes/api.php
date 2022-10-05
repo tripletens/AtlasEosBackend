@@ -917,6 +917,11 @@ Route::group(
         );
 
         Route::get(
+            '/vendor/get-purchases-dealers/{code}',
+            'VendorController@get_purchases_dealers_single'
+        );
+
+        Route::get(
             '/vendor/get-vendor-notes/{dealer}/{vendor}',
             'VendorController@get_vendor_note'
         );

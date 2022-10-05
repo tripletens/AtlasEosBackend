@@ -94,6 +94,8 @@ class DealerController extends Controller
                 : null;
         }
 
+        return $check_special_order;
+
         $pdf_data = [
             'data' => $check_special_order,
             'dealer' => $dealer_ship ? $dealer_ship : null,

@@ -2016,8 +2016,11 @@ class VendorController extends Controller
     public function get_purchases_dealers($code, $user)
     {
         $res_data = [];
-        $users = [];
         $dealers = [];
+
+        global $users;
+
+        $users = [];
 
         if ($code == 'All') {
             $user_data = Users::where('id', $user)
@@ -2026,6 +2029,9 @@ class VendorController extends Controller
             $privilaged_vendors = $user_data->privileged_vendors;
 
             if ($privilaged_vendors) {
+                global $separator;
+                global $counter;
+
                 $separator = explode(',', $privilaged_vendors);
 
                 $vendor_purchases = [];
@@ -2036,8 +2042,6 @@ class VendorController extends Controller
                         array_push($vendor_purchases, $vendor_value);
                     }
                 }
-
-                ///return $separator;
 
                 foreach ($vendor_purchases as $value) {
                     $user_id = $value->uid;
@@ -2053,21 +2057,18 @@ class VendorController extends Controller
                 // }
 
                 $counter = 0;
-                while ($counter < count($separator)) {
-                    if ($separator[$counter] != '') {
-                        // foreach ($separator as $Vendor_value) {
+                ///return $separator[$counter];
+
+                foreach ($separator as $sep_value) {
+                    if ($sep_value != '') {
+                        // return $users;
+
                         foreach ($users as $value) {
-                            $cart_user = Cart::where(
-                                'vendor',
-                                $separator[$counter]
-                            )
+                            $cart_user = Cart::where('vendor', $sep_value)
                                 ->where('uid', $value)
                                 ->get()
                                 ->first();
-                            $sum_user_total = Cart::where(
-                                'vendor',
-                                $separator[$counter]
-                            )
+                            $sum_user_total = Cart::where('vendor', $sep_value)
                                 ->where('uid', $value)
                                 ->get()
                                 ->sum('price');
@@ -2075,7 +2076,7 @@ class VendorController extends Controller
                                 ->get()
                                 ->first();
 
-                            if ($user) {
+                            if ($user && $sum_user_total > 0) {
                                 $data = [
                                     'account_id' => $user->account_id,
                                     'dealer_name' => $user->company_name,
@@ -2092,10 +2093,6 @@ class VendorController extends Controller
                             }
                         }
                     }
-
-                    $counter++;
-
-                    // }
                 }
             }
         } else {

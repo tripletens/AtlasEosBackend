@@ -63,10 +63,10 @@ class DealerController extends Controller
 
     public function generate_special_order_pdf($dealer, $lang, $current_time)
     {
-        $check_special_order_exists = SpecialOrder::where(
-            'dealer_id',
-            $dealer
-        )->get();
+        // $check_special_order_exists = SpecialOrder::where(
+        //     'dealer_id',
+        //     $dealer
+        // )->get();
 
         $check_special_order = DB::table('special_orders')
             ->join(

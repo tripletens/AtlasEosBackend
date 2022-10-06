@@ -4086,25 +4086,43 @@ class AdminController extends Controller
         $dealerCode = $request->dealerCode;
         $dealerName = $request->dealerName;
 
-        $current_user_data = Users::where('id', $vendorId)
-            ->get()
-            ->first();
-
         if ($firstName != '') {
+            $current_user_data = Users::where('id', $vendorId)
+                ->get()
+                ->first();
+
             $full_name = $current_user_data->full_name;
             $ex = explode(' ', $full_name);
 
             if (isset($ex[0])) {
                 $ex[0] = $firstName;
-                $imp = implode(' ', $ex);
                 $update = Users::where('id', $vendorId)->update([
-                    'full_name' => $imp,
+                    'full_name' => $ex[0] . ' ' . $ex[1],
                 ]);
             }
 
             $update = Users::where('id', $vendorId)->update([
                 'first_name' => $firstName,
             ]);
+        }
+
+        if ($lastName != '') {
+            $current_user_data = Users::where('id', $vendorId)
+                ->get()
+                ->first();
+            $update = Users::where('id', $vendorId)->update([
+                'last_name' => $lastName,
+            ]);
+
+            $full_name = $current_user_data->full_name;
+            $ex = explode(' ', $full_name);
+
+            if (isset($ex[1])) {
+                $ex[1] = $lastName;
+                $update = Users::where('id', $vendorId)->update([
+                    'full_name' => $ex[0] . ' ' . $ex[1],
+                ]);
+            }
         }
 
         if ($dealerCode != '') {
@@ -4175,29 +4193,12 @@ class AdminController extends Controller
             ]);
         }
 
-        if ($firstName != '' && $lastName != '') {
-            $full_name = $firstName . ' ' . $lastName;
-            $update = Users::where('id', $vendorId)->update([
-                'full_name' => $full_name,
-            ]);
-        }
-
-        if ($lastName != '') {
-            $update = Users::where('id', $vendorId)->update([
-                'last_name' => $lastName,
-            ]);
-
-            $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $full_name);
-
-            if (isset($ex[1])) {
-                $ex[1] = $lastName;
-                $imp = implode(' ', $ex);
-                $update = Users::where('id', $vendorId)->update([
-                    'full_name' => $imp,
-                ]);
-            }
-        }
+        // if ($firstName != '' && $lastName != '') {
+        //     $full_name = $firstName . ' ' . $lastName;
+        //     $update = Users::where('id', $vendorId)->update([
+        //         'full_name' => $full_name,
+        //     ]);
+        // }
 
         if ($email != '') {
             $update = Users::where('id', $vendorId)->update([

@@ -1989,11 +1989,18 @@ class VendorController extends Controller
                 ->get()
                 ->first();
 
+            $vendor_data = Vendors::where('vendor_code', $code)
+                ->get()
+                ->first();
+
             if ($user) {
                 $data = [
                     'account_id' => $user->account_id,
                     'dealer_name' => $user->company_name,
                     'user' => $value,
+                    'vendor_name' => isset($vendor_data->vendor_name)
+                        ? $vendor_data->vendor_name
+                        : null,
                     'vendor_code' => $code,
                     'purchaser_name' =>
                         $user->first_name . ' ' . $user->last_name,
@@ -2074,12 +2081,25 @@ class VendorController extends Controller
                                 ->get()
                                 ->first();
 
+                            $vendor_data = Vendors::where(
+                                'vendor_code',
+                                $sep_value
+                            )
+                                ->get()
+                                ->first();
+
                             if ($user && $sum_user_total > 0) {
                                 $data = [
                                     'account_id' => $user->account_id,
                                     'dealer_name' => $user->company_name,
                                     'user' => $value,
                                     'vendor_code' => $separator[$counter],
+                                    'vendor_name' => isset(
+                                        $vendor_data->vendor_name
+                                    )
+                                        ? $vendor_data->vendor_name
+                                        : null,
+
                                     'purchaser_name' =>
                                         $user->first_name .
                                         ' ' .
@@ -2118,12 +2138,20 @@ class VendorController extends Controller
                     ->get()
                     ->first();
 
+                $vendor_data = Vendors::where('vendor_code', $code)
+                    ->get()
+                    ->first();
+
                 if ($user) {
                     $data = [
                         'account_id' => $user->account_id,
                         'dealer_name' => $user->company_name,
                         'user' => $value,
                         'vendor_code' => $code,
+                        'vendor_name' => isset($vendor_data->vendor_name)
+                            ? $vendor_data->vendor_name
+                            : null,
+
                         'purchaser_name' =>
                             $user->first_name . ' ' . $user->last_name,
                         'amount' => $sum_user_total,

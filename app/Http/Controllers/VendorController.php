@@ -1635,7 +1635,11 @@ class VendorController extends Controller
 
             //////// Export section //////
 
-            foreach ($vendor_purchases as $value) {
+            $vendor_purchases_ex = Cart::where('vendor', $code)
+                ->orderBy('dealer', 'asc')
+                ->get();
+
+            foreach ($vendor_purchases_ex as $value) {
                 $user_id = $value->uid;
                 $pro_id = $value->product_id;
                 $dealer_code = $value->dealer;
@@ -1668,7 +1672,7 @@ class VendorController extends Controller
             }
         }
 
-        $export_vendor = $this->sort_according_dealer_code($vendor_purchases);
+        /// $export_vendor = $this->sort_according_dealer_code($vendor_purchases);
 
         $res = $this->sort_according_atlas_id($res_data);
 
@@ -1676,7 +1680,7 @@ class VendorController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
         $this->result->data->res = $res;
-        $this->result->data->export = $vendor_purchases;
+        $this->result->data->export = $vendor_purchases_ex;
 
         // $this->result->data->atlas_id = $atlas_id_data;
 

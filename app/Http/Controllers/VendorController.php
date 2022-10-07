@@ -1668,6 +1668,8 @@ class VendorController extends Controller
             }
         }
 
+        $export_vendor = $this->sort_according_dealer_code($vendor_purchases);
+
         $res = $this->sort_according_atlas_id($res_data);
 
         $this->result->status = true;
@@ -1814,6 +1816,33 @@ class VendorController extends Controller
         $this->result->message = 'Purchasers by Dealers';
         $this->result->data = $res;
         return response()->json($this->result);
+    }
+
+    public function sort_according_dealer_code($data)
+    {
+        if (count($data) > 0 && !empty($data)) {
+            // $ddt = array_map(function ($each) {
+            //     $con = (object) $each;
+            //     $dealer = $con->dealer;
+            //    // $tem = str_replace('-', '', $atlas);
+            //   ///  $con->temp = $tem;
+            //     return $dealer;
+            // }, $data);
+
+            usort($data, function ($object1, $object2) {
+                // $ex1 = explode('-', $object1->atlas_id);
+                // $ex2 = explode('-', $object2->atlas_id);
+
+                // if ($ex1[0] > $ex2[0]) {
+                //     return true;
+                // } else {
+                //     return false;
+                // }
+                return $object1->dealer > $object2->dealer;
+            });
+
+            return $ddt;
+        }
     }
 
     public function sort_according_atlas_id($data)

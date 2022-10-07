@@ -44,6 +44,7 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\ProgramCountdown;
 
 use App\Models\VendorOrderNotify;
+use App\Models\SpecialOrder;
 
 class DealerController extends Controller
 {
@@ -58,6 +59,234 @@ class DealerController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function generate_special_order_pdf($dealer, $lang, $current_time)
+    {
+        // $check_special_order_exists = SpecialOrder::where(
+        //     'dealer_id',
+        //     $dealer
+        // )->get();
+
+        $check_special_order = DB::table('special_orders')
+            ->join(
+                'vendors',
+                'vendors.vendor_code',
+                '=',
+                'special_orders.vendor_code'
+            )
+            ->join('users', 'users.id', '=', 'special_orders.uid')
+            ->where('special_orders.dealer_id', $dealer)
+            ->select('vendors.*', 'special_orders.*', 'users.full_name')
+            ->get();
+
+        $dealer_ship = Dealer::where('dealer_code', $dealer)
+            ->get()
+            ->first();
+
+        foreach ($check_special_order as $value) {
+            $uid = $value->uid;
+            $user = Users::where('id', $uid)
+                ->get()
+                ->first();
+
+            $check_special_order->full_name = isset($user->full_name)
+                ? $user->full_name
+                : null;
+        }
+
+        ////// return $check_special_order;
+
+        $pdf_data = [
+            'data' => $check_special_order,
+            'dealer' => $dealer_ship ? $dealer_ship : null,
+            'lang' => $lang,
+            'printed_at' => $current_time,
+        ];
+
+        $d_name = isset($dealer_ship->dealer_name)
+            ? $dealer_ship->dealer_name
+            : null;
+        $d_code = isset($dealer_ship->dealer_code)
+            ? $dealer_ship->dealer_code
+            : null;
+        $filename = $d_name . $d_code . 'special-order';
+
+        $pdf = PDF::loadView('special-orders-pdf', $pdf_data);
+        return $pdf->stream($filename . '.pdf');
+        // return $pdf->download('dealership.pdf');
+    }
+
+    public function get_all_admin_users($user)
+    {
+        $admin_users = Users::where('role', '1')
+            ->orWhere('role', '2')
+            ->orWhere('role', '5')
+            ->orWhere('role', '6')
+            ->get()
+            ->toArray();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($admin_users) {
+            foreach ($admin_users as $value) {
+                $sender = $value['id'];
+                $role = $value['role'];
+
+                $role_name = '';
+
+                switch ($role) {
+                    case '1':
+                        $role_name = 'Super Admin';
+                        break;
+
+                    case '2':
+                        $role_name = 'Branch Manager';
+
+                        break;
+
+                    case '5':
+                        $role_name = 'Inside Sales';
+
+                        break;
+
+                    case '6':
+                        $role_name = 'Outside Sales';
+
+                        break;
+
+                    case '7':
+                        $role_name = 'Admin';
+
+                        break;
+
+                    default:
+                        # code...
+                        break;
+                }
+
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                if ($sender != $user) {
+                    $each_data = [
+                        'id' => $sender_data['id'],
+                        'first_name' => $value['first_name'],
+                        'last_name' => $value['last_name'],
+                        'full_name' => $value['full_name'],
+                        'email' => $value['email'],
+                        'notification' => $count_notification,
+                        'role' => $role_name,
+                    ];
+
+                    array_push($data, $each_data);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'All Admin Users Data';
+        return response()->json($this->result);
+    }
+
+    public function get_branch_manager_users($user)
+    {
+        $branch = Users::where('role', '2')->get();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($branch) {
+            foreach ($branch as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'Get Branch Manager Users successfully';
+
+        return response()->json($this->result);
+    }
+
+    public function get_sales_rep_users($user)
+    {
+        $sales_rep = Users::orWhere('role', '5')
+            ->orWhere('role', '6')
+            ->get();
+
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($sales_rep) {
+            foreach ($sales_rep as $value) {
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
+
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
+                    ->where('status', '0')
+                    ->count();
+
+                $each_data = [
+                    'id' => $sender_data['id'],
+                    'first_name' => $value['first_name'],
+                    'last_name' => $value['last_name'],
+                    'full_name' => $value['full_name'],
+                    'email' => $value['email'],
+                    'notification' => $count_notification,
+                ];
+
+                array_push($data, $each_data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $data;
+        $this->result->message = 'Get Sales Rep Users successfully';
+
+        return response()->json($this->result);
     }
 
     public function get_dealers_privileged_dealers($user)
@@ -249,17 +478,25 @@ class DealerController extends Controller
 
                 $value->description = $this->translateToLocal(
                     $lang,
-                    $pro_data->description
+                    isset($pro_data->description)
+                        ? $pro_data->description
+                        : null
                 );
                 $value->vendor_product_code = $this->translateToLocal(
                     $lang,
-                    $pro_data->vendor_product_code
+                    isset($pro_data->vendor_product_code)
+                        ? $pro_data->vendor_product_code
+                        : null
                 );
             }
 
             $data = [
-                'vendor_code' => $vendor_data->vendor_code,
-                'vendor_name' => $vendor_data->vendor_name,
+                'vendor_code' => isset($vendor_data->vendor_code)
+                    ? $vendor_data->vendor_code
+                    : null,
+                'vendor_name' => isset($vendor_data->vendor_name)
+                    ? $vendor_data->vendor_name
+                    : null,
                 'total' => floatval($total),
                 'data' => $cart_data,
             ];
@@ -277,10 +514,18 @@ class DealerController extends Controller
             'printed_at' => $current_time,
         ];
 
+        $d_name = isset($dealer_ship->dealer_name)
+            ? $dealer_ship->dealer_name
+            : null;
+        $d_code = isset($dealer_ship->dealer_code)
+            ? $dealer_ship->dealer_code
+            : null;
+        $filename = $d_name . $d_code;
+
         /////  return $pdf_data;
 
         $pdf = PDF::loadView('dealership-pdf', $pdf_data);
-        return $pdf->stream('dealership.pdf');
+        return $pdf->stream($filename . '.pdf');
         // return $pdf->download('dealership.pdf');
     }
 
@@ -537,12 +782,14 @@ class DealerController extends Controller
 
                 $data = [
                     'id' => $pro_id,
-                    'desc' => $product_data->description,
+                    'desc' => isset($product_data->description)
+                        ? $product_data->description
+                        : null,
                     'spec_data' => $product_data->spec_data
                         ? json_decode($product_data->spec_data)
                         : null,
                     'grouping' => $product_data->grouping,
-                    'vendor' => $product_data->vendor,
+                    'vendor' => $product_data->vendor_product_code,
                     'atlas_id' => $product_data->atlas_id,
                     'regular' => $product_data->regular,
                     'booking' => $product_data->booking,
@@ -760,6 +1007,7 @@ class DealerController extends Controller
             $value->desc = $product_data->description;
             $value->booking = $product_data->booking;
             $value->regular = $product_data->regular;
+            $value->grouping = $product_data->grouping;
 
             $value->spec_data = json_decode($product_data->spec_data);
         }
@@ -1121,6 +1369,7 @@ class DealerController extends Controller
                 }
             }
 
+
             Users::where('id', $uid)->where('account_id', $dealer)->update(['order_status' => 1]);
 
             // lets get the items from the array
@@ -1162,9 +1411,12 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
-                        Users::where('id', $uid)->where('account_id', $dealer)->update([
-                            'place_order_date' => Carbon::now(),
-                        ]);
+
+                        Users::where('id', $uid)
+                            ->where('account_id', $dealer)
+                            ->update([
+                                'place_order_date' => Carbon::now(),
+                            ]);
 
                         $current_vendor = $product->vendor_id;
                         $submitted_status = true;
@@ -1751,9 +2003,7 @@ class DealerController extends Controller
 
     public function get_dealer_coworkers($code, $user)
     {
-        $dealers = Users::where('account_id', $code)
-            ->get()
-            ->toArray();
+        $dealers = Users::where('account_id', $code)->get();
 
         $user_data = Users::where('id', $user)
             ->get()
@@ -1763,35 +2013,28 @@ class DealerController extends Controller
 
         if ($dealers) {
             foreach ($dealers as $value) {
-                $phase_one_unique_id =
-                    $user_data->id .
-                    $user_data->first_name .
-                    $value['id'] .
-                    $value['first_name'];
+                $sender = $value['id'];
+                $sender_data = Users::where('id', $sender)
+                    ->get()
+                    ->first();
 
-                $phase_two_unique_id =
-                    $value['id'] .
-                    $value['first_name'] .
-                    $user_data['id'] .
-                    $user_data['first_name'];
-
-                $count_notification = Chat::orWhere(
-                    'unique_id',
-                    $phase_two_unique_id
-                )
+                $count_notification = Chat::where('chat_from', $sender)
+                    ->where('chat_to', $user)
                     ->where('status', '0')
                     ->count();
 
-                $each_data = [
-                    'id' => $value['id'],
-                    'first_name' => $value['first_name'],
-                    'last_name' => $value['last_name'],
-                    'full_name' => $value['full_name'],
-                    'email' => $value['email'],
-                    'notification' => $count_notification,
-                ];
+                if ($sender != $user) {
+                    $each_data = [
+                        'id' => $sender_data['id'],
+                        'first_name' => $value['first_name'],
+                        'last_name' => $value['last_name'],
+                        'full_name' => $value['full_name'],
+                        'email' => $value['email'],
+                        'notification' => $count_notification,
+                    ];
 
-                array_push($data, $each_data);
+                    array_push($data, $each_data);
+                }
             }
         }
 
@@ -2058,7 +2301,6 @@ class DealerController extends Controller
 
         $all_dealers = Dealer::all();
 
-
         // return $all_dealers;
 
         $all_dealers_without_orders = [];
@@ -2069,7 +2311,10 @@ class DealerController extends Controller
             foreach ($all_dealers as $dealer) {
                 $dealer_account_id = $dealer['dealer_code'];
 
-                $dealer_cart = Cart::where('dealer', $dealer_account_id)->count();
+                $dealer_cart = Cart::where(
+                    'dealer',
+                    $dealer_account_id
+                )->count();
 
                 if ($dealer_cart == 0) {
                     // dealer has orders
@@ -2094,7 +2339,9 @@ class DealerController extends Controller
         $this->result->message = 'Dealer Dashboard Data';
 
         // $this->result->data->dealers_without_orders = $all_dealers_without_orders;
-        $this->result->data->dealers_without_orders_count = count($all_dealers_without_orders);
+        $this->result->data->dealers_without_orders_count = count(
+            $all_dealers_without_orders
+        );
 
         return response()->json($this->result);
     }
@@ -2354,7 +2601,9 @@ class DealerController extends Controller
             $create_report = Report::create([
                 'subject' => $subject ? $subject : null,
                 'description' => $description ? $description : null,
-                'file_url' => $request->hasFile('photo') ? $full_file_path : null,
+                'file_url' => $request->hasFile('photo')
+                    ? $full_file_path
+                    : null,
                 'vendor_id' => $vendor_id ? $vendor_id : null,
                 'dealer_id' => $dealer_id ? $dealer_id : null,
                 'role' => $role ? $role : null,

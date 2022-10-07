@@ -28,6 +28,11 @@ Route::get('/generate-pdf/{dealer}/{lang}/{current_time}', [
     'generate_pdf',
 ]);
 
+Route::get('/generate-special-order-pdf/{dealer}/{lang}/{current_time}', [
+    DealerController::class,
+    'generate_special_order_pdf',
+]);
+
 Route::get('/generate-vendor-sales-summary-pdf/{vendor}/{lang}/{create_time}', [
     VendorController::class,
     'generate_sales_summary_pdf',

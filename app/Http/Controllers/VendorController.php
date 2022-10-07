@@ -1821,15 +1821,15 @@ class VendorController extends Controller
     public function sort_according_dealer_code($data)
     {
         if (count($data) > 0 && !empty($data)) {
-            // $ddt = array_map(function ($each) {
-            //     $con = (object) $each;
-            //     $dealer = $con->dealer;
-            //    // $tem = str_replace('-', '', $atlas);
-            //   ///  $con->temp = $tem;
-            //     return $dealer;
-            // }, $data);
+            $ddt = array_map(function ($each) {
+                $con = (object) $each;
+                $dealer = $con->dealer;
+                // $tem = str_replace('-', '', $atlas);
+                ///  $con->temp = $tem;
+                return $dealer;
+            }, $data);
 
-            usort($data, function ($object1, $object2) {
+            usort($ddt, function ($object1, $object2) {
                 // $ex1 = explode('-', $object1->atlas_id);
                 // $ex2 = explode('-', $object2->atlas_id);
 

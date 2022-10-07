@@ -359,8 +359,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $product->dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         Cart::where('dealer', $product->dealer)
                             ->where('atlas_id', $product->atlas_id)
@@ -441,8 +441,8 @@ class DealerController extends Controller
 
             if (
                 Cart::where('dealer', $dealer)
-                    ->where('atlas_id', $atlas_id)
-                    ->exists()
+                ->where('atlas_id', $atlas_id)
+                ->exists()
             ) {
                 Cart::where('dealer', $dealer)
                     ->where('atlas_id', $atlas_id)
@@ -459,8 +459,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $product->dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         Cart::where('dealer', $product->dealer)
                             ->where('atlas_id', $product->atlas_id)
@@ -626,8 +626,8 @@ class DealerController extends Controller
 
                 if (
                     Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $atlas_id)
-                        ->exists()
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
                 ) {
                     Cart::where('dealer', $dealer)
                         ->where('atlas_id', $atlas_id)
@@ -709,8 +709,8 @@ class DealerController extends Controller
     {
         if (
             DealerQuickOrder::where('uid', $user)
-                ->where('atlas_id', $atlas_id)
-                ->exists()
+            ->where('atlas_id', $atlas_id)
+            ->exists()
         ) {
             $delete = DealerQuickOrder::where('uid', $user)
                 ->where('atlas_id', $atlas_id)
@@ -808,16 +808,16 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
                         $current_vendor = $product->vendor_id;
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
-                                ->where('atlas_id', $product->atlas_id)
-                                ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                         ) {
                             $existing_already_in_quick_order .=
                                 $product->atlas_id . ', ';
@@ -902,8 +902,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $existing_already_in_order .= $product->atlas_id . ', ';
                         $existing_status = true;
@@ -911,8 +911,8 @@ class DealerController extends Controller
                     } else {
                         if (
                             DealerQuickOrder::where('dealer', $dealer)
-                                ->where('atlas_id', $product->atlas_id)
-                                ->exists()
+                            ->where('atlas_id', $product->atlas_id)
+                            ->exists()
                         ) {
                             $existing_already_in_quick_order .=
                                 $product->atlas_id . ', ';
@@ -987,14 +987,14 @@ class DealerController extends Controller
 
                     if (
                         DealerQuickOrder::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         DealerQuickOrder::where('dealer', $dealer)
                             ->where('atlas_id', $product->atlas_id)
                             ->update([
                                 'qty' =>
-                                    $product->qty != '' ? $product->qty : 0,
+                                $product->qty != '' ? $product->qty : 0,
                                 'price' => $product->price,
                                 'unit_price' => $product->unit_price,
                             ]);
@@ -1121,7 +1121,7 @@ class DealerController extends Controller
                 }
             }
 
-            Users::where('id', $uid)->where('account_id',$dealer)->update(['order_status' => 1]);
+            Users::where('id', $uid)->where('account_id', $dealer)->update(['order_status' => 1]);
 
             // lets get the items from the array
             $product_array = $request->input('product_array');
@@ -1140,8 +1140,8 @@ class DealerController extends Controller
 
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $item_already_added += 1;
                         $item_details .= $product->atlas_id . ',';
@@ -1162,7 +1162,7 @@ class DealerController extends Controller
                         // $this->result->status_code = 404;
                         // $this->result->message = 'item has been added already';
                     } else {
-                        Users::where('id', $uid)->where('account_id',$dealer)->update([
+                        Users::where('id', $uid)->where('account_id', $dealer)->update([
                             'place_order_date' => Carbon::now(),
                         ]);
 
@@ -1220,7 +1220,7 @@ class DealerController extends Controller
         }
     }
 
-    public function get_report_reply($ticket,$dealer)
+    public function get_report_reply($ticket, $dealer)
     {
         $selected = ReportReply::where('ticket', $ticket)->get();
 
@@ -1229,7 +1229,7 @@ class DealerController extends Controller
             foreach ($selected as $value) {
                 $user = $value->user;
                 $user_data = Users::where('id', $user)
-                    ->where('account_id',$dealer)
+                    ->where('account_id', $dealer)
                     ->get()
                     ->first();
 
@@ -1307,7 +1307,7 @@ class DealerController extends Controller
         }
     }
 
-    public function get_first_ticket($ticket,$dealer_id)
+    public function get_first_ticket($ticket, $dealer_id)
     {
         $selected = Report::where('ticket_id', $ticket)
             ->get()
@@ -1315,7 +1315,7 @@ class DealerController extends Controller
 
         $user_id = $selected->user_id;
         $user_data = Users::where('id', $user_id)
-            ->where('account_id',$dealer_id)
+            ->where('account_id', $dealer_id)
             ->get()
             ->first();
 
@@ -1371,68 +1371,42 @@ class DealerController extends Controller
         $data = Cart::where('cart.dealer', $dealer)->where(
             'cart.vendor',
             $vendor
-        );
+        )->get();
 
         // return $data->get();
 
-        $check_data = $data->exists();
-        $fetch_users_data = $data
-            ->join('users', 'users.id', '=', 'cart.uid')
-            ->join('products', 'products.id', '=', 'cart.product_id')
-            ->select(
-                'products.img as product_img',
-                'products.status as product_status',
-                'products.description as product_description',
-                'products.vendor_code as product_vendor_code',
-                'products.vendor_name as products_vendor_name',
-                'products.vendor_product_code as product_vendor_product_code',
-                'products.xref as product_xref',
-                'products.vendor as product_vendor',
-                'products.id as product_id',
-                'products.atlas_id as product_atlas_id',
-                'products.vendor_logo as product_vendor_logo',
-                'products.um as product_um',
-                'products.regular as product_regular',
-                'products.booking as product_booking',
-                'products.special as product_special',
-                'products.cond as product_cond',
-                'products.type as product_type',
-                'products.grouping as product_grouping',
-                'products.full_desc as product_full_desc',
-                'products.spec_data as product_spec_data',
-                'products.check_new as product_check_new',
-                'products.short_note as product_short_note',
-                'products.short_note_url as product_short_note_url',
-                'products.created_at as product_created_at',
-                'products.updated_at as product_updated_at',
-                'cart.*'
-            )
-            ->get();
-        if ($check_data) {
+        // $check_data = $data->exists();
+
+
+        // return $fetch_users_data;
+
+        if (count($data) > 0) {
             $delete = Cart::where('dealer', $dealer)
                 ->where('vendor', $vendor)
                 ->delete();
+
+            // return $delete;
+
             if (!$delete) {
                 $this->result->status = false;
                 $this->result->status_code = 500;
                 $this->result->message =
                     'sorry we could not delete this item to cart';
-            } else {
-                // get the dealer details
-                $dealer = User::where('role', 4)
-                    ->where('id', $dealer)
-                    ->get()
-                    ->first();
-
-                // Mail::to($dealer->email)->send(
-                //     new DeleteOrderMail($fetch_users_data)
-                // );
-
-                $this->result->status = true;
-                $this->result->data = $fetch_users_data;
-                $this->result->status_code = 200;
-                $this->result->message = 'Item deleted successfully';
             }
+            // // get the dealer details
+            // $dealer = User::where('role', 4)
+            //     ->where('id', $dealer)
+            //     ->get()
+            //     ->first();
+
+            // Mail::to($dealer->email)->send(
+            //     new DeleteOrderMail($fetch_users_data)
+            // );
+
+            $this->result->status = true;
+            // $this->result->data = $fetch_users_data;
+            $this->result->status_code = 200;
+            $this->result->message = 'Item deleted successfully';
         } else {
             $this->result->status = false;
             $this->result->status_code = 404;
@@ -1447,68 +1421,59 @@ class DealerController extends Controller
         $data = Cart::where('cart.dealer', $dealer)->where(
             'cart.atlas_id',
             $atlas_id
-        );
+        )->get();
 
-        // return $data->get();
-
-        $check_data = $data->exists();
-        $fetch_users_data = $data
-            ->join('users', 'users.id', '=', 'cart.uid')
-            ->join('products', 'products.id', '=', 'cart.product_id')
-            ->select(
-                'products.img as product_img',
-                'products.status as product_status',
-                'products.description as product_description',
-                'products.vendor_code as product_vendor_code',
-                'products.vendor_name as products_vendor_name',
-                'products.vendor_product_code as product_vendor_product_code',
-                'products.xref as product_xref',
-                'products.vendor as product_vendor',
-                'products.id as product_id',
-                'products.atlas_id as product_atlas_id',
-                'products.vendor_logo as product_vendor_logo',
-                'products.um as product_um',
-                'products.regular as product_regular',
-                'products.booking as product_booking',
-                'products.special as product_special',
-                'products.cond as product_cond',
-                'products.type as product_type',
-                'products.grouping as product_grouping',
-                'products.full_desc as product_full_desc',
-                'products.spec_data as product_spec_data',
-                'products.check_new as product_check_new',
-                'products.short_note as product_short_note',
-                'products.short_note_url as product_short_note_url',
-                'products.created_at as product_created_at',
-                'products.updated_at as product_updated_at',
-                'cart.*'
-            )
-            ->get();
-        if ($check_data) {
+        // $fetch_users_data = $data
+        // ->join('users', 'users.id', '=', 'cart.uid')
+        // ->join('products', 'products.id', '=', 'cart.product_id')
+        // ->select(
+        //     'products.img as product_img',
+        //     'products.status as product_status',
+        //     'products.description as product_description',
+        //     'products.vendor_code as product_vendor_code',
+        //     'products.vendor_name as products_vendor_name',
+        //     'products.vendor_product_code as product_vendor_product_code',
+        //     'products.xref as product_xref',
+        //     'products.vendor as product_vendor',
+        //     'products.id as product_id',
+        //     'products.atlas_id as product_atlas_id',
+        //     'products.vendor_logo as product_vendor_logo',
+        //     'products.um as product_um',
+        //     'products.regular as product_regular',
+        //     'products.booking as product_booking',
+        //     'products.special as product_special',
+        //     'products.cond as product_cond',
+        //     'products.type as product_type',
+        //     'products.grouping as product_grouping',
+        //     'products.full_desc as product_full_desc',
+        //     'products.spec_data as product_spec_data',
+        //     'products.check_new as product_check_new',
+        //     'products.short_note as product_short_note',
+        //     'products.short_note_url as product_short_note_url',
+        //     'products.created_at as product_created_at',
+        //     'products.updated_at as product_updated_at',
+        //     'cart.*'
+        // )
+        // ->get();
+        if (count($data) > 0) {
             $delete = Cart::where('dealer', $dealer)
                 ->where('atlas_id', $atlas_id)
                 ->delete();
+
             if (!$delete) {
                 $this->result->status = false;
                 $this->result->status_code = 500;
                 $this->result->message =
                     'sorry we could not delete this item to cart';
-            } else {
-                // get the dealer details
-                $dealer = User::where('role', 4)
-                    ->where('id', $dealer)
-                    ->get()
-                    ->first();
-
-                // Mail::to($dealer->email)->send(
-                //     new DeleteOrderMail($fetch_users_data)
-                // );
-
-                $this->result->status = true;
-                $this->result->data = $fetch_users_data;
-                $this->result->status_code = 200;
-                $this->result->message = 'Item deleted successfully';
             }
+
+            // Mail::to($dealer->email)->send(
+            //     new DeleteOrderMail($fetch_users_data)
+            // );
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Item deleted successfully';
         } else {
             $this->result->status = false;
             $this->result->status_code = 404;
@@ -1894,8 +1859,8 @@ class DealerController extends Controller
                     );
                     if (
                         Cart::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -2003,8 +1968,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-                ->where('status', '1')
-                ->exists()
+            ->where('status', '1')
+            ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -2032,8 +1997,8 @@ class DealerController extends Controller
     {
         if (
             Products::where('vendor', $code)
-                ->where('status', '1')
-                ->exists()
+            ->where('status', '1')
+            ->exists()
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
@@ -2089,9 +2054,9 @@ class DealerController extends Controller
 
         $order_remaining = Vendors::count();
 
-        // get all the dealers; 
+        // get all the dealers;
 
-        $all_dealers = Dealers::all();
+        $all_dealers = Dealer::all();
 
 
         // return $all_dealers;
@@ -2099,18 +2064,18 @@ class DealerController extends Controller
         $all_dealers_without_orders = [];
 
         $all_dealers_with_orders = [];
-        
-        if(count($all_dealers) > 0){
-            foreach($all_dealers as $dealer){
+
+        if (count($all_dealers) > 0) {
+            foreach ($all_dealers as $dealer) {
                 $dealer_account_id = $dealer['dealer_code'];
-                
-                $dealer_cart = Cart::where('dealer',$dealer_account_id)->count();
-    
-                if($dealer_cart == 0){
-                    // dealer has orders 
-                    array_push($all_dealers_without_orders,$dealer);
-                }else{
-                    array_push($all_dealers_with_orders,$dealer);
+
+                $dealer_cart = Cart::where('dealer', $dealer_account_id)->count();
+
+                if ($dealer_cart == 0) {
+                    // dealer has orders
+                    array_push($all_dealers_without_orders, $dealer);
+                } else {
+                    array_push($all_dealers_with_orders, $dealer);
                 }
             }
         }
@@ -2215,7 +2180,7 @@ class DealerController extends Controller
         # select the settings
         // $fetch_settings = SystemSettings::find($settings_id);
 
-        $fetch_settings = ProgramCountdown::where("status",1)->get()->first();
+        $fetch_settings = ProgramCountdown::where("status", 1)->get()->first();
         // return $fetch_settings->start_countdown_date;
 
         $new_all_orders = DB::table('cart')
@@ -2573,8 +2538,8 @@ class DealerController extends Controller
                     // update to the db
                     if (
                         QuickOrder::where('dealer', $dealer)
-                            ->where('atlas_id', $product->atlas_id)
-                            ->exists()
+                        ->where('atlas_id', $product->atlas_id)
+                        ->exists()
                     ) {
                         $this->result->status = true;
                         $this->result->status_code = 404;
@@ -2677,8 +2642,8 @@ class DealerController extends Controller
 
                 if (
                     Cart::where('dealer', $dealer)
-                        ->where('atlas_id', $atlas_id)
-                        ->exists()
+                    ->where('atlas_id', $atlas_id)
+                    ->exists()
                 ) {
                     $this->result->status = true;
                     $this->result->status_code = 404;

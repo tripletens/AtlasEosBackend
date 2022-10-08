@@ -510,6 +510,18 @@ class DealerController extends Controller
             array_push($res_data, $data);
         }
 
+        usort($res_data, function ($object1, $object2) {
+            // $ex1 = explode('-', $object1->atlas_id);
+            // $ex2 = explode('-', $object2->atlas_id);
+
+            // if ($ex1[0] > $ex2[0]) {
+            //     return true;
+            // } else {
+            //     return false;
+            // }
+            return $object1->vendor_name > $object2->vendor_name;
+        });
+
         $pdf_data = [
             'data' => $res_data,
             'dealer' => $dealer_ship ? $dealer_ship : null,

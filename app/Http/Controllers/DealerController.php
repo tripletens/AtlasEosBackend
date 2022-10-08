@@ -519,7 +519,7 @@ class DealerController extends Controller
             // } else {
             //     return false;
             // }
-            return $object1->vendor_name > $object2->vendor_name;
+            return $object1['vendor_name'] > $object2['vendor_name'];
         });
 
         $pdf_data = [

@@ -43,14 +43,16 @@ class ChatController extends Controller
                     ->get()
                     ->first();
 
-                $data = [
-                    'id' => $user_data->id,
-                    'first_name' => $user_data->first_name,
-                    'last_name' => $user_data->last_name,
-                    'email' => $user_data->email,
-                ];
+                if (isset($user_data->id)) {
+                    $data = [
+                        'id' => isset($user_data->id) ? $user_data->id : null,
+                        'first_name' => $user_data->first_name,
+                        'last_name' => $user_data->last_name,
+                        'email' => $user_data->email,
+                    ];
 
-                array_push($res_data, $data);
+                    array_push($res_data, $data);
+                }
             }
         }
 
@@ -81,13 +83,37 @@ class ChatController extends Controller
         $unread_admin_msg = Chat::where('chat_to', $user)
             ->where('status', '0')
             ->where('role', '1')
+            ->orWhere('role', '2')
+            ->orWhere('role', '5')
+            ->orWhere('role', '6')
             ->count();
+
+        $unread_branch_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '2')
+            ->count();
+
+        $unread_outsidesales_rep__msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '6')
+            ->count();
+
+        $unread_inside_sales_rep__msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '5')
+            ->count();
+
+        $all_sales =
+            $unread_outsidesales_rep__msg + $unread_inside_sales_rep__msg;
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data->dealer = $unread_dealer_msg;
         $this->result->data->vendor = $unread_vendor_msg;
         $this->result->data->admin = $unread_admin_msg;
+
+        $this->result->data->branch = $unread_branch_msg;
+        $this->result->data->sales = $all_sales;
 
         $this->result->message = 'count unread msg chat based on their role';
         return response()->json($this->result);

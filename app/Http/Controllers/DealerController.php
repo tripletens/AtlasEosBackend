@@ -377,7 +377,12 @@ class DealerController extends Controller
         $tr->setSource('en'); // Translate from English
         $tr->setSource(); // Detect language automatically
         $tr->setTarget('fr'); // Translate to Georgian
-        return $tr->translate($text);
+        if($text != null){
+            return $tr->translate($text);
+        }else{
+            return $text;
+
+        }
     }
 
     public function update_report_ticket($ticket)

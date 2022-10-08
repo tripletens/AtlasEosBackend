@@ -258,8 +258,8 @@ class SalesRepController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $pro_data->description;
-                $value->vendor_product_code = $pro_data->vendor_product_code;
+                $value->description = $pro_data ? $pro_data->description : null;
+                $value->vendor_product_code =  $pro_data ? $pro_data->vendor_product_code : null;
             }
 
             $completed_orders_vendors = Cart::where('dealer', $dealer)
@@ -791,14 +791,11 @@ class SalesRepController extends Controller
             foreach ($all_dealers as $dealer) {
                 $dealer_account_id = $dealer['account_id'];
 
-                $dealer_cart = Cart::where(
-                    'dealer',
-                    $dealer_account_id
-                )->count();
+                $dealer_cart = Cart::where('dealer',$dealer_account_id)->count();
 
-                if ($dealer_cart == 0) {
+                if($dealer_cart == 0){
                     // dealer has orders
-                    array_push($all_dealers_without_orders, $dealer);
+                    array_push($all_dealers_without_orders,$dealer);
                 }
             }
         }
@@ -813,9 +810,9 @@ class SalesRepController extends Controller
         $this->result->data->total_logged_in = $total_logged_in;
         $this->result->data->total_not_logged_in = $total_not_logged_in;
         $this->result->data->dealers_without_orders = $all_dealers_without_orders;
-        $this->result->data->dealers_without_orders_count = count(
-            $all_dealers_without_orders
-        );
+
+        $this->result->data->dealers_without_orders_count = count($all_dealers_without_orders);
+
 
         return response()->json($this->result);
     }
@@ -881,39 +878,24 @@ class SalesRepController extends Controller
 
                 $total_price += $cart_data_total;
 
-                $get_priviledged_dealer_details = Dealer::where(
-                    'dealer_code',
-                    $user_privileged_dealers_format
-                )->get();
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                    ->get();
 
-                $get_total_user_dealers = Users::where(
-                    'account_id',
-                    $user_privileged_dealers_format
-                )->get();
+                $get_total_user_dealers = Users::where('account_id', $user_privileged_dealers_format)->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
-                    $dealer_cart = Cart::where(
-                        'dealer',
-                        $user_privileged_dealers_format
-                    )->count();
+                    
+                    $dealer_cart = Cart::where('dealer',$user_privileged_dealers_format)->count();
 
-                    if ($dealer_cart == 0) {
-                        array_push(
-                            $all_dealers_without_orders,
-                            ...$get_priviledged_dealer_details
-                        );
-                    } else {
-                        array_push(
-                            $all_dealers_with_orders,
-                            ...$get_priviledged_dealer_details
-                        );
+                    if($dealer_cart == 0){
+                        array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
+                    }else{
+                        array_push($all_dealers_with_orders, ...$get_priviledged_dealer_details);
                     }
 
-                    array_push(
-                        $user_dealers_array,
-                        ...$get_priviledged_dealer_details
-                    );
+                    array_push($user_dealers_array, ...$get_priviledged_dealer_details);
+
                 }
 
                 array_push($all_user_dealers, ...$get_total_user_dealers);
@@ -1162,7 +1144,7 @@ class SalesRepController extends Controller
                     'dealer_code',
                     $user_privileged_dealers_format
                 )->get();
-
+                
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
                     array_push(
@@ -1177,11 +1159,9 @@ class SalesRepController extends Controller
             foreach ($user_dealers_array as $_dealer) {
                 $account_id = $_dealer->dealer_code;
 
-                $dealer_cart = Cart::where('dealer', $account_id)->count();
+                $dealer_cart = Cart::where('dealer',$account_id)->count();
 
-                $cart_data_total = Cart::where('dealer', $account_id)->sum(
-                    'price'
-                );
+                $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
 
                 $_dealer->total = $cart_data_total;
 
@@ -1264,11 +1244,9 @@ class SalesRepController extends Controller
             foreach ($user_dealers_array as $_dealer) {
                 $account_id = $_dealer->dealer_code;
 
-                $dealer_cart = Cart::where('dealer', $account_id)->count();
+                $dealer_cart = Cart::where('dealer',$account_id)->count();
 
-                $cart_data_total = Cart::where('dealer', $account_id)->sum(
-                    'price'
-                );
+                $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
 
                 $_dealer->total = $cart_data_total;
 

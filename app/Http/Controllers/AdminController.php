@@ -3510,11 +3510,14 @@ class AdminController extends Controller
             $vendor = $request->vendor;
             $spec = $request->spec;
 
+            $grouping = $request->grouping;
+
             // update to the db
             $update = Products::where('atlas_id', $atlasId)->update([
                 'atlas_id' => $atlasId,
                 'description' => $desc,
                 'booking' => $regular,
+                'grouping' => $grouping,
                 'vendor_product_code' => $vendor,
                 'spec_data' => json_encode($spec),
             ]);

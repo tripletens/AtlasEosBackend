@@ -999,7 +999,7 @@ Route::group(
             '/branch/dealers-without-orders/{uid}',
             'BranchController@branch_dealers_without_orders'
         );
-        
+
 
         // branch_dealers_with_orders
         // ---------------- Branch ends here  --------------------------- //
@@ -1201,7 +1201,7 @@ Route::group(
             '/sales-rep/dealers_with_orders/{user_id}',
             'SalesRepController@salesrep_dealers_with_orders'
         );
-        
+
 
     }
 );

@@ -260,7 +260,9 @@ class VendorController extends Controller
 
     public function get_special_orders_by_vendor($code)
     {
-        $special_orders = SpecialOrder::where('vendor_code', $code)->get();
+        $special_orders = SpecialOrder::where('vendor_code', $code)
+            ->orderBy('dealer_id', 'asc')
+            ->get();
 
         if ($special_orders) {
             foreach ($special_orders as $value) {

@@ -358,7 +358,9 @@ class BranchController extends Controller
                     $user_privileged_dealers_format
                 )->get();
 
-                if (count($get_priviledged_dealer_details) > 0) {
+                $dealer_cart_status = Cart::where('dealer',$user_privileged_dealers_format)->count();
+
+                if (count($get_priviledged_dealer_details) > 0 && $dealer_cart_status > 0) {
                     // yay its an array
                     array_push(
                         $user_dealers_array,
@@ -367,6 +369,7 @@ class BranchController extends Controller
                 }
             }
         }
+
 
         $this->result->status = true;
         $this->result->data = $user_dealers_array;

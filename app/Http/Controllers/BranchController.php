@@ -313,7 +313,7 @@ class BranchController extends Controller
         $all_dealers_with_orders = [];
 
         $all_user_dealers = [];
-        
+
         if ($user_privileged_dealers != null) {
 
             $user_privileged_dealers_array = explode(',', $user_privileged_dealers);
@@ -329,7 +329,7 @@ class BranchController extends Controller
 
                 $total_price += $cart_data_total;
 
-                // get the dealerships 
+                // get the dealerships
                 $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privilaged_dealer)
                     ->get();
 
@@ -341,7 +341,7 @@ class BranchController extends Controller
                     // yay its an array
 
                     $dealer_cart = Cart::where('dealer',$user_privilaged_dealer)->count();
-            
+
                     if($dealer_cart > 0){
                         array_push($all_dealers_with_orders, ...$get_priviledged_dealer_details);
                     }else{
@@ -349,7 +349,7 @@ class BranchController extends Controller
                     }
 
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
-                    
+
                 }
 
                 array_push($all_user_dealers, ...$get_total_user_dealers);
@@ -399,7 +399,7 @@ class BranchController extends Controller
         return response()->json($this->result);
     }
 
-    // get dealers that have orders 
+    // get dealers that have orders
     public function branch_dealers_with_orders($uid){
         $user_data = Users::where('id', $uid)->get()->first();
 
@@ -434,7 +434,7 @@ class BranchController extends Controller
                 $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
 
-                    
+
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
@@ -445,9 +445,9 @@ class BranchController extends Controller
 
             foreach($user_dealers_array as $_dealer){
                 $account_id = $_dealer->dealer_code;
-                
+
                 $dealer_cart = Cart::where('dealer',$account_id)->count();
-                    
+
                 $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
 
                 $_dealer->total = $cart_data_total;
@@ -503,7 +503,7 @@ class BranchController extends Controller
                 $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
 
-                    
+
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
@@ -514,9 +514,9 @@ class BranchController extends Controller
 
             foreach($user_dealers_array as $_dealer){
                 $account_id = $_dealer->dealer_code;
-                
+
                 $dealer_cart = Cart::where('dealer',$account_id)->count();
-                
+
                 $cart_data_total = Cart::where('dealer', $account_id)->sum('price');
 
                 $_dealer->total = $cart_data_total;

@@ -547,10 +547,12 @@ class BranchController extends Controller
                 $total_price += $cart_data_total;
 
                 // get the dealerships
+
                 $get_priviledged_dealer_details = Dealer::where(
                     'dealer_code',
                     $user_privilaged_dealer
                 )->get();
+
 
                 $get_total_user_dealers = Users::where(
                     'account_id',
@@ -647,6 +649,7 @@ class BranchController extends Controller
     }
 
     // get dealers that have orders
+
     public function branch_dealers_with_orders($uid)
     {
         $user_data = Users::where('id', $uid)

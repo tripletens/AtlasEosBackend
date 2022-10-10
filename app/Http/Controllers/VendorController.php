@@ -1882,11 +1882,10 @@ class VendorController extends Controller
 
         # get all the priviledged vendor vendor_codes
 
-        return $vendor_details;
-    
+        // return $vendor_details;
+
 
         $all_priviledged_vendor_code_array = array_filter(explode(',', $vendor_details[0]->privileged_vendors));
-
 
         $new_all_orders = array_map(function ($vendor_code) {
             // $settings_id = 1;
@@ -1899,7 +1898,7 @@ class VendorController extends Controller
                 ->where('vendor', $vendor_code)
                 ->whereDate(
                     'created_at',
-                    '<=',
+                    '>=',
                     $fetch_settings->start_countdown_date
                         ? $fetch_settings->start_countdown_date
                         : date('Y-m-d')
@@ -1919,6 +1918,7 @@ class VendorController extends Controller
 
             // return $get_vendor_details;
         }, $all_priviledged_vendor_code_array);
+
 
         $new_david_array = [];
 

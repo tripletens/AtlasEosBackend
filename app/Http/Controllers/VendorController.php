@@ -1994,33 +1994,47 @@ class VendorController extends Controller
     public function get_purchases_dealers_single($code)
     {
         $res_data = [];
-        $dealers = [];
 
         global $users;
+        global $dealers;
 
         $users = [];
+        $dealers = [];
 
         $vendor_purchases = Cart::where('vendor', $code)->get();
 
         foreach ($vendor_purchases as $value) {
             $user_id = $value->uid;
             $product_id = $value->product_id;
+            $dealer = $value->dealer;
 
-            if (!in_array($user_id, $users)) {
+            if (!in_array($dealer, $dealers)) {
+                array_push($dealers, $dealer);
                 array_push($users, $user_id);
             }
         }
 
-        foreach ($users as $value) {
-            $cart_user = Cart::where('vendor', $code)
-                ->where('uid', $value)
+        for ($i = 0; $i < count($dealers); $i++) {
+            $dealer_code = $dealers[$i];
+            $uid = $users[$i];
+
+            $dealer_data = Dealer::where('dealer_code', $dealer_code)
                 ->get()
                 ->first();
+
+            $cart_user = Cart::where('vendor', $code)
+                ->where('dealer', $dealer_code)
+                ->where('uid', $uid)
+                ->get()
+                ->first();
+
             $sum_user_total = Cart::where('vendor', $code)
-                ->where('uid', $value)
+                ->where('dealer', $dealer_code)
+                ->where('uid', $uid)
                 ->get()
                 ->sum('price');
-            $user = Users::where('id', $value)
+
+            $user = Users::where('id', $uid)
                 ->get()
                 ->first();
 
@@ -2030,8 +2044,8 @@ class VendorController extends Controller
 
             if ($user) {
                 $data = [
-                    'account_id' => $user->account_id,
-                    'dealer_name' => $user->company_name,
+                    'account_id' => $dealer_data->dealer_code,
+                    'dealer_name' => $dealer_data->dealer_name,
                     'user' => $value,
                     'vendor_name' => isset($vendor_data->vendor_name)
                         ? $vendor_data->vendor_name
@@ -2045,6 +2059,41 @@ class VendorController extends Controller
                 array_push($res_data, $data);
             }
         }
+
+        // foreach ($users as $value) {
+        //     $cart_user = Cart::where('vendor', $code)
+        //         ->where('uid', $value)
+        //         ->get()
+        //         ->first();
+        //     $sum_user_total = Cart::where('vendor', $code)
+        //         ->where('uid', $value)
+        //         ->get()
+        //         ->sum('price');
+        //     $user = Users::where('id', $value)
+        //         ->get()
+        //         ->first();
+
+        //     $vendor_data = Vendors::where('vendor_code', $code)
+        //         ->get()
+        //         ->first();
+
+        //     if ($user) {
+        //         $data = [
+        //             'account_id' => $user->account_id,
+        //             'dealer_name' => $user->company_name,
+        //             'user' => $value,
+        //             'vendor_name' => isset($vendor_data->vendor_name)
+        //                 ? $vendor_data->vendor_name
+        //                 : null,
+        //             'vendor_code' => $code,
+        //             'purchaser_name' =>
+        //                 $user->first_name . ' ' . $user->last_name,
+        //             'amount' => $sum_user_total,
+        //         ];
+
+        //         array_push($res_data, $data);
+        //     }
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;

@@ -83,10 +83,28 @@ class ChatController extends Controller
         $unread_admin_msg = Chat::where('chat_to', $user)
             ->where('status', '0')
             ->where('role', '1')
-            ->orWhere('role', '2')
-            ->orWhere('role', '5')
-            ->orWhere('role', '6')
             ->count();
+
+        $unread_branch_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '2')
+            ->count();
+
+        $unread_inside_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '5')
+            ->count();
+
+        $unread_outside_msg = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '6')
+            ->count();
+
+        $all_total_admin =
+            $unread_outside_msg +
+            $unread_inside_msg +
+            $unread_branch_msg +
+            $unread_admin_msg;
 
         $unread_branch_msg = Chat::where('chat_to', $user)
             ->where('status', '0')
@@ -110,7 +128,7 @@ class ChatController extends Controller
         $this->result->status_code = 200;
         $this->result->data->dealer = $unread_dealer_msg;
         $this->result->data->vendor = $unread_vendor_msg;
-        $this->result->data->admin = $unread_admin_msg;
+        $this->result->data->admin = $all_total_admin;
 
         $this->result->data->branch = $unread_branch_msg;
         $this->result->data->sales = $all_sales;

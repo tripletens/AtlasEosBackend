@@ -1882,6 +1882,7 @@ class VendorController extends Controller
     {
         $dealer_cart = Cart::where('uid', $user)
             ->where('vendor', $vendor)
+            ->where('dealer', $dealer)
             ->orderBy('product_id', 'asc')
             ->get();
 

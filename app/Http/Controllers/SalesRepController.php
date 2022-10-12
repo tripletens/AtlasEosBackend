@@ -873,10 +873,12 @@ class SalesRepController extends Controller
 
                 $total_price += $cart_data_total;
 
-                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                $get_total_user_dealers = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
 
-                $get_total_user_dealers = Users::where('account_id', $user_privileged_dealers_format)->get();
+                    // get_priviledged_dealer_details
+                    // get_total_user_dealers
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array

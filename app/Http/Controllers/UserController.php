@@ -54,7 +54,7 @@ class UserController extends Controller
         //valid credential
         $this->validate($request, [
             'email' => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'required',
         ]);
 
         if (
@@ -86,18 +86,33 @@ class UserController extends Controller
 
             $end_date = $count_down->end_countdown_date;
             $end_time = $count_down->end_countdown_time;
+
+            // $inital_end_timer = Carbon::parse(
+            //     $end_date . ' ' . $end_time,
+            //     'America/Edmonton'
+            // );
+
+            // $inital_start_timer = Carbon::parse(
+            //     $start_date . ' ' . $start_time,
+            //     'America/Edmonton'
+            // );
+
             $end_count = $end_date . ' ' . $end_time;
+            ///  $ch = Carbon::parse($end_count, 'America/Edmonton');
+
             $end_program = Carbon::createFromFormat(
                 'Y-m-d H:i',
                 $end_count
-            )->format('Y-m-d H:i');
+            )->setTimezone('America/Edmonton');
 
-            $ch = new Carbon($end_program);
+            // $ch = new Carbon($end_program);
             $current = $request->timer;
 
-            if (!$ch->gt($current)) {
+            if (!$end_program->gt($current)) {
                 $this->result->status = false;
                 $this->result->message = 'Program has closed';
+                $this->result->data->mount = $end_program;
+
                 return response()->json($this->result);
             }
         }

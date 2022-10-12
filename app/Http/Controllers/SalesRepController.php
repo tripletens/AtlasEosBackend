@@ -380,6 +380,7 @@ class SalesRepController extends Controller
             $user_privileged_dealers_array = array_filter(explode(',', $user_privileged_dealers));
 
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
+
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
                 $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)->get();
@@ -810,8 +811,11 @@ class SalesRepController extends Controller
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
-                    // ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')
+                // $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                //     // ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')
+                //     ->get();
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
@@ -863,8 +867,11 @@ class SalesRepController extends Controller
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
-                    ->select('*')
+                // $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                //     ->select('*')
+                //     ->get();
+
+                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
@@ -927,9 +934,9 @@ class SalesRepController extends Controller
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                    // ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')
                     ->get();
-
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
@@ -997,9 +1004,11 @@ class SalesRepController extends Controller
             foreach ($user_privileged_dealers_array as $user_privilaged_dealer) {
                 $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
-                $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
-                    ->get();
+                // $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
+                //     ->get();
 
+                $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
+                    ->get();
 
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array

@@ -1880,8 +1880,7 @@ class VendorController extends Controller
 
     public function view_dealer_purchaser_summary($user, $dealer, $vendor)
     {
-        $dealer_cart = Cart::where('uid', $user)
-            ->where('vendor', $vendor)
+        $dealer_cart = Cart::where('vendor', $vendor)
             ->where('dealer', $dealer)
             ->orderBy('product_id', 'asc')
             ->get();
@@ -1891,9 +1890,9 @@ class VendorController extends Controller
         $vendor_data = Vendors::where('vendor_code', $vendor)
             ->get()
             ->first();
-        $dealer_data = Users::where('id', $user)
-            ->get()
-            ->first();
+        // $dealer_data = Users::where('id', $user)
+        //     ->get()
+        //     ->first();
 
         $dealer = Dealer::where('dealer_code', $dealer)
             ->get()
@@ -1908,9 +1907,9 @@ class VendorController extends Controller
 
                 $data = [
                     'id' => $pro_data->id,
-                    'dealer_rep_name' =>
-                        $dealer_data->full_name . ' ' . $dealer_data->last_name,
-                    'user_id' => $user,
+                    // 'dealer_rep_name' =>
+                    //     $dealer_data->full_name . ' ' . $dealer_data->last_name,
+                    //  'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $pro_data->vendor_product_code,

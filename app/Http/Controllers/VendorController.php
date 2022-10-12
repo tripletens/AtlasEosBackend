@@ -1986,7 +1986,7 @@ class VendorController extends Controller
         $this->result->message = 'View Dealer Summary';
         $this->result->data->summary = $res_data;
         $this->result->data->vendor = $vendor_data;
-        $this->result->data->dealer = $dealer_data;
+        $this->result->data->dealer = [];
 
         return response()->json($this->result);
     }

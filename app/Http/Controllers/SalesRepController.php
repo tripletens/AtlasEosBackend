@@ -726,7 +726,6 @@ class SalesRepController extends Controller
                     // get_total_user_dealers
                 $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)->get();
 
-
                 if (count($get_priviledged_dealer_details) > 0) {
                     // yay its an array
                     $dealer_cart = Cart::where('dealer',$user_privileged_dealers_format)->count();

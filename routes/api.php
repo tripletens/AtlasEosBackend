@@ -27,6 +27,41 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::post(
+            '/admin/atlas-format-special-product-upload',
+            'AdminController@atlas_format_special_product_upload'
+        );
+
+        Route::post(
+            '/admin/atlas-format-assorted-product-upload',
+            'AdminController@atlas_format_assorted_product_upload'
+        );
+
+        Route::get(
+            '/admin/delete-dealership/{id}',
+            'AdminController@delete_dealership'
+        );
+
+        Route::get(
+            '/admin/get-each-show-buck/{id}',
+            'AdminController@get_each_show_buck'
+        );
+
+        Route::get(
+            '/admin/get-sales-rep-users/{user}',
+            'AdminController@get_sales_rep_users'
+        );
+
+        Route::get(
+            '/admin/get-branch-manager-users/{user}',
+            'AdminController@get_branch_manager_users'
+        );
+
+        Route::post(
+            '/admin/atlas-product-upload-format',
+            'AdminController@atlas_format_upload_new_product_csv'
+        );
+
         Route::get(
             '/admin/get-vendor-items',
             'AdminController@get_vendors_with_items'
@@ -145,6 +180,11 @@ Route::group(
         );
 
         Route::post(
+            '/edit-dealer-user',
+            'AdminController@edit_dealer_user_data'
+        );
+
+        Route::post(
             '/upload-dealer-users',
             'AdminController@upload_dealer_users'
         );
@@ -178,6 +218,11 @@ Route::group(
         Route::get(
             '/deactivate-product/{id}',
             'AdminController@deactivate_product'
+        );
+
+        Route::get(
+            '/get-edit-product/{id}',
+            'AdminController@get_edit_product'
         );
 
         Route::get('/get-product/{id}', 'AdminController@get_product');
@@ -428,6 +473,26 @@ Route::group(
         Route::post('/create-report', 'DealerController@create_report');
         Route::get('/fetch-all-faqs', 'DealerController@fetch_all_faqs');
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
+
+        Route::get(
+            '/vendor/get-all-admin-users/{user}',
+            'VendorController@get_all_admin_users'
+        );
+
+        Route::get(
+            '/dealer/get-all-admin-users/{user}',
+            'DealerController@get_all_admin_users'
+        );
+
+        Route::get(
+            '/dealer/get-branch-manager-users/{user}',
+            'DealerController@get_branch_manager_users'
+        );
+
+        Route::get(
+            '/dealer/get-sales-rep-users/{user}',
+            'DealerController@get_sales_rep_users'
+        );
 
         Route::get(
             '/dealer/dealer-privileged-dealers/{user}',
@@ -829,6 +894,13 @@ Route::group(
             'VendorController@change_user_bell_status'
         );
 
+        ////// Export /////
+
+        Route::get(
+            '/vendor/get-sales-by-item-detailed-export/{code}',
+            'VendorController@sales_by_item_detailed_export'
+        );
+
         Route::get(
             '/vendor/get-sales-by-item-detailed/{code}',
             'VendorController@sales_by_item_detailed'
@@ -840,8 +912,13 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/get-purchases-dealers/{code}',
+            '/vendor/get-purchases-dealers/{code}/{user}',
             'VendorController@get_purchases_dealers'
+        );
+
+        Route::get(
+            '/vendor/get-purchases-dealers/{code}',
+            'VendorController@get_purchases_dealers_single'
         );
 
         Route::get(
@@ -981,6 +1058,11 @@ Route::group(
         );
 
         Route::get(
+            '/branch/get-all-admin-users/{user}',
+            'BranchController@get_all_admin_users'
+        );
+
+        Route::get(
             '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}',
             'BranchController@get_dealers_with_account_id_under_branch'
         );
@@ -1000,8 +1082,11 @@ Route::group(
             'BranchController@branch_dealers_without_orders'
         );
 
-
         // branch_dealers_with_orders
+        Route::get(
+            '/branch/get-privileged-dealer/{user}',
+            'BranchController@get_privileged_dealers'
+        );
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //
@@ -1067,9 +1152,15 @@ Route::group(
 
         Route::post('/edit_buck', 'BuckController@edit_buck');
 
-        Route::get('/fetch-all-vendor-show-bucks/{vendor_code}', 'BuckController@fetch_all_vendor_show_bucks');
+        Route::get(
+            '/fetch-all-vendor-show-bucks/{vendor_code}',
+            'BuckController@fetch_all_vendor_show_bucks'
+        );
 
-        Route::get('/fetch-all-show-bucks', 'BuckController@fetch_all_show_bucks');
+        Route::get(
+            '/fetch-all-show-bucks',
+            'BuckController@fetch_all_show_bucks'
+        );
 
         // ------------------- show bucks ends here  ------------------ //
 
@@ -1147,6 +1238,11 @@ Route::group(
         );
 
         Route::get(
+            '/sales-rep/get-all-admin-users/{user}',
+            'SalesRepController@get_all_admin_users'
+        );
+
+        Route::get(
             '/sales-rep/get-purchasers-dealer/{user}',
             'SalesRepController@get_purchases_dealers'
         );
@@ -1201,7 +1297,5 @@ Route::group(
             '/sales-rep/dealers_with_orders/{user_id}',
             'SalesRepController@salesrep_dealers_with_orders'
         );
-
-
     }
 );

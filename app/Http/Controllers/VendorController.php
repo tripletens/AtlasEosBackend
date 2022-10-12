@@ -1931,7 +1931,7 @@ class VendorController extends Controller
         $this->result->message = 'View Dealer Summary';
         $this->result->data->summary = $res_data;
         $this->result->data->vendor = $vendor_data;
-        $this->result->data->dealer = $dealer_data;
+        $this->result->data->dealer = [];
 
         return response()->json($this->result);
     }
@@ -1986,7 +1986,7 @@ class VendorController extends Controller
         $this->result->message = 'View Dealer Summary';
         $this->result->data->summary = $res_data;
         $this->result->data->vendor = $vendor_data;
-        $this->result->data->dealer = [];
+        $this->result->data->dealer = $dealer_data;
 
         return response()->json($this->result);
     }
@@ -2684,7 +2684,9 @@ class VendorController extends Controller
 
         // return $vendor_details;
 
-        $all_priviledged_vendor_code_array = array_filter(explode(',', $vendor_details[0]->privileged_vendors));
+        $all_priviledged_vendor_code_array = array_filter(
+            explode(',', $vendor_details[0]->privileged_vendors)
+        );
 
         $new_all_orders = array_map(function ($vendor_code) {
             // $settings_id = 1;

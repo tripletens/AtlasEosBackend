@@ -1901,6 +1901,8 @@ class VendorController extends Controller
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
+                $unit_price = $value->unit_price;
+
                 $pro_data = Products::where('atlas_id', $atlas_id)
                     ->get()
                     ->first();
@@ -1913,7 +1915,7 @@ class VendorController extends Controller
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
+                    'special' => $unit_price,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
                     'dealer_name' => $dealer->dealer_name,
@@ -1958,6 +1960,8 @@ class VendorController extends Controller
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
+                $unit_price = $value->unit_price;
+
                 $pro_data = Products::where('atlas_id', $atlas_id)
                     ->get()
                     ->first();
@@ -1968,7 +1972,7 @@ class VendorController extends Controller
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
+                    'special' => $pro_data->unit_price,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
                     'dealer_name' => $dealer->dealer_name,

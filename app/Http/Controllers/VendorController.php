@@ -460,7 +460,7 @@ class VendorController extends Controller
                 $vendor_code
             )->get();
 
-            return $cart_dealer;
+            // return $cart_dealer;
 
             foreach ($cart_dealer as $value) {
                 $dealer_id = $value->dealer;
@@ -1931,7 +1931,7 @@ class VendorController extends Controller
         $this->result->message = 'View Dealer Summary';
         $this->result->data->summary = $res_data;
         $this->result->data->vendor = $vendor_data;
-        $this->result->data->dealer = $dealer_data;
+        $this->result->data->dealer = [];
 
         return response()->json($this->result);
     }
@@ -1986,7 +1986,7 @@ class VendorController extends Controller
         $this->result->message = 'View Dealer Summary';
         $this->result->data->summary = $res_data;
         $this->result->data->vendor = $vendor_data;
-        $this->result->data->dealer = [];
+        $this->result->data->dealer = $dealer_data;
 
         return response()->json($this->result);
     }
@@ -2666,10 +2666,6 @@ class VendorController extends Controller
     public function fetch_all_vendor_orders_per_day($id)
     {
         // fetch all the orders
-        // $all_orders = Cart::where('dealer', $account)->where('status', '1');
-
-        // return $fetch_settings;
-
         $vendor_details = Users::where('role', '=', '3')
             ->where('id', $id)
             ->get();
@@ -2682,26 +2678,11 @@ class VendorController extends Controller
             return response()->json($this->result);
         }
 
-        // return $vendor_details;
-
-        $privileged_vendors = trim(
-            str_replace('"', ' ', $vendor_details[0]->privileged_vendors)
-        );
-
-        // return $vendor_details[0]->privileged_vendors;
-
-        $vendor_code = $vendor_details[0]->vendor_code;
-
         $all_priviledged_vendor_code_array = [];
 
         # get all the priviledged vendor vendor_codes
-        // if ($privileged_vendors !== null) {
-        //     $all_priviledged_vendor_code_array = array_filter(explode(
-        //         ',',
-        //         $vendor_details[0]->privileged_vendors
-        //     ));
-        //     array_push($all_priviledged_vendor_code_array, $vendor_code);
-        // }
+
+        // return $vendor_details;
 
         $all_priviledged_vendor_code_array = array_filter(
             explode(',', $vendor_details[0]->privileged_vendors)
@@ -2720,7 +2701,7 @@ class VendorController extends Controller
                 ->where('vendor', $vendor_code)
                 ->whereDate(
                     'created_at',
-                    '<=',
+                    '>=',
                     $fetch_settings->start_countdown_date
                         ? $fetch_settings->start_countdown_date
                         : date('Y-m-d')

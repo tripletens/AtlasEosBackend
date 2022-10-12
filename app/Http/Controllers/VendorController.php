@@ -460,7 +460,7 @@ class VendorController extends Controller
                 $vendor_code
             )->get();
 
-            return $cart_dealer;
+            // return $cart_dealer;
 
             foreach ($cart_dealer as $value) {
                 $dealer_id = $value->dealer;
@@ -2719,7 +2719,7 @@ class VendorController extends Controller
 
             // return $get_vendor_details;
         }, $all_priviledged_vendor_code_array);
-        
+
         $new_david_array = [];
 
         foreach ($new_all_orders as $key => $order) {

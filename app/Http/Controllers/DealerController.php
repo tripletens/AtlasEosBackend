@@ -1318,6 +1318,39 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_fetch_by_vendor_atlas($code)
+    {
+        $filtered_item = Products::orWhere('atlas_id', $code)
+            ->orWhere('vendor_product_code', $code)
+            ->get()
+            ->first();
+
+        $data = [];
+
+        if ($filtered_item) {
+            $filtered_item->spec_data = json_decode($filtered_item->spec_data);
+            $vendor = $filtered_item->vendor_code;
+            $vendor_data = Vendors::where('vendor_code', $vendor)
+                ->get()
+                ->first();
+            if ($vendor_data) {
+                $filtered_item->vendor_data = $vendor_data;
+            }
+
+            array_push($data, $filtered_item);
+
+            $check_assorted = $filtered_item->grouping != null ? true : false;
+            $this->result->data->assorted = $check_assorted;
+        } else {
+            $filtered_item = [];
+        }
+
+        $this->result->status = true;
+        $this->result->data->filtered_data = $data;
+        $this->result->message = 'filtered data';
+        return response()->json($this->result);
+    }
+
     public function save_item_cart(Request $request)
     {
         $validator = Validator::make($request->all(), [

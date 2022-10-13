@@ -1115,6 +1115,13 @@ Route::group(
             'SpecialOrderController@fetch_special_order_by_dealer_id'
         );
 
+        // fetch special order by uid and vendor code
+        Route::get(
+            '/special-orders-vendor-code/{dealer_id}/{vendor_code}',
+            'SpecialOrderController@fetch_special_order_by_dealer_id_vendor_id'
+        );
+        //
+
         //------------------- special orders ends here ------------------ //
 
         // ------------------ Product summary --------------------------- //

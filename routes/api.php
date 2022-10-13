@@ -663,7 +663,7 @@ Route::group(
         );
 
         Route::get(
-            '/dealer/get-item-by-atlas-vendor-code/{code}',
+            '/dealer/get-item-by-atlas-vendor-code/{code}/{vendor_code}',
             'DealerController@get_fetch_by_vendor_atlas'
         );
 

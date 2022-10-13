@@ -1275,13 +1275,22 @@ class DealerController extends Controller
         }
     }
 
-    public function get_fetch_by_vendor_atlas($code,$vendor_code)
+    public function get_fetch_by_vendor_atlas($code, $vendor_code)
     {
-        $filtered_item = Products::orWhere('atlas_id', $code)
-            ->orWhere('vendor_product_code', $code)
-            ->where('vendor_code',$vendor_code)
+        // $filtered_item = Products::Where('atlas_id', $code)
+        //     ->where('vendor_product_code', $code)
+        //     ->where('vendor_code', $vendor_code)
+        //     ->get()
+        //     ->first();
+
+        $filtered_item = Products::where('vendor_code', $vendor_code)
+            ->Where(function ($query) use ($code) {
+                $query->orWhere('vendor_product_code', $code)
+                    ->orWhere('vendor_code', $code);
+            })
             ->get()
             ->first();
+
 
         $data = [];
 

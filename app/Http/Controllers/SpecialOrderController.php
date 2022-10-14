@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
 use App\Models\Users;
+
 class SpecialOrderController extends Controller
 {
     //
@@ -60,12 +61,12 @@ class SpecialOrderController extends Controller
                     // check if the item already exists in the db
                     $check_atlas_id = Products::where('atlas_id', $product->vendor_no)->first();
 
-                    if($check_atlas_id){
+                    if ($check_atlas_id) {
                         $this->result->status = false;
                         $this->result->status_code = 200;
                         $this->result->data = [];
                         $this->result->message =
-                            'sorry item with atlas id: '.$product->vendor_no.' already exists in the database';
+                            'sorry item with atlas id: ' . $product->vendor_no . ' already exists in the database';
                     }
 
                     $add_items = SpecialOrder::create([
@@ -264,6 +265,68 @@ class SpecialOrderController extends Controller
         $this->result->status_code = 200;
         $this->result->data = $check_special_order;
         $this->result->message = 'Special order item fetched successfully';
+        return response()->json($this->result);
+    }
+
+    // fetch special order by uid
+    public function fetch_special_order_by_dealer_id_vendor_id($dealer_id, $vendor_code)
+    {
+        // return $dealer_id . " => " .$vendor_code;
+
+        $check_special_order_exists = SpecialOrder::where(
+            'dealer_id',
+            $dealer_id)->where('vendor_code', $vendor_code)->get();
+
+        // return $check_special_order_exists;
+
+        // oops we couldnt find the special order
+        if (
+            !$check_special_order_exists ||
+            count($check_special_order_exists) == 0
+        ) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->data = [];
+            $this->result->message =
+                'sorry special order item for atlas id and vendor could not be found';
+            return response()->json($this->result);
+        }
+
+        $check_special_order = DB::table('special_orders')
+            ->join(
+                'vendors',
+                'vendors.vendor_code',
+                '=',
+                'special_orders.vendor_code'
+            )
+            ->where('special_orders.dealer_id', $dealer_id)
+            ->where('special_orders.vendor_code', $vendor_code)
+            ->select('vendors.*', 'special_orders.*')
+            ->get();
+        //         $check_special_order = SpecialOrder::
+        //                 'vendors.vendor_code as vendor_code',
+        //                 'vendors.vendor_name as vendor_name',
+        //                 'vendors.role as vendor_role',
+        //                 'vendors.role_name as vendor_role_name',
+        //                 'vendors.status as vendor_role_name',
+        //                 'vendors.created_at as vendor_created_at',
+        //                 'vendors.updated_at as vendor_updated_at',
+
+        if (count($check_special_order) > 0) {
+            foreach ($check_special_order as $item) {
+                $get_dealer_users = Users::where(
+                    'account_id',
+                    $dealer_id
+                )->get();
+                $item->users = $get_dealer_users;
+            }
+        }
+
+        // return success response
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $check_special_order;
+        $this->result->message = 'Special order with vendor code fetched successfully';
         return response()->json($this->result);
     }
 }

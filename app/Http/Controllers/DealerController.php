@@ -298,6 +298,10 @@ class DealerController extends Controller
             ? $user_data->privileged_dealers
             : null;
 
+        global $dealer_code;
+
+        $dealer_code = $user_data->dealer_code;
+
         $res_data = [];
 
         if ($privileged_dealers != null) {
@@ -305,11 +309,13 @@ class DealerController extends Controller
             array_unique($expand);
 
             foreach ($expand as $value) {
-                $dealer_data = Dealer::where('dealer_code', $value)
-                    ->get()
-                    ->first();
-                if ($dealer_data) {
-                    array_push($res_data, $dealer_data);
+                if ($value != $dealer_code) {
+                    $dealer_data = Dealer::where('dealer_code', $value)
+                        ->get()
+                        ->first();
+                    if ($dealer_data) {
+                        array_push($res_data, $dealer_data);
+                    }
                 }
             }
         }

@@ -2056,6 +2056,8 @@ class DealerController extends Controller
                     'last_name' => $value['last_name'],
                     'full_name' => $value['full_name'],
                     'email' => $value['email'],
+                    'company' => $value['vendor_name'],
+
                     'notification' => $count_notification,
                 ];
 

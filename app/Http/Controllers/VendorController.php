@@ -2559,6 +2559,8 @@ class VendorController extends Controller
                     'last_name' => $value['last_name'],
                     'full_name' => $value['full_name'],
                     'email' => $value['email'],
+                    'company' => $value['dealer_name'],
+
                     'notification' => $count_notification,
                 ];
 

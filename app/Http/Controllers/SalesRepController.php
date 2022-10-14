@@ -38,6 +38,7 @@ use App\Models\PriceOverideReport;
 use App\Models\SpecialOrder;
 use App\Models\UserStatus;
 
+set_time_limit(25000000000);
 class SalesRepController extends Controller
 {
     //
@@ -45,7 +46,7 @@ class SalesRepController extends Controller
     public function __construct()
     {
         // set timeout limit
-        set_time_limit(25000000);
+        set_time_limit(25000000000);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,

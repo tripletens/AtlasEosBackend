@@ -1,9 +1,13 @@
 
+@php
+set_time_limit(25000000000);
+@endphp
+
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 <link href="http://fonts.cdnfonts.com/css/verdana" rel="stylesheet">
-                
+
 
 <head>
     <title>Atlas Order Details</title>
@@ -11,7 +15,7 @@
 
 <style>
 
-   
+
 *{
     font-family: 'Verdana', sans-serif;
 }
@@ -210,7 +214,7 @@
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Total') }}  ($)</th>
                             </tr>
                         </thead>
-            
+
                         <tbody>
                             @foreach ($data as $item)
 
@@ -221,11 +225,11 @@
                                     <td class="table-value-custom center-text">
                                         {{ $item['atlas_id'] }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $item['vendor_product_code'] }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $item['desc'] }}
                                     </td>
@@ -239,7 +243,7 @@
 
                             @endforeach
 
-            
+
                             {{-- <tr>
                                 <td colspan="5">
                                     <h5 class="each-total-cate-text" style="">
@@ -253,14 +257,14 @@
                                 </td>
                             </tr>
              --}}
-            
+
                         </tbody>
                     </table>
                 </div>
         @endif
     </div>
 
- 
+
     @if (count($data) > 0)
     <div style="width: 100%; text-align: right; border: 1px solid gray; margin-top: 20px">
 
@@ -271,18 +275,6 @@
         </h5>
     </div>
 @endif
-  
-
-
-
-
-   
-
-
-
-
-
- 
 
 
 
@@ -294,17 +286,29 @@
 
 
 
-  
-
-
-   
 
 
 
-   
 
 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

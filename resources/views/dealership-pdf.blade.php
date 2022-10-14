@@ -1,9 +1,13 @@
 
+@php
+    set_time_limit(25000000000);
+@endphp
+
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 <link href="http://fonts.cdnfonts.com/css/verdana" rel="stylesheet">
-                
+
 
 <head>
     <title>Atlas Order Details</title>
@@ -11,7 +15,7 @@
 
 <style>
 
-   
+
 *{
     font-family: 'Verdana', sans-serif;
 }
@@ -198,9 +202,9 @@
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Total') }}  ($)</th>
                             </tr>
                         </thead>
-            
+
                         <tbody>
-            
+
                             @foreach ($item['data'] as $inner)
                                 <tr>
                                     <td class="table-value-custom center-text">
@@ -209,11 +213,11 @@
                                     <td class="table-value-custom center-text">
                                         {{ $inner['atlas_id'] }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $inner['vendor_product_code'] }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $inner['description'] }}
                                     </td>
@@ -224,9 +228,9 @@
                                         {{ number_format($inner['price'], 2) }}
                                     </td>
                                 </tr>
-            
+
                             @endforeach
-            
+
                             <tr>
                                 <td colspan="5">
                                     <h5 class="each-total-cate-text" style="">
@@ -239,8 +243,8 @@
                                         {{ number_format( $item['total'], 2) }}</h5>
                                 </td>
                             </tr>
-            
-            
+
+
                         </tbody>
                     </table>
                 </div>
@@ -248,7 +252,7 @@
         @endif
     </div>
 
- 
+
 
 
 
@@ -263,18 +267,6 @@
         </h5>
     </div>
 @endif
- 
-
-
-
-
-   
-
-
-
-
-
- 
 
 
 
@@ -286,17 +278,29 @@
 
 
 
-  
-
-
-   
 
 
 
-   
 
 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

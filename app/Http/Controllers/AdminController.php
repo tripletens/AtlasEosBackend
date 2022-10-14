@@ -51,14 +51,14 @@ use DateTime;
 // use App\Models\PromotionalCategory;
 
 // use Barryvdh\DomPDF\Facade as PDF;
-set_time_limit(25000000);
+set_time_limit(250000000000);
 
 class AdminController extends Controller
 {
     public function __construct()
     {
         // set timeout limit
-        set_time_limit(25000000);
+        set_time_limit(2500000000);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,

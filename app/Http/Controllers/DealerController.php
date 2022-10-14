@@ -554,18 +554,18 @@ class DealerController extends Controller
     public function get_vendor_item($vendor, $atlas)
     {
         $item = Products::where('vendor', $vendor)
-            // ->orWhere('atlas_id', $atlas)
-            // ->orWhere('vendor_product_code', $atlas)
-            ->orWhere(['atlas_id' => $atlas, 'vendor_product_code' => $atlas])
-
-            // ->where('atlas_id', $atlas)
-
+            ->orWhere('atlas_id', $atlas)
+            ->orWhere('vendor_product_code', $atlas)
+            // ->orWhere(['atlas_id' => $atlas, 'vendor_product_code' => $atlas])
             ->get()
             ->first();
+
         $current = Products::where('vendor', $vendor)
             // ->where('atlas_id', $atlas)
-            ->orWhere(['atlas_id' => $atlas, 'vendor_product_code' => $atlas])
+            ->orWhere('atlas_id', $atlas)
+            ->orWhere('vendor_product_code', $atlas)
             ->get();
+
         $assorted_status = false;
         $assorted_data = [];
 

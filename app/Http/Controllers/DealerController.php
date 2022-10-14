@@ -553,17 +553,38 @@ class DealerController extends Controller
 
     public function get_vendor_item($vendor, $atlas)
     {
-        $item = Products::where('vendor', $vendor)
-            ->orWhere('atlas_id', $atlas)
-            ->orWhere('vendor_product_code', $atlas)
-            // ->orWhere(['atlas_id' => $atlas, 'vendor_product_code' => $atlas])
-            ->get()
-            ->first();
+        // $item = Products::where('vendor', $vendor)
+        //     ->orWhere('atlas_id', $atlas)
+        //     ->orWhere('vendor_product_code', $atlas)
+        //     // ->orWhere(['atlas_id' => $atlas, 'vendor_product_code' => $atlas])
+        //     ->get()
+        //     ->first();
 
-        $current = Products::where('vendor', $vendor)
-            // ->where('atlas_id', $atlas)
-            ->orWhere('atlas_id', $atlas)
-            ->orWhere('vendor_product_code', $atlas)
+        // $current = Products::where('vendor', $vendor)
+        //     // ->where('atlas_id', $atlas)
+        //     ->orWhere('atlas_id', $atlas)
+        //     ->orWhere('vendor_product_code', $atlas)
+        //     ->get();
+
+        // $users = DB::table('users')->where([
+        //     ['status', '=', '1'],
+        //     ['subscribed', '<>', '1'],
+        // ])->get();
+
+        $item = DB::table('products')
+            ->where([['vendor', '=', $vendor]])
+            ->orWhere([
+                ['atlas_id', '=', $atlas],
+                ['vendor_product_code', '=', $atlas],
+            ])
+            ->get();
+
+        $current = DB::table('products')
+            ->where([['vendor', '=', $vendor]])
+            ->orWhere([
+                ['atlas_id', '=', $atlas],
+                ['vendor_product_code', '=', $atlas],
+            ])
             ->get();
 
         $assorted_status = false;

@@ -602,7 +602,7 @@ class DealerController extends Controller
                 $assorted_status = true;
                 $assorted_data = Products::where(
                     'grouping',
-                    $item->grouping
+                    $res[0]->grouping
                 )->get();
 
                 foreach ($assorted_data as $value) {

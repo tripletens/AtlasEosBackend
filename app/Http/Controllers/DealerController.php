@@ -553,39 +553,41 @@ class DealerController extends Controller
 
     public function get_vendor_item($vendor, $atlas)
     {
-        // $item = Products::where('vendor', $vendor)
-        //     ->orWhere('atlas_id', $atlas)
-        //     ->orWhere('vendor_product_code', $atlas)
-        //     // ->orWhere(['atlas_id' => $atlas, 'vendor_product_code' => $atlas])
-        //     ->get()
-        //     ->first();
+        $current;
 
-        // $current = Products::where('vendor', $vendor)
-        //     // ->where('atlas_id', $atlas)
-        //     ->orWhere('atlas_id', $atlas)
-        //     ->orWhere('vendor_product_code', $atlas)
+        // $item = DB::table('products')
+        //     ->where([['vendor', '=', $vendor]])
+        //     ->orWhere([
+        //         ['atlas_id', '=', $atlas],
+        //         ['vendor_product_code', '=', $atlas],
+        //     ])
         //     ->get();
 
-        // $users = DB::table('users')->where([
-        //     ['status', '=', '1'],
-        //     ['subscribed', '<>', '1'],
-        // ])->get();
+        // $current = DB::table('products')
+        //     ->where([['vendor', '=', $vendor]])
+        //     ->orWhere([
+        //         ['atlas_id', '=', $atlas],
+        //         ['vendor_product_code', '=', $atlas],
+        //     ])
+        //     ->get();
 
-        $item = DB::table('products')
-            ->where([['vendor', '=', $vendor]])
-            ->orWhere([
-                ['atlas_id', '=', $atlas],
-                ['vendor_product_code', '=', $atlas],
-            ])
+        $atlas = DB::table('products')
+            ->where('vendor', $vendor)
+            ->where('atlas_id', $atlas)
             ->get();
 
-        $current = DB::table('products')
-            ->where([['vendor', '=', $vendor]])
-            ->orWhere([
-                ['atlas_id', '=', $atlas],
-                ['vendor_product_code', '=', $atlas],
-            ])
+        $vendor_pro = DB::table('products')
+            ->where('vendor', $vendor)
+            ->where('vendor_product_code', $atlas)
             ->get();
+
+        if ($atlas) {
+            $current = $atlas;
+        }
+
+        if ($vendor_pro) {
+            $current = $vendor_pro;
+        }
 
         $assorted_status = false;
         $assorted_data = [];
@@ -609,14 +611,12 @@ class DealerController extends Controller
             }
         }
 
-        // if ($item) {
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data->assorted_state = $assorted_status;
         $this->result->data->item = $current;
         $this->result->data->assorted_data = $assorted_data;
         $this->result->message = 'get user vendor item';
-        // }
 
         return response()->json($this->result);
     }

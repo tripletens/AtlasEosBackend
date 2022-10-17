@@ -2694,7 +2694,7 @@ class VendorController extends Controller
             explode(',', $vendor_details[0]->privileged_vendors)
         );
             
-        return $all_priviledged_vendor_code_array;
+        // return $all_priviledged_vendor_code_array;
 
         $new_all_orders = array_map(function ($vendor_code) {
             // $settings_id = 1;

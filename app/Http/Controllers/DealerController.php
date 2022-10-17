@@ -555,9 +555,8 @@ class DealerController extends Controller
     {
         /// $current;
 
-        $vendor_pro = DB::table('products')
+        $vendor_item = DB::table('products')
             ->where('vendor', $vendor)
-            ->where('atlas_id', $atlas)
             ->get();
 
         // $vendor_pro = DB::table('products')
@@ -565,23 +564,40 @@ class DealerController extends Controller
         //     ->where('vendor_product_code', $atlas)
         //     ->get();
 
-        if ($atlas) {
-            $current = $atlas;
+        $res = [];
+
+        if ($vendor_item) {
+            foreach ($vendor_item as $value) {
+                $atlas_id = $value->atlas_id;
+                $vendor_pro_code = $value->vendor_product_code;
+
+                if ($atlas == $atlas_id) {
+                    array_push($res, $value);
+                }
+
+                if ($atlas == $vendor_pro_code) {
+                    array_push($res, $value);
+                }
+            }
         }
 
-        if ($vendor_pro) {
-            $current = $vendor_pro;
-        }
+        // if ($atlas) {
+        //     $current = $atlas;
+        // }
+
+        // if ($vendor_pro) {
+        //     $current = $vendor_pro;
+        // }
 
         $assorted_status = false;
         $assorted_data = [];
 
-        foreach ($current as $value) {
+        foreach ($res as $value) {
             $value->spec_data = json_decode($value->spec_data);
         }
 
-        if (isset($item->grouping)) {
-            $check_assorted = $item->grouping != null ? true : false;
+        if (isset($res[0]->grouping)) {
+            $check_assorted = $res[0]->grouping != null ? true : false;
             if ($check_assorted) {
                 $assorted_status = true;
                 $assorted_data = Products::where(
@@ -598,7 +614,7 @@ class DealerController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data->assorted_state = $assorted_status;
-        $this->result->data->item = $current;
+        $this->result->data->item = $res;
         $this->result->data->assorted_data = $assorted_data;
         $this->result->message = 'get user vendor item';
 

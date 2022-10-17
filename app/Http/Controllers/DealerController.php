@@ -553,33 +553,17 @@ class DealerController extends Controller
 
     public function get_vendor_item($vendor, $atlas)
     {
-        $current;
+        /// $current;
 
-        // $item = DB::table('products')
-        //     ->where([['vendor', '=', $vendor]])
-        //     ->orWhere([
-        //         ['atlas_id', '=', $atlas],
-        //         ['vendor_product_code', '=', $atlas],
-        //     ])
-        //     ->get();
-
-        // $current = DB::table('products')
-        //     ->where([['vendor', '=', $vendor]])
-        //     ->orWhere([
-        //         ['atlas_id', '=', $atlas],
-        //         ['vendor_product_code', '=', $atlas],
-        //     ])
-        //     ->get();
-
-        $atlas = DB::table('products')
+        $vendor_pro = DB::table('products')
             ->where('vendor', $vendor)
             ->where('atlas_id', $atlas)
             ->get();
 
-        $vendor_pro = DB::table('products')
-            ->where('vendor', $vendor)
-            ->where('vendor_product_code', $atlas)
-            ->get();
+        // $vendor_pro = DB::table('products')
+        //     ->where('vendor', $vendor)
+        //     ->where('vendor_product_code', $atlas)
+        //     ->get();
 
         if ($atlas) {
             $current = $atlas;

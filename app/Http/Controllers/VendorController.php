@@ -2670,7 +2670,7 @@ class VendorController extends Controller
 
     // fetch the sum of order price per vendors per day
         public function fetch_all_vendor_orders_per_day($id)
-    {
+        {
         // fetch all the orders
         $vendor_details = Users::where('role', '=', '3')
             ->where('id', $id)
@@ -2693,6 +2693,8 @@ class VendorController extends Controller
         $all_priviledged_vendor_code_array = array_filter(
             explode(',', $vendor_details[0]->privileged_vendors)
         );
+            
+        return $all_priviledged_vendor_code_array;
 
         $new_all_orders = array_map(function ($vendor_code) {
             // $settings_id = 1;

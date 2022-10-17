@@ -2669,7 +2669,7 @@ class VendorController extends Controller
     }
 
     // fetch the sum of order price per vendors per day
-    public function fetch_all_vendor_orders_per_day($id)
+        public function fetch_all_vendor_orders_per_day($id)
     {
         // fetch all the orders
         $vendor_details = Users::where('role', '=', '3')

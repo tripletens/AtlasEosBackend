@@ -58,7 +58,7 @@ class SummaryController extends Controller
 
                 foreach ($fetch_all_users as $user) {
                     // get all the cart items for each user
-                    $cart_items = Cart::where('uid', $user->id);
+                    $cart_items = Cart::where('dealer', $user->account_id);
                     $user->cart =  $cart_items->get();
                     $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
                         ->join('products', 'cart.product_id', '=', 'products.id')

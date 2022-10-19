@@ -52,9 +52,12 @@ class SummaryController extends Controller
 
             $group = array();
 
+
             if ($users->count() > 0) {
                 // $fetch_all_users = $users->pluck('id')->toArray();
-                $fetch_all_users = $users->select('id', 'first_name', 'last_name', 'full_name')->get();
+                $fetch_all_users = $users->select('id','account_id','first_name', 'last_name', 'full_name')->get();
+
+                // return $fetch_all_users;
 
                 foreach ($fetch_all_users as $user) {
                     // get all the cart items for each user

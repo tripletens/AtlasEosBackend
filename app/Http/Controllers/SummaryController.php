@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\User;
 use App\Models\Users;
 use App\Models\Vendors;
 use Illuminate\Http\Request;
@@ -24,45 +25,68 @@ class SummaryController extends Controller
         ];
     }
 
-    public function product_summary($dealer_id)
+    public function product_summary($uid)
     {
-        // get all the users under a dealer
-        $users = Users::where('account_id', $dealer_id)->where('role', '4')->where('account_id', '!=', null);
 
-        $res_data = [];
+        // get the dealer details then use it to get the account id
+        $get_user_details = Users::find($uid);
 
-        $user_account_id = $users->pluck('id');
-
-        $group = array();
-
-        if ($users) {
-            // $fetch_all_users = $users->pluck('id')->toArray();
-            $fetch_all_users = $users->select('id', 'first_name', 'last_name', 'full_name')->get();
-
-            foreach ($fetch_all_users as $user) {
-                // get all the cart items for each user
-                $cart_items = Cart::where('uid', $user->id);
-                $user->cart =  $cart_items->get();
-                $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
-                    ->join('products', 'cart.product_id', '=', 'products.id')
-                    ->select('vendors.*','products.*','cart.price', 'cart.uid')
-                    ->distinct('vendors.vendor_code')
-                    ->get();
-                $user->all_vendors = $user->vendors->groupBy('vendor_code');
-                // $user->total_price = $cart_items->sum('price');
-                // $user->vendors = $group;
-            }
-
-            foreach ($user->vendors as $vendor) {
-                $vendor->total_price = $vendor->sum('price');
-                $sum = $vendor->sum('price');
-            }
-
+        if (!$get_user_details) {
             $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->data = $fetch_all_users;
-            $this->result->message = 'Product summary fetched Successfully';
+            $this->result->status_code = 400;
+            $this->result->message =
+                'An error ocurred, User doesnt exist.';
             return response()->json($this->result);
+        }
+
+        // return $get_user_details;
+        $dealer_id = $get_user_details->account_id;
+
+        if ($dealer_id) {
+            // get all the users under a dealer
+            $users = Users::where('account_id', $dealer_id)->where('role', '4')->where('account_id', '!=', null);
+
+            $res_data = [];
+
+            $user_account_id = $users->pluck('id');
+
+            $group = array();
+
+            if ($users) {
+                // $fetch_all_users = $users->pluck('id')->toArray();
+                $fetch_all_users = $users->select('id', 'first_name', 'last_name', 'full_name')->get();
+
+                foreach ($fetch_all_users as $user) {
+                    // get all the cart items for each user
+                    $cart_items = Cart::where('uid', $user->id);
+                    $user->cart =  $cart_items->get();
+                    $user->vendors = $cart_items->join('vendors', 'vendor_code', '=', 'cart.vendor')
+                        ->join('products', 'cart.product_id', '=', 'products.id')
+                        ->select('vendors.*', 'products.*', 'cart.price', 'cart.uid')
+                        ->distinct('vendors.vendor_code')
+                        ->get();
+                    $user->all_vendors = $user->vendors->groupBy('vendor_code');
+                    // $user->total_price = $cart_items->sum('price');
+                    // $user->vendors = $group;
+                }
+
+                foreach ($user->vendors as $vendor) {
+                    $vendor->total_price = $vendor->sum('price');
+                    $sum = $vendor->sum('price');
+                }
+
+                $this->result->status = true;
+                $this->result->status_code = 200;
+                $this->result->data = $fetch_all_users;
+                $this->result->message = 'Product summary fetched Successfully';
+                return response()->json($this->result);
+            }
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->data = null;
+            $this->result->message = "Sorry User isn't a dealer";
+            return response()->json($this->result,422);
         }
     }
 
@@ -147,7 +171,7 @@ class SummaryController extends Controller
         // $user->all_vendors = $user->vendors->groupBy('vendor_code');
 
         foreach ($dealer['vendors'] as $vendor) {
-            $vendor->orders = Cart::where('cart.uid', $dealer->id)->where('cart.vendor', $vendor->vendor_code)->join('products','products.id','=','cart.product_id')->get();
+            $vendor->orders = Cart::where('cart.uid', $dealer->id)->where('cart.vendor', $vendor->vendor_code)->join('products', 'products.id', '=', 'cart.product_id')->get();
             $vendor->orders->total_price = Cart::where('cart.uid', $dealer->id)->where('cart.vendor', $vendor->vendor_code)->sum('cart.price');
         }
 

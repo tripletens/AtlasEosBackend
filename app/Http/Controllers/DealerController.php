@@ -338,7 +338,9 @@ class DealerController extends Controller
         $end_time = $count_down->end_countdown_time;
         $end_count = $end_date . ' ' . $end_time;
 
-        $end_program = Carbon::parse($end_count, 'America/Edmonton');
+        $end_program = Carbon::parse($end_count, 'America/Edmonton')->format(
+            'Y-m-d H:i:s'
+        );
 
         // $end_program = Carbon::createFromFormat(
         //     'Y-m-d H:i',
@@ -350,8 +352,12 @@ class DealerController extends Controller
 
         if (!$ch->gt($current)) {
             $this->result->status = true;
+            $this->result->data->cur = $ch;
+
             $this->result->message = 'Program has closed';
         }
+
+        $this->result->data->cur = $ch;
 
         return response()->json($this->result);
     }

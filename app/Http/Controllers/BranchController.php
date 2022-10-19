@@ -513,7 +513,7 @@ class BranchController extends Controller
         }
 
         // get all the privileged dealers under the person
-        $user_privileged_dealers = $user_data->privileged_dealers;
+        $user_privileged_dealers = explode(',',$user_data->privileged_dealers);
 
         $user_privilaged_dealer_last_login = 0;
 
@@ -525,12 +525,14 @@ class BranchController extends Controller
 
         $all_user_dealers = [];
 
-        return $user_privileged_dealers;
+        // return $user_privileged_dealers;
 
         if ($user_privileged_dealers != null) {
             $filter_users_priviledged_dealers_array = array_filter(
-                $user_privileged_dealers_array
+                $user_privileged_dealers
             );
+
+            // return $filter_users_priviledged_dealers_array;
 
             foreach ($filter_users_priviledged_dealers_array
                 as $user_privilaged_dealer) {
@@ -590,15 +592,9 @@ class BranchController extends Controller
             }
         }
 
-        return $all_user_dealers;
+        // return $all_user_dealers;
 
-        $user_privileged_dealers_format = str_replace(
-            '\"',
-            '',
-            $user_privilaged_dealer
-        );
-
-        $number_of_dealers = count($user_privileged_dealers_array);
+        $number_of_dealers = count($user_privileged_dealers);
 
         $last_loggedin_dealer_count = 0;
 

@@ -2247,7 +2247,7 @@ class AdminController extends Controller
 
         $start_timer = Carbon::createFromFormat(
             'Y-m-d H:s:i',
-            $start_date . ' ' . $start_time . ':00'
+            $start_date . ' ' . $start_time
         );
 
         $end_date = $active_countdown->end_countdown_date;
@@ -2255,7 +2255,7 @@ class AdminController extends Controller
 
         $end_timer = Carbon::createFromFormat(
             'Y-m-d H:s:i',
-            $end_date . ' ' . $end_time . ':00'
+            $end_date . ' ' . $end_time
         );
 
         $inital_end_timer = Carbon::parse(

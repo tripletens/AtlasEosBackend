@@ -1128,7 +1128,7 @@ Route::group(
 
         // fetch product summary by dealer_id
         Route::get(
-            '/product-summary/{dealer_id}',
+            '/product-summary/{uid}',
             'SummaryController@product_summary'
         );
 

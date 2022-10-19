@@ -25,26 +25,26 @@ class SummaryController extends Controller
         ];
     }
 
-    public function product_summary($uid)
+    public function product_summary($account_id)
     {
 
         // get the dealer details then use it to get the account id
-        $get_user_details = Users::find($uid);
+        // $get_user_details = Users::find($uid);
 
-        if (!$get_user_details) {
-            $this->result->status = true;
-            $this->result->status_code = 400;
-            $this->result->message =
-                'An error ocurred, User doesnt exist.';
-            return response()->json($this->result);
-        }
+        // if (!$get_user_details) {
+        //     $this->result->status = true;
+        //     $this->result->status_code = 400;
+        //     $this->result->message =
+        //         'An error ocurred, User doesnt exist.';
+        //     return response()->json($this->result);
+        // }
 
         // return $get_user_details;
-        $dealer_id = $get_user_details->account_id;
+        // $dealer_id = $get_user_details->account_id;
 
-        if ($dealer_id) {
+        // if ($dealer_id) {
             // get all the users under a dealer
-            $users = Users::where('account_id', $dealer_id)->where('role', '4')->where('account_id', '!=', null);
+            $users = Users::where('account_id', $account_id)->where('role', '4')->where('account_id', '!=', null);
 
             $res_data = [];
 
@@ -52,7 +52,7 @@ class SummaryController extends Controller
 
             $group = array();
 
-            if ($users) {
+            if ($users->count() > 0) {
                 // $fetch_all_users = $users->pluck('id')->toArray();
                 $fetch_all_users = $users->select('id', 'first_name', 'last_name', 'full_name')->get();
 
@@ -81,7 +81,7 @@ class SummaryController extends Controller
                 $this->result->message = 'Product summary fetched Successfully';
                 return response()->json($this->result);
             }
-        } else {
+         else {
             $this->result->status = false;
             $this->result->status_code = 422;
             $this->result->data = null;

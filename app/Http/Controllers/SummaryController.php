@@ -145,8 +145,10 @@ class SummaryController extends Controller
         $dealer = Users::where('id', $uid)->first();
         $vendor_array = [];
         #get all the dealers with account id orders
+
+        $dealer_account_id = $dealer->account_id;
         # get dealer orders with id
-        $dealer_orders_query = Cart::where('uid', $uid);
+        $dealer_orders_query = Cart::where('uid', $uid)->where('dealer',$dealer_account_id);
         # get the total price of items ordered by dealer
         $dealer_orders_total_sum = $dealer_orders_query->sum('price');
         # assign the dealer total price to the dealer

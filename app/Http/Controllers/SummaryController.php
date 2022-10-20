@@ -8,6 +8,7 @@ use App\Models\Users;
 use App\Models\Vendors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Products;
 
 class SummaryController extends Controller
 {
@@ -23,6 +24,39 @@ class SummaryController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function view_dealer_purchaser_summary($uid, $dealer, $vendor)
+    {
+        $cart_data = Cart::where('uid', $uid)
+            ->where('dealer', $dealer)
+            ->where('vendor', $vendor)
+            ->get();
+
+        $vendor_data = Vendors::where('vendor_code', $vendor)
+            ->get()
+            ->first();
+
+        foreach ($cart_data as $value) {
+            $pro_id = $value->product_id;
+
+            $pro_data = Products::where('id', $pro_id)
+                ->get()
+                ->first();
+            $value->description = $pro_data->description;
+        }
+
+        $data = [
+            'vendor_name' => $vendor_data->vendor_name,
+            'vendor_code' => $vendor_data->vendor_code,
+            'orders' => $cart_data,
+        ];
+
+        $this->result->status = true;
+        $this->result->data = $data;
+        $this->result->status_code = 200;
+        $this->result->message = 'View Dealer Purchasers Summary successfully';
+        return response()->json($this->result);
     }
 
     public function get_dealers_purchasers_summary($uid, $account_id)
@@ -58,8 +92,6 @@ class SummaryController extends Controller
             $curr_user = Users::where('id', $value)
                 ->get()
                 ->first();
-
-            /// return $car;
 
             $cart_user_level = [];
 

@@ -289,6 +289,45 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function get_dealers_privileged_dealers_switch($user)
+    {
+        $user_data = Users::where('id', $user)
+            ->get()
+            ->first();
+        $privileged_dealers = isset($user_data->privileged_dealers)
+            ? $user_data->privileged_dealers
+            : null;
+
+        global $dealer_code;
+
+        $dealer_code = $user_data->dealer_code;
+
+        $res_data = [];
+
+        if ($privileged_dealers != null) {
+            $expand = explode(',', $privileged_dealers);
+            array_unique($expand);
+
+            foreach ($expand as $value) {
+                if ($value != $dealer_code) {
+                    $dealer_data = Users::where('dealer_code', $value)
+                        ->get()
+                        ->first();
+                    if ($dealer_data) {
+                        array_push($res_data, $dealer_data);
+                    }
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'privileged dealers switch';
+        $this->result->data = $res_data;
+
+        return response()->json($this->result);
+    }
+
     public function get_dealers_privileged_dealers($user)
     {
         $user_data = Users::where('id', $user)

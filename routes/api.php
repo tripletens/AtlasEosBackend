@@ -499,6 +499,11 @@ Route::group(
             'DealerController@get_dealers_privileged_dealers'
         );
 
+        Route::get(
+            '/dealer/dealer-privileged-dealers-switch/{user}',
+            'DealerController@get_dealers_privileged_dealers_switch'
+        );
+
         Route::post(
             '/dealer/check-program-state',
             'DealerController@check_end_program'

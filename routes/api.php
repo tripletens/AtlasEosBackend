@@ -1143,6 +1143,12 @@ Route::group(
             'SummaryController@get_dealers_with_orders'
         );
 
+        // get dealer puschasers summary
+        Route::get(
+            '/dealer-purchasers-summary/{uid}/{account_id}',
+            'SummaryController@get_dealers_purchasers_summary'
+        );
+
         // fetch all the orders per branch per dealer
         Route::get(
             '/branch-dealers-orders/{uid}',

@@ -94,7 +94,7 @@ class SummaryController extends Controller
             array_push($user_level_data, $outer_user_level);
         }
 
-        return $user_level_data;
+        // return $user_level_data;
         // } else {
         //     /////// Supper Dealer
         // }

@@ -1,9 +1,13 @@
 
+@php
+set_time_limit(25000000000);
+@endphp
+
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 <link href="http://fonts.cdnfonts.com/css/verdana" rel="stylesheet">
-                
+
 
 <head>
     <title>Atlas Order Details</title>
@@ -11,7 +15,7 @@
 
 <style>
 
-   
+
 *{
     font-family: 'Verdana', sans-serif;
 }
@@ -181,8 +185,8 @@
     <div class="table-wrapper">
 
 
-     
-              
+
+
                 <div class="table-responsive">
                     <table class="">
                         <thead>
@@ -200,7 +204,7 @@
                         </thead>
 
                         @if (count($data) > 0)
-            
+
                         <tbody>
 
                             @foreach ($data as $item)
@@ -211,11 +215,11 @@
                                     <td class="table-value-custom center-text">
                                         {{ $item->atlas_id }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $item->vendor }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $item->description }}
                                     </td>
@@ -231,7 +235,7 @@
                                 </tr>
 
                             @endforeach
-            
+
                             <tr>
                                 <td colspan="6">
                                     <h5 class="each-total-cate-text" style="">
@@ -244,18 +248,18 @@
                                         {{ number_format( $grand_total, 2) }}</h5>
                                 </td>
                             </tr>
-            
+
                         </tbody>
                         @endif
                     </table>
                 </div>
-           
+
     </div>
 
- 
 
 
-{{-- 
+
+{{--
 
     @if (count($data) > 0)
     <div style="width: 100%; text-align: right; border: 1px solid gray; margin-top: 20px">
@@ -267,7 +271,7 @@
         </h5>
     </div>
 @endif --}}
- 
+
 
 
 

@@ -1,9 +1,11 @@
-
+@php
+    set_time_limit(25000000000);
+@endphp
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 <link href="http://fonts.cdnfonts.com/css/verdana" rel="stylesheet">
-                
+
 
 <head>
     <title>Atlas Order Details</title>
@@ -11,7 +13,7 @@
 
 <style>
 
-   
+
 *{
     font-family: 'Verdana', sans-serif;
 }
@@ -158,7 +160,7 @@
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name: No name found') }}  </h2>
                 @endif
 
-            
+
 
                 <h2 class="dealer-name">Date: {{ $printed_at }} (MST)</h2>
 
@@ -177,8 +179,8 @@
     <div class="table-wrapper">
 
 
-     
-              
+
+
                 <div class="table-responsive">
                     <table class="">
                         <thead>
@@ -195,7 +197,7 @@
                         </thead>
 
                         @if (count($data) > 0)
-            
+
                         <tbody>
 
                             @foreach ($data as $item)
@@ -206,32 +208,32 @@
                                     <td class="table-value-custom center-text">
                                         {{ $item->description }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $item->vendor_no }}
                                     </td>
-            
+
                                     <td class="table-value-custom center-text">
                                         {{ $item->vendor_name }}
                                     </td>
                                     <td class="table-value-custom right-align">
                                         {{ $item->full_name }}
                                     </td>
-                                  
+
                                 </tr>
 
                             @endforeach
-            
-                        
-            
+
+
+
                         </tbody>
                         @endif
                     </table>
                 </div>
-           
+
     </div>
 
- 
+
 
 
 

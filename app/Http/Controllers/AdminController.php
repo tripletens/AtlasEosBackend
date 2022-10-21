@@ -53,14 +53,14 @@ use App\Models\Bucks;
 // use App\Models\PromotionalCategory;
 
 // use Barryvdh\DomPDF\Facade as PDF;
-set_time_limit(25000000);
+set_time_limit(250000000000);
 
 class AdminController extends Controller
 {
     public function __construct()
     {
         // set timeout limit
-        set_time_limit(25000000);
+        set_time_limit(2500000000);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,
@@ -2246,16 +2246,18 @@ class AdminController extends Controller
         $start_date = $active_countdown->start_countdown_date;
 
         $start_timer = Carbon::createFromFormat(
-            'Y-m-d H:s:i',
-            $start_date . ' ' . $start_time . ':00'
+            'Y-m-d H:i',
+            $start_date . ' ' . $start_time
         );
+
+        // return $active_countdown;
 
         $end_date = $active_countdown->end_countdown_date;
         $end_time = $active_countdown->end_countdown_time;
 
         $end_timer = Carbon::createFromFormat(
-            'Y-m-d H:s:i',
-            $end_date . ' ' . $end_time . ':00'
+            'Y-m-d H:i',
+            $end_date . ' ' . $end_time
         );
 
         $inital_end_timer = Carbon::parse(

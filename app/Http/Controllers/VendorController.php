@@ -1880,8 +1880,8 @@ class VendorController extends Controller
 
     public function view_dealer_purchaser_summary($user, $dealer, $vendor)
     {
-        $dealer_cart = Cart::where('uid', $user)
-            ->where('vendor', $vendor)
+        $dealer_cart = Cart::where('vendor', $vendor)
+            ->where('dealer', $dealer)
             ->orderBy('product_id', 'asc')
             ->get();
 
@@ -1890,9 +1890,9 @@ class VendorController extends Controller
         $vendor_data = Vendors::where('vendor_code', $vendor)
             ->get()
             ->first();
-        $dealer_data = Users::where('id', $user)
-            ->get()
-            ->first();
+        // $dealer_data = Users::where('id', $user)
+        //     ->get()
+        //     ->first();
 
         $dealer = Dealer::where('dealer_code', $dealer)
             ->get()
@@ -1901,19 +1901,21 @@ class VendorController extends Controller
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
+                $unit_price = $value->unit_price;
+
                 $pro_data = Products::where('atlas_id', $atlas_id)
                     ->get()
                     ->first();
 
                 $data = [
                     'id' => $pro_data->id,
-                    'dealer_rep_name' =>
-                        $dealer_data->full_name . ' ' . $dealer_data->last_name,
-                    'user_id' => $user,
+                    // 'dealer_rep_name' =>
+                    //     $dealer_data->full_name . ' ' . $dealer_data->last_name,
+                    //  'user_id' => $user,
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
+                    'special' => $unit_price,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
                     'dealer_name' => $dealer->dealer_name,
@@ -1931,7 +1933,7 @@ class VendorController extends Controller
         $this->result->message = 'View Dealer Summary';
         $this->result->data->summary = $res_data;
         $this->result->data->vendor = $vendor_data;
-        $this->result->data->dealer = $dealer_data;
+        $this->result->data->dealer = $dealer;
 
         return response()->json($this->result);
     }
@@ -1958,6 +1960,8 @@ class VendorController extends Controller
         if ($dealer_cart) {
             foreach ($dealer_cart as $value) {
                 $atlas_id = $value->atlas_id;
+                $unit_price = $value->unit_price;
+
                 $pro_data = Products::where('atlas_id', $atlas_id)
                     ->get()
                     ->first();
@@ -1968,7 +1972,7 @@ class VendorController extends Controller
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->booking,
+                    'special' => $pro_data->unit_price,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
                     'dealer_name' => $dealer->dealer_name,
@@ -2555,6 +2559,8 @@ class VendorController extends Controller
                     'last_name' => $value['last_name'],
                     'full_name' => $value['full_name'],
                     'email' => $value['email'],
+                    'company' => $value['dealer_name'],
+
                     'notification' => $count_notification,
                 ];
 
@@ -2684,7 +2690,11 @@ class VendorController extends Controller
 
         // return $vendor_details;
 
-        $all_priviledged_vendor_code_array = array_filter(explode(',', $vendor_details[0]->privileged_vendors));
+        $all_priviledged_vendor_code_array = array_filter(
+            explode(',', $vendor_details[0]->privileged_vendors)
+        );
+
+        // return $all_priviledged_vendor_code_array;
 
         $new_all_orders = array_map(function ($vendor_code) {
             // $settings_id = 1;

@@ -499,6 +499,11 @@ Route::group(
             'DealerController@get_dealers_privileged_dealers'
         );
 
+        Route::get(
+            '/dealer/dealer-privileged-dealers-switch/{user}',
+            'DealerController@get_dealers_privileged_dealers_switch'
+        );
+
         Route::post(
             '/dealer/check-program-state',
             'DealerController@check_end_program'
@@ -660,6 +665,11 @@ Route::group(
         Route::post(
             '/dealer/save-item-to-cart',
             'DealerController@save_item_cart'
+        );
+
+        Route::get(
+            '/dealer/get-item-by-atlas-vendor-code/{code}',
+            'DealerController@get_fetch_by_vendor_atlas_quick_order'
         );
 
         Route::get(
@@ -1136,6 +1146,18 @@ Route::group(
         Route::get(
             '/dealer-product-summary/{uid}',
             'SummaryController@get_dealers_with_orders'
+        );
+
+        // get dealer puschasers summary
+        Route::get(
+            '/dealer-purchasers-summary/{uid}/{account_id}',
+            'SummaryController@get_dealers_purchasers_summary'
+        );
+
+        // View dealer puschasers summary
+        Route::get(
+            '/view-dealer-purchasers-summary/{uid}/{account_id}/{vendor}',
+            'SummaryController@view_dealer_purchaser_summary'
         );
 
         // fetch all the orders per branch per dealer

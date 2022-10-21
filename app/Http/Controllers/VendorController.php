@@ -1608,7 +1608,9 @@ class VendorController extends Controller
                                 ? $dealership_db->dealer_name
                                 : null,
                             'qty' => $qty,
-                            'account_id' => $dealer_db->account_id,
+                            'account_id' => isset($dealership_db->dealer_code)
+                                ? $dealership_db->dealer_code
+                                : null,
                             'user' =>
                                 $dealer_db->first_name .
                                 ' ' .

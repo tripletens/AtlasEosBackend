@@ -1591,13 +1591,22 @@ class VendorController extends Controller
                         ->get()
                         ->first();
 
+                    $dealership_db = Dealer::where(
+                        'dealer_code',
+                        $value->dealer
+                    )
+                        ->get()
+                        ->first();
+
                     $price = $value->price;
                     $total_atlas_product += $qty;
 
                     if ($dealer_db) {
                         $data = [
                             'atlas_id' => $value->atlas_id,
-                            'dealer_name' => $dealer_db->company_name,
+                            'dealer_name' => isset($dealership_db->dealer_name)
+                                ? $dealership_db->dealer_name
+                                : null,
                             'qty' => $qty,
                             'account_id' => $dealer_db->account_id,
                             'user' =>

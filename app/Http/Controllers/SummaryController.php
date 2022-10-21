@@ -56,7 +56,6 @@ class SummaryController extends Controller
             if ($users->count() > 0) {
                 // $fetch_all_users = $users->pluck('id')->toArray();
                 $fetch_all_users = $users->select('id','account_id','first_name', 'last_name', 'full_name')->get();
-
                 // return $fetch_all_users;
 
                 foreach ($fetch_all_users as $user) {
@@ -69,6 +68,19 @@ class SummaryController extends Controller
                         ->distinct('vendors.vendor_code')
                         ->get();
                     $user->all_vendors = $user->vendors->groupBy('vendor_code');
+
+                    // `full_name`, `first_name`, `last_name`, `email`, `password`, `password_show`,
+                    //  `role`, `role_name`, `dealer_name`, `dealer_code`, `vendor_code`,
+                    $user->ordered_by = $cart_items->join('users','users.id', '=', 'cart.uid')
+                        ->select('users.full_name as user_full_name',
+                            'users.first_name as user_first_name','users.last_name as user_last_name',
+                            'users.email as user_email', 'users.dealer_name as user_dealer_name','cart.*')
+                        ->get()->groupBy('user_full_name');
+                    
+                    // ;
+
+
+                    // $users->products_order_by = $use
                     // $user->total_price = $cart_items->sum('price');
                     // $user->vendors = $group;
                 }

@@ -29,7 +29,7 @@ class SummaryController extends Controller
     public function view_dealer_purchaser_summary($uid, $dealer, $vendor)
     {
         $cart_data = Cart::where('uid', $uid)
-            // ->where('dealer', $dealer)
+            ->where('dealer', $dealer)
             ->where('vendor', $vendor)
             ->get();
 

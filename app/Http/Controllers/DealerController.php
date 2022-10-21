@@ -698,13 +698,31 @@ class DealerController extends Controller
                             ->where('atlas_id', $product->atlas_id)
                             ->exists()
                     ) {
-                        Cart::where('dealer', $product->dealer)
+                        $curr = Cart::where('dealer', $product->dealer)
                             ->where('atlas_id', $product->atlas_id)
-                            ->update([
-                                'unit_price' => $product->unit_price,
-                                'price' => $product->price,
-                                'qty' => $product->qty,
-                            ]);
+                            ->get()
+                            ->first();
+
+                        $db_qty = $curr->qty;
+
+                        if ($db_qty == $product->qty) {
+                            Cart::where('dealer', $product->dealer)
+                                ->where('atlas_id', $product->atlas_id)
+                                ->update([
+                                    'unit_price' => $product->unit_price,
+                                    'price' => $product->price,
+                                    'qty' => $product->qty,
+                                ]);
+                        } else {
+                            Cart::where('dealer', $product->dealer)
+                                ->where('atlas_id', $product->atlas_id)
+                                ->update([
+                                    'unit_price' => $product->unit_price,
+                                    'price' => $product->price,
+                                    'qty' => $product->qty,
+                                    'uid' => $uid,
+                                ]);
+                        }
                     } else {
                     }
                 }

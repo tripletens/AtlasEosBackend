@@ -95,39 +95,27 @@ class SummaryController extends Controller
 
             $cart_user_level = [];
 
-            foreach ($car as $ass) {
-                $vendor = $ass->vendor;
+            if ($car) {
+                foreach ($car as $ass) {
+                    $vendor = $ass->vendor;
 
-                $total = Cart::where('uid', $value)
-                    ->where('dealer', $account_id)
-                    ->where('vendor', $vendor)
-                    ->sum('price');
+                    $total = Cart::where('uid', $value)
+                        ->where('dealer', $account_id)
+                        ->where('vendor', $vendor)
+                        ->sum('price');
 
-                $vendor_data = Vendors::where('vendor_code', $vendor)
-                    ->get()
-                    ->first();
+                    $vendor_data = Vendors::where('vendor_code', $vendor)
+                        ->get()
+                        ->first();
 
-                if ($total) {
                     $vendor_levels = [
                         'vendor_name' => $vendor_data->vendor_name,
                         'vendor_code' => $vendor_data->vendor_code,
                         'total' => $total,
                     ];
-                } else {
-                    $vendor_levels = [
-                        'vendor_name' => $vendor_data->vendor_name,
-                        'vendor_code' => $vendor_data->vendor_code,
-                        'total' => 0,
-                    ];
+
+                    array_push($cart_user_level, $vendor_levels);
                 }
-
-                // $vendor_levels = [
-                //     'vendor_name' => $vendor_data->vendor_name,
-                //     'vendor_code' => $vendor_data->vendor_code,
-                //     'total' => $total,
-                // ];
-
-                array_push($cart_user_level, $vendor_levels);
             }
 
             $outer_user_level = [

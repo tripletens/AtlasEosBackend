@@ -1604,7 +1604,9 @@ class VendorController extends Controller
                     if ($dealer_db) {
                         $data = [
                             'atlas_id' => $value->atlas_id,
-                            'dealer_name' => $dealership_db->dealer_name,
+                            'dealer_name' => isset($dealership_db->dealer_name)
+                                ? $dealership_db->dealer_name
+                                : null,
                             'qty' => $qty,
                             'account_id' => $dealer_db->account_id,
                             'user' =>

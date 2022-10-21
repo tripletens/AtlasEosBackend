@@ -107,11 +107,25 @@ class SummaryController extends Controller
                     ->get()
                     ->first();
 
-                $vendor_levels = [
-                    'vendor_name' => $vendor_data->vendor_name,
-                    'vendor_code' => $vendor_data->vendor_code,
-                    'total' => $total,
-                ];
+                if ($total) {
+                    $vendor_levels = [
+                        'vendor_name' => $vendor_data->vendor_name,
+                        'vendor_code' => $vendor_data->vendor_code,
+                        'total' => $total,
+                    ];
+                } else {
+                    $vendor_levels = [
+                        'vendor_name' => $vendor_data->vendor_name,
+                        'vendor_code' => $vendor_data->vendor_code,
+                        'total' => 0,
+                    ];
+                }
+
+                // $vendor_levels = [
+                //     'vendor_name' => $vendor_data->vendor_name,
+                //     'vendor_code' => $vendor_data->vendor_code,
+                //     'total' => $total,
+                // ];
 
                 array_push($cart_user_level, $vendor_levels);
             }

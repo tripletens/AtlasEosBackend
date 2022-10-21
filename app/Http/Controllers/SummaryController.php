@@ -155,6 +155,7 @@ class SummaryController extends Controller
         // $dealer_id = $get_user_details->account_id;
 
         // if ($dealer_id) {
+        
         // get all the users under a dealer
         $users = Users::where('account_id', $account_id)
             ->where('role', '4')
@@ -198,6 +199,12 @@ class SummaryController extends Controller
                 $user->all_vendors = $user->vendors->groupBy('vendor_code');
                 // $user->total_price = $cart_items->sum('price');
                 // $user->vendors = $group;
+                
+                $user->ordered_by = $cart_items->join('users','users.id', '=', 'cart.uid')
+                        ->select('users.full_name as user_full_name',
+                            'users.first_name as user_first_name','users.last_name as user_last_name',
+                            'users.email as user_email', 'users.dealer_name as user_dealer_name','cart.*')
+                        ->get()->groupBy('user_full_name');
             }
 
             foreach ($user->vendors as $vendor) {

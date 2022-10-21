@@ -72,8 +72,21 @@ class SummaryController extends Controller
         $uid_arr = [];
 
         $cart_dealer = Cart::where('dealer', $account_id)->get();
+
+        $related_user = Users::select('id')
+            ->where('dealer_code', $account_id)
+            ->get();
+
         foreach ($cart_dealer as $value) {
-            $uid = $value->uid;
+            $uid = strval($value->uid);
+
+            if (!in_array($uid, $uid_arr)) {
+                array_push($uid_arr, $uid);
+            }
+        }
+
+        foreach ($related_user as $value) {
+            $uid = $value->id;
 
             if (!in_array($uid, $uid_arr)) {
                 array_push($uid_arr, $uid);

@@ -84,9 +84,11 @@ class AdminController extends Controller
 
     public function deactivate_dealer_dashboard()
     {
-        $switch_state = Users::where('role', '4')->update([
-            'dash_activate' => 0,
-        ]);
+        $switch_state = Users::where('role', '4')
+            ->orWhere('role', '1')
+            ->update([
+                'dash_activate' => 0,
+            ]);
 
         if ($switch_state) {
             $this->result->status = true;
@@ -104,9 +106,11 @@ class AdminController extends Controller
 
     public function activate_dealer_dashboard()
     {
-        $switch_state = Users::where('role', '4')->update([
-            'dash_activate' => 1,
-        ]);
+        $switch_state = Users::where('role', '4')
+            ->orWhere('role', '1')
+            ->update([
+                'dash_activate' => 1,
+            ]);
 
         if ($switch_state) {
             $this->result->status = true;

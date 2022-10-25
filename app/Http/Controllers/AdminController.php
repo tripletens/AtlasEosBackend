@@ -82,6 +82,46 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function deactivate_dealer_dashboard()
+    {
+        $switch_state = Users::where('role', '4')->update([
+            'dash_activate' => 0,
+        ]);
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message =
+                'Deactivate dealer dashboard was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function activate_dealer_dashboard()
+    {
+        $switch_state = Users::where('role', '4')->update([
+            'dash_activate' => 1,
+        ]);
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message =
+                'Activate dealer dashboard was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function get_each_show_buck($id)
     {
         $fetch_show_bucks = Bucks::where('id', $id)

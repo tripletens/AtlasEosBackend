@@ -63,7 +63,7 @@ class DealerController extends Controller
 
     public function dealer_dashboard_state()
     {
-        $first_dealer = User::where('role', '4')
+        $first_dealer = Users::where('role', '4')
             ->get()
             ->first();
 

@@ -61,6 +61,19 @@ class DealerController extends Controller
         ];
     }
 
+    public function dealer_dashboard_state()
+    {
+        $first_dealer = User::where('role', '4')
+            ->get()
+            ->first();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $first_dealer;
+        $this->result->message = 'Dealer Dashboard State';
+        return response()->json($this->result);
+    }
+
     public function generate_special_order_pdf($dealer, $lang, $current_time)
     {
         // $check_special_order_exists = SpecialOrder::where(

@@ -485,6 +485,11 @@ Route::group(
         Route::get('/dealer-faqs', 'DealerController@dealer_faq');
 
         Route::get(
+            '/dealer/dealer-dashboard-state',
+            'DealerController@dealer_dashboard_state'
+        );
+
+        Route::get(
             '/vendor/get-all-admin-users/{user}',
             'VendorController@get_all_admin_users'
         );

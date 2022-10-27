@@ -49,6 +49,7 @@ class ChatController extends Controller
                         'first_name' => $user_data->first_name,
                         'last_name' => $user_data->last_name,
                         'email' => $user_data->email,
+                        'company' => $user_data->company_name,
                     ];
 
                     array_push($res_data, $data);

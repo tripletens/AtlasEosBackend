@@ -1983,7 +1983,7 @@ class VendorController extends Controller
                     'qty' => $value->qty,
                     'atlas_id' => $atlas_id,
                     'vendor_product_code' => $pro_data->vendor_product_code,
-                    'special' => $pro_data->unit_price,
+                    'special' => $value->unit_price,
                     'desc' => $pro_data->description,
                     'total' => $value->price,
                     'dealer_name' => $dealer->dealer_name,

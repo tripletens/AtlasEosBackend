@@ -4170,8 +4170,11 @@ class AdminController extends Controller
                 $password = bcrypt($value[4]);
                 $password_show = $value[4];
                 $email = strtolower($value[5]);
-                $privilege_vendors = $value[6];
-                $privilege_dealers = $value[7];
+                //  $privilege_vendors = $value[6];
+                $privilege_dealers = $value[6];
+
+                $phone = isset($value[7]) ? $value[7] : null;
+                $location = isset($value[8]) ? $value[8] : null;
 
                 $full_name = $first_name . ' ' . $last_name;
                 $role = '4';
@@ -4194,6 +4197,9 @@ class AdminController extends Controller
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
+
+                        'phone' => $phone,
+                        'location' => $location,
                     ]);
                 }
 

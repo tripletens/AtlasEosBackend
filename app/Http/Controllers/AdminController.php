@@ -4411,51 +4411,53 @@ class AdminController extends Controller
         if ($csv == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
-            $this->result->message = 'Please upload dealer in csv format';
+            $this->result->message = 'Please upload dealer in excel format';
             return response()->json($this->result);
         }
 
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
-            array_shift($csv_data);
-            // remove the first row of the csv
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
 
-            foreach ($csv_data as $key => $value) {
-                $dealer_code = trim($value[0]);
-                $dealer_name = trim($value[1]);
-                $location = trim($value[2]);
-                $role_name = 'dealer';
-                $role_id = '4';
+            foreach ($row_range as $row) {
+                $save_product = Dealer::create([
+                    'dealer_name' => $sheet->getCell('A' . $row)->getValue(),
+                    'role_name' => 'dealer',
+                    'dealer_code' => $sheet->getCell('B' . $row)->getValue(),
+                    'location' => $sheet->getCell('C' . $row)->getValue(),
+                    'role' => 'dealer',
+                    'role_id' => '4',
+                ]);
 
-                if (!Dealer::where('dealer_code', $dealer_code)->exists()) {
-                    $save_dealer = Dealer::create([
-                        'dealer_name' => $dealer_name,
-                        'dealer_code' => $dealer_code,
-                        'location' => $location,
-                        'role_name' => $role_name,
-                        'role_id' => $role_id,
-                    ]);
-
-                    if (!$save_dealer) {
-                        $this->result->status = false;
-                        $this->result->status_code = 422;
-                        $this->result->message =
-                            'Sorry File could not be uploaded. Try again later.';
-                        return response()->json($this->result);
-                    }
+                if (!$save_product) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
                 }
+
+                $startcount++;
             }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Dealer uploaded successfully';
         return response()->json($this->result);
-        fclose($file);
     }
 
     public function get_vendor_user($id)
@@ -4854,49 +4856,65 @@ class AdminController extends Controller
         if ($csv == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
-            $this->result->message = 'Please upload dealers in csv format';
+            $this->result->message = 'Please upload dealers in excel format';
             return response()->json($this->result);
         }
 
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
-            array_shift($csv_data);
-            // remove the first row of the csv
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
 
-            foreach ($csv_data as $key => $value) {
-                // `full_name`, `first_name`, `last_name`, `email`, `password`,
-                // `password_show`, `role`, `role_name`, `dealer`, `vendor`,
-                // `vendor_name`, `privileged_vendors`, `username`, `account_id`,
-                // `phone`, `status`, `order_status`, `location`, `company_name`,
-                // `last_login`,`login_device`, `place_order_date`, `created_at`,
-                // `updated_at`
-                $vendor_name = $value[0];
-                $username = $value[1];
-                $first_name = $value[2];
-                $password = bcrypt($value[3]);
-                // $password = bcrypt($value[4]);
-                $password_show = $value[3];
-                $privilege_vendors = $value[4];
-                $email = strtolower($value[5]);
-                $vendor_code = $value[7];
-                $role = '3';
-                $role_name = 'vendor';
+            ///return $row_range;
 
-                if (Users::where('email', $email)->exists()) {
-                } else {
+            foreach ($row_range as $row) {
+                ////return $startcount;
+
+                // if ($startcount > $row_limit) {
+
+                $email = strtolower($sheet->getCell('F' . $row)->getValue());
+
+                if (!Users::where('email', $email)->exists()) {
+                    $vendor_name = $sheet->getCell('A' . $row)->getValue();
+                    $full_name = $sheet->getCell('C' . $row)->getValue();
+
+                    $exp = explode(' ', $full_name);
+                    $last_name = isset($exp[1]) ? $exp[1] : null;
+
+                    $first_name = $sheet->getCell('C' . $row)->getValue();
+
+                    $password = bcrypt($sheet->getCell('D' . $row)->getValue());
+                    // $password = bcrypt($value[4]);
+                    $password_show = $sheet->getCell('D' . $row)->getValue();
+
+                    $privilege_vendors = $sheet
+                        ->getCell('E' . $row)
+                        ->getValue();
+
+                    if (strval($privilege_vendors[-1]) != ',') {
+                        $privilege_vendors = $privilege_vendors . ',';
+                    }
+
+                    $vendor_code = $sheet->getCell('H' . $row)->getValue();
+
+                    $role = '3';
+                    $role_name = 'vendor';
+
                     $save_users = Users::create([
-                        'full_name' => $first_name,
+                        'full_name' => $full_name,
                         'first_name' => $first_name,
+                        'last_name' => $last_name,
                         'email' => $email,
                         'password' => $password,
                         'password_show' => $password_show,
                         'role' => $role,
                         'role_name' => $role_name,
-                        // 'vendor' => $vendor,
                         'vendor_name' => $vendor_name,
                         'privileged_vendors' => $privilege_vendors,
                         'username' => $email,
@@ -4912,14 +4930,23 @@ class AdminController extends Controller
                         return response()->json($this->result);
                     }
                 }
+
+                // }
+
+                $startcount++;
             }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Vendor Users uploaded successfully';
         return response()->json($this->result);
-        fclose($file);
     }
 
     public function register_vendors(Request $request)
@@ -5068,7 +5095,7 @@ class AdminController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'Vendors uploaded successfully';
         return response()->json($this->result);
-        fclose($file);
+        //// fclose($file);
     }
 
     public function upload_dealeship(Request $request)

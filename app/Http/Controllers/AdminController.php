@@ -5029,19 +5029,21 @@ class AdminController extends Controller
                 $vendor_id = $value[1];
                 $role = 3;
 
-                $save_product = Vendors::create([
-                    'vendor_name' => $vendor_name,
-                    'role_name' => 'vendor',
-                    'vendor_code' => $vendor_id,
-                    'role' => $role,
-                ]);
+                if (!Vendors::where('vendor_code', $vendor_id)->exists()) {
+                    $save_product = Vendors::create([
+                        'vendor_name' => $vendor_name,
+                        'role_name' => 'vendor',
+                        'vendor_code' => $vendor_id,
+                        'role' => $role,
+                    ]);
 
-                if (!$save_product) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_product) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
             }
         }

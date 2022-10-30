@@ -4155,38 +4155,50 @@ class AdminController extends Controller
         if ($csv == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
-            $this->result->message = 'Please upload dealer in csv format';
+            $this->result->message = 'Please upload dealer in excel format';
             return response()->json($this->result);
         }
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
-            array_shift($csv_data);
-            // remove the first row of the csv
 
-            foreach ($csv_data as $key => $value) {
-                $dealer_code = $value[0];
-                $dealer_name = $value[1];
-                $first_name = strtolower($value[2]);
-                $last_name = strtolower($value[3]);
-                $password = bcrypt($value[4]);
-                $password_show = $value[4];
-                $email = strtolower($value[5]);
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $dealer_code = $sheet->getCell('A' . $row)->getValue();
+                $dealer_name = $sheet->getCell('B' . $row)->getValue();
+                $first_name = strtolower(
+                    $sheet->getCell('C' . $row)->getValue()
+                );
+                $last_name = strtolower(
+                    $sheet->getCell('D' . $row)->getValue()
+                );
+                $password = bcrypt($sheet->getCell('E' . $row)->getValue());
+                $password_show = $sheet->getCell('E' . $row)->getValue();
+                $email = strtolower($sheet->getCell('F' . $row)->getValue());
                 //  $privilege_vendors = $value[6];
-                $privilege_dealers = $value[6];
 
-                $phone = isset($value[7]) ? $value[7] : null;
-                $location = isset($value[8]) ? $value[8] : null;
+                $privilege_dealers = $sheet->getCell('G' . $row)->getValue();
+
+                if (strval($privilege_dealers[-1]) != ',') {
+                    $privilege_dealers = $privilege_dealers . ',';
+                }
+
+                $phone = $sheet->getCell('H' . $row)->getValue();
+
+                $location = $sheet->getCell('I' . $row)->getValue();
 
                 $full_name = $first_name . ' ' . $last_name;
                 $role = '4';
                 $role_name = 'dealer';
 
-                if (Users::where('email', $email)->exists()) {
-                } else {
+                if (!Users::where('email', $email)->exists()) {
                     $save_dealer = Users::create([
                         'first_name' => $first_name,
                         'last_name' => $last_name,
@@ -4197,7 +4209,7 @@ class AdminController extends Controller
                         'role' => $role,
                         'role_name' => $role_name,
                         'dealer_name' => $dealer_name,
-                        'privileged_vendors' => $privilege_vendors,
+                        // 'privileged_vendors' => $privilege_vendors,
                         'privileged_dealers' => $privilege_dealers,
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
@@ -4208,21 +4220,28 @@ class AdminController extends Controller
                     ]);
                 }
 
-                // if (!$save_dealer) {
-                //     $this->result->status = false;
-                //     $this->result->status_code = 422;
-                //     $this->result->message =
-                //         'Sorry File could not be uploaded. Try again later.';
-                //     return response()->json($this->result);
-                // }
+                if (!$save_dealer) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
+                }
+
+                $startcount++;
             }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Dealer uploaded successfully';
+        $this->result->message = 'Dealer users uploaded successfully';
         return response()->json($this->result);
-        fclose($file);
     }
 
     public function edit_vendor_user_data(Request $request)

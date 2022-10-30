@@ -4170,8 +4170,11 @@ class AdminController extends Controller
                 $password = bcrypt($value[4]);
                 $password_show = $value[4];
                 $email = strtolower($value[5]);
-                $privilege_vendors = $value[6];
-                $privilege_dealers = $value[7];
+                //  $privilege_vendors = $value[6];
+                $privilege_dealers = $value[6];
+
+                $phone = isset($value[7]) ? $value[7] : null;
+                $location = isset($value[8]) ? $value[8] : null;
 
                 $full_name = $first_name . ' ' . $last_name;
                 $role = '4';
@@ -4194,6 +4197,9 @@ class AdminController extends Controller
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
+
+                        'phone' => $phone,
+                        'location' => $location,
                     ]);
                 }
 
@@ -5023,19 +5029,21 @@ class AdminController extends Controller
                 $vendor_id = $value[1];
                 $role = 3;
 
-                $save_product = Vendors::create([
-                    'vendor_name' => $vendor_name,
-                    'role_name' => 'vendor',
-                    'vendor_code' => $vendor_id,
-                    'role' => $role,
-                ]);
+                if (!Vendors::where('vendor_code', $vendor_id)->exists()) {
+                    $save_product = Vendors::create([
+                        'vendor_name' => $vendor_name,
+                        'role_name' => 'vendor',
+                        'vendor_code' => $vendor_id,
+                        'role' => $role,
+                    ]);
 
-                if (!$save_product) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_product) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
             }
         }

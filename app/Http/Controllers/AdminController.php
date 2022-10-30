@@ -5020,7 +5020,7 @@ class AdminController extends Controller
             // remove the first row of the csv
             foreach ($csv_data as $key => $value) {
                 $vendor_name = $value[0];
-                $vendor_id = $value[2];
+                $vendor_id = $value[1];
                 $role = 3;
 
                 $save_product = Vendors::create([

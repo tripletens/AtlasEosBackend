@@ -17,6 +17,11 @@ use App\Models\Vendors;
 use App\Models\Faq;
 use App\Models\Seminar;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 // use Maatwebsite\Excel\Facades\Excel;
 // use App\Imports\ProductsImport;
 // use App\Http\Helpers;
@@ -5016,25 +5021,28 @@ class AdminController extends Controller
             return response()->json($this->result);
         }
 
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
-            array_shift($csv_data);
-            // remove the first row of the csv
-            foreach ($csv_data as $key => $value) {
-                $vendor_name = $value[0];
-                $vendor_id = $value[1];
-                $role = 3;
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
 
-                if (!Vendors::where('vendor_code', $vendor_id)->exists()) {
+            foreach ($row_range as $row) {
+                if ($startcount > $row_limit) {
                     $save_product = Vendors::create([
-                        'vendor_name' => $vendor_name,
+                        'vendor_name' => $sheet
+                            ->getCell('B' . $row)
+                            ->getValue(),
                         'role_name' => 'vendor',
-                        'vendor_code' => $vendor_id,
-                        'role' => $role,
+                        'vendor_code' => $sheet
+                            ->getCell('A' . $row)
+                            ->getValue(),
+                        'role' => 'vendor',
                     ]);
 
                     if (!$save_product) {
@@ -5045,7 +5053,15 @@ class AdminController extends Controller
                         return response()->json($this->result);
                     }
                 }
+
+                $startcount++;
             }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
         }
 
         $this->result->status = true;

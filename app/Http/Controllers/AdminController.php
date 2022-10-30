@@ -61,9 +61,9 @@ class AdminController extends Controller
     {
         // set timeout limit
         set_time_limit(2500000000);
-        $this->middleware('auth:api', [
-            'except' => ['login', 'register', 'test'],
-        ]);
+        // $this->middleware('auth:api', [
+        //     'except' => ['login', 'register', 'test'],
+        // ]);
 
         $this->result = (object) [
             'status' => false,
@@ -3263,18 +3263,21 @@ class AdminController extends Controller
             foreach ($csv_data as $key => $value) {
                 # code...
                 $name = $value[0];
-                // $desgination = $value[1];
+                $desgination = $value[1];
                 $email = $value[2];
-                $access_level_first = $value[4];
-                $access_level_second = $value[5];
-                $password = bcrypt($value[6]);
-                $password_show = $value[6];
-                $region = $value[7];
+
+                $access_level_first = isset($value[4]) ? $value[4] : null;
+                // $access_level_second = $value[5];
+
+                $password = bcrypt($value[5]);
+                $password_show = $value[5];
+
+                // $region = $value[7];
                 $extra_name = explode(' ', $name);
                 $first_name = $extra_name[0];
                 // $last_name = is_empty($extra_name[1]) ? '' : $extra_name[1];
                 $role = 0;
-                $role_name = $value[3];
+                $role_name = $value[1];
 
                 if (strtolower($role_name) == 'super admin') {
                     $role = 1;
@@ -3315,10 +3318,10 @@ class AdminController extends Controller
                         'role_name' => $role_name,
                         'role' => $role,
                         'access_level_first' => $access_level_first,
-                        'access_level_second' => $access_level_second,
+                        // 'access_level_second' => $access_level_second,
                         'password' => $password,
                         'password_show' => $password_show,
-                        'region' => $region,
+                        // 'region' => $region,
                     ]);
 
                     if (!$save_admin) {

@@ -3252,77 +3252,67 @@ class AdminController extends Controller
         if ($csv == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
-            $this->result->message = 'Please upload dealer in csv format';
+            $this->result->message = 'Please upload dealer in excel format';
             return response()->json($this->result);
         }
 
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
-            array_shift($csv_data);
-            // remove the first row of the csv
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
 
-            foreach ($csv_data as $key => $value) {
-                # code...
-                $name = $value[0];
-                $desgination = $value[1];
-                $email = $value[2];
+            foreach ($row_range as $row) {
+                $full_name = strtolower(
+                    $sheet->getCell('A' . $row)->getValue()
+                );
 
-                $access_level_first = isset($value[4]) ? $value[4] : null;
-                // $access_level_second = $value[5];
+                $exp = explode(' ', $full_name);
 
-                $password = bcrypt($value[5]);
-                $password_show = $value[5];
+                $first_name = $exp[0];
+                $last_name = $exp[1];
 
-                // $region = $value[7];
-                $extra_name = explode(' ', $name);
-                $first_name = $extra_name[0];
-                // $last_name = is_empty($extra_name[1]) ? '' : $extra_name[1];
+                $password = bcrypt($sheet->getCell('F' . $row)->getValue());
+                $password_show = $sheet->getCell('F' . $row)->getValue();
+                $email = strtolower($sheet->getCell('C' . $row)->getValue());
+                $designation = $sheet->getCell('B' . $row)->getValue();
+                $access = $sheet->getCell('E' . $row)->getValue();
+
                 $role = 0;
-                $role_name = $value[1];
-
-                if (strtolower($role_name) == 'super admin') {
+                if (strtolower($designation) == 'admin') {
                     $role = 1;
                 }
 
-                if (strtolower($role_name) == 'admin') {
+                if (strtolower($designation) == 'admin') {
                     $role = 7;
                 }
 
-                if (strtolower($role_name) == 'branch manager') {
+                if (strtolower($designation) == 'branch manager') {
                     $role = 2;
                 }
 
-                if (strtolower($role_name) == 'vendor') {
-                    $role = 3;
-                }
-
-                if (strtolower($role_name) == 'dealer') {
-                    $role = 4;
-                }
-                if (strtolower($role_name) == 'inside sales') {
+                if (strtolower($designation) == 'inside sales') {
                     $role = 5;
                 }
-
-                if (strtolower($role_name) == 'outside sales') {
+                if (strtolower($designation) == 'outside sales') {
                     $role = 6;
                 }
 
-                if (Users::where('email', $email)->exists()) {
-                    // post with the same slug already exists
-                } else {
+                if (!Users::where('email', $email)->exists()) {
                     $save_admin = Users::create([
                         'first_name' => $first_name,
-                        ////'last_name' => $last_name,
-                        'full_name' => $name,
-                        'designation' => $role_name,
+                        'last_name' => $last_name,
+                        'full_name' => $full_name,
+                        'designation' => $designation,
                         'email' => $email,
-                        'role_name' => $role_name,
+                        'role_name' => $designation,
                         'role' => $role,
-                        'access_level_first' => $access_level_first,
+                        'access_level_first' => $access,
                         // 'access_level_second' => $access_level_second,
                         'password' => $password,
                         'password_show' => $password_show,
@@ -3337,14 +3327,21 @@ class AdminController extends Controller
                         return response()->json($this->result);
                     }
                 }
+
+                $startcount++;
             }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Admin Users uploaded successfully';
         return response()->json($this->result);
-        fclose($file);
     }
 
     public function most_sales_vendors_admin_dashboard()
@@ -4656,6 +4653,87 @@ class AdminController extends Controller
             $this->result->message = 'Please upload admin in csv format';
             return response()->json($this->result);
         }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $full_name = strtolower(
+                    $sheet->getCell('A' . $row)->getValue()
+                );
+
+                $exp = explode(' ', $full_name);
+
+                $first_name = $exp[0];
+                $last_name = $exp[1];
+
+                $password = bcrypt($sheet->getCell('F' . $row)->getValue());
+                $password_show = $sheet->getCell('F' . $row)->getValue();
+                $email = strtolower($sheet->getCell('C' . $row)->getValue());
+                $designation = $sheet->getCell('B' . $row)->getValue();
+                $access = $sheet->getCell('E' . $row)->getValue();
+
+                $role = 0;
+                if (strtolower($designation) == 'admin') {
+                    $role = 1;
+                }
+
+                if (strtolower($designation) == 'branch manager') {
+                    $role = 2;
+                }
+
+                if (strtolower($designation) == 'inside sales') {
+                    $role = 5;
+                }
+                if (strtolower($designation) == 'outside sales') {
+                    $role = 6;
+                }
+
+                if (!Users::where('email', $email)->exists()) {
+                    $save_admin = Admin::create([
+                        'name' => $name,
+                        'first_name' => $first_name,
+                        'last_name' => $last_name,
+                        'email' => $email,
+                        'password' => $password,
+                        'password_show' => $password_show,
+                        'role' => $role,
+                        'designation' => $designation,
+                        'role_name' => $role_name,
+                        'first_level_access' => $access,
+                    ]);
+
+                    if (!$save_dealer) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+
+                $startcount++;
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer users uploaded successfully';
+        return response()->json($this->result);
 
         if ($csv->getSize() > 0) {
             $file = fopen($_FILES['csv']['tmp_name'], 'r');

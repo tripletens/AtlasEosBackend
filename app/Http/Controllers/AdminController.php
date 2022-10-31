@@ -4183,8 +4183,10 @@ class AdminController extends Controller
 
                 $privilege_dealers = $sheet->getCell('G' . $row)->getValue();
 
-                if (strval($privilege_dealers[-1]) != ',') {
-                    $privilege_dealers = $privilege_dealers . ',';
+                if ($privilege_dealers != null && $privilege_dealers) {
+                    if (strval($privilege_dealers[-1]) != ',') {
+                        $privilege_dealers = $privilege_dealers . ',';
+                    }
                 }
 
                 $phone = $sheet->getCell('H' . $row)->getValue();

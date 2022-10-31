@@ -4170,12 +4170,8 @@ class AdminController extends Controller
             foreach ($row_range as $row) {
                 $dealer_code = $sheet->getCell('A' . $row)->getValue();
                 $dealer_name = $sheet->getCell('B' . $row)->getValue();
-                $first_name = strtolower(
-                    $sheet->getCell('C' . $row)->getValue()
-                );
-                $last_name = strtolower(
-                    $sheet->getCell('D' . $row)->getValue()
-                );
+                $first_name = $sheet->getCell('C' . $row)->getValue();
+                $last_name = $sheet->getCell('D' . $row)->getValue();
                 $password = bcrypt($sheet->getCell('E' . $row)->getValue());
                 $password_show = $sheet->getCell('E' . $row)->getValue();
                 $email = strtolower($sheet->getCell('F' . $row)->getValue());
@@ -4446,9 +4442,9 @@ class AdminController extends Controller
 
             foreach ($row_range as $row) {
                 $save_product = Dealer::create([
-                    'dealer_name' => $sheet->getCell('A' . $row)->getValue(),
+                    'dealer_name' => $sheet->getCell('B' . $row)->getValue(),
                     'role_name' => 'dealer',
-                    'dealer_code' => $sheet->getCell('B' . $row)->getValue(),
+                    'dealer_code' => $sheet->getCell('A' . $row)->getValue(),
                     'location' => $sheet->getCell('C' . $row)->getValue(),
                     'role' => 'dealer',
                     'role_id' => '4',
@@ -4668,9 +4664,7 @@ class AdminController extends Controller
             $data = [];
 
             foreach ($row_range as $row) {
-                $full_name = strtolower(
-                    $sheet->getCell('A' . $row)->getValue()
-                );
+                $full_name = $sheet->getCell('A' . $row)->getValue();
 
                 $exp = explode(' ', $full_name);
 

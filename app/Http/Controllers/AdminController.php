@@ -66,9 +66,9 @@ class AdminController extends Controller
     {
         // set timeout limit
         set_time_limit(2500000000);
-        // $this->middleware('auth:api', [
-        //     'except' => ['login', 'register', 'test'],
-        // ]);
+        $this->middleware('auth:api', [
+            'except' => ['login', 'register', 'test'],
+        ]);
 
         $this->result = (object) [
             'status' => false,
@@ -4217,14 +4217,14 @@ class AdminController extends Controller
                         'phone' => $phone,
                         'location' => $location,
                     ]);
-                }
 
-                if (!$save_dealer) {
-                    $this->result->status = false;
-                    $this->result->status_code = 422;
-                    $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
-                    return response()->json($this->result);
+                    if (!$save_dealer) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
                 }
 
                 $startcount++;

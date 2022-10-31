@@ -5153,25 +5153,27 @@ class AdminController extends Controller
             $data = [];
 
             foreach ($row_range as $row) {
-                if ($startcount > $row_limit) {
-                    $name = $sheet->getCell('B' . $row)->getValue();
+                $name = $sheet->getCell('B' . $row)->getValue();
+                $code = $sheet->getCell('A' . $row)->getValue();
 
-                    $code = $sheet->getCell('A' . $row)->getValue();
+                // return [
+                //     'code' => $code,
+                //     'name' => $name,
+                // ];
 
-                    $save_product = Vendors::create([
-                        'vendor_name' => $name,
-                        'role_name' => 'vendor',
-                        'vendor_code' => $code,
-                        'role' => 'vendor',
-                    ]);
+                $save_product = Vendors::create([
+                    'vendor_name' => $name,
+                    'role_name' => 'vendor',
+                    'vendor_code' => $code,
+                    'role' => 'vendor',
+                ]);
 
-                    if (!$save_product) {
-                        $this->result->status = false;
-                        $this->result->status_code = 422;
-                        $this->result->message =
-                            'Sorry File could not be uploaded. Try again later.';
-                        return response()->json($this->result);
-                    }
+                if (!$save_product) {
+                    $this->result->status = false;
+                    $this->result->status_code = 422;
+                    $this->result->message =
+                        'Sorry File could not be uploaded. Try again later.';
+                    return response()->json($this->result);
                 }
 
                 $startcount++;

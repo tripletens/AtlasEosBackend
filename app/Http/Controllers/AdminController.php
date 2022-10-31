@@ -5154,14 +5154,14 @@ class AdminController extends Controller
 
             foreach ($row_range as $row) {
                 if ($startcount > $row_limit) {
+                    $name = $sheet->getCell('B' . $row)->getValue();
+
+                    $code = $sheet->getCell('A' . $row)->getValue();
+
                     $save_product = Vendors::create([
-                        'vendor_name' => $sheet
-                            ->getCell('B' . $row)
-                            ->getValue(),
+                        'vendor_name' => $name,
                         'role_name' => 'vendor',
-                        'vendor_code' => $sheet
-                            ->getCell('A' . $row)
-                            ->getValue(),
+                        'vendor_code' => $code,
                         'role' => 'vendor',
                     ]);
 

@@ -116,8 +116,9 @@ class SeminarReminderCron extends Command
                     'dealer_data' => $all_dealers_that_joined_seminar
                 ];
 
-                $this->send_reminder_email($all_dealer_emails, $mail_data);
+                // $this->send_reminder_email($all_dealer_emails, $mail_data);
             }
+            
             $seminar->difference = $difference;
         });
 

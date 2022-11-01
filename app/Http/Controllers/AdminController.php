@@ -93,7 +93,7 @@ class AdminController extends Controller
 
     public function deactivate_dealer_dashboard()
     {
-        $switch_state = Users::where('role', '4')
+        $switch_state = Users::where('email', '!=', 'info@atlastrailer.com')
             ->orWhere('role', '1')
             ->update([
                 'dash_activate' => 0,

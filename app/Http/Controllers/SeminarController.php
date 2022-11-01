@@ -539,4 +539,34 @@ class SeminarController extends Controller
             return response()->json($this->result);
         }
     }
+
+    // delete the seminar
+    public function delete_seminar($id)
+    {
+        $seminar = Seminar::find($id);
+
+        if (!$seminar) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't find the seminar";
+            return response()->json($this->result);
+        }
+
+        $delete_seminar = $seminar->delete();
+
+        if (!$delete_seminar) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't delete the seminar";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $seminar;
+        $this->result->message = 'Seminar deleted Successfully';
+        return response()->json($this->result);
+    }
 }

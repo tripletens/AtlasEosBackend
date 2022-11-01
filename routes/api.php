@@ -289,6 +289,7 @@ Route::group(
 
         Route::get('/get-all-seminar', 'AdminController@get_all_seminar');
 
+
         Route::get('/deactivate-faq/{id}', 'AdminController@deactivate_faq');
 
         Route::get('/get-faq-id/{id}', 'AdminController@get_faq_id');
@@ -714,6 +715,8 @@ Route::group(
             '/fetch-all-seminars/{dealer_id}',
             'SeminarController@fetch_all_seminars'
         );
+
+        Route::get('/delete-seminar/{id}', 'SeminarController@delete_seminar');
 
         Route::get(
             '/fetch-scheduled-seminars/{dealer_id}',
@@ -1341,5 +1344,13 @@ Route::group(
             '/sales-rep/dealers_with_orders/{user_id}',
             'SalesRepController@salesrep_dealers_with_orders'
         );
+
+        // route error
+        Route::get(
+            '/failed-login',
+            'RedirectController@redirect_Unauthenticated_Users'
+        )->name('failed-login');
+
+
     }
 );

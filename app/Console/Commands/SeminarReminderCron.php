@@ -101,7 +101,7 @@ class SeminarReminderCron extends Command
             $difference = $seminar_time->diffInMinutes($current_time, $absolute = false);
 
             // $difference < -15  < -15 && $difference < 1
-            if ($difference < 15 && $difference < 1) {
+            if ($difference > -15 && $difference < 1) {
                 // $this->send_email_to_dealer($seminar);
                 $all_dealers_that_joined_seminar = $this->fetch_all_dealers_in_seminar($seminar->id);
                 $all_dealer_emails = $this->fetch_only_dealer_emails($seminar->id);
@@ -111,7 +111,7 @@ class SeminarReminderCron extends Command
                     'dealer_data' => $all_dealers_that_joined_seminar
                 ];
 
-                $this->send_reminder_email($all_dealer_emails, $mail_data);
+                // $this->send_reminder_email($all_dealer_emails, $mail_data);
             }
             $seminar->difference = $difference;
         });

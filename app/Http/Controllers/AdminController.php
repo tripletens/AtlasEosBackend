@@ -1276,9 +1276,7 @@ class AdminController extends Controller
 
     public function get_all_dealership()
     {
-        $dealer = Dealer::where('status', '1')
-            ->orderBy('dealer_name', 'asc')
-            ->get();
+        $dealer = Dealer::orderBy('dealer_name', 'asc')->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;

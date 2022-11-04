@@ -3900,7 +3900,7 @@ class AdminController extends Controller
                             'booking' => floatval($booking),
                             'special' => floatval($special),
                             'cond' => intval($condition),
-                            'type' => strtolower($type),
+                            'type' => 'special',
                             'desc' => $desc,
                         ];
 

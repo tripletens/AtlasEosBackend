@@ -3783,19 +3783,12 @@ class AdminController extends Controller
 
             foreach ($row_range as $row) {
                 $vendor_code = $sheet->getCell('A' . $row)->getValue();
-
                 $vendor_name = $sheet->getCell('B' . $row)->getValue();
-
                 $atlas_id = $sheet->getCell('C' . $row)->getValue();
-
                 $vendor_pro_code = $sheet->getCell('D' . $row)->getValue();
-
                 $xref = $sheet->getCell('E' . $row)->getValue();
-
                 $desc = $sheet->getCell('F' . $row)->getValue();
-
                 $regular = $sheet->getCell('G' . $row)->getValue();
-
                 $booking = $sheet->getCell('H' . $row)->getValue();
 
                 if (!Products::where('atlas_id', $atlas_id)->exists()) {
@@ -3889,13 +3882,9 @@ class AdminController extends Controller
                             ->first();
 
                         $condition = $sheet->getCell('J' . $row)->getValue();
-
                         $special = $sheet->getCell('K' . $row)->getValue();
-
                         $booking = $sheet->getCell('I' . $row)->getValue();
-
                         $desc = $sheet->getCell('E' . $row)->getValue();
-
                         $spec_data = [
                             'booking' => floatval($booking),
                             'special' => floatval($special),
@@ -3938,7 +3927,7 @@ class AdminController extends Controller
                     }
                 }
 
-                $startcount++;
+                ///  $startcount++;
             }
         } catch (Exception $e) {
             $error_code = $e->errorInfo[1];

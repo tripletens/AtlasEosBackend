@@ -3836,7 +3836,7 @@ class AdminController extends Controller
                             'desc' => $desc,
                         ];
 
-                        if ($check_atlas_id->spec_data != null) {
+                        if ($check_atlas_id->spec_data) {
                             $spec = json_decode(
                                 $check_atlas_id->spec_data,
                                 true
@@ -3893,7 +3893,7 @@ class AdminController extends Controller
                             'desc' => $desc,
                         ];
 
-                        if ($check_atlas_id->spec_data != null) {
+                        if ($check_atlas_id->spec_data) {
                             $spec = json_decode(
                                 $check_atlas_id->spec_data,
                                 true
@@ -5130,7 +5130,7 @@ class AdminController extends Controller
         if ($csv == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
-            $this->result->message = 'Please upload dealers in csv format';
+            $this->result->message = 'Please upload description in csv format';
             return response()->json($this->result);
         }
 
@@ -5165,7 +5165,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Vendors uploaded successfully';
+        $this->result->message = 'Description uploaded successfully';
         return response()->json($this->result);
     }
 

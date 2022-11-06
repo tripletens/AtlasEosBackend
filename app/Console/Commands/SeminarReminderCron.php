@@ -90,9 +90,14 @@ class SeminarReminderCron extends Command
         $current_time = Carbon::now()->format('H:i:s');
         $current_date = Carbon::now()->format('Y-m-d');
 
-        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today = Seminar::where('status', 1)
+        // echo "here"; exit();
+
+        $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today =
+            Seminar::where('status', 1)
             ->where('seminar_date', $current_date)
             ->get();
+
+        // echo $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today;  exit();
 
         #get the difference between the current time and the seminar time
         $get_all_seminars_with_seminar_date_and_seminar_time_less_than_today->each(function ($seminar) {
@@ -113,6 +118,7 @@ class SeminarReminderCron extends Command
 
                 // $this->send_reminder_email($all_dealer_emails, $mail_data);
             }
+            
             $seminar->difference = $difference;
         });
 

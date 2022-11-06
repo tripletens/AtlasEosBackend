@@ -50,7 +50,7 @@ class DealerController extends Controller
 {
     public function __construct()
     {
-        //// $this->middleware( 'auth:api', [ 'except' => [ 'login', 'register', 'test' ] ] );
+         $this->middleware( 'auth:api', [ 'except' => [ 'login', 'register', 'test' ] ] );
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,
@@ -61,9 +61,9 @@ class DealerController extends Controller
         ];
     }
 
-    public function dealer_dashboard_state()
+    public function dealer_dashboard_state($user)
     {
-        $first_dealer = Users::where('role', '4')
+        $first_dealer = Users::where('id', $user)
             ->get()
             ->first();
 

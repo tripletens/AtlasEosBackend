@@ -142,7 +142,9 @@ class SeminarController extends Controller
     {
         // status => [ 1 => 'scheduled', 2 => 'ongoing', 3 => 'watched']
         // fetch all except completed seminars
-        $fetch_seminars = Seminar::orderBy('id', 'desc')->where('status',"!=",3)->get();
+        $fetch_seminars = Seminar::orderBy('id', 'desc')
+        // ->orderby('start_time','desc')
+        ->where('status',"!=",3)->get();
         // $check_bookmarked = [];
 
         if (!$fetch_seminars) {

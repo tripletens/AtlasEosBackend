@@ -43,7 +43,7 @@ class BuckController extends Controller
             // 'description' => 'required',
             'status' => 'required|boolean',
             'pdf' => 'required|mimes:pdf,doc,docx',
-            'image' => 'required|mimes:jpg,jpeg,png,gif',
+            // 'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {
@@ -55,7 +55,7 @@ class BuckController extends Controller
             return response()->json($this->result);
         } else {
 
-            if ($request->hasFile('image')) {
+            // if ($request->hasFile('image')) {
                 // $image_filenameWithExt = $request
                 //     ->file('image')
                 //     ->getClientOriginalName();
@@ -71,10 +71,10 @@ class BuckController extends Controller
                 //             ->file('image')
                 //             ->storeAs('public/bucks', $image_fileNameToStore)
                 //     );
-                $image_path = Storage::disk('s3')->put('showbuck_image', $request->image, 'public');
+                // $image_path = Storage::disk('s3')->put('showbuck_image', $request->image, 'public');
 
-                $full_image_path = Storage::disk('s3')->url($image_path);
-            }
+                // $full_image_path = Storage::disk('s3')->url($image_path);
+            // }
 
             if ($request->hasFile('pdf')) {
                 // $filenameWithExt = $request
@@ -113,7 +113,8 @@ class BuckController extends Controller
                 'title' => $title ? $title : null,
                 'description' => $description ? $description : null,
                 'status' => $status ? $status : null,
-                'img_url' => $request->hasFile('image') ? $full_image_path : null,
+                // 'img_url' => $request->hasFile('image') ? $full_image_path : null,
+                'img_url' =>  "https://atlasbookingprogram.com/assets/images/show_buck/show_buck.jpeg", // $request->hasFile('image') ?  $full_image_path
                 'pdf_url' => $request->hasFile('pdf') ? $full_pdf_path : null
             ]);
 

@@ -43,7 +43,7 @@ class BuckController extends Controller
             // 'description' => 'required',
             'status' => 'required|boolean',
             'pdf' => 'required|mimes:pdf,doc,docx',
-            'image' => 'required|mimes:jpg,jpeg,png,gif',
+            // 'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
 
         if ($validator->fails()) {

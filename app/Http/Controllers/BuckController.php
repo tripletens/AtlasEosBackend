@@ -210,7 +210,8 @@ class BuckController extends Controller
             $title = $request->input('title');
             $description = $request->input('description');
             $status = $request->input('status');
-            $image =   $request->hasFile('image');
+            // $image =   $request->hasFile('image');
+
             $pdf =   $request->hasFile('pdf');
 
             $check_buck = Bucks::where('vendor_code', $vendor_code)->get()->first();
@@ -223,23 +224,23 @@ class BuckController extends Controller
             }
 
             // upload show buck image
-            if ($request->hasFile('image')) {
-                $image_filenameWithExt = $request
-                    ->file('image')
-                    ->getClientOriginalName();
-                $image_filename = pathinfo($image_filenameWithExt, PATHINFO_FILENAME);
-                $image_extension = $request
-                    ->file('image')
-                    ->getClientOriginalExtension();
-                $image_fileNameToStore = Str::slug($image_filename, '_', $language = 'en') . '_' . time() . '.' . $image_extension;
-                $img_filepath =
-                    env('APP_URL') .
-                    Storage::url(
-                        $request
-                            ->file('image')
-                            ->storeAs('public/bucks', $image_fileNameToStore)
-                    );
-            }
+            // if ($request->hasFile('image')) {
+            //     $image_filenameWithExt = $request
+            //         ->file('image')
+            //         ->getClientOriginalName();
+            //     $image_filename = pathinfo($image_filenameWithExt, PATHINFO_FILENAME);
+            //     $image_extension = $request
+            //         ->file('image')
+            //         ->getClientOriginalExtension();
+            //     $image_fileNameToStore = Str::slug($image_filename, '_', $language = 'en') . '_' . time() . '.' . $image_extension;
+            //     $img_filepath =
+            //         env('APP_URL') .
+            //         Storage::url(
+            //             $request
+            //                 ->file('image')
+            //                 ->storeAs('public/bucks', $image_fileNameToStore)
+            //         );
+            // }
 
             // upload show buck pdf
             if ($request->hasFile('pdf')) {
@@ -265,7 +266,8 @@ class BuckController extends Controller
             $check_buck->title = $title ? $title : null;
             $check_buck->description = $description ? $description : null;
             $check_buck->status = $status ? $status : null;
-            $check_buck->img_url = $image ? $img_filepath : null;
+            $check_buck->img_url = "https://atlasbookingprogram.com/assets/images/show_buck/show_buck.jpeg";
+            // $check_buck->img_url = $image ? $img_filepath : null;
             $check_buck->pdf_url = $pdf ? $pdf_filepath : null;
 
 
@@ -335,6 +337,35 @@ class BuckController extends Controller
         $this->result->status_code = 200;
         $this->result->data = $fetch_show_bucks;
         $this->result->message = 'All show bucks fetched Successfully';
+        return response()->json($this->result);
+    }
+
+    public function delete_show_buck($id)
+    {
+        $show_buck = Bucks::find($id);
+
+        if (!$show_buck) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An error ocurred, we couldn't find the show buck";
+            return response()->json($this->result);
+        }
+
+        $delete_show_buck = $show_buck->delete();
+
+        if (!$delete_show_buck) {
+            $this->result->status = true;
+            $this->result->status_code = 400;
+            $this->result->message =
+                "An Error Ocurred, we couldn't delete the show buck";
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $show_buck;
+        $this->result->message = 'show buck deleted Successfully';
         return response()->json($this->result);
     }
 }

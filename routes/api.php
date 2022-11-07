@@ -1200,6 +1200,8 @@ Route::group(
 
         Route::post('/edit_buck', 'BuckController@edit_buck');
 
+        Route::get('/delete_show_buck/{id}', 'BuckController@delete_show_buck');
+
         Route::get(
             '/fetch-all-vendor-show-bucks/{vendor_code}',
             'BuckController@fetch_all_vendor_show_bucks'

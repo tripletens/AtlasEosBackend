@@ -50,7 +50,9 @@ class DealerController extends Controller
 {
     public function __construct()
     {
-         $this->middleware( 'auth:api', [ 'except' => [ 'login', 'register', 'test' ] ] );
+        $this->middleware('auth:api', [
+            'except' => ['login', 'register', 'test'],
+        ]);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,
@@ -992,6 +994,7 @@ class DealerController extends Controller
                 $unit_price = $item->unit_price;
                 $status = $item->status;
                 $groupings = $item->groupings;
+                $xref = $item->xref;
 
                 if (
                     Cart::where('dealer', $dealer)
@@ -1022,6 +1025,7 @@ class DealerController extends Controller
                         'price' => $price,
                         'unit_price' => $unit_price,
                         'status' => $status,
+                        'xref' => $xref,
                     ]);
 
                     if (!$save) {
@@ -1205,6 +1209,7 @@ class DealerController extends Controller
                                 'unit_price' => $product->unit_price,
                                 'vendor_no' => $product->vendor_no,
                                 'type' => $product->type,
+                                'xref' => $product->xref,
                             ]);
 
                             $newly_added++;
@@ -1301,6 +1306,7 @@ class DealerController extends Controller
                                 'unit_price' => $product->unit_price,
                                 'vendor_no' => $product->vendor_no,
                                 'type' => $product->type,
+                                'xref' => $product->xref,
                             ]);
 
                             $newly_added++;
@@ -1596,6 +1602,7 @@ class DealerController extends Controller
                             'price' => $product->price,
                             'unit_price' => $product->unit_price,
                             'type' => $product->type,
+                            'xref' => $product->xref,
                         ]);
 
                         if ($save) {
@@ -2290,6 +2297,7 @@ class DealerController extends Controller
                             'price' => $product->price,
                             'unit_price' => $product->unit_price,
                             'type' => $product->type,
+                            'xref' => $product->xref,
                         ]);
 
                         if (!$save) {

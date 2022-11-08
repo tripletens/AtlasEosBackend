@@ -880,7 +880,7 @@ class AdminController extends Controller
     public function dealer_detailed_report()
     {
         $cart = Cart::where('status', '1')
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
 
         foreach ($cart as $value) {

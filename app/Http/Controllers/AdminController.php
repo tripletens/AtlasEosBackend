@@ -3776,7 +3776,7 @@ class AdminController extends Controller
                     $type = $sheet->getCell('L' . $row)->getValue();
 
                     if (strtolower($type) == 'quantity break') {
-                        $atlas_id = $sheet->getCell('B' . $row)->getValue();
+                        $atlas_id = $sheet->getCell('C' . $row)->getValue();
 
                         $check_atlas_id = Products::where('atlas_id', $atlas_id)
                             ->get()

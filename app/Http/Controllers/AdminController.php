@@ -3559,17 +3559,19 @@ class AdminController extends Controller
             $update = Products::where('atlas_id', $atlasId)->update([
                 'atlas_id' => $atlasId,
                 'description' => $desc,
-                'booking' => $regular,
+                'regular' => $regular,
+                'booking' => $special,
+
                 'grouping' => $grouping,
                 'vendor_product_code' => $vendor,
                 'spec_data' => json_encode($spec),
             ]);
 
-            if ($special != null) {
-                Products::where('atlas_id', $atlasId)->update([
-                    'special' => $special != null ? $special : '',
-                ]);
-            }
+            // if ($special != null) {
+            //     Products::where('atlas_id', $atlasId)->update([
+            //         'booking' => $special != null ? $special : '',
+            //     ]);
+            // }
 
             if ($update) {
                 $this->result->status = true;
@@ -3643,7 +3645,9 @@ class AdminController extends Controller
 
     public function get_all_products()
     {
-        $products = Products::where('status', '1')->get();
+        $products = Products::where('status', '1')
+            ->orderBy('xref', 'asc')
+            ->get();
 
         foreach ($products as $value) {
             $value->spec_data = json_decode($value->spec_data);

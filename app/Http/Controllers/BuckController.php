@@ -192,6 +192,7 @@ class BuckController extends Controller
             'title' => 'required|string',
             // 'description' => 'required',
             'status' => 'required|boolean',
+            // 'id' => 'required|integer',
             // 'pdf' => 'required|mimes:pdf,doc,docx',
             // 'image' => 'required|mimes:jpg,jpeg,png,gif',
         ]);
@@ -204,6 +205,17 @@ class BuckController extends Controller
 
             return response()->json($this->result);
         } else {
+
+            // $show_buck_id = $request->input('id');
+
+            // $fetch_show_buck_by_id = Bucks::find($show_buck_id);
+
+            // if (!$fetch_show_buck_by_id) {
+            //     $this->result->status = true;
+            //     $this->result->status_code = 404;
+            //     $this->result->message = "An Error Ocurred, we couldn't fetch the show bucks";
+            //     return response()->json($this->result);
+            // }
 
             $vendor_code = $request->input('vendor_code');
             $vendor_name = $request->input('vendor_name');

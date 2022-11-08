@@ -567,7 +567,7 @@ class VendorController extends Controller
             ->first();
 
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
         $res_data = [];
         $atlas_id_checker = [];
@@ -1419,7 +1419,7 @@ class VendorController extends Controller
     public function sales_by_item_detailed_export($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
         $res_data = [];
         $atlas_id_data = [];
@@ -1554,7 +1554,7 @@ class VendorController extends Controller
     public function sales_by_item_detailed($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
         $res_data = [];
         $atlas_id_data = [];
@@ -1705,7 +1705,7 @@ class VendorController extends Controller
     public function sales_by_item_summary($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
         $res_data = [];
         $atlas_id_checker = [];
@@ -1895,7 +1895,7 @@ class VendorController extends Controller
     {
         $dealer_cart = Cart::where('vendor', $vendor)
             ->where('dealer', $dealer)
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
 
         $res_data = [];

@@ -21,6 +21,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/test', function () {
+    return phpinfo();
+
+    // return view('welcome');
+});
+
+
+
 // Route::get('/generate-pdf/{code}', 'DealerController@generate_pdf');
 
 Route::get('/generate-pdf/{dealer}/{lang}/{current_time}', [

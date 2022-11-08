@@ -532,6 +532,7 @@ class DealerController extends Controller
                 ->first();
             $cart_data = Cart::where('vendor', $value)
                 ->where('dealer', $dealer)
+                ->orderBy('xref', 'asc')
                 ->get();
 
             $total = 0;
@@ -891,7 +892,7 @@ class DealerController extends Controller
     {
         $order = Cart::where('vendor', $vendor)
             ->where('dealer', $dealer)
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
 
         $res_data = [];

@@ -105,7 +105,7 @@ class PromotionalFlierController extends Controller
 
                 $full_file_path = Storage::disk('s3')->url($path);
 
-                Storage::setVisibility($full_file_path, 'public');
+                // Storage::setVisibility($full_file_path, 'public');
             }
 
             $name = $request->input('name');

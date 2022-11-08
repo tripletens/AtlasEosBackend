@@ -23,7 +23,7 @@ class ProductsController extends Controller
     public function fetch_all_new_products()
     {
         $fetch_new_products = Products::where('check_new', true)
-            ->orderby('id', 'asc')
+            ->orderby('vendor_name', 'asc')
             ->get();
 
         foreach ($fetch_new_products as $value) {
@@ -48,7 +48,8 @@ class ProductsController extends Controller
     // sort new products by vendor id
     public function sort_newproduct_by_vendor_id($vendor_id)
     {
-        $fetch_new_products_by_vendor = Products::where('check_new', '1')->where('vendor', $vendor_id)
+        $fetch_new_products_by_vendor = Products::where('check_new', '1')
+            ->where('vendor', $vendor_id)
             ->orderby('id', 'asc')
             ->get();
 
@@ -119,7 +120,10 @@ class ProductsController extends Controller
     // fetch all the new products by vendor code
     public function fetch_all_products_by_vendor_code($vendor_code)
     {
-        $fetch_all_products_by_vendor_code = Products::where('vendor_code', $vendor_code)
+        $fetch_all_products_by_vendor_code = Products::where(
+            'vendor_code',
+            $vendor_code
+        )
             ->orderby('atlas_id', 'asc')
             ->get();
 
@@ -134,7 +138,8 @@ class ProductsController extends Controller
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $fetch_all_products_by_vendor_code;
-        $this->result->message = 'All products for vendor code fetched successfully';
+        $this->result->message =
+            'All products for vendor code fetched successfully';
         return response()->json($this->result);
     }
 }

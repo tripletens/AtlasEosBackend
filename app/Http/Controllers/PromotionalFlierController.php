@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Vendors;
-use Illuminate\Http\File;
 
 class PromotionalFlierController extends Controller
 {
@@ -79,66 +78,57 @@ class PromotionalFlierController extends Controller
 
             return response()->json($this->result);
         } else {
+            if ($request->hasFile('pdf')) {
+                // $filenameWithExt = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalName();
+                // $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                // $extension = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalExtension();
+                // $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
+                // $filepath =
+                //     env('APP_URL') .
+                //     Storage::url(
+                //         $request
+                //             ->file('pdf')
+                //             ->storeAs('public/pdf', $fileNameToStore)
+                //     );
 
-            return "hello";
-            // if ($request->hasFile('pdf')) {
-            //     $filenameWithExt = $request
-            //         ->file('pdf')
-            //         ->getClientOriginalName();
-            //     $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-            //     $extension = $request
-            //         ->file('pdf')
-            //         ->getClientOriginalExtension();
-            //     $fileNameToStore = Str::slug($filename, '_', $language = 'en') . '_' . time() . '.' . $extension;
-            //     $local_filepath =
-            //         env('APP_URL') .
-            //         Storage::url(
-            //             $request
-            //                 ->file('pdf')
-            //                 ->storeAs('public/pdf', $fileNameToStore)
-            //         );
+                // $imageName = time().'.'.$request->image->extension();
 
-            //     // Save to S3 (Grab the file object and stream it to S3 to a folder called 'file-uploads'. File is set to a public file that can be accessed by URL.
-            //     $savetoS3 = Storage::disk('s3')->putFile('pdf', new File($local_filepath), 'public');
+                $path = Storage::disk('s3')->put(
+                    'pdf',
+                    $request->pdf,
+                    'public'
+                );
 
+                $full_file_path = Storage::disk('s3')->url($path);
 
-            //     // Delete local copy so it does not take space on your server
-            //     Storage::delete($local_filepath);
+                // Storage::setVisibility($full_file_path, 'public');
+            }
 
-            //     // $imageName = time().'.'.$request->image->extension();
+            $name = $request->input('name');
+            // $pdf_url = $request->input('pdf_url');
+            $vendor_id = $request->input('vendor_id');
+            $description = $request->input('description');
+            $image_url = $request->input('image_url');
 
-            //     // $path = Storage::disk('s3')->put(
-            //     //     'pdf',
-            //     //     $request->pdf,
-            //     //     'public'
-            //     // );
+            $createPromotionalFlier = PromotionalFlier::create([
+                'name' => $name ? $name : null,
+                'pdf_url' => $request->hasFile('pdf') ? $full_file_path : null,
+                'vendor_id' => $vendor_id ? $vendor_id : null,
+                'description' => $description ? $description : null,
+                'image_url' => $image_url ? $image_url : null,
+            ]);
 
-            //     $full_file_path = Storage::disk('s3')->url($savetoS3);
-
-            //     // Storage::setVisibility($full_file_path, 'public');
-            // }
-
-            // $name = $request->input('name');
-            // // $pdf_url = $request->input('pdf_url');
-            // $vendor_id = $request->input('vendor_id');
-            // $description = $request->input('description');
-            // $image_url = $request->input('image_url');
-
-            // $createPromotionalFlier = PromotionalFlier::create([
-            //     'name' => $name ? $name : null,
-            //     'pdf_url' => $request->hasFile('pdf') ? $full_file_path : null,
-            //     'vendor_id' => $vendor_id ? $vendor_id : null,
-            //     'description' => $description ? $description : null,
-            //     'image_url' => $image_url ? $image_url : null,
-            // ]);
-
-            // if (!$createPromotionalFlier) {
-            //     $this->result->status = true;
-            //     $this->result->status_code = 400;
-            //     $this->result->message =
-            //         'An error ocurred, Promotional Flier addition failed';
-            //     return response()->json($this->result);
-            // }
+            if (!$createPromotionalFlier) {
+                $this->result->status = true;
+                $this->result->status_code = 400;
+                $this->result->message =
+                    'An error ocurred, Promotional Flier addition failed';
+                return response()->json($this->result);
+            }
 
             $this->result->status = true;
             $this->result->status_code = 200;

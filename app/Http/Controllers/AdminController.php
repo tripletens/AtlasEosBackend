@@ -48,6 +48,8 @@ use App\Models\SystemSettings;
 use DateTime;
 use App\Models\Bucks;
 
+use App\Models\ProductModel;
+
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -66,9 +68,9 @@ class AdminController extends Controller
     {
         // set timeout limit
         set_time_limit(2500000000);
-        $this->middleware('auth:api', [
-            'except' => ['login', 'register', 'test'],
-        ]);
+        // $this->middleware('auth:api', [
+        //     'except' => ['login', 'register', 'test'],
+        // ]);
 
         $this->result = (object) [
             'status' => false,
@@ -880,7 +882,7 @@ class AdminController extends Controller
     public function dealer_detailed_report()
     {
         $cart = Cart::where('status', '1')
-            ->orderBy('product_id', 'asc')
+            ->orderBy('xref', 'asc')
             ->get();
 
         foreach ($cart as $value) {
@@ -1014,162 +1016,39 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
-    public function upload_new_product_csv(Request $request)
+    public function upload_product_desc(Request $request)
     {
         $csv = $request->file('csv');
 
         if ($csv == null) {
             $this->result->status = false;
             $this->result->status_code = 422;
-            $this->result->message = 'Please upload products in csv format';
+            $this->result->message = 'Please upload products in excel format';
             return response()->json($this->result);
         }
 
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
 
-            array_shift($csv_data);
-            // remove the first row of the csv
+            foreach ($row_range as $row) {
+                $xref = $sheet->getCell('B' . $row)->getValue();
+                $desc = $sheet->getCell('C' . $row)->getValue();
 
-            $test = [];
-
-            foreach ($csv_data as $key => $value) {
-                # code...
-
-                $spec_arr = [];
-                $vendor_code = $value[0];
-                $vendor_name = $value[1];
-                $atlas_id = $value[2];
-                $vendor_product_code = $value[3];
-                $xref = $value[4];
-                $description = $value[5];
-                $regular_price = $value[6];
-                $booking_price = $value[7];
-                // $type = $value[9] ? $value[9] : '';
-
-                $type = array_key_exists('8', $value) ? $value[8] : '';
-
-                $exists = Products::where('atlas_id', $atlas_id)->exists();
-
-                if ($exists) {
-                    switch ($type) {
-                        case 'special':
-                            if ($exists) {
-                                $desc = $value[4];
-                                $special_price = $value[6];
-                                $ass_price = $value[7];
-                                $cond = $value[10];
-                                $spec_type = 'special';
-
-                                $spec_data = [
-                                    'booking' => floatval($special_price),
-                                    'special' => floatval($ass_price),
-                                    'cond' => intval($cond),
-                                    'type' => strtolower($spec_type),
-                                    'desc' => $desc,
-                                ];
-
-                                if (!empty($check_atlas_id->spec_data)) {
-                                    $spec = json_decode(
-                                        $check_atlas_id->spec_data,
-                                        true
-                                    );
-                                    array_push($spec, $spec_data);
-                                    $new_spec = json_encode($spec);
-
-                                    // Products::where('atlas_id', $atlas_id)->update([
-                                    //     'grouping' => $grouping,
-                                    // ]);
-
-                                    Products::where(
-                                        'atlas_id',
-                                        $atlas_id
-                                    )->update([
-                                        'spec_data' => $new_spec,
-                                    ]);
-                                } else {
-                                    $data = [];
-                                    array_push($data, $spec_data);
-                                    $new_spec = json_encode($data);
-
-                                    Products::where(
-                                        'atlas_id',
-                                        $atlas_id
-                                    )->update([
-                                        'spec_data' => $new_spec,
-                                    ]);
-                                }
-                            }
-
-                            break;
-
-                        case 'assorted':
-                            $desc = $value[4];
-                            $special_price = $value[6];
-                            $ass_price = $value[7];
-                            $cond = $value[10];
-                            $grouping = $value[9];
-                            $spec_type = 'assorted';
-
-                            $spec_data = [
-                                'booking' => floatval($special_price),
-                                'special' => floatval($ass_price),
-                                'cond' => intval($cond),
-                                'type' => strtolower($spec_type),
-                                'desc' => $desc,
-                            ];
-
-                            if (!empty($check_atlas_id->spec_data)) {
-                                $spec = json_decode(
-                                    $check_atlas_id->spec_data,
-                                    true
-                                );
-                                array_push($spec, $spec_data);
-                                $new_spec = json_encode($spec);
-
-                                Products::where('atlas_id', $atlas_id)->update([
-                                    'grouping' => $grouping,
-                                ]);
-                                Products::where('atlas_id', $atlas_id)->update([
-                                    'spec_data' => $new_spec,
-                                ]);
-                            } else {
-                                $data = [];
-                                array_push($data, $spec_data);
-                                $new_spec = json_encode($data);
-                                Products::where('atlas_id', $atlas_id)->update([
-                                    'grouping' => $grouping,
-                                ]);
-                                Products::where('atlas_id', $atlas_id)->update([
-                                    'spec_data' => $new_spec,
-                                ]);
-                            }
-
-                            break;
-
-                        default:
-                            break;
-                    }
-                } else {
-                    $save_product = Products::create([
-                        'atlas_id' => $atlas_id,
-                        'description' => $description,
-                        'status' => '1',
-                        'vendor_code' => $vendor_code,
-                        'vendor' => $vendor_code,
-                        'vendor_name' => $vendor_name,
-                        'vendor_product_code' => $vendor_product_code,
+                if (!ProductModel::where('xref', $xref)->exists()) {
+                    $save_admin = ProductModel::create([
                         'xref' => $xref,
-                        'regular' => $regular_price,
-                        'booking' => $booking_price,
-                        'check_new' => 1,
+                        'description' => $desc,
                     ]);
 
-                    if (!$save_product) {
+                    if (!$save_admin) {
                         $this->result->status = false;
                         $this->result->status_code = 422;
                         $this->result->message =
@@ -1178,13 +1057,88 @@ class AdminController extends Controller
                     }
                 }
             }
-
-            $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->message = 'Products uploaded successfully';
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
             return response()->json($this->result);
-            fclose($file);
         }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Products Description uploaded successfully';
+        return response()->json($this->result);
+    }
+
+    public function upload_new_product_csv(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in excel format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $vendor_code = $sheet->getCell('A' . $row)->getValue();
+                $vendor_name = $sheet->getCell('B' . $row)->getValue();
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
+                $vendor_pro_code = $sheet->getCell('D' . $row)->getValue();
+                $xref = $sheet->getCell('E' . $row)->getValue();
+                $desc = $sheet->getCell('F' . $row)->getValue();
+                $regular = $sheet->getCell('G' . $row)->getValue();
+                $booking = $sheet->getCell('H' . $row)->getValue();
+
+                if (!Products::where('atlas_id', $atlas_id)->exists()) {
+                    $save_admin = Products::create([
+                        'vendor' => $vendor_code,
+                        'vendor_code' => $vendor_code,
+                        'vendor_name' => $vendor_name,
+                        'atlas_id' => $atlas_id,
+                        'xref' => $xref,
+                        'description' => $desc,
+                        'status' => '1',
+                        'regular' => $regular,
+                        'booking' => $booking,
+                        'vendor_product_code' => $vendor_pro_code,
+                        'check_new' => 1,
+                    ]);
+
+                    if (!$save_admin) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'New Products uploaded successfully';
+        return response()->json($this->result);
     }
 
     public function deactivate_vendor_switch()
@@ -1276,7 +1230,7 @@ class AdminController extends Controller
 
     public function get_all_dealership()
     {
-        $dealer = Dealer::all();
+        $dealer = Dealer::orderBy('dealer_name', 'asc')->get();
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -3136,6 +3090,7 @@ class AdminController extends Controller
             ->orWhere('role', '2')
             ->orWhere('role', '5')
             ->orWhere('role', '6')
+            ->orWhere('role', '7')
             ->get();
 
         $this->result->status = true;
@@ -3662,17 +3617,19 @@ class AdminController extends Controller
             $update = Products::where('atlas_id', $atlasId)->update([
                 'atlas_id' => $atlasId,
                 'description' => $desc,
-                'booking' => $regular,
+                'regular' => $regular,
+                'booking' => $special,
+
                 'grouping' => $grouping,
                 'vendor_product_code' => $vendor,
                 'spec_data' => json_encode($spec),
             ]);
 
-            if ($special != null) {
-                Products::where('atlas_id', $atlasId)->update([
-                    'special' => $special != null ? $special : '',
-                ]);
-            }
+            // if ($special != null) {
+            //     Products::where('atlas_id', $atlasId)->update([
+            //         'booking' => $special != null ? $special : '',
+            //     ]);
+            // }
 
             if ($update) {
                 $this->result->status = true;
@@ -3746,7 +3703,9 @@ class AdminController extends Controller
 
     public function get_all_products()
     {
-        $products = Products::where('status', '1')->get();
+        $products = Products::where('status', '1')
+            ->orderBy('xref', 'asc')
+            ->get();
 
         foreach ($products as $value) {
             $value->spec_data = json_decode($value->spec_data);
@@ -3756,6 +3715,192 @@ class AdminController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'get all products was successful';
         $this->result->data = $products;
+        return response()->json($this->result);
+    }
+
+    public function upload_product_assorted(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
+
+                if (Products::where('atlas_id', $atlas_id)->exists()) {
+                    $atlas_id = $sheet->getCell('C' . $row)->getValue();
+
+                    $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
+
+                    $grouping = $sheet->getCell('K' . $row)->getValue();
+                    $condition = $sheet->getCell('L' . $row)->getValue();
+                    $special = $sheet->getCell('I' . $row)->getValue();
+                    $booking = $sheet->getCell('H' . $row)->getValue();
+                    $desc = $sheet->getCell('F' . $row)->getValue();
+
+                    $spec_data = [
+                        'booking' => floatval($booking),
+                        'special' => floatval($special),
+                        'cond' => intval($condition),
+                        'type' => 'assorted',
+                        'desc' => $desc,
+                    ];
+
+                    if ($check_atlas_id->spec_data) {
+                        $spec = json_decode($check_atlas_id->spec_data, true);
+                        array_push($spec, $spec_data);
+                        $new_spec = json_encode($spec);
+
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'cond' => $condition,
+                        ]);
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'grouping' => $grouping,
+                        ]);
+
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'spec_data' => $new_spec,
+                        ]);
+                    } else {
+                        $data = [];
+                        array_push($data, $spec_data);
+                        $new_spec = json_encode($data);
+
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'cond' => $condition,
+                        ]);
+
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'grouping' => $grouping,
+                        ]);
+                        Products::where('atlas_id', $atlas_id)->update([
+                            'spec_data' => $new_spec,
+                        ]);
+                    }
+
+                    if (!$save_admin) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+                ///  $startcount++;
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Assorted Products uploaded successfully';
+        return response()->json($this->result);
+    }
+
+    public function upload_product_special(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
+
+                $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $condition = $sheet->getCell('J' . $row)->getValue();
+                $special = $sheet->getCell('K' . $row)->getValue();
+                $booking = $sheet->getCell('I' . $row)->getValue();
+                $desc = $sheet->getCell('E' . $row)->getValue();
+                $spec_data = [
+                    'booking' => floatval($booking),
+                    'special' => floatval($special),
+                    'cond' => intval($condition),
+                    'type' => 'special',
+                    'desc' => $desc,
+                ];
+
+                if ($check_atlas_id->spec_data) {
+                    $spec = json_decode($check_atlas_id->spec_data, true);
+                    array_push($spec, $spec_data);
+                    $new_spec = json_encode($spec);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'cond' => $condition,
+                    ]);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'spec_data' => $new_spec,
+                    ]);
+                } else {
+                    $data = [];
+                    array_push($data, $spec_data);
+                    $new_spec = json_encode($data);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'cond' => $condition,
+                    ]);
+
+                    // Products::where('atlas_id', $atlas_id)->update([
+                    //     'grouping' => $grouping,
+                    // ]);
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'spec_data' => $new_spec,
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Assorted Products uploaded successfully';
         return response()->json($this->result);
     }
 
@@ -3770,185 +3915,64 @@ class AdminController extends Controller
             return response()->json($this->result);
         }
 
-        if ($csv->getSize() > 0) {
-            $file = fopen($_FILES['csv']['tmp_name'], 'r');
-            $csv_data = [];
-            while (($col = fgetcsv($file, 1000, ',')) !== false) {
-                $csv_data[] = $col;
-            }
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
 
-            array_shift($csv_data);
-            // remove the first row of the csv
+            foreach ($row_range as $row) {
+                $vendor_code = $sheet->getCell('A' . $row)->getValue();
+                $vendor_name = $sheet->getCell('B' . $row)->getValue();
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
+                $vendor_pro_code = $sheet->getCell('D' . $row)->getValue();
+                $xref = $sheet->getCell('E' . $row)->getValue();
+                $desc = $sheet->getCell('F' . $row)->getValue();
+                $regular = $sheet->getCell('G' . $row)->getValue();
+                $booking = $sheet->getCell('H' . $row)->getValue();
 
-            $test = [];
+                if (!Products::where('atlas_id', $atlas_id)->exists()) {
+                    $save_admin = Products::create([
+                        'vendor' => $vendor_code,
+                        'vendor_code' => $vendor_code,
+                        'vendor_name' => $vendor_name,
+                        'atlas_id' => $atlas_id,
+                        'xref' => $xref,
+                        'description' => $desc,
+                        'status' => '1',
+                        'regular' => $regular,
+                        'booking' => $booking,
+                        'vendor_product_code' => $vendor_pro_code,
+                    ]);
 
-            foreach ($csv_data as $key => $value) {
-                # code...
-
-                $atlas_id = $value[2];
-                $check_atlas_id = Products::where('atlas_id', $atlas_id)
-                    ->get()
-                    ->first();
-
-                if ($check_atlas_id) {
-                    $type = $value[9];
-
-                    if ($type == 'special') {
-                        $special = $value[8];
-                        $desc_spec = $value[5];
-                        $cond_data = explode('+', $desc_spec);
-                        $condition = $cond_data[0];
-                        $booking = $value[7];
-                        $regular = $value[6];
-
-                        $spec_data = [
-                            'booking' => floatval($booking),
-                            'special' => floatval($special),
-                            'cond' => intval($condition),
-                            'type' => strtolower($type),
-                            'desc' => strtolower($desc_spec),
-                        ];
-
-                        if (!empty($check_atlas_id->spec_data)) {
-                            $spec = json_decode(
-                                $check_atlas_id->spec_data,
-                                true
-                            );
-                            array_push($spec, $spec_data);
-                            $new_spec = json_encode($spec);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'cond' => $condition,
-                            ]);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'spec_data' => $new_spec,
-                            ]);
-                        } else {
-                            $data = [];
-                            array_push($data, $spec_data);
-                            $new_spec = json_encode($data);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'cond' => $condition,
-                            ]);
-
-                            // Products::where('atlas_id', $atlas_id)->update([
-                            //     'grouping' => $grouping,
-                            // ]);
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'spec_data' => $new_spec,
-                            ]);
-                        }
-                    }
-
-                    if ($type == 'assorted') {
-                        $special = $value[8];
-                        $desc_spec = $value[5];
-                        $cond_data = explode('+', $desc_spec);
-                        $condition = $cond_data[0];
-                        $booking = $value[7];
-                        $regular = $value[6];
-                        $grouping = $value[10];
-
-                        $spec_data = [
-                            'booking' => floatval($booking),
-                            'special' => floatval($special),
-                            'cond' => intval($condition),
-                            'type' => strtolower($type),
-                            'desc' => strtolower($desc_spec),
-                        ];
-
-                        if (!empty($check_atlas_id->spec_data)) {
-                            $spec = json_decode(
-                                $check_atlas_id->spec_data,
-                                true
-                            );
-                            array_push($spec, $spec_data);
-                            $new_spec = json_encode($spec);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'cond' => $condition,
-                            ]);
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'grouping' => $grouping,
-                            ]);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'spec_data' => $new_spec,
-                            ]);
-                        } else {
-                            $data = [];
-                            array_push($data, $spec_data);
-                            $new_spec = json_encode($data);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'cond' => $condition,
-                            ]);
-
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'grouping' => $grouping,
-                            ]);
-                            Products::where('atlas_id', $atlas_id)->update([
-                                'spec_data' => $new_spec,
-                            ]);
-                        }
-                    }
-                } else {
-                    $spec_arr = [];
-                    $vendor_code = $value[0];
-                    $vendor_name = $value[1];
-                    $atlas_id = $value[2];
-                    $vendor_product_code = $value[3];
-                    $xref = $value[4];
-                    $description = $value[5];
-                    $regular_price = $value[6];
-                    $booking_price = $value[7];
-                    // $type = $value[9] ? $value[9] : '';
-
-                    $type = array_key_exists('9', $value) ? $value[9] : '';
-
-                    switch ($type) {
-                        case 'special':
-                            # code...
-                            break;
-
-                        case 'assorted':
-                            # code...
-                            break;
-
-                        default:
-                            $save_product = Products::create([
-                                'atlas_id' => $atlas_id,
-                                'description' => $description,
-                                'status' => '1',
-                                'vendor_code' => $vendor_code,
-                                'vendor' => $vendor_code,
-                                'vendor_name' => $vendor_name,
-                                'vendor_product_code' => $vendor_product_code,
-                                'xref' => $xref,
-                                'regular' => $regular_price,
-                                'booking' => $booking_price,
-                            ]);
-
-                            if (!$save_product) {
-                                $this->result->status = false;
-                                $this->result->status_code = 422;
-                                $this->result->message =
-                                    'Sorry File could not be uploaded. Try again later.';
-                                return response()->json($this->result);
-                            }
-                            break;
+                    if (!$save_admin) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
                     }
                 }
-            }
 
-            $this->result->status = true;
-            $this->result->status_code = 200;
-            $this->result->message = 'Products uploaded successfully';
+                ///  $startcount++;
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
             return response()->json($this->result);
-            fclose($file);
         }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Products uploaded successfully';
+        return response()->json($this->result);
     }
 
     public function get_all_dealer_users()
@@ -5129,6 +5153,51 @@ class AdminController extends Controller
         $this->result->message = 'Vendors uploaded successfully';
         return response()->json($this->result);
         fclose($file);
+    }
+
+    public function upload_desc(Request $request)
+    {
+        $csv = $request->file('csv');
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload description in csv format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $xref = $sheet->getCell('B' . $row)->getValue();
+                $desc = $sheet->getCell('C' . $row)->getValue();
+
+                if (Products::where('xref', $xref)->exists()) {
+                    Products::where('xref', $xref)->update([
+                        'full_desc' => $desc,
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Description uploaded successfully';
+        return response()->json($this->result);
     }
 
     public function upload_vendors(Request $request)

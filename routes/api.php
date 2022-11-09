@@ -27,6 +27,21 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::post(
+            '/admin/upload-product-special',
+            'AdminController@upload_product_special'
+        );
+
+        Route::post(
+            '/admin/upload-product-assorted',
+            'AdminController@upload_product_assorted'
+        );
+
+        Route::post(
+            '/admin/upload-product-desc',
+            'AdminController@upload_product_desc'
+        );
+
         Route::get(
             '/admin/deactivate-dealer-dashboard',
             'AdminController@deactivate_dealer_dashboard'
@@ -184,6 +199,8 @@ Route::group(
 
         Route::post('/upload-dealers', 'AdminController@upload_dealers');
 
+        Route::post('/upload-desc', 'AdminController@upload_desc');
+
         Route::post(
             '/edit-vendor-user',
             'AdminController@edit_vendor_user_data'
@@ -288,7 +305,6 @@ Route::group(
         Route::post('/create-seminar', 'AdminController@create_seminar');
 
         Route::get('/get-all-seminar', 'AdminController@get_all_seminar');
-
 
         Route::get('/deactivate-faq/{id}', 'AdminController@deactivate_faq');
 
@@ -1199,6 +1215,8 @@ Route::group(
 
         Route::post('/edit_buck', 'BuckController@edit_buck');
 
+        Route::get('/delete_show_buck/{id}', 'BuckController@delete_show_buck');
+
         Route::get(
             '/fetch-all-vendor-show-bucks/{vendor_code}',
             'BuckController@fetch_all_vendor_show_bucks'
@@ -1350,7 +1368,5 @@ Route::group(
             '/failed-login',
             'RedirectController@redirect_Unauthenticated_Users'
         )->name('failed-login');
-
-
     }
 );

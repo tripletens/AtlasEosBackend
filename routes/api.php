@@ -28,6 +28,16 @@ Route::group(
         Route::post('/admin-login', 'AdminController@admin_login');
 
         Route::post(
+            '/admin/upload-product-special',
+            'AdminController@upload_product_special'
+        );
+
+        Route::post(
+            '/admin/upload-product-assorted',
+            'AdminController@upload_product_assorted'
+        );
+
+        Route::post(
             '/admin/upload-product-desc',
             'AdminController@upload_product_desc'
         );

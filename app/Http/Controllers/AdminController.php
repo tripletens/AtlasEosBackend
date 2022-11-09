@@ -3090,6 +3090,7 @@ class AdminController extends Controller
             ->orWhere('role', '2')
             ->orWhere('role', '5')
             ->orWhere('role', '6')
+            ->orWhere('role', '7')
             ->get();
 
         $this->result->status = true;

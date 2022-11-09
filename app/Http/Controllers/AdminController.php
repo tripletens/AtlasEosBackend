@@ -1042,10 +1042,10 @@ class AdminController extends Controller
                 $xref = $sheet->getCell('B' . $row)->getValue();
                 $desc = $sheet->getCell('C' . $row)->getValue();
 
-                if (!ProductModel::where('atlas_id', $atlas_id)->exists()) {
+                if (!ProductModel::where('xref', $xref)->exists()) {
                     $save_admin = ProductModel::create([
-                        'xref' => $vendor_code,
-                        'desc' => $vendor_code,
+                        'xref' => $xref,
+                        'desc' => $desc,
                     ]);
 
                     if (!$save_admin) {

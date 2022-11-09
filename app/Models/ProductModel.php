@@ -11,5 +11,5 @@ class ProductModel extends Model
 
     protected $table = 'product_desc';
 
-    protected $fillable = ['xref', 'description'];
+    protected $fillable = ['atlas_id', 'xref', 'description'];
 }

@@ -3645,8 +3645,10 @@ class AdminController extends Controller
 
     public function get_all_products()
     {
-        $products = Products::where('status', '1')
-            ->orderBy('xref', 'asc')
+        $products = Products::where('products.status', '1')
+            ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
+            ->select('products.*','product_desc.*')
+            ->orderBy('products.xref', 'asc')
             ->get();
 
         foreach ($products as $value) {

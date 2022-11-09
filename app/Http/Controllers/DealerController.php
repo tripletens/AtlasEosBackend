@@ -2387,9 +2387,11 @@ class DealerController extends Controller
                 ->where('status', '1')
                 ->exists()
         ) {
-            $vendor_products = Products::where('vendor', $code)
-                ->where('status', '1')
-                ->orderBy('xref', 'asc')
+            $vendor_products = Products::where('products.vendor', $code)
+                ->where('products.status', '1')
+                ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
+                ->orderBy('products.xref', 'asc')
+                ->select('products.*', 'product_desc.*')
                 ->get();
 
             foreach ($vendor_products as $value) {

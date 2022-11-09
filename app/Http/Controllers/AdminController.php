@@ -1045,7 +1045,7 @@ class AdminController extends Controller
                 if (!ProductModel::where('xref', $xref)->exists()) {
                     $save_admin = ProductModel::create([
                         'xref' => $xref,
-                        'desc' => $desc,
+                        'description' => $desc,
                     ]);
 
                     if (!$save_admin) {

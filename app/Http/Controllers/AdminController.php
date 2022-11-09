@@ -1040,11 +1040,10 @@ class AdminController extends Controller
 
             foreach ($row_range as $row) {
                 $atlas_id = $sheet->getCell('A' . $row)->getValue();
-
                 $xref = $sheet->getCell('B' . $row)->getValue();
                 $desc = $sheet->getCell('C' . $row)->getValue();
 
-                if (!ProductModel::where('xref', $xref)->exists()) {
+                if (!ProductModel::where('atlas_id', $atlas_id)->exists()) {
                     $save_admin = ProductModel::create([
                         'atlas_id' => $atlas_id,
                         'xref' => $xref,

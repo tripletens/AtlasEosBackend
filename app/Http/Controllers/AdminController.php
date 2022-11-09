@@ -2860,13 +2860,11 @@ class AdminController extends Controller
     public function deactivate_admin($id)
     {
         if (Users::where('id', $id)->exists()) {
-            $update = Users::where('id', $id)->update([
-                'status' => '0',
-            ]);
+            $update = Users::where('id', $id)->delete();
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'Admin User deactivated with id';
+            $this->result->message = 'Admin User has been deleted with id';
         } else {
             $this->result->status = false;
             $this->result->status_code = 404;

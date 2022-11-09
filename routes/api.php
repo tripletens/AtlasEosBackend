@@ -27,6 +27,11 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::post(
+            '/admin/upload-product-desc',
+            'AdminController@upload_product_desc'
+        );
+
         Route::get(
             '/admin/deactivate-dealer-dashboard',
             'AdminController@deactivate_dealer_dashboard'

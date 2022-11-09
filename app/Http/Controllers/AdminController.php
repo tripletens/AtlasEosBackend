@@ -48,6 +48,8 @@ use App\Models\SystemSettings;
 use DateTime;
 use App\Models\Bucks;
 
+use App\Models\ProductModel;
+
 // use App\Models\Catalogue_Order;
 // use Illuminate\Support\Facades\Mail;
 // use App\Mail\SendDealerDetailsMail;
@@ -1011,6 +1013,61 @@ class AdminController extends Controller
             $this->result->message = 'no vendor data found, try again';
         }
 
+        return response()->json($this->result);
+    }
+
+    public function upload_product_desc(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in excel format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $xref = $sheet->getCell('B' . $row)->getValue();
+                $desc = $sheet->getCell('C' . $row)->getValue();
+
+                if (!ProductModel::where('atlas_id', $atlas_id)->exists()) {
+                    $save_admin = ProductModel::create([
+                        'xref' => $vendor_code,
+                        'desc' => $vendor_code,
+                    ]);
+
+                    if (!$save_admin) {
+                        $this->result->status = false;
+                        $this->result->status_code = 422;
+                        $this->result->message =
+                            'Sorry File could not be uploaded. Try again later.';
+                        return response()->json($this->result);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Products Description uploaded successfully';
         return response()->json($this->result);
     }
 

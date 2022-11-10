@@ -2447,6 +2447,8 @@ class DealerController extends Controller
                         ? $desc_data->description
                         : null;
                 }
+
+                $value->spec_data = json_decode($value->spec_data);
             }
 
             $this->result->status = true;

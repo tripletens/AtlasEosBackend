@@ -2440,7 +2440,9 @@ class DealerController extends Controller
                     ->get()
                     ->first();
 
-                $value->full_desc = $desc_data->description;
+                $value->full_desc = isset($desc_data->description)
+                    ? $desc_data->description
+                    : null;
             }
 
             $this->result->status = true;

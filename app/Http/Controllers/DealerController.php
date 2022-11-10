@@ -2432,6 +2432,7 @@ class DealerController extends Controller
         ) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
+                ->orderBy('xref', 'asc')
                 ->get();
 
             foreach ($vendor_products as $value) {

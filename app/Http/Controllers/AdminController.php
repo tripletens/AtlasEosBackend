@@ -3705,7 +3705,8 @@ class AdminController extends Controller
     {
         $products = Products::where('products.status', '1')
             ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
-            ->select('products.*','product_desc.*')
+            // ->select('products.*','product_desc.*')
+            ->select('products.*',`product_desc.xref as product_desc_xref`,`product_desc.description as product_desc_description`)
             ->orderBy('products.xref', 'asc')
             ->get();
 

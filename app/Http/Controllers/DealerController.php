@@ -2715,6 +2715,13 @@ class DealerController extends Controller
 
         foreach ($product as $value) {
             $value->spec_data = json_decode($value->spec_data);
+
+            $pro_desc = ProductModel::where('atlas_id', $value->atlas_id)
+                ->get()
+                ->first();
+            $value->full_desc = isset($pro_desc->description)
+                ? $pro_desc->description
+                : null;
         }
 
         $search_result = [

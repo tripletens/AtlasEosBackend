@@ -3585,13 +3585,11 @@ class AdminController extends Controller
     public function deactivate_product($id)
     {
         if (Products::where('id', $id)->exists()) {
-            $update = Products::where('id', $id)->update([
-                'status' => '0',
-            ]);
+            $update = Products::where('id', $id)->delete();
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'product deactivated with id';
+            $this->result->message = 'product deleted with id';
         } else {
             $this->result->status = false;
             $this->result->status_code = 404;
@@ -3724,16 +3722,6 @@ class AdminController extends Controller
     public function get_all_products()
     {
         $products = Products::where('status', '1')->get();
-
-        // $users = DB::table('products')
-        //     ->join(
-        //         'product_desc',
-        //         'products.atlas_id',
-        //         '=',
-        //         'product_desc.atlas_id'
-        //     )
-        //     ->select('product_desc.*', 'products.', 'orders.price')
-        //     ->get();
 
         foreach ($products as $value) {
             // $atlas_id = $value->atlas_id;

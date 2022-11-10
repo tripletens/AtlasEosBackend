@@ -3585,13 +3585,11 @@ class AdminController extends Controller
     public function deactivate_product($id)
     {
         if (Products::where('id', $id)->exists()) {
-            $update = Products::where('id', $id)->update([
-                'status' => '0',
-            ]);
+            $update = Products::where('id', $id)->delete();
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'product deactivated with id';
+            $this->result->message = 'product deleted with id';
         } else {
             $this->result->status = false;
             $this->result->status_code = 404;

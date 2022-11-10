@@ -125,8 +125,7 @@ class ChatController extends Controller
         //     ->where('role', '5')
         //     ->count();
 
-        // $all_sales =
-        //     $unread_outsidesales_rep__msg + $unread_inside_sales_rep__msg;
+        $all_sales = $unread_outside_msg + $unread_outside_msg;
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -134,8 +133,8 @@ class ChatController extends Controller
         $this->result->data->vendor = $unread_vendor_msg;
         $this->result->data->admin = $all_total_admin;
 
-        // $this->result->data->branch = $unread_branch_msg;
-        // $this->result->data->sales = $all_sales;
+        $this->result->data->branch = $unread_branch_msg;
+        $this->result->data->sales = $all_sales;
 
         $this->result->message = 'count unread msg chat based on their role';
         return response()->json($this->result);

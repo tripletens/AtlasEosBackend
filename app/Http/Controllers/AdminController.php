@@ -3623,6 +3623,7 @@ class AdminController extends Controller
             $spec = $request->spec;
 
             $grouping = $request->grouping;
+            $full_desc = $request->full_desc;
 
             // update to the db
             $update = Products::where('atlas_id', $atlasId)->update([
@@ -3634,6 +3635,10 @@ class AdminController extends Controller
                 'grouping' => $grouping,
                 'vendor_product_code' => $vendor,
                 'spec_data' => json_encode($spec),
+            ]);
+
+            ProductModel::where('atlas_id', $atlasId)->update([
+                'description' => $full_desc,
             ]);
 
             // if ($special != null) {

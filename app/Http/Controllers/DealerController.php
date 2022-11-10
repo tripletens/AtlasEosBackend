@@ -2436,13 +2436,16 @@ class DealerController extends Controller
 
             foreach ($vendor_products as $value) {
                 $atlas_id = $value->atlas_id;
-                $desc_data = ProductModel::where('atlas_id', $atlas_id)
-                    ->get()
-                    ->first();
 
-                $value->full_desc = isset($desc_data->description)
-                    ? $desc_data->description
-                    : null;
+                if (ProductModel::where('atlas_id', $atlas_id)->exists()) {
+                    $desc_data = ProductModel::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
+
+                    $value->full_desc = isset($desc_data->description)
+                        ? $desc_data->description
+                        : null;
+                }
             }
 
             $this->result->status = true;

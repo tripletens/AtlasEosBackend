@@ -3639,10 +3639,11 @@ class AdminController extends Controller
                 'spec_data' => json_encode($spec),
             ]);
 
-            ProductModel::where('atlas_id', $atlasId)->update([
-                'description' => $full_desc,
-            ]);
-
+            if (ProductModel::where('atlas_id', $atlasId)->exists()) {
+                ProductModel::where('atlas_id', $atlasId)->update([
+                    'description' => $full_desc,
+                ]);
+            }
             // if ($special != null) {
             //     Products::where('atlas_id', $atlasId)->update([
             //         'booking' => $special != null ? $special : '',

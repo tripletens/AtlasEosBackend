@@ -2838,6 +2838,10 @@ class AdminController extends Controller
 
             if (Users::where('email', $email)->exists()) {
                 // post with the same slug already exists
+                $this->result->status = false;
+                $this->result->status_code = 200;
+                $this->result->message = 'Email already exists';
+                return response()->json($this->result);
             } else {
                 $save_admin = Users::create([
                     'first_name' => $full_name,
@@ -2857,7 +2861,7 @@ class AdminController extends Controller
                     $this->result->status = false;
                     $this->result->status_code = 422;
                     $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
+                        'Sorry, Something went wrong. Try again later.';
                     return response()->json($this->result);
                 }
 

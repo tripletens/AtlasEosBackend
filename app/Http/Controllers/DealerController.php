@@ -1753,6 +1753,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+
     public function get_problem_dealer($ticket)
     {
         $selected = Report::where('ticket_id', $ticket)->get();
@@ -2378,6 +2379,10 @@ class DealerController extends Controller
         $this->result->message = 'Vendors fetched successfully';
 
         return response()->json($this->result);
+    }
+
+    public function hello($code){
+        return $code;
     }
 
     public function dealer_get_vendor_products($code)

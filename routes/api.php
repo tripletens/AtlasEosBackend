@@ -656,10 +656,28 @@ Route::group(
             'DealerController@get_vendor_products'
         );
 
+        // Route::get(
+        //     '/dealer/get-all-vendor-products/{code}',
+        //     'DealerController@dealer_get_vendor_products'
+        // );
+
+
         Route::get(
-            '/dealer/get-vendor-products/{code}',
-            'DealerController@dealer_get_vendor_products'
+            '/dealer/get-all-vendor-products/{code}',
+            'DealerNewController@dealer_get_vendor_products'
         );
+
+
+        Route::get(
+            '/hello/{code}',
+            'DealerController@hello'
+        );
+
+
+        // Route::get(
+        //     '/dealer/get-vendor-products-yes/{code}',
+        //     'DealerController@dealer_get_vendor_products'
+        // );
 
         Route::get(
             '/dealer/get-orders-by-vendor/{code}',

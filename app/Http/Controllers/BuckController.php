@@ -106,7 +106,7 @@ class BuckController extends Controller
             $vendor_name = $request->input('vendor_name');
             $vendor_code = $request->input('vendor_code');
             $title = $request->input('title');
-            $description = $request->input('description');
+            $description = $request->input('description') ? $request->input('description') : null;
             $vendor_code = $request->input('vendor_code');
             $status = $request->input('status');
 

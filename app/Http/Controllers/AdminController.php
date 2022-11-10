@@ -3736,9 +3736,7 @@ class AdminController extends Controller
             $value->full_desc = isset($desc_data->description)
                 ? $desc_data->description
                 : null;
-        }
 
-        foreach ($products as $value) {
             $value->spec_data = json_decode($value->spec_data);
         }
 

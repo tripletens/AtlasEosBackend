@@ -2391,7 +2391,7 @@ class DealerController extends Controller
                 ->where('products.status', '1')
                 ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
                 ->orderBy('products.xref', 'asc')
-                ->select('products.*',`product_desc.xref as product_desc_xref`,`product_desc.description as product_desc_description`)
+                ->select('products.*',`product_desc.*`)
                 ->get();
 
             foreach ($vendor_products as $value) {

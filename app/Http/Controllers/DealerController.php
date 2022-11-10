@@ -1753,6 +1753,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+
     public function get_problem_dealer($ticket)
     {
         $selected = Report::where('ticket_id', $ticket)->get();
@@ -2380,6 +2381,10 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
+    public function hello($code){
+        return $code;
+    }
+
     public function dealer_get_vendor_products($code)
     {
         if (
@@ -2391,7 +2396,7 @@ class DealerController extends Controller
                 ->where('products.status', '1')
                 ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
                 ->orderBy('products.xref', 'asc')
-                ->select('products.*',`product_desc.xref as product_desc_xref`,`product_desc.description as product_desc_description`)
+                ->select('products.*',`product_desc.*`)
                 ->get();
 
             foreach ($vendor_products as $value) {

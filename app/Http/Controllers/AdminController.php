@@ -778,6 +778,7 @@ class AdminController extends Controller
             ->first();
 
         $grouping = $product->grouping;
+        $atlas_id = $product->atlas_id;
 
         $assoc = [];
 
@@ -792,6 +793,16 @@ class AdminController extends Controller
         }
 
         $product->spec_data = json_decode($product->spec_data);
+
+        if (ProductModel::where('atlas_id', $atlas_id)->exists()) {
+            $desc_data = ProductModel::where('atlas_id', $atlas_id)
+                ->get()
+                ->first();
+
+            $product->full_desc = isset($desc_data->description)
+                ? $desc_data->description
+                : null;
+        }
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -3703,12 +3714,21 @@ class AdminController extends Controller
 
     public function get_all_products()
     {
-        $products = Products::where('products.status', '1')
-            ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
-            ->select('products.*','product_desc.*')
-            // ->select('products.*',`product_desc.xref as product_desc_xref`,`product_desc.description as product_desc_description`)
-            ->orderBy('products.xref', 'asc')
-            ->get();
+        $products = Products::where('status', '1')->get();
+
+        foreach ($products as $value) {
+            $atlas_id = $value->atlas_id;
+
+            if (ProductModel::where('atlas_id', $atlas_id)->exists()) {
+                $desc_data = ProductModel::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->full_desc = isset($desc_data->description)
+                    ? $desc_data->description
+                    : null;
+            }
+        }
 
         foreach ($products as $value) {
             $value->spec_data = json_decode($value->spec_data);

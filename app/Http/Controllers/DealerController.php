@@ -45,6 +45,7 @@ use App\Models\ProgramCountdown;
 
 use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
+use App\Models\ProductModel;
 
 class DealerController extends Controller
 {
@@ -1753,7 +1754,6 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-
     public function get_problem_dealer($ticket)
     {
         $selected = Report::where('ticket_id', $ticket)->get();
@@ -2381,7 +2381,8 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function hello($code){
+    public function hello($code)
+    {
         return $code;
     }
 
@@ -2394,9 +2395,14 @@ class DealerController extends Controller
         ) {
             $vendor_products = Products::where('products.vendor', $code)
                 ->where('products.status', '1')
-                ->join('product_desc', 'product_desc.atlas_id', '=', 'products.atlas_id')
+                ->join(
+                    'product_desc',
+                    'product_desc.atlas_id',
+                    '=',
+                    'products.atlas_id'
+                )
                 ->orderBy('products.xref', 'asc')
-                ->select('products.*',`product_desc.*`)
+                ->select('products.*', `product_desc.*`)
                 ->get();
 
             foreach ($vendor_products as $value) {
@@ -2427,6 +2433,16 @@ class DealerController extends Controller
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
                 ->get();
+
+            foreach ($vendor_products as $value) {
+                $atlas_id = $value->atlas_id;
+                $desc_data = ProductModel::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $value->full_desc = $desc_data->description;
+            }
+
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->data = $vendor_products;

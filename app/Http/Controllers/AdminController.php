@@ -3726,20 +3726,25 @@ class AdminController extends Controller
         $products = Products::where('status', '1')->get();
 
         // $users = DB::table('products')
-        // ->join('product_desc', 'products.atlas_id', '=', 'product_desc.atlas_id')
-        // ->select('users.*', 'contacts.phone', 'orders.price')
-        // ->get();
+        //     ->join(
+        //         'product_desc',
+        //         'products.atlas_id',
+        //         '=',
+        //         'product_desc.atlas_id'
+        //     )
+        //     ->select('product_desc.*', 'products.', 'orders.price')
+        //     ->get();
 
         foreach ($products as $value) {
-            $atlas_id = $value->atlas_id;
+            // $atlas_id = $value->atlas_id;
 
-            $desc_data = ProductModel::where('atlas_id', $atlas_id)
-                ->get()
-                ->first();
+            // $desc_data = ProductModel::where('atlas_id', $atlas_id)
+            //     ->get()
+            //     ->first();
 
-            $value->full_desc = isset($desc_data->description)
-                ? $desc_data->description
-                : null;
+            // $value->full_desc = isset($desc_data->description)
+            //     ? $desc_data->description
+            //     : null;
 
             $value->spec_data = json_decode($value->spec_data);
         }

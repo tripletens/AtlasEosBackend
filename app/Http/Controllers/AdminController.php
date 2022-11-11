@@ -2791,10 +2791,7 @@ class AdminController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'fullName' => 'required',
-            'designation' => 'required',
             'role' => 'required',
-            'accountAccess' => 'required',
-            'region' => 'required',
             'email' => 'required',
             'password' => 'required',
         ]);

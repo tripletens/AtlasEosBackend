@@ -735,9 +735,9 @@ class SalesRepController extends Controller
                     $dealer_cart = Cart::where('dealer',$user_privilaged_dealer)->count();
 
                     if($dealer_cart == 0){
-                        array_push($all_dealers_without_orders, ...$get_priviledged_dealer_details);
+                        array_push($all_dealers_without_orders, ...$get_total_user_dealers);
                     }else{
-                        array_push($all_dealers_with_orders, ...$get_priviledged_dealer_details);
+                        array_push($all_dealers_with_orders, ...$get_total_user_dealers);
                     }
 
                     array_push($user_dealers_array, ...$get_priviledged_dealer_details);
@@ -981,7 +981,7 @@ class SalesRepController extends Controller
                 // $get_priviledged_dealer_details = Users::where('account_id', $user_privileged_dealers_format)
                     // ->select('id', 'account_id', 'full_name', 'first_name', 'last_name', 'vendor_name', 'company_name','last_login')
                     // ->get();
-                    
+
                 $get_priviledged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealers_format)
                     ->get();
 

@@ -44,7 +44,11 @@ class ProductsController extends Controller
                 foreach ($fetch_new_products as $db_value) {
                     $vendor_name = $db_value->vendor_name;
 
-                    $db_value->spec_data = json_decode($db_value->spec_data);
+                    if ($db_value->spec_data != null) {
+                        $db_value->spec_data = json_decode(
+                            $db_value->spec_data
+                        );
+                    }
 
                     if ($value == $vendor_name) {
                         array_push($single, $db_value);

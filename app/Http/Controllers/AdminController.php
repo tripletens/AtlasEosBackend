@@ -2840,6 +2840,10 @@ class AdminController extends Controller
 
             if (Users::where('email', $email)->exists()) {
                 // post with the same slug already exists
+                $this->result->status = false;
+                $this->result->status_code = 200;
+                $this->result->message = 'Email already exists';
+                return response()->json($this->result);
             } else {
                 $save_admin = Users::create([
                     'first_name' => $full_name,
@@ -2859,7 +2863,7 @@ class AdminController extends Controller
                     $this->result->status = false;
                     $this->result->status_code = 422;
                     $this->result->message =
-                        'Sorry File could not be uploaded. Try again later.';
+                        'Sorry, Something went wrong. Try again later.';
                     return response()->json($this->result);
                 }
 
@@ -3583,13 +3587,11 @@ class AdminController extends Controller
     public function deactivate_product($id)
     {
         if (Products::where('id', $id)->exists()) {
-            $update = Products::where('id', $id)->update([
-                'status' => '0',
-            ]);
+            $update = Products::where('id', $id)->delete();
 
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'product deactivated with id';
+            $this->result->message = 'product deleted with id';
         } else {
             $this->result->status = false;
             $this->result->status_code = 404;
@@ -3639,10 +3641,14 @@ class AdminController extends Controller
                 'spec_data' => json_encode($spec),
             ]);
 
-            ProductModel::where('atlas_id', $atlasId)->update([
-                'description' => $full_desc,
-            ]);
-
+            if (
+                ProductModel::where('atlas_id', $atlasId)->exists() &&
+                $full_desc != ''
+            ) {
+                ProductModel::where('atlas_id', $atlasId)->update([
+                    'description' => $full_desc,
+                ]);
+            }
             // if ($special != null) {
             //     Products::where('atlas_id', $atlasId)->update([
             //         'booking' => $special != null ? $special : '',
@@ -3723,21 +3729,16 @@ class AdminController extends Controller
     {
         $products = Products::where('status', '1')->get();
 
-        // $users = DB::table('products')
-        // ->join('product_desc', 'products.atlas_id', '=', 'product_desc.atlas_id')
-        // ->select('users.*', 'contacts.phone', 'orders.price')
-        // ->get();
-
         foreach ($products as $value) {
-            $atlas_id = $value->atlas_id;
+            // $atlas_id = $value->atlas_id;
 
-            $desc_data = ProductModel::where('atlas_id', $atlas_id)
-                ->get()
-                ->first();
+            // $desc_data = ProductModel::where('atlas_id', $atlas_id)
+            //     ->get()
+            //     ->first();
 
-            $value->full_desc = isset($desc_data->description)
-                ? $desc_data->description
-                : null;
+            // $value->full_desc = isset($desc_data->description)
+            //     ? $desc_data->description
+            //     : null;
 
             $value->spec_data = json_decode($value->spec_data);
         }

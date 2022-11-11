@@ -70,7 +70,7 @@ class ProductsController extends Controller
                     return $object1->xref > $object2->xref;
                 });
 
-                array_push($res, $value['data']);
+                array_push($res, $value['data'][0]);
             }
         }
 

@@ -2836,6 +2836,8 @@ class AdminController extends Controller
                 $role_name = 'outside sales';
             }
 
+            // $check_user = Users::where('email',$email)->where()
+
             if (Users::where('email', $email)->exists()) {
                 // post with the same slug already exists
             } else {

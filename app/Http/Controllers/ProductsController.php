@@ -26,21 +26,59 @@ class ProductsController extends Controller
             ->orderby('vendor_name', 'asc')
             ->get();
 
-        foreach ($fetch_new_products as $value) {
-            $value->spec_data = json_decode($value->spec_data);
+        if ($fetch_new_products) {
+            $vendor_arr = [];
+            foreach ($fetch_new_products as $value) {
+                $vendor_name = $value->vendor_name;
+
+                if (!\in_array($vendor_name, $vendor_arr)) {
+                    array_push($vendor_arr, $vendor_name);
+                }
+            }
+
+            $mix_up = [];
+
+            foreach ($vendor_arr as $value) {
+                $single = [];
+
+                foreach ($fetch_new_products as $db_value) {
+                    $vendor_name = $db_value->vendor_name;
+
+                    $db_value->spec_data = json_decode($db_value->spec_data);
+
+                    if ($value == $vendor_name) {
+                        array_push($single, $db_value);
+                    }
+                }
+
+                $dd = [
+                    'vendor' => $value,
+                    'data' => $single,
+                ];
+
+                array_push($mix_up, $dd);
+            }
+
+            $res = [];
+
+            foreach ($mix_up as $value) {
+                usort($value['data'], function ($object1, $object2) {
+                    return $object1->xref > $object2->xref;
+                });
+
+                array_push($res, $value['data']);
+            }
         }
 
-        if (!$fetch_new_products) {
-            $this->result->status = true;
-            $this->result->status_code = 400;
-            $this->result->message =
-                "An Error Ocurred, we couldn't fetch all the new products";
-            return response()->json($this->result);
-        }
+        /// return $res;
+
+        // foreach ($fetch_new_products as $value) {
+        //     $value->spec_data = json_decode($value->spec_data);
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data = $fetch_new_products;
+        $this->result->data = $res;
         $this->result->message = 'All new Products fetched Successfully';
         return response()->json($this->result);
     }

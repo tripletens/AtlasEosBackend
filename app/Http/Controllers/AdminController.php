@@ -3890,7 +3890,7 @@ class AdminController extends Controller
                     'desc' => $desc,
                 ];
 
-                if ($check_atlas_id->spec_data) {
+                if (isset($check_atlas_id->spec_data)) {
                     $spec = json_decode($check_atlas_id->spec_data, true);
                     array_push($spec, $spec_data);
                     $new_spec = json_encode($spec);

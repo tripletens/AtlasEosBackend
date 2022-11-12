@@ -22,7 +22,7 @@ class ProductsController extends Controller
     // fetch all new products
     public function fetch_all_new_products()
     {
-        $fetch_new_products = Products::where('check_new', true)
+        $fetch_new_products = Products::where('check_new', '1')
             ->orderby('vendor_name', 'asc')
             ->get();
 
@@ -30,15 +30,28 @@ class ProductsController extends Controller
             $vendor_arr = [];
             foreach ($fetch_new_products as $value) {
                 $vendor_name = $value->vendor_name;
+                $vendor_code = $value->vendor_code;
 
-                if (!\in_array($vendor_name, $vendor_arr)) {
+                // if (!in_array($vendor_code, $vendor_arr)) {
+                //     array_push($vendor_arr, $vendor_code);
+                // }
+
+                if (!in_array($vendor_name, $vendor_arr)) {
                     array_push($vendor_arr, $vendor_name);
                 }
             }
 
+            ////  return count($vendor_arr);
+
             $mix_up = [];
 
+            global $glo_vendor;
+
+            $count_check = 0;
+
             foreach ($vendor_arr as $value) {
+                $glo_vendor = $value;
+
                 $single = [];
 
                 foreach ($fetch_new_products as $db_value) {
@@ -50,10 +63,12 @@ class ProductsController extends Controller
                     //     );
                     // }
 
-                    if ($value == $vendor_name) {
+                    if ($glo_vendor == $vendor_name) {
                         array_push($single, $db_value);
                     }
                 }
+
+                $count_check += count($single);
 
                 $dd = [
                     'vendor' => $value,
@@ -70,11 +85,11 @@ class ProductsController extends Controller
                     return $object1->xref > $object2->xref;
                 });
 
-                array_push($res, $value['data'][0]);
+                foreach ($value['data'] as $data_val) {
+                    array_push($res, $data_val);
+                }
             }
         }
-
-        /// return $res;
 
         // foreach ($fetch_new_products as $value) {
         //     $value->spec_data = json_decode($value->spec_data);

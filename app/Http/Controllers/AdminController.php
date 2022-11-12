@@ -2791,10 +2791,7 @@ class AdminController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'fullName' => 'required',
-            'designation' => 'required',
             'role' => 'required',
-            'accountAccess' => 'required',
-            'region' => 'required',
             'email' => 'required',
             'password' => 'required',
         ]);
@@ -2835,6 +2832,8 @@ class AdminController extends Controller
             if (strtolower($role) == '6') {
                 $role_name = 'outside sales';
             }
+
+            // $check_user = Users::where('email',$email)->where()
 
             if (Users::where('email', $email)->exists()) {
                 // post with the same slug already exists

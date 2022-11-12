@@ -3793,6 +3793,10 @@ class AdminController extends Controller
                         'desc' => $desc,
                     ];
 
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'type' => 'assorted',
+                    ]);
+
                     if ($check_atlas_id->spec_data) {
                         $spec = json_decode($check_atlas_id->spec_data, true);
                         array_push($spec, $spec_data);
@@ -3889,6 +3893,10 @@ class AdminController extends Controller
                     'type' => 'special',
                     'desc' => $desc,
                 ];
+
+                Products::where('atlas_id', $atlas_id)->update([
+                    'type' => 'special',
+                ]);
 
                 if (isset($check_atlas_id->spec_data)) {
                     $spec = json_decode($check_atlas_id->spec_data, true);

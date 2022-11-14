@@ -445,7 +445,7 @@ class WebViewController extends Controller
                         $lang,
                         isset($pro_data->description)
                             ? $pro_data->description
-                            : ''
+                            : 'null'
                     );
                 }
 

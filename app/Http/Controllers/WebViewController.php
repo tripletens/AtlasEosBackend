@@ -399,6 +399,24 @@ class WebViewController extends Controller
         // return $pdf->download('dealership.pdf');
     }
 
+    public function translateToLocal($languagecode, $text)
+    {
+        if ($languagecode == 'en') {
+            //no conversion in case of english to english
+            return $text;
+        }
+
+        $tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default
+        $tr->setSource('en'); // Translate from English
+        $tr->setSource(); // Detect language automatically
+        $tr->setTarget('fr'); // Translate to Georgian
+        if ($text != null && $text != '') {
+            return $tr->translate($text);
+        } else {
+            return $text;
+        }
+    }
+
     public function generate_pdf($dealer, $lang, $current_time)
     {
         $data = [

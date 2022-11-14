@@ -440,12 +440,15 @@ class WebViewController extends Controller
                     ->get()
                     ->first();
 
-                $value->description = $this->translateToLocal(
-                    $lang,
-                    isset($pro_data->description)
-                        ? $pro_data->description
-                        : null
-                );
+                if (isset($pro_data->description)) {
+                    $value->description = $this->translateToLocal(
+                        $lang,
+                        isset($pro_data->description)
+                            ? $pro_data->description
+                            : null
+                    );
+                }
+
                 $value->vendor_product_code = $this->translateToLocal(
                     $lang,
                     isset($pro_data->vendor_product_code)

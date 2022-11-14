@@ -2386,7 +2386,9 @@ class VendorController extends Controller
 
     public function get_vendors_products($code)
     {
-        $res_data = Products::where('vendor_code', $code)->get();
+        $res_data = Products::where('vendor_code', $code)
+            ->orderBy('xref', 'asc')
+            ->get();
 
         foreach ($res_data as $value) {
             $spec_data = $value->spec_data;

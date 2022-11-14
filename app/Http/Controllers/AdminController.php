@@ -1658,6 +1658,7 @@ class AdminController extends Controller
         if (Products::where('vendor', $code)->exists()) {
             $vendor_products = Products::where('vendor', $code)
                 ->where('status', '1')
+                ->orderBy('xref', 'asc')
                 ->get();
 
             foreach ($vendor_products as $value) {

@@ -86,6 +86,11 @@ class ProductsController extends Controller
                 });
 
                 foreach ($value['data'] as $data_val) {
+                    if ($data_val->spec_data != null) {
+                        $data_val->spec_data = json_decode(
+                            $data_val->spec_data
+                        );
+                    }
                     array_push($res, $data_val);
                 }
             }

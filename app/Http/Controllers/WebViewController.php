@@ -446,6 +446,7 @@ class WebViewController extends Controller
                         ? $pro_data->description
                         : null
                 );
+
                 $value->vendor_product_code = $this->translateToLocal(
                     $lang,
                     isset($pro_data->vendor_product_code)

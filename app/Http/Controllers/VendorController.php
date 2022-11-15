@@ -1885,7 +1885,7 @@ class VendorController extends Controller
                 // } else {
                 //     return false;
                 // }
-                return $object1['xref'] > $object2['xref'];
+                return $object1->xref > $object2->xref;
             });
 
             return $data;

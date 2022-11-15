@@ -27,6 +27,8 @@ Route::group(
     function () {
         Route::post('/admin-login', 'AdminController@admin_login');
 
+        Route::get('/update-login', 'AdminController@update_login');
+
         Route::post(
             '/admin/upload-product-special',
             'AdminController@upload_product_special'

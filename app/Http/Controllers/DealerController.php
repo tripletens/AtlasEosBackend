@@ -659,10 +659,9 @@ class DealerController extends Controller
             $check_assorted = $res[0]->grouping != null ? true : false;
             if ($check_assorted) {
                 $assorted_status = true;
-                $assorted_data = Products::where(
-                    'grouping',
-                    $res[0]->grouping
-                )->get();
+                $assorted_data = Products::where('grouping', $res[0]->grouping)
+                    ->orderBy('xref', 'asc')
+                    ->get();
 
                 foreach ($assorted_data as $value) {
                     $value->spec_data = json_decode($value->spec_data);

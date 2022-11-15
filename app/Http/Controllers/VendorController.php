@@ -1876,7 +1876,7 @@ class VendorController extends Controller
             //     return $con;
             // }, $data);
 
-            usort($ddt, function ($object1, $object2) {
+            usort($data, function ($object1, $object2) {
                 // $ex1 = explode('-', $object1->atlas_id);
                 // $ex2 = explode('-', $object2->atlas_id);
 
@@ -1888,7 +1888,7 @@ class VendorController extends Controller
                 return $object1['xref'] > $object2['xref'];
             });
 
-            return $ddt;
+            return $data;
         }
     }
 

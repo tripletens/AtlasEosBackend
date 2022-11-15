@@ -1125,7 +1125,7 @@ class DealerController extends Controller
             ->where('quick_order.dealer', $dealer)
             ->join('vendors', 'vendors.vendor_code', '=', 'quick_order.vendor')
             ->select('quick_order.*', 'vendors.vendor_name')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('xref', 'asc')
             ->get();
 
         foreach ($quick_orders as $value) {

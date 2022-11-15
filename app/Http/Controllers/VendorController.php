@@ -1829,12 +1829,12 @@ class VendorController extends Controller
         //     array_push($res_data, $data);
         // }
 
-        $res = $this->sort_according_atlas_id($res_data);
+        ///  $res = $this->sort_according_atlas_id($res_data);
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Purchasers by Dealers';
-        $this->result->data = $res;
+        $this->result->data = $res_data;
         return response()->json($this->result);
     }
 

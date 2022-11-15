@@ -95,9 +95,11 @@ class AdminController extends Controller
 
     public function update_login()
     {
-        $order_users = Users::where('order_status', '1')->update([
-            'last_login' => Carbon::now(),
-        ]);
+        $order_users = Users::where('order_status', '1')
+            ->where('last_login', null)
+            ->update([
+                'last_login' => Carbon::now(),
+            ]);
 
         if ($order_users) {
             $this->result->status = true;

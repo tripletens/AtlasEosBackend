@@ -482,11 +482,11 @@ class BranchController extends Controller
 
             array_push($new_dealers_array, ...$dealer_inner_details);
 
-            $sum_user_total = Cart::where('dealer', $_dealer->dealer_code)
-                ->get()
-                ->sum('price');
+            $sum_user_total = Cart::where('dealer', $_dealer->dealer_code)->pluck('price')->toArray();
+                // ->get();
+                // ->sum('price');
 
-            $_dealer->amount = $sum_user_total;
+            $_dealer->amount = array_sum($sum_user_total);
         }
 
         $this->result->status = true;

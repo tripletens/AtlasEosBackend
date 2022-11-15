@@ -932,11 +932,11 @@ class DealerController extends Controller
         //     return $object1->score > $object2->score;
         // }
 
-        $res = (object) $res_data;
+        // $res = (object) $res_data;
 
-        usort($res_data, function ($object1, $object2) {
-            return $object1['id'] > $object2['id'];
-        });
+        // usort($res_data, function ($object1, $object2) {
+        //     return $object1['id'] > $object2['id'];
+        // });
 
         $this->result->status = true;
         $this->result->status_code = 200;

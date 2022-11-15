@@ -93,6 +93,25 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function update_login()
+    {
+        $order_users = Users::where('order_status', '1')->update([
+            'last_login' => Carbon::now(),
+        ]);
+
+        if ($order_users) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Last Login done';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function deactivate_dealer_dashboard()
     {
         $switch_state = Users::where('email', '!=', 'info@atlastrailer.com')

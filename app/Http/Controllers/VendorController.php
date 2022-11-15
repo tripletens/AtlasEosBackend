@@ -1722,6 +1722,7 @@ class VendorController extends Controller
         foreach ($atlas_id_checker as $value) {
             $item_cart = Cart::where('vendor', $code)
                 ->where('atlas_id', $value)
+                ->orderBy('xref', 'asc')
                 ->get();
 
             $total_qty = 0;
@@ -1884,7 +1885,7 @@ class VendorController extends Controller
                 // } else {
                 //     return false;
                 // }
-                return $object1->pro_id > $object2->pro_id;
+                return $object1->xref > $object2->xref;
             });
 
             return $ddt;

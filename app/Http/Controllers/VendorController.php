@@ -586,6 +586,7 @@ class VendorController extends Controller
         foreach ($atlas_id_checker as $value) {
             $item_cart = Cart::where('vendor', $code)
                 ->where('atlas_id', $value)
+                ->orderBy('xref', 'asc')
                 ->get();
 
             $total_qty = 0;
@@ -630,10 +631,10 @@ class VendorController extends Controller
             }
         }
 
-        $res = $this->sort_according_atlas_id($res_data);
+        ////  $res = $this->sort_according_atlas_id($res_data);
 
         $pdf_data = [
-            'data' => $res,
+            'data' => $res_data,
             'vendor' => $vendor_data ? $vendor_data : null,
             'grand_total' => $over_all_total,
             'lang' => $lang,
@@ -1540,12 +1541,12 @@ class VendorController extends Controller
             // return $res_data;
         }
 
-        $res = $this->sort_according_atlas_id($res_data);
+        ////$res = $this->sort_according_atlas_id($res_data);
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
-        $this->result->data->res = $res;
+        $this->result->data->res = $res_data;
         // $this->result->data->atlas_id = $atlas_id_data;
 
         return response()->json($this->result);
@@ -1577,6 +1578,7 @@ class VendorController extends Controller
 
                 $atlas_filter = Cart::where('vendor', $code)
                     ->where('atlas_id', $each_id)
+                    ->orderBy('xref', 'asc')
                     ->get();
 
                 $pro_data = Products::where('atlas_id', $each_id)
@@ -1623,7 +1625,6 @@ class VendorController extends Controller
                         ];
 
                         $total_atlas_amount += floatval($value->price);
-
                         array_push($dealer_data, $data);
                     }
                 }
@@ -1689,12 +1690,12 @@ class VendorController extends Controller
 
         /// $export_vendor = $this->sort_according_dealer_code($vendor_purchases);
 
-        $res = $this->sort_according_atlas_id($res_data);
+        ////   $res = $this->sort_according_atlas_id($res_data);
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
-        $this->result->data->res = $res;
+        $this->result->data->res = $res_data;
         $this->result->data->export = $vendor_purchases_ex;
 
         // $this->result->data->atlas_id = $atlas_id_data;

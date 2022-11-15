@@ -1106,7 +1106,9 @@ class DealerController extends Controller
 
     public function get_item_grouping($group)
     {
-        $product_data = Products::where('grouping', $group)->get();
+        $product_data = Products::where('grouping', $group)
+            ->orderBy('xref', 'asc')
+            ->get();
         foreach ($product_data as $value) {
             $value->spec_data = json_decode($value->spec_data);
         }

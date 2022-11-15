@@ -1868,15 +1868,15 @@ class VendorController extends Controller
     public function sort_according_atlas_id($data)
     {
         if (count($data) > 0 && !empty($data)) {
-            $ddt = array_map(function ($each) {
-                $con = (object) $each;
-                $atlas = $con->atlas_id;
-                $tem = str_replace('-', '', $atlas);
-                $con->temp = $tem;
-                return $con;
-            }, $data);
+            // $ddt = array_map(function ($each) {
+            //     $con = (object) $each;
+            //     $atlas = $con->atlas_id;
+            //     $tem = str_replace('-', '', $atlas);
+            //     $con->temp = $tem;
+            //     return $con;
+            // }, $data);
 
-            usort($ddt, function ($object1, $object2) {
+            usort($data, function ($object1, $object2) {
                 // $ex1 = explode('-', $object1->atlas_id);
                 // $ex2 = explode('-', $object2->atlas_id);
 
@@ -1888,7 +1888,7 @@ class VendorController extends Controller
                 return $object1->xref > $object2->xref;
             });
 
-            return $ddt;
+            return $data;
         }
     }
 

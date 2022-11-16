@@ -1271,7 +1271,7 @@ Route::group(
         Route::post('/branch-login', 'BranchController@login');
 
         Route::get(
-            '/branch/get-vendor-unread-msg',
+            '/branch/get-vendor-unread-msg/{user}',
             'BranchController@get_vendor_unread_msg'
         );
     }

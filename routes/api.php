@@ -1269,6 +1269,11 @@ Route::group(
     ['namespace' => 'App\Http\Controllers', 'middleware' => 'cors'],
     function () {
         Route::post('/branch-login', 'BranchController@login');
+
+        Route::post(
+            '/branch/get-vendor-unread-msg',
+            'BranchController@get_vendor_unread_msg'
+        );
     }
 );
 

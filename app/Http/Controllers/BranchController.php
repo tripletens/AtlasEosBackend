@@ -23,7 +23,9 @@ class BranchController extends Controller
 {
     public function __construct()
     {
-        //// $this->middleware( 'auth:api', [ 'except' => [ 'login', 'register', 'test' ] ] );
+        $this->middleware('auth:api', [
+            'except' => ['login', 'register', 'test'],
+        ]);
         $this->result = (object) [
             'status' => false,
             'status_code' => 200,
@@ -32,6 +34,58 @@ class BranchController extends Controller
             'token' => null,
             'debug' => null,
         ];
+    }
+
+    public function get_vendor_unread_msg($user)
+    {
+        $unread_msg_data = Chat::where('chat_to', $user)
+            ->where('status', '0')
+            ->where('role', '3')
+            ->get()
+            ->toArray();
+
+        $data = [];
+
+        if ($unread_msg_data) {
+            foreach ($unread_msg_data as $value) {
+                $sender = $value['chat_from'];
+
+                $sender_data = Users::where('id', $sender)
+                    ->where('role', '3')
+                    ->get()
+                    ->first();
+
+                if ($sender_data) {
+                    $count_notification = Chat::where('chat_from', $sender)
+                        ->where('chat_to', $user)
+                        ->where('status', '0')
+                        ->count();
+
+                    $each_data = [
+                        'id' => $sender_data->id,
+                        'vendor_name' => $sender_data->vendor_name,
+                        'first_name' => $sender_data->first_name,
+                        'last_name' => $sender_data->last_name,
+                        'full_name' => $sender_data->full_name,
+                        'email' => $sender_data->email,
+                        'notification' => $count_notification,
+                    ];
+
+                    array_push($data, $each_data);
+                }
+            }
+        }
+
+        $data = array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $data))
+        );
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'get vendor unread msg';
+        $this->result->data = $data;
+        return response()->json($this->result);
     }
 
     public function get_all_admin_users($user)
@@ -343,8 +397,10 @@ class BranchController extends Controller
                 $user_privileged_dealers_array
             );
 
-            foreach ($filter_users_priviledged_dealers_array
-                as $user_privilaged_dealer) {
+            foreach (
+                $filter_users_priviledged_dealers_array
+                as $user_privilaged_dealer
+            ) {
                 $user_privileged_dealers_format = str_replace(
                     '"',
                     '',
@@ -356,9 +412,15 @@ class BranchController extends Controller
                     $user_privileged_dealers_format
                 )->get();
 
-                $dealer_cart_status = Cart::where('dealer', $user_privileged_dealers_format)->count();
+                $dealer_cart_status = Cart::where(
+                    'dealer',
+                    $user_privileged_dealers_format
+                )->count();
 
-                if (count($get_priviledged_dealer_details) > 0 && $dealer_cart_status > 0) {
+                if (
+                    count($get_priviledged_dealer_details) > 0 &&
+                    $dealer_cart_status > 0
+                ) {
                     // yay its an array
                     array_push(
                         $user_dealers_array,
@@ -367,7 +429,6 @@ class BranchController extends Controller
                 }
             }
         }
-
 
         $this->result->status = true;
         $this->result->data = $user_dealers_array;
@@ -404,8 +465,10 @@ class BranchController extends Controller
                 $user_privileged_dealers_array
             );
 
-            foreach ($filter_users_priviledged_dealers_array
-                as $user_privilaged_dealer) {
+            foreach (
+                $filter_users_priviledged_dealers_array
+                as $user_privilaged_dealer
+            ) {
                 $user_privileged_dealers_format = str_replace(
                     '"',
                     '',
@@ -513,7 +576,7 @@ class BranchController extends Controller
         }
 
         // get all the privileged dealers under the person
-        $user_privileged_dealers = explode(',',$user_data->privileged_dealers);
+        $user_privileged_dealers = explode(',', $user_data->privileged_dealers);
 
         $user_privilaged_dealer_last_login = 0;
 
@@ -534,8 +597,10 @@ class BranchController extends Controller
 
             // return $filter_users_priviledged_dealers_array;
 
-            foreach ($filter_users_priviledged_dealers_array
-                as $user_privilaged_dealer) {
+            foreach (
+                $filter_users_priviledged_dealers_array
+                as $user_privilaged_dealer
+            ) {
                 // $user_privileged_dealers_format = str_replace('"', '', $user_privilaged_dealer);
 
                 // return $user_privilaged_dealer;
@@ -553,7 +618,6 @@ class BranchController extends Controller
                     'dealer_code',
                     $user_privilaged_dealer
                 )->get();
-
 
                 $get_total_user_dealers = Users::where(
                     'account_id',
@@ -677,8 +741,10 @@ class BranchController extends Controller
 
             // return $user_privileged_dealers_array[0];
 
-            foreach ($user_privileged_dealers_array
-                as $user_privilaged_dealer) {
+            foreach (
+                $user_privileged_dealers_array
+                as $user_privilaged_dealer
+            ) {
                 $user_privileged_dealers_format = str_replace(
                     '"',
                     '',
@@ -761,8 +827,10 @@ class BranchController extends Controller
 
             // return $user_privileged_dealers_array[0];
 
-            foreach ($user_privileged_dealers_array
-                as $user_privilaged_dealer) {
+            foreach (
+                $user_privileged_dealers_array
+                as $user_privilaged_dealer
+            ) {
                 $user_privileged_dealers_format = str_replace(
                     '"',
                     '',

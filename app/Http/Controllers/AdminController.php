@@ -93,6 +93,28 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function fix_notes()
+    {
+        $all = ProgramNotes::all();
+        foreach ($all as $value) {
+            $id = $value->id;
+            $dealer_uid = $value->dealer_uid;
+            $user = Users::where('id', $dealer_uid)
+                ->get()
+                ->first();
+            $full_name = $user->full_name;
+            ProgramNotes::where('id', $id)->update([
+                'dealer_rep' => $full_name,
+            ]);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Last Login done';
+
+        return response()->json($this->result);
+    }
+
     public function update_login()
     {
         $order_users = Users::where('order_status', '1')

@@ -25,6 +25,8 @@ Route::group(
         'middleware' => 'cors',
     ],
     function () {
+        Route::get('/update-notes', 'AdminController@fix_notes');
+
         Route::post('/admin-login', 'AdminController@admin_login');
 
         Route::get('/update-login', 'AdminController@update_login');

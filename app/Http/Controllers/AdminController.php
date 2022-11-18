@@ -2831,7 +2831,7 @@ class AdminController extends Controller
             $full_name = $request->fullName;
             $designation = $request->designation;
             $role = $request->role;
-            $region = $request->region;
+            // $region = $request->region;
             $email = $request->email;
             $password = $request->password;
 
@@ -2875,7 +2875,7 @@ class AdminController extends Controller
                     'access_level_first' => $accountAccess,
                     'password' => bcrypt($password),
                     'password_show' => $password,
-                    'region' => $region,
+                    // 'region' => $region,
                 ]);
 
                 if (!$save_admin) {

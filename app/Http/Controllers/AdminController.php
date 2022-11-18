@@ -1596,7 +1596,7 @@ class AdminController extends Controller
 
     public function dealer_summary()
     {
-        $dealers = Dealer::all();
+        $dealers = Dealer::orderBy('dealer_code', 'asc')->get();
         $dealer_count = Dealer::count();
         $total_sales = 0;
         $res_data = [];
@@ -1624,10 +1624,10 @@ class AdminController extends Controller
         }
 
         /////// Sorting //////////
-        usort($res_data, function ($a, $b) {
-            //Sort the array using a user defined function
-            return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
-        });
+        // usort($res_data, function ($a, $b) {
+        //     //Sort the array using a user defined function
+        //     return $a['sales'] > $b['sales'] ? -1 : 1; //Compare the scores
+        // });
 
         $this->result->status = true;
         $this->result->status_code = 200;

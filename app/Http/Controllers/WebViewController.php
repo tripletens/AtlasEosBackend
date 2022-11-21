@@ -48,9 +48,26 @@ use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
 use App\Models\ProductModel;
 
+set_time_limit(250000000000);
+
 class WebViewController extends Controller
 {
     //
+
+    public function __construct()
+    {
+        // set timeout limit
+        set_time_limit(2500000000);
+
+        $this->result = (object) [
+            'status' => false,
+            'status_code' => 200,
+            'message' => null,
+            'data' => (object) null,
+            'token' => null,
+            'debug' => null,
+        ];
+    }
 
     public function generate_vendor_view_summary(
         $dealer,

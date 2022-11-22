@@ -470,44 +470,45 @@ class WebViewController extends Controller
 
             $total = 0;
 
-            foreach ($cart_data as $value) {
-                $total += $value->price;
-                $atlas_id = $value->atlas_id;
-                $pro_data = Products::where('atlas_id', $atlas_id)
-                    ->get()
-                    ->first();
+            if ($cart_data) {
+                foreach ($cart_data as $value) {
+                    $total += $value->price;
+                    $atlas_id = $value->atlas_id;
+                    $pro_data = Products::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
 
-                if (isset($pro_data->description)) {
-                    $value->description = $this->translateToLocal(
+                    if (isset($pro_data->description)) {
+                        $value->description = $this->translateToLocal(
+                            $lang,
+                            isset($pro_data->description)
+                                ? $pro_data->description
+                                : 'null'
+                        );
+                    }
+
+                    $value->vendor_product_code = $this->translateToLocal(
                         $lang,
-                        isset($pro_data->description)
-                            ? $pro_data->description
-                            : 'null'
+                        isset($pro_data->vendor_product_code)
+                            ? $pro_data->vendor_product_code
+                            : null
                     );
                 }
 
-                $value->vendor_product_code = $this->translateToLocal(
-                    $lang,
-                    isset($pro_data->vendor_product_code)
-                        ? $pro_data->vendor_product_code
-                        : null
-                );
+                $data = [
+                    'vendor_code' => isset($vendor_data->vendor_code)
+                        ? $vendor_data->vendor_code
+                        : null,
+                    'vendor_name' => isset($vendor_data->vendor_name)
+                        ? $vendor_data->vendor_name
+                        : null,
+                    'total' => floatval($total),
+                    'data' => $cart_data,
+                ];
+
+                $grand_total += $total;
+                array_push($res_data, $data);
             }
-
-            $data = [
-                'vendor_code' => isset($vendor_data->vendor_code)
-                    ? $vendor_data->vendor_code
-                    : null,
-                'vendor_name' => isset($vendor_data->vendor_name)
-                    ? $vendor_data->vendor_name
-                    : null,
-                'total' => floatval($total),
-                'data' => $cart_data,
-            ];
-
-            $grand_total += $total;
-
-            array_push($res_data, $data);
         }
 
         usort($res_data, function ($object1, $object2) {

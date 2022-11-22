@@ -446,7 +446,7 @@ class WebViewController extends Controller
         $grand_total = 0;
 
         $dealer_data = Cart::where('dealer', $dealer)->get();
-        $vendor_data = Vendors::where('dealer', $dealer)->get();
+        $vendor_data = Vendors::all();
 
         $dealer_ship = Dealer::where('dealer_code', $dealer)
             ->get()

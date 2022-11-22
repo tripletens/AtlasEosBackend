@@ -445,14 +445,14 @@ class WebViewController extends Controller
         $res_data = [];
         $grand_total = 0;
 
-        $dealer_data = Cart::where('dealer', $dealer)->get();
+        $dealer_data = Vendors::where('dealer', $dealer)->get();
         $dealer_ship = Dealer::where('dealer_code', $dealer)
             ->get()
             ->first();
 
         foreach ($dealer_data as $value) {
-            $vendor_code = $value->vendor;
-            if (!\in_array($vendor_code, $vendors)) {
+            $vendor_code = $value->vendor_code;
+            if (!in_array($vendor_code, $vendors)) {
                 array_push($vendors, $vendor_code);
             }
         }

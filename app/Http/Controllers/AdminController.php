@@ -1389,8 +1389,10 @@ class AdminController extends Controller
             ->get()
             ->first();
 
-        foreach ($dealer_data as $value) {
-            $vendor_code = $value->vendor;
+        $vendor_datas = Vendors::all();
+
+        foreach ($vendor_datas as $value) {
+            $vendor_code = $value->vendor_code;
             if (!\in_array($vendor_code, $vendors)) {
                 array_push($vendors, $vendor_code);
             }
@@ -1406,37 +1408,39 @@ class AdminController extends Controller
 
             $total = 0;
 
-            foreach ($cart_data as $value) {
-                $total += $value->price;
-                $atlas_id = $value->atlas_id;
-                $pro_data = Products::where('atlas_id', $atlas_id)
-                    ->get()
-                    ->first();
+            if (count($cart_data) > 0) {
+                foreach ($cart_data as $value) {
+                    $total += $value->price;
+                    $atlas_id = $value->atlas_id;
+                    $pro_data = Products::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
 
-                $value->description = isset($pro_data->description)
-                    ? $pro_data->description
-                    : null;
-                $value->vendor_product_code = isset(
-                    $pro_data->vendor_product_code
-                )
-                    ? $pro_data->vendor_product_code
-                    : null;
+                    $value->description = isset($pro_data->description)
+                        ? $pro_data->description
+                        : null;
+                    $value->vendor_product_code = isset(
+                        $pro_data->vendor_product_code
+                    )
+                        ? $pro_data->vendor_product_code
+                        : null;
+                }
+
+                $data = [
+                    'vendor_code' => isset($vendor_data->vendor_code)
+                        ? $vendor_data->vendor_code
+                        : null,
+                    'vendor_name' => isset($vendor_data->vendor_name)
+                        ? $vendor_data->vendor_name
+                        : null,
+                    'total' => floatval($total),
+                    'data' => $cart_data,
+                ];
+
+                $grand_total += $total;
+
+                array_push($res_data, $data);
             }
-
-            $data = [
-                'vendor_code' => isset($vendor_data->vendor_code)
-                    ? $vendor_data->vendor_code
-                    : null,
-                'vendor_name' => isset($vendor_data->vendor_name)
-                    ? $vendor_data->vendor_name
-                    : null,
-                'total' => floatval($total),
-                'data' => $cart_data,
-            ];
-
-            $grand_total += $total;
-
-            array_push($res_data, $data);
         }
 
         $pdf_data = [

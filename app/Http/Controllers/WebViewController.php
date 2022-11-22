@@ -470,7 +470,7 @@ class WebViewController extends Controller
 
             $total = 0;
 
-            if ($cart_data) {
+            if (count($cart_data) > 0) {
                 foreach ($cart_data as $value) {
                     $total += $value->price;
                     $atlas_id = $value->atlas_id;

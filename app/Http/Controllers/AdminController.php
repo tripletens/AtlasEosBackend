@@ -350,7 +350,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Vendor User Updated Successfully';
+        $this->result->message = 'Vendor User Updated Successfully. Thank you';
         return response()->json($this->result);
     }
 

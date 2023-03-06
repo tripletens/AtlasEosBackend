@@ -82,43 +82,43 @@ class UserController extends Controller
             return response()->json($this->result);
         }
 
-        if ($active_staff['role'] == '4') {
-            $count_down = ProgramCountdown::where('status', '1')
-                ->get()
-                ->first();
+//         if ($active_staff['role'] == '4') {
+//             $count_down = ProgramCountdown::where('status', '1')
+//                 ->get()
+//                 ->first();
 
-            $end_date = $count_down->end_countdown_date;
-            $end_time = $count_down->end_countdown_time;
+//             $end_date = $count_down->end_countdown_date;
+//             $end_time = $count_down->end_countdown_time;
 
-            // $inital_end_timer = Carbon::parse(
-            //     $end_date . ' ' . $end_time,
-            //     'America/Edmonton'
-            // );
+//             // $inital_end_timer = Carbon::parse(
+//             //     $end_date . ' ' . $end_time,
+//             //     'America/Edmonton'
+//             // );
 
-            // $inital_start_timer = Carbon::parse(
-            //     $start_date . ' ' . $start_time,
-            //     'America/Edmonton'
-            // );
+//             // $inital_start_timer = Carbon::parse(
+//             //     $start_date . ' ' . $start_time,
+//             //     'America/Edmonton'
+//             // );
 
-            $end_count = $end_date . ' ' . $end_time;
-            ///  $ch = Carbon::parse($end_count, 'America/Edmonton');
+//             $end_count = $end_date . ' ' . $end_time;
+//             ///  $ch = Carbon::parse($end_count, 'America/Edmonton');
 
-            $end_program = Carbon::createFromFormat(
-                'Y-m-d H:i',
-                $end_count
-            )->setTimezone('America/Edmonton');
+//             $end_program = Carbon::createFromFormat(
+//                 'Y-m-d H:i',
+//                 $end_count
+//             )->setTimezone('America/Edmonton');
 
-            // $ch = new Carbon($end_program);
-            $current = $request->timer;
+//             // $ch = new Carbon($end_program);
+//             $current = $request->timer;
 
-            if (!$end_program->gt($current)) {
-                $this->result->status = false;
-                $this->result->message = 'Program has closed';
-                $this->result->data->mount = $end_program;
+//             if (!$end_program->gt($current)) {
+//                 $this->result->status = false;
+//                 $this->result->message = 'Program has closed';
+//                 $this->result->data->mount = $end_program;
 
-                return response()->json($this->result);
-            }
-        }
+//                 return response()->json($this->result);
+//             }
+//         }
 
         $dealer = Users::where('email', $request->email)->first();
         $dealer_details = Users::where('email', $request->email)->get();

@@ -24,7 +24,6 @@ use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 set_time_limit(2500000000000000);
 
-
 class VendorController extends Controller
 {
     //
@@ -769,7 +768,7 @@ class VendorController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'privileged dealers ';
+        $this->result->message = 'privileged dealers the test result';
         $this->result->data = $filter_array;
 
         return response()->json($this->result);

@@ -736,7 +736,11 @@ class VendorController extends Controller
             ->get()
             ->first();
 
-        $user_vendor_code = $selected_user->vendor_code;
+        $user_vendor_code =
+            $selected_user->vendor_code != null &&
+            $selected_user->vendor_code != ''
+                ? $selected_user->vendor_code
+                : null;
 
         $privileged_dealers = isset($selected_user->privileged_dealers)
             ? $selected_user->privileged_dealers
@@ -744,7 +748,6 @@ class VendorController extends Controller
 
         if ($privileged_dealers != null) {
             $separator = explode(',', $privileged_dealers);
-
             $privilaged = [];
 
             /////// Filter the duplicates out /////

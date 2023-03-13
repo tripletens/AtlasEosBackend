@@ -750,7 +750,7 @@ class VendorController extends Controller
             /////// Filter the duplicates out /////
             foreach ($separator as $value) {
                 if ($value != '') {
-                    if (in_array($value, $privilaged)) {
+                    if (!in_array($value, $privilaged)) {
                         array_push($privilaged, $value);
                     }
                 }

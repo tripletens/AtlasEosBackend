@@ -631,7 +631,7 @@ Route::group(
         );
 
         Route::get(
-            '/vendor/get-privileged-dealers/{code}',
+            '/vendor/get-privileged-dealers/{user}',
             'VendorController@get_privileged_dealers'
         );
 

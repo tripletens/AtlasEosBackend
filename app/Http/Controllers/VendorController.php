@@ -765,7 +765,7 @@ class VendorController extends Controller
                     ->get();
 
                     foreach($dealers as $dealer_data){
-                        array_push($res_data, $dealer_data)
+                        array_push($res_data, $dealer_data);
                     }
                 }
 

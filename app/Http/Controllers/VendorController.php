@@ -729,12 +729,9 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
-    public function get_privileged_dealers($user, $code)
+    public function get_privileged_dealers($user)
     {
-
-
         $res_data = [];
-
         $selected_user = Users::where('id', $user)
             ->get()
             ->first();
@@ -751,27 +748,24 @@ class VendorController extends Controller
             $privilaged = [];
 
             /////// Filter the duplicates out /////
-            foreach($separator as $value){
-                if($value != ''){
-                    if (!in_array($value, $privilaged)) {
+            foreach ($separator as $value) {
+                if ($value != '') {
+                    if (in_array($value, $privilaged)) {
                         array_push($privilaged, $value);
                     }
                 }
             }
 
-            foreach($privilaged as $value){
-                if($value != ''){
-                    $dealers =  Users::where('dealer_code', $value)
-                    ->get();
+            foreach ($privilaged as $value) {
+                if ($value != '') {
+                    $dealers = Users::where('dealer_code', $value)->get();
 
-                    foreach($dealers as $dealer_data){
+                    foreach ($dealers as $dealer_data) {
                         array_push($res_data, $dealer_data);
                     }
                 }
-
             }
-
-
+        }
 
         ////////// End of old code ////
         // $dealers = Users::where('role', '4')->get();
@@ -813,7 +807,6 @@ class VendorController extends Controller
         $this->result->status_code = 200;
         $this->result->message = 'privileged dealers the test result';
         $this->result->data = $res_data;
-
         return response()->json($this->result);
     }
 

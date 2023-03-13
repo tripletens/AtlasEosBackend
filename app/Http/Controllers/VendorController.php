@@ -729,47 +729,90 @@ class VendorController extends Controller
         return response()->json($this->result);
     }
 
-    public function get_privileged_dealers($code)
+    public function get_privileged_dealers($user, $code)
     {
-        $dealers = Users::where('role', '4')->get();
-        $access_dealers = [];
 
-        if ($dealers) {
-            foreach ($dealers as $value) {
-                $privileged_vendors = $value->privileged_vendors;
 
-                if ($privileged_vendors != null) {
-                    $expand = explode(',', $privileged_vendors);
+        $res_data = [];
 
-                    if (in_array($code, $expand)) {
-                        $account_id = $value->account_id;
-                        $dealer_data = Dealer::where('dealer_code', $account_id)
-                            ->get()
-                            ->first();
+        $selected_user = Users::where('id', $user)
+            ->get()
+            ->first();
 
-                        if ($dealer_data) {
-                            array_push($access_dealers, $dealer_data);
-                        }
+        $user_vendor_code = $selected_user->vendor_code;
+
+        $privileged_dealers = isset($selected_user->privileged_dealers)
+            ? $selected_user->privileged_dealers
+            : null;
+
+        if ($privileged_dealers != null) {
+            $separator = explode(',', $privileged_dealers);
+
+            $privilaged = [];
+
+            /////// Filter the duplicates out /////
+            foreach($separator as $value){
+                if($value != ''){
+                    if (!in_array($value, $privilaged)) {
+                        array_push($privilaged, $value);
                     }
                 }
             }
-        }
 
-        $access_dealers = array_map(
-            'unserialize',
-            array_unique(array_map('serialize', $access_dealers))
-        );
+            foreach($privilaged as $value){
+                if($value != ''){
+                    $dealers =  Users::where('dealer_code', $value)
+                    ->get();
 
-        $filter_array = [];
+                    foreach($dealers as $dealer_data){
+                        array_push($res_data, $dealer_data)
+                    }
+                }
 
-        foreach ($access_dealers as $value) {
-            array_push($filter_array, $value);
-        }
+            }
+
+
+
+        ////////// End of old code ////
+        // $dealers = Users::where('role', '4')->get();
+        // $access_dealers = [];
+
+        // if ($dealers) {
+        //     foreach ($dealers as $value) {
+        //         $privileged_vendors = $value->privileged_vendors;
+
+        //         if ($privileged_vendors != null) {
+        //             $expand = explode(',', $privileged_vendors);
+
+        //             if (in_array($code, $expand)) {
+        //                 $account_id = $value->account_id;
+        //                 $dealer_data = Dealer::where('dealer_code', $account_id)
+        //                     ->get()
+        //                     ->first();
+
+        //                 if ($dealer_data) {
+        //                     array_push($access_dealers, $dealer_data);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        // $access_dealers = array_map(
+        //     'unserialize',
+        //     array_unique(array_map('serialize', $access_dealers))
+        // );
+
+        // $filter_array = [];
+
+        // foreach ($access_dealers as $value) {
+        //     array_push($filter_array, $value);
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'privileged dealers the test result';
-        $this->result->data = $filter_array;
+        $this->result->data = $res_data;
 
         return response()->json($this->result);
     }
@@ -2485,7 +2528,7 @@ class VendorController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'get vendor unread msg';
+        $this->result->message = 'get privileged vendors';
 
         $this->result->data = $res_data;
         return response()->json($this->result);

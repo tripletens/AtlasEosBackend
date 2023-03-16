@@ -1814,7 +1814,7 @@ class AdminController extends Controller
                     ? $user_data->company_name
                     : null,
                 'rep_name' => $first_name . ' ' . $last_name,
-                'vendor_no' => null,
+                'vendor_no' => $value->vendor_no,
             ];
 
             array_push($res_data, $data);

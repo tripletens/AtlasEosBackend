@@ -60,6 +60,8 @@ class UserController extends Controller
             'password' => 'required',
         ]);
 
+        // return
+
         if (
             !($token = Auth::guard('api')->attempt([
                 'email' => $request->email,
@@ -87,6 +89,14 @@ class UserController extends Controller
                 ->get()
                 ->first();
 
+            if(!$count_down){
+                // there is no countdown available at the moment
+                $this->result->status = false;
+                $this->result->message = 'Sorry there is no available program at the moment. Contact Admin';
+                $this->result->data->mount = $end_program;
+
+                return response()->json($this->result);
+            }
             $end_date = $count_down->end_countdown_date;
             $end_time = $count_down->end_countdown_time;
 
@@ -150,5 +160,5 @@ class UserController extends Controller
         return $this->respondWithToken(auth()->refresh());
     }
 
-    
+
 }

@@ -741,6 +741,12 @@ Route::group(
             'DealerController@fetch_orders_remaining'
         );
 
+        Route::get(
+            '/fetch-dealers-without-orders',
+            'DealerController@get_dealers_without_orders'
+        );
+
+
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');
         Route::get(

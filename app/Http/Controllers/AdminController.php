@@ -935,11 +935,13 @@ class AdminController extends Controller
 
     public function dealer_detailed_report()
     {
-        $cart = Cart::where('status', '1')
+        $cart = Dealer::where('status', '1')
             ->orderBy('xref', 'asc')
-            ->get();
+            ->paginate(100);
 
-        foreach ($cart as $value) {
+        $cart_data = $cart->items();
+
+        foreach ($cart_data as $value) {
             $atlas_id = $value->atlas_id;
 
             $pro_data = Products::where('atlas_id', $atlas_id)

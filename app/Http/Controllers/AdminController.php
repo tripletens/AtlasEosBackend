@@ -935,24 +935,32 @@ class AdminController extends Controller
 
     public function dealer_detailed_report()
     {
-        $cart = Cart::where('status', '1')
+        $cart = Cart::select(
+            'cart.*',
+            'products.description',
+            'products.vendor_product_code'
+        )
+            ->where('cart.status', '1')
+            ->join('products', 'products.atlas_id', '=', 'cart.atlas_id')
             ->orderBy('xref', 'asc')
-            ->get();
+            ->paginate(2000);
 
-        foreach ($cart as $value) {
-            $atlas_id = $value->atlas_id;
+        // $cart_data = $cart->items();
 
-            $pro_data = Products::where('atlas_id', $atlas_id)
-                ->get()
-                ->first();
+        // foreach ($cart_data as $value) {
+        //     $atlas_id = $value->atlas_id;
 
-            $value->desc = isset($pro_data->description)
-                ? $pro_data->description
-                : null;
-            $value->vendor_product_code = isset($pro_data->vendor_product_code)
-                ? $pro_data->vendor_product_code
-                : null;
-        }
+        //     $pro_data = Products::where('atlas_id', $atlas_id)
+        //         ->get()
+        //         ->first();
+
+        //     $value->desc = isset($pro_data->description)
+        //         ? $pro_data->description
+        //         : null;
+        //     $value->vendor_product_code = isset($pro_data->vendor_product_code)
+        //         ? $pro_data->vendor_product_code
+        //         : null;
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;
@@ -1814,7 +1822,7 @@ class AdminController extends Controller
                     ? $user_data->company_name
                     : null,
                 'rep_name' => $first_name . ' ' . $last_name,
-                'vendor_no' => null,
+                'vendor_no' => $value->vendor_no,
             ];
 
             array_push($res_data, $data);

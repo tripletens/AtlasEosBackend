@@ -937,7 +937,7 @@ class AdminController extends Controller
     {
         $cart = Cart::where('status', '1')
             ->orderBy('xref', 'asc')
-            ->paginate(500);
+            ->paginate(1000);
 
         $cart_data = $cart->items();
 

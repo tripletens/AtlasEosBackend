@@ -943,7 +943,7 @@ class AdminController extends Controller
             ->where('cart.status', '1')
             ->join('products', 'products.atlas_id', '=', 'cart.atlas_id')
             ->orderBy('xref', 'asc')
-            ->paginate(1500);
+            ->paginate(2000);
 
         // $cart_data = $cart->items();
 

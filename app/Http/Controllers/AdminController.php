@@ -350,7 +350,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Vendor User Updated Successfully';
+        $this->result->message = 'Vendor User Updated Successfully. Thank you';
         return response()->json($this->result);
     }
 
@@ -935,7 +935,7 @@ class AdminController extends Controller
 
     public function dealer_detailed_report()
     {
-        $cart = Dealer::where('status', '1')
+        $cart = Cart::where('status', '1')
             ->orderBy('xref', 'asc')
             ->paginate(100);
 

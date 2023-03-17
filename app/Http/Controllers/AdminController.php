@@ -935,7 +935,7 @@ class AdminController extends Controller
 
     public function dealer_detailed_report()
     {
-        $cart = Dealer::where('status', '1')
+        $cart = Cart::where('status', '1')
             ->orderBy('xref', 'asc')
             ->paginate(100);
 

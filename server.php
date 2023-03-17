@@ -14,6 +14,7 @@ $uri = urldecode(
 // $command = "php artisan schedule:work"; 
 // $path = base_path();
 // exec("cd {$path} && {$command}");
+// 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
 
 // This file allows us to emulate Apache's "mod_rewrite" functionality from the
 // built-in PHP web server. This provides a convenient way to test a Laravel

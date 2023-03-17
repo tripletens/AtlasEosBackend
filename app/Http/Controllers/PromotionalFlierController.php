@@ -191,32 +191,40 @@ class PromotionalFlierController extends Controller
                 $description = $request->input('description');
                 $image_url = $request->input('image_url');
 
-                if ($request->hasFile('pdf')) {
-                    $filenameWithExt = $request
-                        ->file('pdf')
-                        ->getClientOriginalName();
-                    $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                    $extension = $request
-                        ->file('pdf')
-                        ->getClientOriginalExtension();
-                    $fileNameToStore =
-                        Str::slug($filename, '_', $language = 'en') .
-                        '_' .
-                        time() .
-                        '.' .
-                        $extension;
-                    $filepath =
-                        env('APP_URL') .
-                        Storage::url(
-                            $request
-                                ->file('pdf')
-                                ->storeAs('public/pdf', $fileNameToStore)
-                        );
-                }
+                // if ($request->hasFile('pdf')) {
+                //     $filenameWithExt = $request
+                //         ->file('pdf')
+                //         ->getClientOriginalName();
+                //     $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                //     $extension = $request
+                //         ->file('pdf')
+                //         ->getClientOriginalExtension();
+                //     $fileNameToStore =
+                //         Str::slug($filename, '_', $language = 'en') .
+                //         '_' .
+                //         time() .
+                //         '.' .
+                //         $extension;
+                //     $filepath =
+                //         env('APP_URL') .
+                //         Storage::url(
+                //             $request
+                //                 ->file('pdf')
+                //                 ->storeAs('public/pdf', $fileNameToStore)
+                //         );
+                // }
+
+                $path = Storage::disk('s3')->put(
+                    'pdf',
+                    $request->pdf,
+                    'public'
+                );
+
+                $full_file_path = Storage::disk('s3')->url($path);
 
                 $update_promotional_flier = $one_promotional_flier->update([
                     'name' => $name ? $name : null,
-                    'pdf_url' => $request->hasFile('pdf') ? $filepath : null,
+                    'pdf_url' => $request->hasFile('pdf') ? $full_file_path : null,
                     'vendor_id' => $vendor_id ? $vendor_id : null,
                     'description' => $description ? $description : null,
                     'image_url' => $image_url ? $image_url : null,

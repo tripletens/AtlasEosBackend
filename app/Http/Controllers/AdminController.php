@@ -940,7 +940,7 @@ class AdminController extends Controller
             'product.description',
             'product.vendor_product_code'
         )
-            ->where('status', '1')
+            ->where('cart.status', '1')
             ->join('products', 'products.atlas_id', '=', 'cart.atlas_id')
             ->orderBy('xref', 'asc')
             ->paginate(1500);

@@ -2948,7 +2948,15 @@ class AdminController extends Controller
 
     public function get_all_seminar()
     {
-        $seminar = Seminar::orderBy('id', 'desc')->get();
+        $seminar = Seminar::orderBy('id', 'desc')
+            ->get()
+            ->toArray();
+
+        usort($seminar, function ($a, $b) {
+            return strtotime($a['seminar_date'] . ' ' . $a['start_time']) -
+                strtotime($b['seminar_date'] . ' ' . $b['start_time']);
+        });
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $seminar;

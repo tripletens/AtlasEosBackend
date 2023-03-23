@@ -1892,9 +1892,9 @@ class VendorController extends Controller
                 return $vendor;
             }, $data);
 
-            usort($ddt, function ($object1, $object2) {
-                return $object1->vendor > $object2->vendor;
-            });
+            // usort($ddt, function ($object1, $object2) {
+            //     return $object1->vendor > $object2->vendor;
+            // });
 
             return $ddt;
         }

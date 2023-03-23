@@ -1846,6 +1846,11 @@ class AdminController extends Controller
                     ->get()
                     ->first();
                 $dealer_code = $value->dealer_code;
+
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+
                 $vendor_code = $value->vendor_code;
                 $vendor_data = Vendors::where('vendor_code', $vendor_code)
                     ->get()
@@ -1870,6 +1875,9 @@ class AdminController extends Controller
 
                 $data = [
                     'dealer_code' => $dealer_code,
+                    'dealer_name' => isset($dealer_data->dealer_name)
+                        ? $dealer_data->dealer_name
+                        : null,
                     'vendor_name' => isset($vendor_data->vendor_name)
                         ? $vendor_data->vendor_name
                         : null,

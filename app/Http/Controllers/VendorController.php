@@ -1885,18 +1885,18 @@ class VendorController extends Controller
     public function sort_according_vendor_pro_code($data)
     {
         if (count($data) > 0 && !empty($data)) {
-            $ddt = array_map(function ($each) {
-                $con = (object) $each;
-                $vendor = $con->vendor;
+            // $ddt = array_map(function ($each) {
+            //     $con = (object) $each;
+            //     $vendor = $con->vendor;
 
-                return $vendor;
-            }, $data);
+            //     return $vendor;
+            // }, $data);
 
-            // usort($ddt, function ($object1, $object2) {
-            //     return $object1->vendor > $object2->vendor;
-            // });
+            usort($data, function ($object1, $object2) {
+                return $object1['vendor'] > $object2['vendor'];
+            });
 
-            return $ddt;
+            return $data;
         }
     }
 

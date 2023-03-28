@@ -1861,7 +1861,10 @@ class AdminController extends Controller
                     ->first();
                 $qty = $value->qty;
                 $new_qty = $value->new_qty;
-                $regular = $value->regular;
+                // $regular = $value->regular;
+
+                $regular = $product_data->booking;
+
                 $show = $value->show_price;
                 $overide_price = $value->overide_price;
 

@@ -132,21 +132,22 @@ class AdminController extends Controller
 
     public function fetch_dealer_locations()
     {
+        $res_data = [];
         $unique_location = Dealer::distinct('location')
             ->pluck('location')
             ->toArray();
 
-        if (!$unique_location) {
-            $this->result->status = false;
-            $this->result->status_code = 422;
-            $this->result->message =
-                'Sorry we could not fetch the unique locations';
-            return response()->json($this->result);
+        if ($unique_location) {
+            foreach ($unique_location as $value) {
+                if ($value != null) {
+                    array_push($res_data, $value);
+                }
+            }
         }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data = $unique_location;
+        $this->result->data = $res_data;
         $this->result->message = 'Unique Dealer Locations fetched Successfully';
         return response()->json($this->result);
     }

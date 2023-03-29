@@ -95,21 +95,44 @@ class AdminController extends Controller
 
     public function filter_dealer_location($location)
     {
-        $dealer = User::where('dealer', '4')
-            ->where('location', $location)
+        $dealers = Dealer::where('location', $location)
+            ->orderBy('dealer_code', 'asc')
             ->get();
+        $total_sales = 0;
+        $res_data = [];
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $dealer_code = $value->dealer_code;
+                $dealer_name = $value->dealer_name;
+                $location = $value->location;
+                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'location' => $location,
+                    'sales' => $dealer_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->data = $dealer;
+        $this->result->data = $res_data;
         $this->result->message = 'Dealer Locations fetched Successfully';
         return response()->json($this->result);
     }
 
     public function fetch_dealer_locations()
     {
-        $unique_location = User::where('dealer', '4')
-            ->distinct('location')
+        $unique_location = Dealer::distinct('location')
             ->pluck('location')
             ->toArray();
 

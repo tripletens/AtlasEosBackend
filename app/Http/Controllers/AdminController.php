@@ -93,6 +93,41 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function filter_dealer_location($location)
+    {
+        $dealer = User::where('dealer', '4')
+            ->where('location', $location)
+            ->get();
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $dealer;
+        $this->result->message = 'Dealer Locations fetched Successfully';
+        return response()->json($this->result);
+    }
+
+    public function fetch_dealer_locations()
+    {
+        $unique_location = User::where('dealer', '4')
+            ->distinct('location')
+            ->pluck('location')
+            ->toArray();
+
+        if (!$unique_location) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message =
+                'Sorry we could not fetch the unique locations';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $unique_location;
+        $this->result->message = 'Unique Dealer Locations fetched Successfully';
+        return response()->json($this->result);
+    }
+
     public function fix_notes()
     {
         $all = ProgramNotes::all();

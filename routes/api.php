@@ -60,6 +60,16 @@ Route::group(
 
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
 
+        Route::get(
+            '/admin/dealer-location',
+            'AdminController@fetch_dealer_locations'
+        );
+
+        Route::get(
+            '/admin/filter-dealer-location/{location}',
+            'AdminController@filter_dealer_location'
+        );
+
         Route::post('/admin-login', 'AdminController@admin_login');
 
         Route::get('/update-login', 'AdminController@update_login');

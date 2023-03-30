@@ -3252,7 +3252,7 @@ class AdminController extends Controller
             // }, $data);
 
             usort($all_admin, function ($object1, $object2) {
-                return $object1['designation'] > $object2['designation'];
+                return $object1['role_name'] > $object2['role_name'];
             });
 
             //  return $all_admin;

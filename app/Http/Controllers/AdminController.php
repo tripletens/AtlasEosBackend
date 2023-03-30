@@ -3242,6 +3242,21 @@ class AdminController extends Controller
             ->orderBy('designation', 'asc')
             ->get();
 
+        if (count($all_admin) > 0 && !empty($all_admin)) {
+            // $ddt = array_map(function ($each) {
+            //     $con = (object) $each;
+            //     $vendor = $con->vendor;
+
+            //     return $vendor;
+            // }, $data);
+
+            usort($all_admin, function ($object1, $object2) {
+                return $object1['designation'] > $object2['designation'];
+            });
+
+            //  return $all_admin;
+        }
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $all_admin;

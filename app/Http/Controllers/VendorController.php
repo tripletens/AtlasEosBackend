@@ -1897,6 +1897,8 @@ class VendorController extends Controller
             });
 
             return $data;
+        } else {
+            return $data;
         }
     }
 

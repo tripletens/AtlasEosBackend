@@ -3240,7 +3240,8 @@ class AdminController extends Controller
             ->orWhere('role', '7')
             ->orWhere('role', '1')
             ->orderBy('designation', 'asc')
-            ->get();
+            ->get()
+            ->toArray();
 
         if (count($all_admin) > 0 && !empty($all_admin)) {
             // $ddt = array_map(function ($each) {

@@ -3239,6 +3239,7 @@ class AdminController extends Controller
             ->orWhere('role', '5')
             ->orWhere('role', '6')
             ->orWhere('role', '7')
+            ->orderBy('designation', 'asc')
             ->get();
 
         $this->result->status = true;

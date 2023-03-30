@@ -3234,11 +3234,11 @@ class AdminController extends Controller
 
     public function get_all_admins()
     {
-        $all_admin = Users::orWhere('role', '1')
-            ->orWhere('role', '2')
+        $all_admin = Users::orWhere('role', '2')
             ->orWhere('role', '5')
             ->orWhere('role', '6')
             ->orWhere('role', '7')
+            ->orWhere('role', '1')
             ->orderBy('designation', 'asc')
             ->get();
 

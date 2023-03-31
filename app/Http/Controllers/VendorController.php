@@ -1733,12 +1733,12 @@ class VendorController extends Controller
 
         /// $export_vendor = $this->sort_according_dealer_code($vendor_purchases);
 
-        ////   $res = $this->sort_according_atlas_id($res_data);
+        $res = $this->sort_according_vendor_pro_code($res_data);
 
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Sales By Detailed';
-        $this->result->data->res = $res_data;
+        $this->result->data->res = $res;
         $this->result->data->export = $vendor_purchases_ex;
 
         // $this->result->data->atlas_id = $atlas_id_data;
@@ -1880,6 +1880,26 @@ class VendorController extends Controller
         $this->result->message = 'Purchasers by Dealers';
         $this->result->data = $res_data;
         return response()->json($this->result);
+    }
+
+    public function sort_according_vendor_pro_code($data)
+    {
+        if (count($data) > 0 && !empty($data)) {
+            // $ddt = array_map(function ($each) {
+            //     $con = (object) $each;
+            //     $vendor = $con->vendor;
+
+            //     return $vendor;
+            // }, $data);
+
+            usort($data, function ($object1, $object2) {
+                return $object1['vendor'] > $object2['vendor'];
+            });
+
+            return $data;
+        } else {
+            return $data;
+        }
     }
 
     public function sort_according_dealer_code($data)

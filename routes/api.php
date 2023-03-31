@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,36 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::get('/sem', function () {
+    $d_day = [
+        'd' => '2022-11-01 09:45:00',
+        'd' => '2022-11-03 09:45:00',
+        'd' => '2022-11-01 04:45:00',
+        'd' => '2022-11-01 01:45:00',
+        'd' => '2022-11-01 12:45:00',
+    ];
+
+    $arr = [
+        '2020-02-11 00:00:00',
+        '2020-02-13 00:00:00',
+        '2020-02-08 00:00:00',
+    ];
+    usort($arr, function ($a, $b) {
+        return strtotime($a) - strtotime($b);
+    });
+
+    echo json_encode($arr);
+
+    // return Carbon::createFromFormat(
+    //     'Y-m-d H:i:s',
+    //     '2022-11-01 09:45:00'
+    // )->toDateTimeString();
+
+    return 'hello';
+});
+
+// Route::get('/sem', 'App\Http\Controllers\AdminController@get_all_seminar');
+
 ///////////////// Admin /////////////
 Route::group(
     [
@@ -25,7 +56,19 @@ Route::group(
         'middleware' => 'cors',
     ],
     function () {
+        // Route::get('/admin/seminars', 'AdminController@get_all_seminar');
+
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
+
+        Route::get(
+            '/admin/dealer-location',
+            'AdminController@fetch_dealer_locations'
+        );
+
+        Route::get(
+            '/admin/filter-dealer-location/{location}',
+            'AdminController@filter_dealer_location'
+        );
 
         Route::post('/admin-login', 'AdminController@admin_login');
 

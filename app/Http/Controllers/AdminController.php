@@ -93,6 +93,65 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function filter_dealer_location($location)
+    {
+        $dealers = Dealer::where('location', $location)
+            ->orderBy('dealer_code', 'asc')
+            ->get();
+        $total_sales = 0;
+        $res_data = [];
+        if ($dealers) {
+            foreach ($dealers as $value) {
+                $dealer_code = $value->dealer_code;
+                $dealer_name = $value->dealer_name;
+                $location = $value->location;
+                $dealer_sales = Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('dealer', $dealer_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'dealer_name' => $dealer_name,
+                    'dealer_code' => $dealer_code,
+                    'location' => $location,
+                    'sales' => $dealer_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+        $this->result->message = 'Dealer Locations fetched Successfully';
+        return response()->json($this->result);
+    }
+
+    public function fetch_dealer_locations()
+    {
+        $res_data = [];
+        $unique_location = Dealer::distinct('location')
+            ->pluck('location')
+            ->toArray();
+
+        if ($unique_location) {
+            foreach ($unique_location as $value) {
+                if ($value != null) {
+                    array_push($res_data, $value);
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->data = $res_data;
+        $this->result->message = 'Unique Dealer Locations fetched Successfully';
+        return response()->json($this->result);
+    }
+
     public function fix_notes()
     {
         $all = ProgramNotes::all();
@@ -1846,6 +1905,11 @@ class AdminController extends Controller
                     ->get()
                     ->first();
                 $dealer_code = $value->dealer_code;
+
+                $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                    ->get()
+                    ->first();
+
                 $vendor_code = $value->vendor_code;
                 $vendor_data = Vendors::where('vendor_code', $vendor_code)
                     ->get()
@@ -1856,7 +1920,10 @@ class AdminController extends Controller
                     ->first();
                 $qty = $value->qty;
                 $new_qty = $value->new_qty;
-                $regular = $value->regular;
+                // $regular = $value->regular;
+
+                $regular = $product_data->booking;
+
                 $show = $value->show_price;
                 $overide_price = $value->overide_price;
 
@@ -1870,6 +1937,9 @@ class AdminController extends Controller
 
                 $data = [
                     'dealer_code' => $dealer_code,
+                    'dealer_name' => isset($dealer_data->dealer_name)
+                        ? $dealer_data->dealer_name
+                        : null,
                     'vendor_name' => isset($vendor_data->vendor_name)
                         ? $vendor_data->vendor_name
                         : null,
@@ -2948,7 +3018,15 @@ class AdminController extends Controller
 
     public function get_all_seminar()
     {
-        $seminar = Seminar::orderBy('id', 'desc')->get();
+        $seminar = Seminar::orderBy('id', 'desc')
+            ->get()
+            ->toArray();
+
+        usort($seminar, function ($a, $b) {
+            return strtotime($a['seminar_date'] . ' ' . $a['start_time']) -
+                strtotime($b['seminar_date'] . ' ' . $b['start_time']);
+        });
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->data = $seminar;
@@ -3156,12 +3234,29 @@ class AdminController extends Controller
 
     public function get_all_admins()
     {
-        $all_admin = Users::orWhere('role', '1')
-            ->orWhere('role', '2')
+        $all_admin = Users::orWhere('role', '2')
             ->orWhere('role', '5')
             ->orWhere('role', '6')
             ->orWhere('role', '7')
-            ->get();
+            ->orWhere('role', '1')
+            ->orderBy('designation', 'asc')
+            ->get()
+            ->toArray();
+
+        if (count($all_admin) > 0 && !empty($all_admin)) {
+            // $ddt = array_map(function ($each) {
+            //     $con = (object) $each;
+            //     $vendor = $con->vendor;
+
+            //     return $vendor;
+            // }, $data);
+
+            usort($all_admin, function ($object1, $object2) {
+                return $object1['role_name'] > $object2['role_name'];
+            });
+
+            //  return $all_admin;
+        }
 
         $this->result->status = true;
         $this->result->status_code = 200;

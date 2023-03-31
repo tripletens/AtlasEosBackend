@@ -5278,7 +5278,7 @@ class AdminController extends Controller
                 'vendor_name' => $name,
                 'vendor_code' => $code,
                 'role_name' => 'vendor',
-                'role' => '3',
+                'role' => 'vendor',
             ]);
 
             if ($save_vendor) {

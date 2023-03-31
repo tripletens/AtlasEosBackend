@@ -367,6 +367,58 @@ class BranchController extends Controller
         return response()->json($this->result);
     }
 
+    # get pending orders for each dealer on the branch end
+    public function get_dealers_with_account_id_under_branch_with_pending_orders($uid)
+    {
+        $dealers = $this->get_dealers_in_branch($uid);
+
+        return $dealers;
+
+        $vendor_array = [];
+        #get all the dealers with account id orders
+        if ($dealers && count($dealers) > 0) {
+            foreach ($dealers as $key => $dealer) {
+                # get dealer orders with id
+                $dealer_orders_query = Cart::where('uid', $dealer->id);
+                # get the total price of items ordered by dealer
+                $dealer_orders_total_sum = $dealer_orders_query->sum('price');
+                # assign the dealer total price to the dealer
+                $dealer->total_price = $dealer_orders_total_sum;
+
+                // $dealer->orders = $dealer_orders_query->get();
+
+                $dealer->vendors = $dealer_orders_query
+                    ->join('vendors', 'vendors.vendor_code', '=', 'cart.vendor')
+                    ->select(
+                        'vendors.id',
+                        'vendors.vendor_name',
+                        'vendors.vendor_code'
+                    )
+                    ->groupBy('vendors.id')
+                    ->get();
+
+                foreach ($dealer->vendors as $vendor) {
+                    $vendor->orders = Cart::where('uid', $dealer->id)
+                        ->where('vendor', $vendor->vendor_code)
+                        ->get();
+                    $vendor->orders->total_price = Cart::where(
+                        'uid',
+                        $dealer->id
+                    )
+                        ->where('vendor', $vendor->vendor_code)
+                        ->sum('price');
+                }
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->data = $dealers;
+        $this->result->status_code = 200;
+        $this->result->message =
+            'Branch dealers with orders fetched successfully';
+        return response()->json($this->result);
+    }
+
     # fetch all the dealers in a branch
     public function branch_dealers($uid)
     {

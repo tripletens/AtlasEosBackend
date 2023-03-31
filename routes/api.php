@@ -1153,6 +1153,13 @@ Route::group(
             '/branch/get-privileged-dealer/{user}',
             'BranchController@get_privileged_dealers'
         );
+
+        // get branch dealers with pending orders
+        Route::get(
+            '/branch/get-dealers-pending-orders/{user}',
+            'BranchController@get_dealers_with_account_id_under_branch_with_pending_orders'
+        );
+
         // ---------------- Branch ends here  --------------------------- //
 
         //------------------- special orders starts here ---------------- //

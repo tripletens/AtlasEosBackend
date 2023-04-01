@@ -2372,9 +2372,13 @@ class AdminController extends Controller
             $end_date . ' ' . $end_time
         );
 
-        $inital_end_timer = Carbon::parse(
-            $end_date . ' ' . $end_time,
-            'America/Edmonton'
+        // $inital_end_timer = Carbon::parse(
+        //     $end_date . ' ' . $end_time,
+        //     'America/Edmonton'
+        // );
+
+        $inital_end_timer = Carbon::parse($end_date . ' ' . $end_time)->format(
+            'm/d/Y H:i:s'
         );
 
         $inital_start_timer = Carbon::parse(

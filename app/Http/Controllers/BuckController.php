@@ -268,26 +268,36 @@ class BuckController extends Controller
 
             // upload show buck pdf
             if ($request->hasFile('pdf')) {
-                $filenameWithExt = $request
-                    ->file('pdf')
-                    ->getClientOriginalName();
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                $extension = $request
-                    ->file('pdf')
-                    ->getClientOriginalExtension();
-                $fileNameToStore =
-                    Str::slug($filename, '_', $language = 'en') .
-                    '_' .
-                    time() .
-                    '.' .
-                    $extension;
-                $pdf_filepath =
-                    env('APP_URL') .
-                    Storage::url(
-                        $request
-                            ->file('pdf')
-                            ->storeAs('public/bucks', $fileNameToStore)
-                    );
+
+
+                // $filenameWithExt = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalName();
+                // $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                // $extension = $request
+                //     ->file('pdf')
+                //     ->getClientOriginalExtension();
+                // $fileNameToStore =
+                //     Str::slug($filename, '_', $language = 'en') .
+                //     '_' .
+                //     time() .
+                //     '.' .
+                //     $extension;
+                // $pdf_filepath =
+                //     env('APP_URL') .
+                //     Storage::url(
+                //         $request
+                //             ->file('pdf')
+                //             ->storeAs('public/bucks', $fileNameToStore)
+                //     );
+
+                $path = Storage::disk('s3')->put(
+                    'pdf',
+                    $request->pdf,
+                    'public'
+                );
+
+                $full_file_path = Storage::disk('s3')->url($path);
             }
 
             $check_buck->vendor_name = $vendor_name ? $vendor_name : null;
@@ -298,7 +308,7 @@ class BuckController extends Controller
             $check_buck->img_url =
                 'https://atlasbookingprogram.com/assets/images/show_buck/show_buck.jpeg';
             // $check_buck->img_url = $image ? $img_filepath : null;
-            $check_buck->pdf_url = $pdf ? $pdf_filepath : null;
+            $check_buck->pdf_url = $pdf ? $full_file_path : null;
 
             $update_buck = $check_buck->save();
 

@@ -60,6 +60,9 @@ Route::group(
 
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
 
+        Route::post('/admin/update-location', 'AdminController@update_location');
+
+
         Route::get(
             '/admin/dealer-location',
             'AdminController@fetch_dealer_locations'

@@ -149,14 +149,15 @@ class AdminController extends Controller
 
     public function filter_dealer_location($location)
     {
-        $dealers = Dealer::where('location', $location)
+        $dealers = Users::where('location', $location)
+            ->where('role', '4')
             ->orderBy('dealer_code', 'asc')
             ->get();
         $total_sales = 0;
         $res_data = [];
         if ($dealers) {
             foreach ($dealers as $value) {
-                $dealer_code = $value->dealer_code;
+                $dealer_code = $value->account_id;
                 $dealer_name = $value->dealer_name;
                 $location = $value->location;
                 $dealer_sales = Cart::where('dealer', $dealer_code)->sum(

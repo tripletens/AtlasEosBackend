@@ -194,7 +194,7 @@ class AdminController extends Controller
 
         if ($unique_location) {
             foreach ($unique_location as $value) {
-                if ($value != null) {
+                if ($value != null && !in_array($value, $res_data)) {
                     array_push($res_data, $value);
                 }
             }

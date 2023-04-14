@@ -192,7 +192,10 @@ class AdminController extends Controller
     {
         $res_data = [];
         $unique_location = Dealer::distinct('location')
+            ->orderBy('location', 'asc')
+
             ->pluck('location')
+
             ->toArray();
 
         // Dealer::distinct('location')

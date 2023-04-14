@@ -116,11 +116,14 @@ class AdminController extends Controller
             $data = [];
 
             foreach ($row_range as $row) {
-                $email = $sheet->getCell('F' . $row)->getValue();
+                $dealer_code = $sheet->getCell('A' . $row)->getValue();
                 $location = $sheet->getCell('H' . $row)->getValue();
 
-                if (Users::where('email', $email)->exists()) {
-                    $save_admin = Users::where('email', $email)->update([
+                if (Dealer::where('dealer_code', $dealer_code)->exists()) {
+                    $save_admin = Dealer::where(
+                        'dealer_code',
+                        $dealer_code
+                    )->update([
                         'location' => $location,
                     ]);
 
@@ -149,15 +152,14 @@ class AdminController extends Controller
 
     public function filter_dealer_location($location)
     {
-        $dealers = Users::where('location', $location)
-            ->where('role', '4')
+        $dealers = Dealer::where('location', $location)
             ->orderBy('dealer_code', 'asc')
             ->get();
         $total_sales = 0;
         $res_data = [];
         if ($dealers) {
             foreach ($dealers as $value) {
-                $dealer_code = $value->account_id;
+                $dealer_code = $value->dealer_code;
                 $dealer_name = $value->dealer_name;
                 $location = $value->location;
                 $dealer_sales = Cart::where('dealer', $dealer_code)->sum(

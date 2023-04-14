@@ -124,13 +124,13 @@ class AdminController extends Controller
                         'location' => $location,
                     ]);
 
-                    if (!$save_admin) {
-                        $this->result->status = false;
-                        $this->result->status_code = 422;
-                        $this->result->message =
-                            'Sorry File could not be uploaded. Try again later.';
-                        return response()->json($this->result);
-                    }
+                    // if (!$save_admin) {
+                    //     $this->result->status = false;
+                    //     $this->result->status_code = 422;
+                    //     $this->result->message =
+                    //         'Sorry File could not be uploaded. Try again later.';
+                    //     return response()->json($this->result);
+                    // }
                 }
             }
         } catch (Exception $e) {

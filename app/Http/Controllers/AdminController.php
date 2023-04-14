@@ -155,6 +155,7 @@ class AdminController extends Controller
         $dealers = Dealer::where('location', $location)
             ->orderBy('dealer_code', 'asc')
             ->get();
+
         $total_sales = 0;
         $res_data = [];
         if ($dealers) {
@@ -190,10 +191,13 @@ class AdminController extends Controller
     public function fetch_dealer_locations()
     {
         $res_data = [];
-        $unique_location = Users::where('role', '4')
-            ->distinct('location')
+        $unique_location = Dealer::distinct('location')
             ->pluck('location')
             ->toArray();
+
+        // Dealer::distinct('location')
+        // ->pluck('location')
+        // ->toArray();
 
         if ($unique_location) {
             foreach ($unique_location as $value) {

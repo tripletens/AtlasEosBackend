@@ -187,7 +187,8 @@ class AdminController extends Controller
     public function fetch_dealer_locations()
     {
         $res_data = [];
-        $unique_location = Dealer::distinct('location')
+        $unique_location = Users::where('role', '4')
+            ->distinct('location')
             ->pluck('location')
             ->toArray();
 

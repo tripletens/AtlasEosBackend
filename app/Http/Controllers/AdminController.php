@@ -119,7 +119,7 @@ class AdminController extends Controller
                 $email = $sheet->getCell('F' . $row)->getValue();
                 $location = $sheet->getCell('H' . $row)->getValue();
 
-                if (!Users::where('email', $email)->exists()) {
+                if (Users::where('email', $email)->exists()) {
                     $save_admin = Users::where('email', $email)->update([
                         'location' => $location,
                     ]);

@@ -119,13 +119,27 @@ class AdminController extends Controller
                 $atlas_id = $sheet->getCell('A' . $row)->getValue();
                 $um = $sheet->getCell('B' . $row)->getValue();
 
-                if (Products::where('atlas_id', $atlas_id)->exists()) {
-                    $save_admin = Products::where(
-                        'atlas_id',
-                        $atlas_id
-                    )->update([
-                        'um' => $um,
-                    ]);
+                $pro_query = Products::query();
+
+                if (
+                    $pro_query
+                        ->clone()
+                        ->where('atlas_id', $atlas_id)
+                        ->exists()
+                ) {
+                    if (
+                        $pro_query
+                            ->clone()
+                            ->whereNull('um')
+                            ->where('atlas_id', $atlas_id)
+                    ) {
+                        $save_admin = $pro_query
+                            ->clone()
+                            ->where('atlas_id', $atlas_id)
+                            ->update([
+                                'um' => $um,
+                            ]);
+                    }
                 }
             }
         } catch (Exception $e) {

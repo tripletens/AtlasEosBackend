@@ -119,27 +119,16 @@ class AdminController extends Controller
                 $atlas_id = $sheet->getCell('A' . $row)->getValue();
                 $um = $sheet->getCell('B' . $row)->getValue();
 
-                $pro_query = Products::query();
-
                 if (
-                    $pro_query
-                        ->clone()
+                    Products::query()
                         ->where('atlas_id', $atlas_id)
                         ->exists()
                 ) {
-                    if (
-                        $pro_query
-                            ->clone()
-                            ->whereNull('um')
-                            ->where('atlas_id', $atlas_id)
-                    ) {
-                        $save_admin = $pro_query
-                            ->clone()
-                            ->where('atlas_id', $atlas_id)
-                            ->update([
-                                'um' => $um,
-                            ]);
-                    }
+                    $save_admin = Products::query()
+                        ->where('atlas_id', $atlas_id)
+                        ->update([
+                            'um' => $um,
+                        ]);
                 }
             }
         } catch (Exception $e) {
@@ -1792,7 +1781,9 @@ class AdminController extends Controller
             $this->result->status = true;
             $this->result->status_code = 200;
             $this->result->message = 'Vendor summary';
-            $this->result->data = $res_data;
+            $this->result->data->summary = $res_data;
+            $this->result->data->total_sales = $total_sales;
+
             return response()->json($this->result);
         }
     }

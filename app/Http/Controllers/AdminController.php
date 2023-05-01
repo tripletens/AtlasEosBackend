@@ -1763,7 +1763,8 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
-    public function vendor_summary_report(){
+    public function vendor_summary_report()
+    {
         $vendors = Vendors::orderBy('vendor_name', 'asc')->get();
         $dealer_count = Vendors::count();
         $total_sales = 0;
@@ -1793,6 +1794,7 @@ class AdminController extends Controller
             $this->result->message = 'Vendor summary';
             $this->result->data = $res_data;
             return response()->json($this->result);
+        }
     }
 
     public function vendor_summary($code)

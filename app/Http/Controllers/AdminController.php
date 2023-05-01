@@ -1763,6 +1763,38 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public function vendor_summary_report(){
+        $vendors = Vendors::orderBy('vendor_name', 'asc')->get();
+        $dealer_count = Vendors::count();
+        $total_sales = 0;
+        $res_data = [];
+        if ($vendors) {
+            foreach ($vendors as $value) {
+                $vendor_code = $value->vendor_code;
+                $vendor_name = $value->vendor_name;
+                $vendor_sales = Cart::where('vendor', $vendor_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'vendor_name' => $vendor_name,
+                    'vendor_code' => $vendor_code,
+                    'sales' => $vendor_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor summary';
+            $this->result->data = $res_data;
+            return response()->json($this->result);
+    }
+
     public function vendor_summary($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)->get();
@@ -1792,6 +1824,7 @@ class AdminController extends Controller
 
             $first_name = isset($user->first_name) ? $user->first_name : null;
             $last_name = isset($user->last_name) ? $user->last_name : null;
+
             $data = [
                 'account_id' => isset($user->account_id)
                     ? $user->account_id
@@ -1810,7 +1843,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Purchasers by Dealers';
+        $this->result->message = 'Vendor summary filter by vendors';
         $this->result->data = $res_data;
         return response()->json($this->result);
     }

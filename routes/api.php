@@ -502,6 +502,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/vendor-summary',
+            'AdminController@vendor_summary_report'
+        );
+
+        Route::get(
             '/admin/deactivate-dealers',
             'AdminController@deactivate_all_dealers'
         );

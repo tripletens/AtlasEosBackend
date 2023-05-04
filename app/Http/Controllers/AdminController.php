@@ -3931,6 +3931,7 @@ class AdminController extends Controller
             $special = $request->special;
             $vendor = $request->vendor;
             $spec = $request->spec;
+            $um = $request->um;
 
             $grouping = $request->grouping;
             $full_desc = $request->full_desc;
@@ -3941,6 +3942,7 @@ class AdminController extends Controller
                 'description' => $desc,
                 'regular' => $regular,
                 'booking' => $special,
+                'um' => $um,
 
                 'grouping' => $grouping,
                 'vendor_product_code' => $vendor,

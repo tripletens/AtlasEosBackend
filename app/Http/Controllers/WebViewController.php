@@ -183,6 +183,9 @@ class WebViewController extends Controller
                     'desc' => isset($pro_data->description)
                         ? $pro_data->description
                         : null,
+
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
+
                     'total' => $value->price,
                 ];
 

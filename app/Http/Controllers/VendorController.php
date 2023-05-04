@@ -1679,6 +1679,8 @@ class VendorController extends Controller
                     ? $pro_data->description
                     : null;
 
+                $um = isset($pro_data->um) ? $pro_data->um : null;
+
                 $data = [
                     'pro_id' => isset($pro_data->id) ? $pro_data->id : null,
                     'vendor' => isset($pro_data->vendor_product_code)
@@ -1686,6 +1688,8 @@ class VendorController extends Controller
                         : null,
 
                     'description' => $desc,
+                    'um' => $um,
+
                     'overall_total' => $total_atlas_amount,
                     'qty_total' => $total_atlas_product,
                     'atlas_id' => $each_id,
@@ -1728,6 +1732,7 @@ class VendorController extends Controller
                 $value->desc = isset($pro_data->description)
                     ? $pro_data->description
                     : null;
+                $value->um = isset($pro_data->um) ? $pro_data->um : null;
                 $value->dealer_name = $dealer_data->dealer_name;
                 $value->vendor_name = $vendor_data->vendor_name;
                 $value->vendor_pro_code = $pro_data->vendor_product_code;

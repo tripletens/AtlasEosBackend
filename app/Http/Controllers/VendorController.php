@@ -1815,6 +1815,7 @@ class VendorController extends Controller
                     'description' => isset($product->description)
                         ? $product->description
                         : null,
+                    'um' => isset($product->um) ? $product->um : null,
                     'regular' => isset($product->regular)
                         ? $product->regular
                         : null,

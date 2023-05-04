@@ -1114,7 +1114,8 @@ class AdminController extends Controller
         $cart = Cart::select(
             'cart.*',
             'products.description',
-            'products.vendor_product_code'
+            'products.vendor_product_code',
+            'products.um'
         )
             ->where('cart.status', '1')
             ->join('products', 'products.atlas_id', '=', 'cart.atlas_id')

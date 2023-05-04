@@ -2199,6 +2199,7 @@ class AdminController extends Controller
                     'description' => $pro_data->description,
                     'price' => $cart_data->unit_price,
                     'dealer' => $dealer,
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
                 ];
 
                 $this->result->status = true;

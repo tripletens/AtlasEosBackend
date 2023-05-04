@@ -238,7 +238,7 @@
                             @endforeach
 
                             <tr>
-                                <td colspan="5">
+                                <td colspan="6">
                                     <h5 class="each-total-cate-text" style="">
 
                                         {{ App\Http\Controllers\DealerController::staticTrans($lang, 'TOTAL FOR') }}    {{ $item['vendor_name'] }}

@@ -2003,6 +2003,7 @@ class VendorController extends Controller
                     'dealer_code' => $dealer->dealer_code,
                     'vendor_name' => $vendor_data->vendor_name,
                     'vendor_code' => $vendor_data->vendor_code,
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
                 ];
 
                 array_push($res_data, $data);

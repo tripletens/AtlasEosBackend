@@ -1600,6 +1600,8 @@ class AdminController extends Controller
                         ->get()
                         ->first();
 
+                    $value->um = isset($pro_data->um) ? $pro_data->um : null;
+
                     $value->description = isset($pro_data->description)
                         ? $pro_data->description
                         : null;

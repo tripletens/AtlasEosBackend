@@ -2055,6 +2055,8 @@ class VendorController extends Controller
                     'vendor_product_code' => $pro_data->vendor_product_code,
                     'special' => $value->unit_price,
                     'desc' => $pro_data->description,
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
+
                     'total' => $value->price,
                     'dealer_name' => $dealer->dealer_name,
                     'dealer_code' => $dealer->dealer_code,

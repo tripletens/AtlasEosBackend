@@ -111,13 +111,13 @@ class UserController extends Controller
             // $ch = new Carbon($end_program);
             $current = $request->timer;
 
-            if (!$end_program->gt($current)) {
-                $this->result->status = false;
-                $this->result->message = 'Program has closed';
-                $this->result->data->mount = $end_program;
+            // if (!$end_program->gt($current)) {
+            //     $this->result->status = false;
+            //     $this->result->message = 'Program has closed';
+            //     $this->result->data->mount = $end_program;
 
-                return response()->json($this->result);
-            }
+            //     return response()->json($this->result);
+            // }
         }
 
         $dealer = Users::where('email', $request->email)->first();
@@ -149,6 +149,4 @@ class UserController extends Controller
     {
         return $this->respondWithToken(auth()->refresh());
     }
-
-    
 }

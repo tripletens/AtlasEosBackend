@@ -60,6 +60,8 @@ Route::group(
 
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
 
+        Route::get('/admin/update-pro-type', 'AdminController@update_pro_type');
+
         Route::post(
             '/admin/update-location',
             'AdminController@update_location'
@@ -803,7 +805,6 @@ Route::group(
             '/fetch-dealers-without-orders',
             'DealerController@get_dealers_without_orders'
         );
-
 
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');

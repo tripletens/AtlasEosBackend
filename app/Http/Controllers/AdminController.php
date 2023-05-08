@@ -93,6 +93,52 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function update_pro_type()
+    {
+        $pro = Products::all();
+
+        foreach ($pro as $value) {
+            $spec_data = $value->spec_data;
+            $id = $value->id;
+
+            if ($spec_data && $spec_data != null && $spec_data != 'null') {
+                ///  return $value;
+                $spec_data = json_decode($spec_data);
+
+                if (isset($spec_data[0])) {
+                    ///  return $spec_data;
+                    $first = $spec_data[0];
+                    $type = isset($first->type)
+                        ? strtolower($first->type)
+                        : null;
+                    if ($type == 'assorted') {
+                        $grouping = isset($first->grouping)
+                            ? $first->grouping
+                            : null;
+
+                        if ($grouping != null) {
+                            Products::where('id', $id)->update([
+                                'grouping' => $grouping,
+                            ]);
+                        }
+                    }
+                    if ($type != null) {
+                        Products::where('id', $id)->update(['type' => $type]);
+                    }
+                } else {
+                    Products::where('id', $id)->update(['type' => 'regular']);
+                }
+            } else {
+                Products::where('id', $id)->update(['type' => 'regular']);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'type fixed';
+        return response()->json($this->result);
+    }
+
     public function update_product_um(Request $request)
     {
         $csv = $request->file('csv');

@@ -4864,9 +4864,9 @@ class AdminController extends Controller
 
             foreach ($row_range as $row) {
                 $save_product = Dealer::create([
-                    'dealer_name' => $sheet->getCell('B' . $row)->getValue(),
+                    'dealer_name' => $sheet->getCell('A' . $row)->getValue(),
                     'role_name' => 'dealer',
-                    'dealer_code' => $sheet->getCell('A' . $row)->getValue(),
+                    'dealer_code' => $sheet->getCell('B' . $row)->getValue(),
                     'location' => $sheet->getCell('C' . $row)->getValue(),
                     'role' => 'dealer',
                     'role_id' => '4',

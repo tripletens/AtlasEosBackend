@@ -4468,12 +4468,12 @@ class AdminController extends Controller
 
                     'username' => $email,
                     'location' => $location,
-                    'company_name' => $company_code,
-                    'company_code' => $company_name,
-                    'account_id' => $company_name,
+                    'company_name' => $company_name,
+                    'company_code' => $company_code,
+                    'account_id' => $company_code,
 
-                    'dealer_code' => $company_name,
-                    'dealer_name' => $company_code,
+                    'dealer_code' => $company_code,
+                    'dealer_name' => $company_name,
                 ]);
             }
 

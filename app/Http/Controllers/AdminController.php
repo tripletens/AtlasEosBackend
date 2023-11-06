@@ -3605,7 +3605,7 @@ class AdminController extends Controller
                 $first_name = $exp[0];
                 $last_name = $exp[1];
 
-                $password = bcrypt($sheet->getCell('F' . $row)->getValue());
+                $password = $sheet->getCell('F' . $row)->getValue();
                 $password_show = $sheet->getCell('F' . $row)->getValue();
                 $email = strtolower($sheet->getCell('C' . $row)->getValue());
                 $designation = $sheet->getCell('B' . $row)->getValue();
@@ -3642,7 +3642,7 @@ class AdminController extends Controller
                         'role' => $role,
                         'access_level_first' => $access,
                         // 'access_level_second' => $access_level_second,
-                        'password' => $password,
+                        'password' => bcrypt($password),
                         'password_show' => $password_show,
                         // 'region' => $region,
                     ]);

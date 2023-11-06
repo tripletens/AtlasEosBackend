@@ -4446,6 +4446,16 @@ class AdminController extends Controller
             $role = '4';
             $role_name = 'dealer';
 
+            $dash_activate = 0;
+
+            $first_user = Users::query()
+                ->where('role', '4')
+                ->get()
+                ->first();
+            if ($first_user) {
+                $dash_activate = $first_user->dash_activate;
+            }
+
             if (Users::where('email', $email)->exists()) {
                 $this->result->status = true;
                 $this->result->status_code = 200;
@@ -4471,7 +4481,7 @@ class AdminController extends Controller
                     'company_name' => $company_name,
                     'company_code' => $company_code,
                     'account_id' => $company_code,
-
+                    'dash_activate' => $dash_activate,
                     'dealer_code' => $company_code,
                     'dealer_name' => $company_name,
                 ]);
@@ -4615,6 +4625,16 @@ class AdminController extends Controller
                 $role = '4';
                 $role_name = 'dealer';
 
+                $dash_activate = 0;
+
+                $first_user = Users::query()
+                    ->where('role', '4')
+                    ->get()
+                    ->first();
+                if ($first_user) {
+                    $dash_activate = $first_user->dash_activate;
+                }
+
                 if (!Users::where('email', $email)->exists()) {
                     $save_dealer = Users::create([
                         'first_name' => $first_name,
@@ -4631,7 +4651,7 @@ class AdminController extends Controller
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
-
+                        'dash_activate' => $dash_activate,
                         'phone' => $phone,
                         'location' => $location,
                     ]);

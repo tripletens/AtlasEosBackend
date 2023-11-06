@@ -3612,7 +3612,7 @@ class AdminController extends Controller
                 $access = $sheet->getCell('E' . $row)->getValue();
 
                 $role = 0;
-                if (strtolower($designation) == 'admin') {
+                if (strtolower($designation) == 'super admin') {
                     $role = 1;
                 }
 

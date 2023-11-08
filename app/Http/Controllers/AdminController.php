@@ -3853,7 +3853,7 @@ class AdminController extends Controller
 
         $this->result->data->total_dealership = $total_dealership;
 
-        $this->result->message = 'Analysis Admin Dashboard Data';
+        $this->result->message = 'Analysis Admin Dashboard Dataaa';
         return response()->json($this->result);
     }
 

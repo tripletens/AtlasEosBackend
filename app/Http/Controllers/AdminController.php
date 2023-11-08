@@ -3788,6 +3788,7 @@ class AdminController extends Controller
         $total_dealers = Users::where('role', '4')->count();
         $total_products = Products::count();
         $total_order = Cart::where('status', '1')->count();
+        $total_dealership = Dealer::count();
 
         $logged_vendors = Users::where('role', '3')
             ->where('last_login', '!=', null)
@@ -3849,6 +3850,8 @@ class AdminController extends Controller
 
         $this->result->data->total_logged_in_dealer = $total_logged_in_dealers;
         $this->result->data->total_not_logged_in_dealer = $total_not_logged_in_dealers;
+
+        $this->result->data->total_dealership = $total_dealership;
 
         $this->result->message = 'Analysis Admin Dashboard Data';
         return response()->json($this->result);

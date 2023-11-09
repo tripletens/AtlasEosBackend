@@ -50,9 +50,9 @@ return [
             // 'username' =>  env('DB_USERNAME', 'doadmin'),
             // 'password' => env('DB_PASSWORD', 'AVNS_6Hx7LhRY_mGOsgDx_eh'),
 
-            'host' =>  "localhost",
+            'host' =>  "127.0.0.1",
             'port' => "3306",
-            'database' => "atlas_eos_new",
+            'database' => "atlas_eos",
             'username' =>  "root",
             'password' => "",
             'unix_socket' => env('DB_SOCKET', ''),

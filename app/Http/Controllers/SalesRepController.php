@@ -869,7 +869,7 @@ class SalesRepController extends Controller
                 $user_privileged_dealers_array
             );
 
-            // return $filter_users_priviledged_dealers_array;
+            // return $filter_users_prziviledged_dealers_array;
 
             // return $user_privileged_dealers_format = str_replace('"', '', $user_privileged_dealers_array[0]);
 

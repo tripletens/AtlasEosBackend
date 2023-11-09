@@ -60,6 +60,18 @@ Route::group(
 
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
 
+        Route::get('/admin/update-pro-type', 'AdminController@update_pro_type');
+
+        Route::post(
+            '/admin/update-location',
+            'AdminController@update_location'
+        );
+
+        Route::post(
+            '/admin/update-product-um',
+            'AdminController@update_product_um'
+        );
+
         Route::get(
             '/admin/dealer-location',
             'AdminController@fetch_dealer_locations'
@@ -492,6 +504,11 @@ Route::group(
         );
 
         Route::get(
+            '/admin/vendor-summary',
+            'AdminController@vendor_summary_report'
+        );
+
+        Route::get(
             '/admin/deactivate-dealers',
             'AdminController@deactivate_all_dealers'
         );
@@ -788,7 +805,6 @@ Route::group(
             '/fetch-dealers-without-orders',
             'DealerController@get_dealers_without_orders'
         );
-
 
         //---------------------- seminar apis here -------------------- //
         // Route::post('/create-seminar', 'SeminarController@create_seminar');

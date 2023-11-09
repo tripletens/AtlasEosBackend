@@ -196,6 +196,8 @@ set_time_limit(25000000000);
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Atlas') }}  #</th>
                                 <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor') }} #</th>
                                 <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Description') }}</th>
+                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'UM') }}</th>
+
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Regular ') }}  ($)</th>
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Show ') }}  ($)</th>
 
@@ -222,6 +224,9 @@ set_time_limit(25000000000);
 
                                     <td class="table-value-custom center-text">
                                         {{ $item->description }}
+                                    </td>
+                                    <td class="table-value-custom center-text">
+                                        {{ $item->um }}
                                     </td>
                                     <td class="table-value-custom right-align">
                                         {{ number_format(floatval($item->regular), 2) }}

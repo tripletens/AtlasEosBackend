@@ -93,11 +93,167 @@ class AdminController extends Controller
     // outside == 6
     // admin == 7
 
+    public function update_pro_type()
+    {
+        $pro = Products::all();
+
+        foreach ($pro as $value) {
+            $spec_data = $value->spec_data;
+            $id = $value->id;
+
+            if ($spec_data && $spec_data != null && $spec_data != 'null') {
+                ///  return $value;
+                $spec_data = json_decode($spec_data);
+
+                if (isset($spec_data[0])) {
+                    ///  return $spec_data;
+                    $first = $spec_data[0];
+                    $type = isset($first->type)
+                        ? strtolower($first->type)
+                        : null;
+                    if ($type == 'assorted') {
+                        $grouping = isset($first->grouping)
+                            ? $first->grouping
+                            : null;
+
+                        if ($grouping != null) {
+                            Products::where('id', $id)->update([
+                                'grouping' => $grouping,
+                            ]);
+                        }
+                    }
+                    if ($type != null) {
+                        Products::where('id', $id)->update(['type' => $type]);
+                    }
+                } else {
+                    Products::where('id', $id)->update(['type' => 'regular']);
+                }
+            } else {
+                Products::where('id', $id)->update(['type' => 'regular']);
+            }
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'type fixed';
+        return response()->json($this->result);
+    }
+
+    public function update_product_um(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in excel format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $atlas_id = $sheet->getCell('A' . $row)->getValue();
+                $um = $sheet->getCell('B' . $row)->getValue();
+
+                if (
+                    Products::query()
+                        ->where('atlas_id', $atlas_id)
+                        ->exists()
+                ) {
+                    $save_admin = Products::query()
+                        ->where('atlas_id', $atlas_id)
+                        ->update([
+                            'um' => $um,
+                        ]);
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Products UM updated successfully';
+        return response()->json($this->result);
+    }
+
+    public function update_location(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in excel format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $dealer_code = $sheet->getCell('A' . $row)->getValue();
+                $location = $sheet->getCell('H' . $row)->getValue();
+
+                if (Dealer::where('dealer_code', $dealer_code)->exists()) {
+                    $save_admin = Dealer::where(
+                        'dealer_code',
+                        $dealer_code
+                    )->update([
+                        'location' => $location,
+                    ]);
+
+                    // if (!$save_admin) {
+                    //     $this->result->status = false;
+                    //     $this->result->status_code = 422;
+                    //     $this->result->message =
+                    //         'Sorry File could not be uploaded. Try again later.';
+                    //     return response()->json($this->result);
+                    // }
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Dealer Location updated successfully';
+        return response()->json($this->result);
+    }
+
     public function filter_dealer_location($location)
     {
         $dealers = Dealer::where('location', $location)
             ->orderBy('dealer_code', 'asc')
             ->get();
+
         $total_sales = 0;
         $res_data = [];
         if ($dealers) {
@@ -134,12 +290,19 @@ class AdminController extends Controller
     {
         $res_data = [];
         $unique_location = Dealer::distinct('location')
+            ->orderBy('location', 'asc')
+
             ->pluck('location')
+
             ->toArray();
+
+        // Dealer::distinct('location')
+        // ->pluck('location')
+        // ->toArray();
 
         if ($unique_location) {
             foreach ($unique_location as $value) {
-                if ($value != null) {
+                if ($value != null && !in_array($value, $res_data)) {
                     array_push($res_data, $value);
                 }
             }
@@ -997,7 +1160,8 @@ class AdminController extends Controller
         $cart = Cart::select(
             'cart.*',
             'products.description',
-            'products.vendor_product_code'
+            'products.vendor_product_code',
+            'products.um'
         )
             ->where('cart.status', '1')
             ->join('products', 'products.atlas_id', '=', 'cart.atlas_id')
@@ -1483,6 +1647,8 @@ class AdminController extends Controller
                         ->get()
                         ->first();
 
+                    $value->um = isset($pro_data->um) ? $pro_data->um : null;
+
                     $value->description = isset($pro_data->description)
                         ? $pro_data->description
                         : null;
@@ -1635,6 +1801,42 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public function vendor_summary_report()
+    {
+        $vendors = Vendors::orderBy('vendor_name', 'asc')->get();
+        $dealer_count = Vendors::count();
+        $total_sales = 0;
+        $res_data = [];
+        if ($vendors) {
+            foreach ($vendors as $value) {
+                $vendor_code = $value->vendor_code;
+                $vendor_name = $value->vendor_name;
+                $vendor_sales = Cart::where('vendor', $vendor_code)->sum(
+                    'price'
+                );
+                $total_sales += Cart::where('vendor', $vendor_code)->sum(
+                    'price'
+                );
+
+                $data = [
+                    'vendor_name' => $vendor_name,
+                    'vendor_code' => $vendor_code,
+                    'sales' => $vendor_sales,
+                ];
+
+                array_push($res_data, $data);
+            }
+
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message = 'Vendor summary';
+            $this->result->data->summary = $res_data;
+            $this->result->data->total_sales = $total_sales;
+
+            return response()->json($this->result);
+        }
+    }
+
     public function vendor_summary($code)
     {
         $vendor_purchases = Cart::where('vendor', $code)->get();
@@ -1664,6 +1866,7 @@ class AdminController extends Controller
 
             $first_name = isset($user->first_name) ? $user->first_name : null;
             $last_name = isset($user->last_name) ? $user->last_name : null;
+
             $data = [
                 'account_id' => isset($user->account_id)
                     ? $user->account_id
@@ -1682,7 +1885,7 @@ class AdminController extends Controller
 
         $this->result->status = true;
         $this->result->status_code = 200;
-        $this->result->message = 'Purchasers by Dealers';
+        $this->result->message = 'Vendor summary filter by vendors';
         $this->result->data = $res_data;
         return response()->json($this->result);
     }
@@ -2045,6 +2248,7 @@ class AdminController extends Controller
                     'description' => $pro_data->description,
                     'price' => $cart_data->unit_price,
                     'dealer' => $dealer,
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
                 ];
 
                 $this->result->status = true;
@@ -2501,6 +2705,10 @@ class AdminController extends Controller
             $end_date . ' ' . $end_time,
             'America/Edmonton'
         );
+
+        // $inital_end_timer = Carbon::parse($end_date . ' ' . $end_time)->format(
+        //     'm/d/Y H:i:s'
+        // );
 
         $inital_start_timer = Carbon::parse(
             $start_date . ' ' . $start_time,
@@ -3397,14 +3605,14 @@ class AdminController extends Controller
                 $first_name = $exp[0];
                 $last_name = $exp[1];
 
-                $password = bcrypt($sheet->getCell('F' . $row)->getValue());
+                $password = $sheet->getCell('F' . $row)->getValue();
                 $password_show = $sheet->getCell('F' . $row)->getValue();
                 $email = strtolower($sheet->getCell('C' . $row)->getValue());
                 $designation = $sheet->getCell('B' . $row)->getValue();
                 $access = $sheet->getCell('E' . $row)->getValue();
 
                 $role = 0;
-                if (strtolower($designation) == 'admin') {
+                if (strtolower($designation) == 'super admin') {
                     $role = 1;
                 }
 
@@ -3434,7 +3642,7 @@ class AdminController extends Controller
                         'role' => $role,
                         'access_level_first' => $access,
                         // 'access_level_second' => $access_level_second,
-                        'password' => $password,
+                        'password' => bcrypt($password),
                         'password_show' => $password_show,
                         // 'region' => $region,
                     ]);
@@ -3580,6 +3788,7 @@ class AdminController extends Controller
         $total_dealers = Users::where('role', '4')->count();
         $total_products = Products::count();
         $total_order = Cart::where('status', '1')->count();
+        $total_dealership = Dealer::count();
 
         $logged_vendors = Users::where('role', '3')
             ->where('last_login', '!=', null)
@@ -3642,7 +3851,9 @@ class AdminController extends Controller
         $this->result->data->total_logged_in_dealer = $total_logged_in_dealers;
         $this->result->data->total_not_logged_in_dealer = $total_not_logged_in_dealers;
 
-        $this->result->message = 'Analysis Admin Dashboard Data';
+        $this->result->data->total_dealership = $total_dealership;
+
+        $this->result->message = 'Analysis Admin Dashboard Dataaa';
         return response()->json($this->result);
     }
 
@@ -3773,6 +3984,7 @@ class AdminController extends Controller
             $special = $request->special;
             $vendor = $request->vendor;
             $spec = $request->spec;
+            $um = $request->um;
 
             $grouping = $request->grouping;
             $full_desc = $request->full_desc;
@@ -3783,6 +3995,7 @@ class AdminController extends Controller
                 'description' => $desc,
                 'regular' => $regular,
                 'booking' => $special,
+                'um' => $um,
 
                 'grouping' => $grouping,
                 'vendor_product_code' => $vendor,
@@ -4236,6 +4449,16 @@ class AdminController extends Controller
             $role = '4';
             $role_name = 'dealer';
 
+            $dash_activate = 0;
+
+            $first_user = Users::query()
+                ->where('role', '4')
+                ->get()
+                ->first();
+            if ($first_user) {
+                $dash_activate = $first_user->dash_activate;
+            }
+
             if (Users::where('email', $email)->exists()) {
                 $this->result->status = true;
                 $this->result->status_code = 200;
@@ -4261,7 +4484,7 @@ class AdminController extends Controller
                     'company_name' => $company_name,
                     'company_code' => $company_code,
                     'account_id' => $company_code,
-
+                    'dash_activate' => $dash_activate,
                     'dealer_code' => $company_code,
                     'dealer_name' => $company_name,
                 ]);
@@ -4405,6 +4628,16 @@ class AdminController extends Controller
                 $role = '4';
                 $role_name = 'dealer';
 
+                $dash_activate = 0;
+
+                $first_user = Users::query()
+                    ->where('role', '4')
+                    ->get()
+                    ->first();
+                if ($first_user) {
+                    $dash_activate = $first_user->dash_activate;
+                }
+
                 if (!Users::where('email', $email)->exists()) {
                     $save_dealer = Users::create([
                         'first_name' => $first_name,
@@ -4421,7 +4654,7 @@ class AdminController extends Controller
                         'account_id' => $dealer_code,
                         'dealer_code' => $dealer_code,
                         'company_name' => $dealer_name,
-
+                        'dash_activate' => $dash_activate,
                         'phone' => $phone,
                         'location' => $location,
                     ]);
@@ -4654,9 +4887,9 @@ class AdminController extends Controller
 
             foreach ($row_range as $row) {
                 $save_product = Dealer::create([
-                    'dealer_name' => $sheet->getCell('B' . $row)->getValue(),
+                    'dealer_name' => $sheet->getCell('A' . $row)->getValue(),
                     'role_name' => 'dealer',
-                    'dealer_code' => $sheet->getCell('A' . $row)->getValue(),
+                    'dealer_code' => $sheet->getCell('B' . $row)->getValue(),
                     'location' => $sheet->getCell('C' . $row)->getValue(),
                     'role' => 'dealer',
                     'role_id' => '4',
@@ -5278,7 +5511,7 @@ class AdminController extends Controller
                 'vendor_name' => $name,
                 'vendor_code' => $code,
                 'role_name' => 'vendor',
-                'role' => '3',
+                'role' => 'vendor',
             ]);
 
             if ($save_vendor) {

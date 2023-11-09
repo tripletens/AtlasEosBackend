@@ -115,6 +115,7 @@ class WebViewController extends Controller
                     'desc' => isset($pro_data->description)
                         ? $pro_data->description
                         : null,
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
                     'total' => $value->price,
                 ];
 
@@ -183,6 +184,9 @@ class WebViewController extends Controller
                     'desc' => isset($pro_data->description)
                         ? $pro_data->description
                         : null,
+
+                    'um' => isset($pro_data->um) ? $pro_data->um : null,
+
                     'total' => $value->price,
                 ];
 
@@ -326,6 +330,7 @@ class WebViewController extends Controller
                     'description' => isset($product->description)
                         ? $product->description
                         : null,
+                    'um' => isset($product->um) ? $product->um : null,
                     'regular' => isset($product->regular)
                         ? $product->regular
                         : null,
@@ -484,6 +489,13 @@ class WebViewController extends Controller
                             isset($pro_data->description)
                                 ? $pro_data->description
                                 : 'null'
+                        );
+                    }
+
+                    if (isset($pro_data->um)) {
+                        $value->um = $this->translateToLocal(
+                            $lang,
+                            isset($pro_data->um) ? $pro_data->um : 'null'
                         );
                     }
 

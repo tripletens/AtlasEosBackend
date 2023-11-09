@@ -198,6 +198,7 @@
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Atlas') }}  #</th>
                                 <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor') }} #</th>
                                 <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Description') }}</th>
+                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'UM') }}</th>
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Special Price') }}  ($)</th>
                                 <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Total') }}  ($)</th>
                             </tr>
@@ -221,6 +222,11 @@
                                     <td class="table-value-custom center-text">
                                         {{ $inner['description'] }}
                                     </td>
+
+                                    <td class="table-value-custom center-text">
+                                        {{ $inner['um'] }}
+                                    </td>
+
                                     <td class="table-value-custom right-align">
                                         {{ number_format(floatval($inner['unit_price']), 2) }}
                                     </td>
@@ -232,7 +238,7 @@
                             @endforeach
 
                             <tr>
-                                <td colspan="5">
+                                <td colspan="6">
                                     <h5 class="each-total-cate-text" style="">
 
                                         {{ App\Http\Controllers\DealerController::staticTrans($lang, 'TOTAL FOR') }}    {{ $item['vendor_name'] }}

@@ -260,6 +260,9 @@ class SalesRepController extends Controller
                     ->first();
 
                 $value->description = $pro_data ? $pro_data->description : null;
+
+                $value->um = isset($pro_data->um) ? $pro_data->um : null;
+
                 $value->vendor_product_code = $pro_data
                     ? $pro_data->vendor_product_code
                     : null;

@@ -862,6 +862,8 @@ class SalesRepController extends Controller
 
         $all_dealerships = [];
 
+        $all_dealers_orders = [];
+
         if ($user_privileged_dealers != null) {
             $user_privileged_dealers_array = explode(
                 ',',
@@ -872,7 +874,7 @@ class SalesRepController extends Controller
                 $user_privileged_dealers_array
             );
 
-            // return $filter_users_prziviledged_dealers_array;
+            // return count($filter_users_priviledged_dealers_array);
 
             // return $user_privileged_dealers_format = str_replace('"', '', $user_privileged_dealers_array[0]);
 
@@ -901,33 +903,42 @@ class SalesRepController extends Controller
                 // get_priviledged_dealer_details
                 // get_total_user_dealers
 
-                $get_priviledged_dealer_details = Users::where(
+                $get_priviledged_dealer_users_details = Users::where(
                     'account_id',
                     $user_privilaged_dealer
                 )->get();
 
-                if (count($get_priviledged_dealer_details) > 0) {
+                // return $get_priviledged_dealer_users_details;
+
+
+                if (count($get_priviledged_dealer_users_details) > 0) {
                     // yay its an array
-                    $dealer_cart = Cart::where(
-                        'dealer',
-                        $user_privilaged_dealer
-                    )->count();
 
-                    if ($dealer_cart == 0) {
-                        array_push(
-                            $all_dealers_without_orders,
-                            ...$get_total_user_dealers
-                        );
-                    } else {
-                        array_push(
-                            $all_dealers_with_orders,
-                            ...$get_total_user_dealers
-                        );
-                    }
+                    // add the dealer
 
+                    // $dealer_cart = Cart::where(
+                    //     'dealer',
+                    //     $user_privilaged_dealer
+                    // )->count();
+
+                    // // return $dealer_cart;
+
+                    // if ($dealer_cart == 0) {
+                    //     array_push(
+                    //         $all_dealers_without_orders,
+                    //         ...$get_total_user_dealers
+                    //     );
+                    // } else {
+                    //     array_push(
+                    //         $all_dealers_with_orders,
+                    //         ...$get_total_user_dealers
+                    //     );
+                    // }
+
+                    // add dealer users
                     array_push(
                         $user_dealers_array,
-                        ...$get_priviledged_dealer_details
+                        ...$get_priviledged_dealer_users_details
                     );
                 }
 
@@ -945,11 +956,15 @@ class SalesRepController extends Controller
 
         $last_login_array = [];
 
-        // return $user_privileged_dealers_array;
-
         // return $user_dealers_array;
 
+        // return count($user_privileged_dealers_array);
+
+        // return count($user_dealers_array);
+
         // return $all_dealerships;
+
+        // return $all_dealers_orders;
 
         foreach ($all_dealerships as $_dealer) {
             $total_not_logged_in = Users::where(
@@ -967,6 +982,27 @@ class SalesRepController extends Controller
             // array_push($last_login_array, array_values($dealer_inner_details));
         }
 
+        $user_dealer_with_cart_order = [];
+        $user_dealer_without_cart_order = [];
+        
+        // check the number f users that have item in cart
+
+        foreach ($user_dealers_array as $user){
+            $user_cart_item = Cart::where('dealer', $user->account_id)->count();
+
+            $user->cart_count = $user_cart_item;
+
+            if($user_cart_item != 0){
+                $user_dealer_with_cart_order[] = $user;
+            }
+
+            if($user_cart_item == 0){
+                $user_dealer_without_cart_order[] = $user;
+            }
+        }
+
+        // return $user_dealer_with_cart_order;
+
         // return $last_not_loggedin_dealer_count . " => last login count =>" . $last_loggedin_dealer_count;
 
         $this->result->status = true;
@@ -979,16 +1015,17 @@ class SalesRepController extends Controller
 
         $this->result->data->total_logged_in = $last_loggedin_dealer_count;
         $this->result->data->total_not_logged_in = $last_not_loggedin_dealer_count;
-        $this->result->data->all_dealers_without_orders = $all_dealers_without_orders;
-        $this->result->data->all_dealers_with_orders = $all_dealers_with_orders;
+        $this->result->data->all_dealers_without_orders = $user_dealer_without_cart_order;
+        $this->result->data->all_dealers_with_orders = $user_dealer_with_cart_order;
 
         $this->result->data->all_dealer_users = $user_dealers_array;
 
         $this->result->data->all_dealers_with_orders_count = count(
-            $all_dealers_with_orders
+            $user_dealer_with_cart_order
         );
+
         $this->result->data->all_dealers_without_orders_count = count(
-            $all_dealers_without_orders
+            $user_dealer_without_cart_order
         );
 
         $this->result->data->all_dealer_users_count = count(

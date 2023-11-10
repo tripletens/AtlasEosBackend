@@ -123,10 +123,10 @@ class AdminController extends Controller
             $data = [];
 
             foreach ($row_range as $row) {
-                $atlas_id = $sheet->getCell('1' . $row)->getValue();
-                $xref = $sheet->getCell('2' . $row)->getValue();
-                $um = $sheet->getCell('3' . $row)->getValue();
-                $desc = $sheet->getCell('4' . $row)->getValue();
+                $atlas_id = $sheet->getCell('A' . $row)->getValue();
+                $xref = $sheet->getCell('B' . $row)->getValue();
+                $um = $sheet->getCell('C' . $row)->getValue();
+                $desc = $sheet->getCell('D' . $row)->getValue();
 
                 if (
                     Products::query()

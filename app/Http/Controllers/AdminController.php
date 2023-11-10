@@ -106,51 +106,52 @@ class AdminController extends Controller
         }
 
         $the_file = $request->file('csv');
-        try {
-            $spreadsheet = IOFactory::load($the_file->getRealPath());
-            $sheet = $spreadsheet->getActiveSheet();
-            $row_limit = $sheet->getHighestDataRow();
-            $column_limit = $sheet->getHighestDataColumn();
-            $row_range = range(2, $row_limit);
-            $column_range = range('F', $column_limit);
-            $startcount = 2;
-            $data = [];
 
-            foreach ($row_range as $row) {
-                $atlas_id = $sheet->getCell('A' . $row)->getValue();
-                $xref = $sheet->getCell('B' . $row)->getValue();
-                $um = $sheet->getCell('C' . $row)->getValue();
-                $desc = $sheet->getCell('D' . $row)->getValue();
+        // try {
+        //     $spreadsheet = IOFactory::load($the_file->getRealPath());
+        //     $sheet = $spreadsheet->getActiveSheet();
+        //     $row_limit = $sheet->getHighestDataRow();
+        //     $column_limit = $sheet->getHighestDataColumn();
+        //     $row_range = range(2, $row_limit);
+        //     $column_range = range('F', $column_limit);
+        //     $startcount = 2;
+        //     $data = [];
 
-                if (
-                    Products::query()
-                        ->where('atlas_id', $atlas_id)
-                        ->exists()
-                ) {
-                    $save_admin = Products::query()
-                        ->where('atlas_id', $atlas_id)
-                        ->update([
-                            'um' => $um,
-                        ]);
+        //     foreach ($row_range as $row) {
+        //         $atlas_id = $sheet->getCell('A' . $row)->getValue();
+        //         $xref = $sheet->getCell('B' . $row)->getValue();
+        //         $um = $sheet->getCell('C' . $row)->getValue();
+        //         $desc = $sheet->getCell('D' . $row)->getValue();
 
-                    if (
-                        !ProductDesc::where(['atlas_id' => $atlas_id])->exists()
-                    ) {
-                        ProductDesc::create([
-                            'atlas_id' => $atlas_id,
-                            'xref' => $xref,
-                            'desc' => $desc,
-                        ]);
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            $error_code = $e->errorInfo[1];
-            $this->result->status = false;
-            $this->result->status_code = 404;
-            $this->result->message = 'Something went wrong';
-            return response()->json($this->result);
-        }
+        //         if (
+        //             Products::query()
+        //                 ->where('atlas_id', $atlas_id)
+        //                 ->exists()
+        //         ) {
+        //             $save_admin = Products::query()
+        //                 ->where('atlas_id', $atlas_id)
+        //                 ->update([
+        //                     'um' => $um,
+        //                 ]);
+
+        //             if (
+        //                 !ProductDesc::where(['atlas_id' => $atlas_id])->exists()
+        //             ) {
+        //                 ProductDesc::create([
+        //                     'atlas_id' => $atlas_id,
+        //                     'xref' => $xref,
+        //                     'desc' => $desc,
+        //                 ]);
+        //             }
+        //         }
+        //     }
+        // } catch (Exception $e) {
+        //     $error_code = $e->errorInfo[1];
+        //     $this->result->status = false;
+        //     $this->result->status_code = 404;
+        //     $this->result->message = 'Something went wrong';
+        //     return response()->json($this->result);
+        // }
 
         $this->result->status = true;
         $this->result->status_code = 200;

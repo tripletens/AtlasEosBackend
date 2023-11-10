@@ -63,6 +63,8 @@ Route::group(
             'AdminController@update_product_desc_um'
         );
 
+        Route::get('/test', 'AdminController@test');
+
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
 
         Route::get('/admin/update-pro-type', 'AdminController@update_pro_type');

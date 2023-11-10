@@ -10,4 +10,6 @@ class ProductDesc extends Model
     use HasFactory;
 
     public $table = 'product_desc';
+
+    protected $fillable = ['atlas_id', 'xref', 'description'];
 }

@@ -169,45 +169,45 @@ class AdminController extends Controller
         $pro = Products::all();
 
         foreach ($pro as $value) {
-            if ($value->type != null && $value->type != '') {
-                $spec_data = $value->spec_data;
-                $id = $value->id;
+            //  if ($value->type != null && $value->type != '') {
+            $spec_data = $value->spec_data;
+            $id = $value->id;
 
-                if ($spec_data && $spec_data != null && $spec_data != 'null') {
-                    ///  return $value;
-                    $spec_data = json_decode($spec_data);
+            if ($spec_data && $spec_data != null && $spec_data != 'null') {
+                ///  return $value;
+                $spec_data = json_decode($spec_data);
 
-                    if (isset($spec_data[0])) {
-                        ///  return $spec_data;
-                        $first = $spec_data[0];
-                        $type = isset($first->type)
-                            ? strtolower($first->type)
-                            : null;
-                        // if ($type == 'assorted') {
-                        //     $grouping = isset($first->grouping)
-                        //         ? $first->grouping
-                        //         : null;
+                if (isset($spec_data[0])) {
+                    ///  return $spec_data;
+                    $first = $spec_data[0];
+                    $type = isset($first->type)
+                        ? strtolower($first->type)
+                        : null;
+                    // if ($type == 'assorted') {
+                    //     $grouping = isset($first->grouping)
+                    //         ? $first->grouping
+                    //         : null;
 
-                        //     if ($grouping != null) {
-                        //         Products::where('id', $id)->update([
-                        //             'grouping' => $grouping,
-                        //         ]);
-                        //     }
-                        // }
-                        if ($type != null) {
-                            Products::where('id', $id)->update([
-                                'type' => $type,
-                            ]);
-                        }
-                    } else {
+                    //     if ($grouping != null) {
+                    //         Products::where('id', $id)->update([
+                    //             'grouping' => $grouping,
+                    //         ]);
+                    //     }
+                    // }
+                    if ($type != null) {
                         Products::where('id', $id)->update([
-                            'type' => 'regular',
+                            'type' => $type,
                         ]);
                     }
                 } else {
-                    Products::where('id', $id)->update(['type' => 'regular']);
+                    Products::where('id', $id)->update([
+                        'type' => 'regular',
+                    ]);
                 }
+            } else {
+                Products::where('id', $id)->update(['type' => 'regular']);
             }
+            //  }
         }
 
         $this->result->status = true;

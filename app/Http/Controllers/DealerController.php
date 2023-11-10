@@ -2476,7 +2476,7 @@ class DealerController extends Controller
     }
 
     // dealer dashboard
-    public function dealer_dashboard($account)
+    public function dealer_dashboard_old($account)
     {
         // completed orders are the list of vendors that you have ordered from
 
@@ -2561,7 +2561,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function dealer_dashboard_new($account)
+    public function dealer_dashboard($account)
     {
         // Fetch completed and uncompleted orders vendors
         $completed_orders_vendors = Cart::where('dealer', $account)
@@ -2592,13 +2592,13 @@ class DealerController extends Controller
         $order_remaining = Vendors::count();
 
         // Fetch dealers with and without orders
-        $dealers = Dealer::select(
-            'dealer_code',
-            DB::raw('COUNT(*) as order_count')
-        )
-            ->leftJoin('cart', 'dealer.dealer_code', '=', 'cart.dealer')
-            ->groupBy('dealer.dealer_code')
+        $dealers = Dealer::select('dealer_code', DB::raw('COUNT(*) as order_count'))
+            ->leftJoin('cart', 'dealers.dealer_code', '=', 'cart.dealer')
+            ->groupBy('dealers.dealer_code')
+
             ->get();
+
+
 
         $all_dealers_without_orders = $dealers->filter(function ($dealer) {
             return $dealer->order_count == 0;
@@ -2709,7 +2709,8 @@ class DealerController extends Controller
         $fetch_settings = ProgramCountdown::where('status', 1)
             ->get()
             ->first();
-        return $fetch_settings->start_countdown_date;
+
+        // return $fetch_settings->start_countdown_date;
 
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)

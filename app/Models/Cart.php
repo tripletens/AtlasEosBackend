@@ -30,5 +30,6 @@ class Cart extends Model
         'category',
         'um',
         'xref',
+        'type',
     ];
 }

@@ -2644,7 +2644,7 @@ class DealerController extends Controller
         $fetch_settings = ProgramCountdown::where('status', 1)
             ->get()
             ->first();
-        // return $fetch_settings->start_countdown_date;
+        return $fetch_settings->start_countdown_date;
 
         $new_all_orders = DB::table('cart')
             ->where('dealer', $account)

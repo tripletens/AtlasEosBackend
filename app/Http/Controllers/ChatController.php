@@ -51,6 +51,7 @@ class ChatController extends Controller
                         'id' => isset($user_data->id) ? $user_data->id : null,
                         'first_name' => $user_data->first_name,
                         'last_name' => $user_data->last_name,
+                        'full_name' => $user_data->full_name,
                         'email' => $user_data->email,
                         'company' => $user_data->company_name,
                     ];

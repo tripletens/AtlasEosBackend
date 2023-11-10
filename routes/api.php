@@ -58,6 +58,13 @@ Route::group(
     function () {
         // Route::get('/admin/seminars', 'AdminController@get_all_seminar');
 
+        Route::post(
+            '/admin/update-product-desc-um',
+            'AdminController@update_product_desc_um'
+        );
+
+        Route::get('/test', 'AdminController@test');
+
         Route::get('/admin/update-notes', 'AdminController@fix_notes');
 
         Route::get('/admin/update-pro-type', 'AdminController@update_pro_type');
@@ -1455,7 +1462,7 @@ Route::group(
             '/sales-rep/dealers_with_orders/{user_id}',
             'SalesRepController@salesrep_dealers_with_orders'
         );
- 
+
         // route error
         Route::get(
             '/failed-login',

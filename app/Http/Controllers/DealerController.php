@@ -2588,7 +2588,7 @@ class DealerController extends Controller
 
         // Fetch dealers with and without orders
         $dealers = Dealer::select('dealer_code', DB::raw('COUNT(*) as order_count'))
-            ->leftJoin('cart', 'dealer.dealer_code', '=', 'cart.dealer')
+            ->leftJoin('cart', 'dealer.dealer', '=', 'cart.dealer')
             ->groupBy('dealer.dealer_code')
             ->get();
 

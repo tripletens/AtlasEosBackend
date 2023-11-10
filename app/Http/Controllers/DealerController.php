@@ -2474,7 +2474,7 @@ class DealerController extends Controller
     }
 
     // dealer dashboard
-    public function dealer_dashboard_old($account)
+    public function dealer_dashboard($account)
     {
         // completed orders are the list of vendors that you have ordered from
 
@@ -2559,7 +2559,7 @@ class DealerController extends Controller
         return response()->json($this->result);
     }
 
-    public function dealer_dashboard($account)
+    public function dealer_dashboard_new($account)
     {
         // Fetch completed and uncompleted orders vendors
         $completed_orders_vendors = Cart::where('dealer', $account)

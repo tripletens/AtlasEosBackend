@@ -1435,6 +1435,15 @@ class AdminController extends Controller
         return response()->json($this->result);
     }
 
+    public static function filter_text($str)
+    {
+        $str = filter_var($str, FILTER_SANITIZE_STRING);
+
+        $str = trim($str);
+
+        return $str;
+    }
+
     public function upload_new_product_csv(Request $request)
     {
         $csv = $request->file('csv');
@@ -1469,12 +1478,14 @@ class AdminController extends Controller
 
                 if (!Products::where('atlas_id', $atlas_id)->exists()) {
                     $save_admin = Products::create([
-                        'vendor' => $vendor_code,
+                        'vendor' => AdminController::filter_text($vendor_code),
                         'vendor_code' => $vendor_code,
-                        'vendor_name' => $vendor_name,
+                        'vendor_name' => AdminController::filter_text(
+                            $vendor_name
+                        ),
                         'atlas_id' => $atlas_id,
                         'xref' => $xref,
-                        'description' => $desc,
+                        'description' => AdminController::filter_text($desc),
                         'status' => '1',
                         'regular' => $regular,
                         'booking' => $booking,

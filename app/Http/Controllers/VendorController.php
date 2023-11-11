@@ -1733,8 +1733,12 @@ class VendorController extends Controller
                     ? $pro_data->description
                     : null;
                 $value->um = isset($pro_data->um) ? $pro_data->um : null;
-                $value->dealer_name = $dealer_data->dealer_name;
-                $value->vendor_name = $vendor_data->vendor_name;
+                $value->dealer_name = isset($dealer_data->dealer_name)
+                    ? $dealer_data->dealer_name
+                    : null;
+                $value->vendor_name = isset($dealer_data->dealer_name)
+                    ? $vendor_data->vendor_name
+                    : null;
                 $value->vendor_pro_code = $pro_data->vendor_product_code;
             }
         }

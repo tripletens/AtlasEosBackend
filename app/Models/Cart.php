@@ -25,7 +25,7 @@ class Cart extends Model
         'pro_img',
         'vendor_img',
         'spec_data',
-        'grouping',
+        'groupings',
         'booking',
         'category',
         'um',

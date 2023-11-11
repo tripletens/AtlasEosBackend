@@ -3958,6 +3958,7 @@ class AdminController extends Controller
             'description' => 'required',
             'regular' => 'required',
             'special' => 'required',
+            'type' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -3978,6 +3979,8 @@ class AdminController extends Controller
             $new_state = $request->newState;
             $image = $request->image;
             $grouping = $request->grouping;
+            $type = $request->type;
+
             $spec_data = isset($request->specData)
                 ? json_encode($request->specData)
                 : null;
@@ -4016,6 +4019,7 @@ class AdminController extends Controller
                     'check_new' => $new_state ? '1' : '0',
                     'img' => $image,
                     'grouping' => $grouping,
+                    'type' => $type,
                     'spec_data' => $spec_data != null ? $spec_data : null,
                 ]);
 
@@ -4440,6 +4444,7 @@ class AdminController extends Controller
                         'status' => '1',
                         'regular' => $regular,
                         'booking' => $booking,
+                        'type' => 'regular',
                         'vendor_product_code' => $vendor_pro_code,
                     ]);
 

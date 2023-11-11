@@ -2302,49 +2302,6 @@ class VendorController extends Controller
                                 array_push($res_data, $data);
                             }
                         }
-
-                        // foreach ($users as $value) {
-                        //     $cart_user = Cart::where('vendor', $sep_value)
-                        //         ->where('uid', $value)
-                        //         ->get()
-                        //         ->first();
-                        //     $sum_user_total = Cart::where('vendor', $sep_value)
-                        //         ->where('uid', $value)
-                        //         ->get()
-                        //         ->sum('price');
-                        //     $user = Users::where('id', $value)
-                        //         ->get()
-                        //         ->first();
-
-                        //     $vendor_data = Vendors::where(
-                        //         'vendor_code',
-                        //         $sep_value
-                        //     )
-                        //         ->get()
-                        //         ->first();
-
-                        //     if ($user && $sum_user_total > 0) {
-                        //         $data = [
-                        //             'account_id' => $user->account_id,
-                        //             'dealer_name' => $user->company_name,
-                        //             'user' => $value,
-                        //             'vendor_code' => $separator[$counter],
-                        //             'vendor_name' => isset(
-                        //                 $vendor_data->vendor_name
-                        //             )
-                        //                 ? $vendor_data->vendor_name
-                        //                 : null,
-
-                        //             'purchaser_name' =>
-                        //                 $user->first_name .
-                        //                 ' ' .
-                        //                 $user->last_name,
-                        //             'amount' => $sum_user_total,
-                        //         ];
-
-                        //         array_push($res_data, $data);
-                        //     }
-                        // }
                     }
                 }
             }
@@ -2362,58 +2319,51 @@ class VendorController extends Controller
                 }
             }
 
-            // foreach ($vendor_purchases as $value) {
-            //     $user_id = $value->uid;
-            //     $product_id = $value->product_id;
-
-            //     if (!in_array($user_id, $users)) {
-            //         array_push($users, $user_id);
-            //     }
-            // }
-
             for ($i = 0; $i < count($dealers); $i++) {
                 $dealer_code = $dealers[$i];
                 $uid = $users[$i];
 
-                $dealer_data = Dealer::where('dealer_code', $dealer_code)
-                    ->get()
-                    ->first();
+                if ($dealer_code != null && $dealer_code != '') {
+                    $dealer_data = Dealer::where('dealer_code', $dealer_code)
+                        ->get()
+                        ->first();
 
-                $cart_user = Cart::where('vendor', $code)
-                    ->where('dealer', $dealer_code)
-                    ->where('uid', $uid)
-                    ->get()
-                    ->first();
+                    $cart_user = Cart::where('vendor', $code)
+                        ->where('dealer', $dealer_code)
+                        ->where('uid', $uid)
+                        ->get()
+                        ->first();
 
-                $sum_user_total = Cart::where('vendor', $code)
-                    ->where('dealer', $dealer_code)
-                    ->where('uid', $uid)
-                    ->get()
-                    ->sum('price');
+                    $sum_user_total = Cart::where('vendor', $code)
+                        ->where('dealer', $dealer_code)
+                        ->where('uid', $uid)
+                        ->get()
+                        ->sum('price');
 
-                $user = Users::where('id', $uid)
-                    ->get()
-                    ->first();
+                    $user = Users::where('id', $uid)
+                        ->get()
+                        ->first();
 
-                $vendor_data = Vendors::where('vendor_code', $code)
-                    ->get()
-                    ->first();
+                    $vendor_data = Vendors::where('vendor_code', $code)
+                        ->get()
+                        ->first();
 
-                if ($user && $sum_user_total > 0) {
-                    $data = [
-                        'account_id' => $dealer_data->dealer_code,
-                        'dealer_name' => $dealer_data->dealer_name,
-                        'user' => $value,
-                        'vendor_name' => isset($vendor_data->vendor_name)
-                            ? $vendor_data->vendor_name
-                            : null,
-                        'vendor_code' => $code,
-                        'purchaser_name' =>
-                            $user->first_name . ' ' . $user->last_name,
-                        'amount' => $sum_user_total,
-                    ];
+                    if ($user && $sum_user_total > 0) {
+                        $data = [
+                            'account_id' => $dealer_data->dealer_code,
+                            'dealer_name' => $dealer_data->dealer_name,
+                            'user' => $value,
+                            'vendor_name' => isset($vendor_data->vendor_name)
+                                ? $vendor_data->vendor_name
+                                : null,
+                            'vendor_code' => $code,
+                            'purchaser_name' =>
+                                $user->first_name . ' ' . $user->last_name,
+                            'amount' => $sum_user_total,
+                        ];
 
-                    array_push($res_data, $data);
+                        array_push($res_data, $data);
+                    }
                 }
             }
 

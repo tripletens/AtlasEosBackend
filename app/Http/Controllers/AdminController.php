@@ -145,8 +145,14 @@ class AdminController extends Controller
                         ProductDesc::create([
                             'atlas_id' => $atlas_id,
                             'xref' => $xref,
-                            'desc' => $desc,
+                            'description' => $desc,
                         ]);
+                    } else {
+                        ProductDesc::query()
+                            ->where('atlas_id', $atlas_id)
+                            ->update([
+                                'description' => $desc,
+                            ]);
                     }
                 }
             }

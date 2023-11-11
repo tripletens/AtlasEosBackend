@@ -1607,6 +1607,7 @@ class DealerController extends Controller
                             'unit_price' => $product->unit_price,
                             'type' => $product->type,
                             'xref' => $product->xref,
+                            'booking' => $product->booking,
                         ]);
 
                         if ($save) {
@@ -3095,6 +3096,7 @@ class DealerController extends Controller
                             'unit_price' => $product->unit_price,
                             'vendor_no' => $product->vendor_no,
                             'type' => $product->type,
+                            'booking' => $product->booking,
                         ]);
 
                         if (!$save) {
@@ -3176,6 +3178,8 @@ class DealerController extends Controller
                 $unit_price = $item->unit_price;
                 $status = $item->status;
                 $groupings = $item->groupings;
+                $booking = $item->booking;
+                $type = $item->type;
 
                 if (
                     Cart::where('dealer', $dealer)
@@ -3198,6 +3202,9 @@ class DealerController extends Controller
                         'price' => trim($price),
                         'unit_price' => trim($unit_price),
                         'status' => $status,
+
+                        'type' => $type,
+                        'booking' => $booking,
                     ]);
 
                     if (!$save) {

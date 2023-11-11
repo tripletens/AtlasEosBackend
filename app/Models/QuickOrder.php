@@ -22,6 +22,8 @@ class QuickOrder extends Model
         'groupings',
         'qty',
         'price',
+        'type',
+        'booking',
         'unit_price',
         'vendor_no',
         'status',

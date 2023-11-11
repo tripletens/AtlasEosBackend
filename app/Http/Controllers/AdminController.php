@@ -4444,6 +4444,7 @@ class AdminController extends Controller
                         'status' => '1',
                         'regular' => $regular,
                         'booking' => $booking,
+                        'type' => 'regular',
                         'vendor_product_code' => $vendor_pro_code,
                     ]);
 

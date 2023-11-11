@@ -1478,14 +1478,12 @@ class AdminController extends Controller
 
                 if (!Products::where('atlas_id', $atlas_id)->exists()) {
                     $save_admin = Products::create([
-                        'vendor' => AdminController::filter_text($vendor_code),
+                        'vendor' => $vendor_code,
                         'vendor_code' => $vendor_code,
-                        'vendor_name' => AdminController::filter_text(
-                            $vendor_name
-                        ),
+                        'vendor_name' => $vendor_name,
                         'atlas_id' => $atlas_id,
                         'xref' => $xref,
-                        'description' => AdminController::filter_text($desc),
+                        'description' => $desc,
                         'status' => '1',
                         'regular' => $regular,
                         'booking' => $booking,

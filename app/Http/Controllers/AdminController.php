@@ -172,48 +172,50 @@ class AdminController extends Controller
 
     public function update_pro_type()
     {
-        $pro = Products::all();
+        $null_product = Products::query()
+            ->whereNull('type')
+            ->get();
 
-        foreach ($pro as $value) {
-            if (is_null($value->type)) {
-                $spec_data = $value->spec_data;
-                $id = $value->id;
-                $atlas_id = $value->atlas_id;
+        ///  $pro = Products::all();
 
-                if ($spec_data && !is_null($spec_data)) {
-                    ///  return $value;
-                    $spec_data = json_decode($spec_data);
+        foreach ($null_product as $value) {
+            $spec_data = $value->spec_data;
+            $id = $value->id;
+            $atlas_id = $value->atlas_id;
 
-                    if (isset($spec_data[0])) {
-                        ///  return $spec_data;
-                        $first = $spec_data[0];
-                        $type = isset($first->type)
-                            ? strtolower($first->type)
-                            : null;
-                        // if ($type == 'assorted') {
-                        //     $grouping = isset($first->grouping)
-                        //         ? $first->grouping
-                        //         : null;
+            if ($spec_data && !is_null($spec_data)) {
+                ///  return $value;
+                $spec_data = json_decode($spec_data);
 
-                        //     if ($grouping != null) {
-                        //         Products::where('id', $id)->update([
-                        //             'grouping' => $grouping,
-                        //         ]);
-                        //     }
-                        // }
-                        if ($type != null) {
-                            Products::where('id', $id)->update([
-                                'type' => $type,
-                            ]);
-                        }
-                    } else {
+                if (isset($spec_data[0])) {
+                    ///  return $spec_data;
+                    $first = $spec_data[0];
+                    $type = isset($first->type)
+                        ? strtolower($first->type)
+                        : null;
+                    // if ($type == 'assorted') {
+                    //     $grouping = isset($first->grouping)
+                    //         ? $first->grouping
+                    //         : null;
+
+                    //     if ($grouping != null) {
+                    //         Products::where('id', $id)->update([
+                    //             'grouping' => $grouping,
+                    //         ]);
+                    //     }
+                    // }
+                    if ($type != null) {
                         Products::where('id', $id)->update([
-                            'type' => 'regular',
+                            'type' => $type,
                         ]);
                     }
                 } else {
-                    Products::where('id', $id)->update(['type' => 'regular']);
+                    Products::where('id', $id)->update([
+                        'type' => 'regular',
+                    ]);
                 }
+            } else {
+                Products::where('id', $id)->update(['type' => 'regular']);
             }
         }
 

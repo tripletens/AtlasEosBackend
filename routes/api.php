@@ -555,7 +555,7 @@ Route::group(
             'AdminController@get_all_dealership'
         );
 
-        Route::get(
+        Route::post(
             '/admin/upload-new-product-special',
             'AdminController@upload_new_product_special'
         );

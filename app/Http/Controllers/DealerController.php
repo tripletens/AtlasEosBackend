@@ -997,6 +997,8 @@ class DealerController extends Controller
                 $status = $item->status;
                 $groupings = $item->groupings;
                 $xref = $item->xref;
+                $type = $item->type;
+                $booking = $item->booking;
 
                 if (
                     Cart::where('dealer', $dealer)
@@ -1028,6 +1030,8 @@ class DealerController extends Controller
                         'unit_price' => $unit_price,
                         'status' => $status,
                         'xref' => $xref,
+                        'type' => $type,
+                        'booking' => $booking,
                     ]);
 
                     if (!$save) {
@@ -3190,7 +3194,7 @@ class DealerController extends Controller
                     $this->result->status = true;
                     $this->result->status_code = 404;
                     $this->result->message = 'item has been added already';
-                    break;
+                    // break;
                 } else {
                     $save = Cart::create([
                         'uid' => $uid,
@@ -3203,7 +3207,7 @@ class DealerController extends Controller
                         'price' => trim($price),
                         'unit_price' => trim($unit_price),
                         'status' => $status,
-                        'type' => $type,
+                        'type' => $item->type,
                         'booking' => $booking,
                     ]);
 

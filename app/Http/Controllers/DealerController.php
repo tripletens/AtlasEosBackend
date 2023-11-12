@@ -997,6 +997,8 @@ class DealerController extends Controller
                 $status = $item->status;
                 $groupings = $item->groupings;
                 $xref = $item->xref;
+                $type = $item->type;
+                $booking = $item->booking;
 
                 if (
                     Cart::where('dealer', $dealer)
@@ -1028,6 +1030,8 @@ class DealerController extends Controller
                         'unit_price' => $unit_price,
                         'status' => $status,
                         'xref' => $xref,
+                        'type' => $type,
+                        'booking' => $booking,
                     ]);
 
                     if (!$save) {
@@ -1205,7 +1209,7 @@ class DealerController extends Controller
                                 'uid' => $uid,
                                 'atlas_id' => $product->atlas_id,
                                 'dealer' => $dealer,
-                                'grouping' => $product->groupings,
+                                'groupings' => $product->groupings,
                                 'vendor' => $product->vendor_id,
                                 'product_id' => $product->product_id,
                                 'qty' => $product->qty,
@@ -1214,6 +1218,7 @@ class DealerController extends Controller
                                 'vendor_no' => $product->vendor_no,
                                 'type' => $product->type,
                                 'xref' => $product->xref,
+                                'booking' => $product->booking,
                             ]);
 
                             $newly_added++;
@@ -3190,7 +3195,7 @@ class DealerController extends Controller
                     $this->result->status = true;
                     $this->result->status_code = 404;
                     $this->result->message = 'item has been added already';
-                    break;
+                    // break;
                 } else {
                     $save = Cart::create([
                         'uid' => $uid,
@@ -3203,8 +3208,7 @@ class DealerController extends Controller
                         'price' => trim($price),
                         'unit_price' => trim($unit_price),
                         'status' => $status,
-
-                        'type' => $type,
+                        'type' => $item->type,
                         'booking' => $booking,
                     ]);
 

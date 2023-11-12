@@ -1495,6 +1495,7 @@ class AdminController extends Controller
                         'booking' => $booking,
                         'vendor_product_code' => $vendor_pro_code,
                         'check_new' => 1,
+                        'type' => 'regular',
                     ]);
 
                     if (!$save_admin) {

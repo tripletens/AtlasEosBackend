@@ -1205,7 +1205,7 @@ class DealerController extends Controller
                                 'uid' => $uid,
                                 'atlas_id' => $product->atlas_id,
                                 'dealer' => $dealer,
-                                'grouping' => $product->groupings,
+                                'groupings' => $product->groupings,
                                 'vendor' => $product->vendor_id,
                                 'product_id' => $product->product_id,
                                 'qty' => $product->qty,
@@ -1214,6 +1214,7 @@ class DealerController extends Controller
                                 'vendor_no' => $product->vendor_no,
                                 'type' => $product->type,
                                 'xref' => $product->xref,
+                                'booking' => $product->booking,
                             ]);
 
                             $newly_added++;
@@ -3202,7 +3203,6 @@ class DealerController extends Controller
                         'price' => trim($price),
                         'unit_price' => trim($unit_price),
                         'status' => $status,
-
                         'type' => $type,
                         'booking' => $booking,
                     ]);

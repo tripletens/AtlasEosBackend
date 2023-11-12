@@ -99,6 +99,92 @@ class AdminController extends Controller
         return 'hello';
     }
 
+    public function upload_new_product_special(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in csv format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
+
+                $check_atlas_id = Products::where('atlas_id', $atlas_id)
+                    ->get()
+                    ->first();
+
+                $condition = $sheet->getCell('F' . $row)->getValue();
+                $special = $sheet->getCell('I' . $row)->getValue();
+                $booking = $sheet->getCell('H' . $row)->getValue();
+                $desc = $sheet->getCell('G' . $row)->getValue();
+
+                $spec_data = [
+                    'booking' => floatval($booking),
+                    'special' => floatval($special),
+                    'cond' => intval($condition),
+                    'type' => 'special',
+                    'desc' => $desc,
+                ];
+
+                Products::where('atlas_id', $atlas_id)->update([
+                    'type' => 'special',
+                ]);
+
+                if (isset($check_atlas_id->spec_data)) {
+                    $spec = json_decode($check_atlas_id->spec_data, true);
+                    array_push($spec, $spec_data);
+                    $new_spec = json_encode($spec);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'cond' => $condition,
+                    ]);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'spec_data' => $new_spec,
+                    ]);
+                } else {
+                    $data = [];
+                    array_push($data, $spec_data);
+                    $new_spec = json_encode($data);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'cond' => $condition,
+                    ]);
+
+                    Products::where('atlas_id', $atlas_id)->update([
+                        'spec_data' => $new_spec,
+                    ]);
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Assorted Products uploaded successfully';
+        return response()->json($this->result);
+    }
+
     public function update_product_desc_um(Request $request)
     {
         $csv = $request->file('csv');

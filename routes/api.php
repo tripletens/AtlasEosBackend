@@ -555,6 +555,11 @@ Route::group(
             'AdminController@get_all_dealership'
         );
 
+        Route::get(
+            '/admin/upload-new-product-special',
+            'AdminController@upload_new_product_special'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

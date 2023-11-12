@@ -2354,8 +2354,13 @@ class VendorController extends Controller
 
                     if ($user && $sum_user_total > 0) {
                         $data = [
-                            'account_id' => $dealer_data->dealer_code,
-                            'dealer_name' => $dealer_data->dealer_name,
+                            'current_dealer_code' => $dealer_code,
+                            'account_id' => isset($dealer_data->dealer_code)
+                                ? $dealer_data->dealer_code
+                                : null,
+                            'dealer_name' => isset($dealer_data->dealer_name)
+                                ? $dealer_data->dealer_name
+                                : null,
                             'user' => $value,
                             'vendor_name' => isset($vendor_data->vendor_name)
                                 ? $vendor_data->vendor_name

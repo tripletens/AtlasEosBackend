@@ -283,7 +283,7 @@ class AdminController extends Controller
                             'um' => $um,
                         ]);
 
-                    array_push($avaliable_atlas, $save_admin);
+                    array_push($avaliable_atlas, $atlas_id);
 
                     if (
                         !ProductDesc::where(['atlas_id' => $atlas_id])->exists()

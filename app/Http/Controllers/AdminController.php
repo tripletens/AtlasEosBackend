@@ -99,6 +99,56 @@ class AdminController extends Controller
         return 'hello';
     }
 
+    public function delete_product_upload(Request $request)
+    {
+        $csv = $request->file('csv');
+
+        if ($csv == null) {
+            $this->result->status = false;
+            $this->result->status_code = 422;
+            $this->result->message = 'Please upload products in excel format';
+            return response()->json($this->result);
+        }
+
+        $the_file = $request->file('csv');
+
+        try {
+            $spreadsheet = IOFactory::load($the_file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $row_limit = $sheet->getHighestDataRow();
+            $column_limit = $sheet->getHighestDataColumn();
+            $row_range = range(2, $row_limit);
+            $column_range = range('F', $column_limit);
+            $startcount = 2;
+            $data = [];
+
+            foreach ($row_range as $row) {
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
+
+                if (
+                    Products::query()
+                        ->where('atlas_id', $atlas_id)
+                        ->exists()
+                ) {
+                    Products::query()
+                        ->where('atlas_id', $atlas_id)
+                        ->delete();
+                }
+            }
+        } catch (Exception $e) {
+            $error_code = $e->errorInfo[1];
+            $this->result->status = false;
+            $this->result->status_code = 404;
+            $this->result->message = 'Something went wrong';
+            return response()->json($this->result);
+        }
+
+        $this->result->status = true;
+        $this->result->status_code = 200;
+        $this->result->message = 'Products UM updated successfully';
+        return response()->json($this->result);
+    }
+
     public function upload_new_product_special(Request $request)
     {
         $csv = $request->file('csv');

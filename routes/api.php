@@ -560,6 +560,11 @@ Route::group(
             'AdminController@upload_new_product_special'
         );
 
+        Route::post(
+            '/admin/upload-delete-product',
+            'AdminController@delete_product_upload'
+        );
+
         Route::get('/testing', 'AdminController@testing_api');
     }
 );

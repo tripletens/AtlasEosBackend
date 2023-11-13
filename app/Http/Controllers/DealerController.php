@@ -118,6 +118,7 @@ class DealerController extends Controller
             'dealer' => $dealer_ship ? $dealer_ship : null,
             'lang' => $lang,
             'printed_at' => $current_time,
+            'year' => date('Y'),
         ];
 
         $d_name = isset($dealer_ship->dealer_name)
@@ -593,6 +594,7 @@ class DealerController extends Controller
             'grand_total' => $grand_total,
             'lang' => $lang,
             'printed_at' => $current_time,
+            'year' => date('Y'),
         ];
 
         $d_name = isset($dealer_ship->dealer_name)

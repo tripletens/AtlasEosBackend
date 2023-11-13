@@ -146,24 +146,17 @@
     }
 
 </style>
-
 <body>
-
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
-
                 <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SUMMARY') }}  <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SPECIAL ORDER DISPLAY') }}</h2>
                 @if($dealer != null && $dealer->dealer_name)
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
                 @else
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name: No name found') }}  </h2>
                 @endif
-
-
-
                 <h2 class="dealer-name">Date: {{ $printed_at }} (MST)</h2>
-
             </div>
             <div>
                 <img src="https://atlasbookingprogram.com/assets/atlas-lgo.png" class="com-logo" alt="">
@@ -171,74 +164,48 @@
         </div>
     </div>
 
-
-
-
-
-
     <div class="table-wrapper">
+        <div class="table-responsive">
+            <table class="">
+                <thead>
+                    <tr>
+                        <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Qty') }} </th>
+                        <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Description') }}</th>
+                        <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Parts') }} #</th>
+                        <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Name') }} </th>
+                        <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Ordered By ') }}</th>
+                    </tr>
+                </thead>
 
-
-
-
-                <div class="table-responsive">
-                    <table class="">
-                        <thead>
+                @if (count($data) > 0)
+                    <tbody>
+                        @foreach ($data as $item)
                             <tr>
+                                <td class="table-value-custom center-text">
+                                    {{ $item->quantity }}
+                                </td>
+                                <td class="table-value-custom center-text">
+                                    {{ $item->description }}
+                                </td>
 
-                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Qty') }} </th>
-                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Description') }}</th>
-                                <th class="thead-custom"> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Parts') }} #</th>
+                                <td class="table-value-custom center-text">
+                                    {{ $item->vendor_no }}
+                                </td>
 
-                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Vendor Name') }} </th>
-                                <th class="thead-custom">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Ordered By ') }}</th>
+                                <td class="table-value-custom center-text">
+                                    {{ $item->vendor_name }}
+                                </td>
+                                <td class="table-value-custom right-align">
+                                    {{ $item->full_name }}
+                                </td>
 
                             </tr>
-                        </thead>
 
-                        @if (count($data) > 0)
-
-                        <tbody>
-
-                            @foreach ($data as $item)
-                                <tr>
-                                    <td class="table-value-custom center-text">
-                                        {{ $item->quantity }}
-                                    </td>
-                                    <td class="table-value-custom center-text">
-                                        {{ $item->description }}
-                                    </td>
-
-                                    <td class="table-value-custom center-text">
-                                        {{ $item->vendor_no }}
-                                    </td>
-
-                                    <td class="table-value-custom center-text">
-                                        {{ $item->vendor_name }}
-                                    </td>
-                                    <td class="table-value-custom right-align">
-                                        {{ $item->full_name }}
-                                    </td>
-
-                                </tr>
-
-                            @endforeach
-
-
-
-                        </tbody>
-                        @endif
-                    </table>
-                </div>
-
+                        @endforeach
+                    </tbody>
+                @endif
+            </table>
+        </div>
     </div>
-
-
-
-
-
-
-
 </body>
-
 </html>

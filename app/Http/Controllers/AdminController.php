@@ -123,7 +123,7 @@ class AdminController extends Controller
             $data = [];
 
             foreach ($row_range as $row) {
-                $atlas_id = $sheet->getCell('D' . $row)->getValue();
+                $atlas_id = $sheet->getCell('C' . $row)->getValue();
 
                 if (
                     Products::query()

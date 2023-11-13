@@ -248,6 +248,14 @@ class AdminController extends Controller
 
         $the_file = $request->file('csv');
 
+        global $avaliable_atlas;
+        global $avaliable_desc;
+        global $avaliable_update_desc;
+
+        $avaliable_atlas = [];
+        $avaliable_desc = [];
+        $avaliable_update_desc = [];
+
         try {
             $spreadsheet = IOFactory::load($the_file->getRealPath());
             $sheet = $spreadsheet->getActiveSheet();
@@ -275,6 +283,8 @@ class AdminController extends Controller
                             'um' => $um,
                         ]);
 
+                    array_push($avaliable_atlas, $save_admin);
+
                     if (
                         !ProductDesc::where(['atlas_id' => $atlas_id])->exists()
                     ) {
@@ -283,12 +293,15 @@ class AdminController extends Controller
                             'xref' => $xref,
                             'description' => $desc,
                         ]);
+                        array_push($avaliable_desc, $atlas_id);
                     } else {
                         ProductDesc::query()
-                            ->where('atlas_id', $atlas_id)
+                            ->where(['atlas_id' => $atlas_id])
                             ->update([
                                 'description' => $desc,
                             ]);
+
+                        array_push($avaliable_update_desc, $atlas_id);
                     }
                 }
             }
@@ -300,9 +313,17 @@ class AdminController extends Controller
             return response()->json($this->result);
         }
 
+        $res_data = [
+            'avaliable_atlas' => $avaliable_atlas,
+            'avaliable_desc' => $avaliable_desc,
+            'avaliable_update_desc' => $avaliable_update_desc,
+        ];
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Products UM updated successfully';
+        $this->result->data = $res_data;
+
         return response()->json($this->result);
     }
 

@@ -155,7 +155,7 @@ set_time_limit(25000000000);
         <div class="row">
             <div class="col-6">
 
-                <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2024 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SUMMARY') }} </h2>
+                <h2 class="top-title">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2024 VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'SUMMARY') }} </h2>
                 @if($dealer != null && $dealer->dealer_name)
                 <h2 class="dealer-name">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'Dealer Name:') }}   {{ $dealer->dealer_name }}</h2>
                 @else

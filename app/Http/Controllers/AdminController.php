@@ -4966,19 +4966,19 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
-            $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $full_name);
+            $update = Users::where('id', $vendorId)->update([
+                'full_name' => $firstName,
+            ]);
+
+            // $full_name = $current_user_data->full_name;
+            $ex = explode(' ', $firstName);
 
             if (isset($ex[0])) {
-                $ex[0] = $firstName;
+                //$ex[0] = $firstName;
                 $update = Users::where('id', $vendorId)->update([
-                    'full_name' => $ex[0] . ' ' . $ex[1],
+                    'first_name' => $ex[0],
                 ]);
             }
-
-            $update = Users::where('id', $vendorId)->update([
-                'first_name' => $firstName,
-            ]);
         }
 
         if ($lastName != '') {

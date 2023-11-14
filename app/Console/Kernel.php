@@ -17,11 +17,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('seminar:reminder')->everyFiveMinutes()
-            ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
+        // $schedule->command('seminar:reminder')->everyFiveMinutes()
+        //     ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
 
-        $schedule->command('seminar:check-status')->everyMinute()
-            ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
+        // $schedule->command('seminar:check-status')->everyMinute()
+        //     ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
     }
 
     /**
@@ -31,8 +31,8 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        // $this->load(__DIR__.'/Commands');
 
-        require base_path('routes/console.php');
+        // require base_path('routes/console.php');
     }
 }

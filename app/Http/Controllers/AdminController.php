@@ -69,9 +69,9 @@ class AdminController extends Controller
     {
         // set timeout limit
         set_time_limit(2500000000);
-        // $this->middleware('auth:api', [
-        //     'except' => ['login', 'register', 'test'],
-        // ]);
+        $this->middleware('auth:api', [
+            'except' => ['login', 'register', 'test'],
+        ]);
 
         $this->result = (object) [
             'status' => false,

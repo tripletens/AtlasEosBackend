@@ -157,7 +157,7 @@ set_time_limit(25000000000);
 
                 <br>
                 <br>
-                <h2 class="top-title" style="margin-top: 20px">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2023 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'PURCHASES BY DEALER (Detailed
+                <h2 class="top-title" style="margin-top: 20px">{{ App\Http\Controllers\DealerController::staticTrans($lang, 'ATLAS 2024 ATLAS VIRTUAL SHOW') }}   <br> {{ App\Http\Controllers\DealerController::staticTrans($lang, 'PURCHASES BY DEALER (Detailed
                     display)') }} </h2>
 
 

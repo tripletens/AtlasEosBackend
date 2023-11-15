@@ -139,7 +139,7 @@ class AdminController extends Controller
         } else {
             $this->result->status = false;
             $this->result->status_code = 200;
-            $this->result->message = 'Something went wrong, try again';
+            $this->result->message = 'Something went wrong, try again!';
         }
 
         return response()->json($this->result);

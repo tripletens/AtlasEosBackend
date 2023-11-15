@@ -103,11 +103,7 @@ class AdminController extends Controller
 
     public function deactivate_post_show_dashboard()
     {
-        $switch_state = Users::where(
-            'email',
-            '!=',
-            'info@atlastrailer.com'
-        )->update([
+        $switch_state = Users::query()->update([
             'post_show_dashboard' => 0,
         ]);
 
@@ -127,7 +123,7 @@ class AdminController extends Controller
 
     public function activate_post_show_dashboard()
     {
-        $switch_state = Users::update([
+        $switch_state = Users::query()->update([
             'post_show_dashboard' => 1,
         ]);
 

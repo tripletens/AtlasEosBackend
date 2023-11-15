@@ -45,6 +45,7 @@ class Users extends Authenticatable implements JWTSubject
         'designation',
         'switch_state',
         'dash_activate',
+        'post_show_dashboard'
     ];
 
     public function getJWTIdentifier()

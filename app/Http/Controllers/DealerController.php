@@ -46,11 +46,13 @@ use App\Models\ProgramCountdown;
 use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
 use App\Models\ProductModel;
+set_time_limit(250000000000);
 
 class DealerController extends Controller
 {
     public function __construct()
     {
+        set_time_limit(2500000000);
         $this->middleware('auth:api', [
             'except' => ['login', 'register', 'test'],
         ]);
@@ -572,7 +574,6 @@ class DealerController extends Controller
             ];
 
             $grand_total += $total;
-
             array_push($res_data, $data);
         }
 
@@ -2599,13 +2600,14 @@ class DealerController extends Controller
         $order_remaining = Vendors::count();
 
         // Fetch dealers with and without orders
-        $dealers = Dealer::select('dealer_code', DB::raw('COUNT(*) as order_count'))
+        $dealers = Dealer::select(
+            'dealer_code',
+            DB::raw('COUNT(*) as order_count')
+        )
             ->leftJoin('cart', 'dealers.dealer_code', '=', 'cart.dealer')
             ->groupBy('dealers.dealer_code')
 
             ->get();
-
-
 
         $all_dealers_without_orders = $dealers->filter(function ($dealer) {
             return $dealer->order_count == 0;

@@ -46,7 +46,7 @@ use App\Models\ProgramCountdown;
 use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
 use App\Models\ProductModel;
-set_time_limit(250000000000);
+set_time_limit(99000000000000000000000);
 
 class DealerController extends Controller
 {

@@ -99,6 +99,48 @@ class AdminController extends Controller
         return 'hello';
     }
 
+    // post_show_dashboard
+
+    public function deactivate_post_show_dashboard()
+    {
+        $switch_state = Users::query()->update([
+            'post_show_dashboard' => 0,
+        ]);
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message =
+                'Deactivate dealer post show dashboard was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again';
+        }
+
+        return response()->json($this->result);
+    }
+
+    public function activate_post_show_dashboard()
+    {
+        $switch_state = Users::query()->update([
+            'post_show_dashboard' => 1,
+        ]);
+
+        if ($switch_state) {
+            $this->result->status = true;
+            $this->result->status_code = 200;
+            $this->result->message =
+                'Activate dealer post show dashboard was successfull';
+        } else {
+            $this->result->status = false;
+            $this->result->status_code = 200;
+            $this->result->message = 'Something went wrong, try again!';
+        }
+
+        return response()->json($this->result);
+    }
+
     public function delete_product_upload(Request $request)
     {
         $csv = $request->file('csv');
@@ -604,10 +646,9 @@ class AdminController extends Controller
     public function deactivate_dealer_dashboard()
     {
         $switch_state = Users::where('email', '!=', 'info@atlastrailer.com')
-            ->orWhere('role', '1')
-            ->update([
-                'dash_activate' => 0,
-            ]);
+        ->update([
+            'dash_activate' => 0,
+        ]);
 
         if ($switch_state) {
             $this->result->status = true;
@@ -625,11 +666,10 @@ class AdminController extends Controller
 
     public function activate_dealer_dashboard()
     {
-        $switch_state = Users::where('role', '4')
-            ->orWhere('role', '1')
-            ->update([
-                'dash_activate' => 1,
-            ]);
+        $switch_state = Users::query()->update([
+            'dash_activate' => 1,
+            'post_show_dashboard' => 0,
+        ]);
 
         if ($switch_state) {
             $this->result->status = true;
@@ -4966,19 +5006,19 @@ class AdminController extends Controller
                 ->get()
                 ->first();
 
-            $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $full_name);
+            $update = Users::where('id', $vendorId)->update([
+                'full_name' => $firstName,
+            ]);
+
+            // $full_name = $current_user_data->full_name;
+            $ex = explode(' ', $firstName);
 
             if (isset($ex[0])) {
-                $ex[0] = $firstName;
+                //$ex[0] = $firstName;
                 $update = Users::where('id', $vendorId)->update([
-                    'full_name' => $ex[0] . ' ' . $ex[1],
+                    'first_name' => $ex[0],
                 ]);
             }
-
-            $update = Users::where('id', $vendorId)->update([
-                'first_name' => $firstName,
-            ]);
         }
 
         if ($lastName != '') {

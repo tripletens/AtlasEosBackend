@@ -58,6 +58,16 @@ Route::group(
     function () {
         // Route::get('/admin/seminars', 'AdminController@get_all_seminar');
 
+        Route::get(
+            '/admin/deactivate-post-show-dashboard',
+            'AdminController@deactivate_post_show_dashboard'
+        );
+
+        Route::get(
+            '/admin/activate-post-show-dashboard',
+            'AdminController@activate_post_show_dashboard'
+        );
+
         Route::post(
             '/admin/update-product-desc-um',
             'AdminController@update_product_desc_um'

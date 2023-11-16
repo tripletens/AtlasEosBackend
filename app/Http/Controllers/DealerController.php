@@ -46,13 +46,16 @@ use App\Models\ProgramCountdown;
 use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
 use App\Models\ProductModel;
+
 set_time_limit(2500000000000);
+
 
 class DealerController extends Controller
 {
     public function __construct()
     {
         set_time_limit(2500000000000);
+
         $this->middleware('auth:api', [
             'except' => ['login', 'register', 'test'],
         ]);
@@ -135,6 +138,30 @@ class DealerController extends Controller
         return $pdf->stream($filename . '.pdf');
         // return $pdf->download('dealership.pdf');
     }
+
+//     public function generate_special_order_pdf_new($dealer, $lang, $current_time)
+// {
+//     $check_special_order = SpecialOrder::with('vendor', 'user')
+//         ->where('dealer_id', $dealer)
+//         ->get();
+
+//     $dealer_ship = Dealer::where('dealer_code', $dealer)->first();
+
+//     $pdf_data = [
+//         'data' => $check_special_order,
+//         'dealer' => $dealer_ship ?? null,
+//         'lang' => $lang,
+//         'printed_at' => $current_time,
+//         'year' => date('Y'),
+//     ];
+
+//     $d_name = optional($dealer_ship)->dealer_name;
+//     $d_code = optional($dealer_ship)->dealer_code;
+//     $filename = $d_name . $d_code . 'special-order';
+
+//     $pdf = PDF::loadView('special-orders-pdf', $pdf_data);
+//     return $pdf->stream($filename . '.pdf');
+// }
 
     public function get_all_admin_users($user)
     {
@@ -1942,6 +1969,7 @@ class DealerController extends Controller
             }
         }
 
+        ///   return $vendor_code;
         /// return $vendor_code;
 
         $res_data = [];

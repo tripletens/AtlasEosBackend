@@ -22,7 +22,7 @@ use App\Models\SpecialOrder;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-set_time_limit(2500000000000000);
+set_time_limit(2500000000000);
 
 class VendorController extends Controller
 {
@@ -30,7 +30,7 @@ class VendorController extends Controller
 
     public function __construct()
     {
-        set_time_limit(2500000000000000);
+        set_time_limit(2500000000000);
 
         $this->middleware('auth:api', [
             'except' => ['login', 'register', 'test'],

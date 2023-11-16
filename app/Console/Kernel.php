@@ -22,6 +22,14 @@ class Kernel extends ConsoleKernel
 
         // $schedule->command('seminar:check-status')->everyMinute()
         //     ->emailOutputOnFailure('tripletens.kc@gmail.com')->runInBackground();
+        // 4Liberty@2023atlas
+        // php artisan queue:work & 
+        // while true; do 
+        // echo "=> Running scheduler"
+        // php artisan schedule:work || true;
+        // echo "=> sleeping for 60 seconds"
+        // sleep 60;
+        // done
     }
 
     /**

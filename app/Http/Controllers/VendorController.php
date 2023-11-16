@@ -22,7 +22,7 @@ use App\Models\SpecialOrder;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-set_time_limit(2500000000000000);
+set_time_limit(9000000000000000000);
 
 class VendorController extends Controller
 {

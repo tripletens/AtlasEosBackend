@@ -4692,9 +4692,7 @@ class AdminController extends Controller
     public function deactivate_dealer_user($id)
     {
         // update to the db
-        $update = Users::where('id', $id)->update([
-            'status' => '0',
-        ]);
+        $update = Users::where('id', $id)->delete();
 
         if ($update) {
             $this->result->status = true;
@@ -5264,28 +5262,12 @@ class AdminController extends Controller
     {
         // update to the db
 
-        $user_data = Users::where('id', $id)
-            ->get()
-            ->first();
+        $user_data = Users::where('id', $id)->delete();
 
-        $status = $user_data->status;
-
-        if ($status == '1') {
-            $update = Users::where('id', $id)->update([
-                'status' => '0',
-            ]);
-        } else {
-            $update = Users::where('id', $id)->update([
-                'status' => '1',
-            ]);
-        }
-
-        // DB::table('users')->where('id', $id)->delete();
-
-        if ($update) {
+        if ($user_data) {
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'Vendor User Activated Successfully';
+            $this->result->message = 'Vendor User Deleted Successfully';
             return response()->json($this->result);
         } else {
             $this->result->status = true;

@@ -4988,6 +4988,8 @@ class AdminController extends Controller
         $username = $request->username;
         $email = $request->email;
         $firstName = $request->firstName;
+        $fullName = $request->fullName;
+
         $lastName = $request->lastName;
         $password = $request->password;
         $phone = $request->phone;
@@ -5011,14 +5013,14 @@ class AdminController extends Controller
             ]);
 
             // $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $firstName);
+            // $ex = explode(' ', $firstName);
 
-            if (isset($ex[0])) {
-                //$ex[0] = $firstName;
-                $update = Users::where('id', $vendorId)->update([
-                    'first_name' => $ex[0],
-                ]);
-            }
+            // if (isset($ex[0])) {
+            //     //$ex[0] = $firstName;
+            //     $update = Users::where('id', $vendorId)->update([
+            //         'first_name' => $ex[0],
+            //     ]);
+            // }
         }
 
         if ($lastName != '') {
@@ -5029,15 +5031,21 @@ class AdminController extends Controller
                 'last_name' => $lastName,
             ]);
 
-            $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $full_name);
+            // $full_name = $current_user_data->full_name;
+            // $ex = explode(' ', $full_name);
 
-            if (isset($ex[1])) {
-                $ex[1] = $lastName;
-                $update = Users::where('id', $vendorId)->update([
-                    'full_name' => $ex[0] . ' ' . $ex[1],
-                ]);
-            }
+            // if (isset($ex[1])) {
+            //     $ex[1] = $lastName;
+            //     $update = Users::where('id', $vendorId)->update([
+            //         'full_name' => $ex[0] . ' ' . $ex[1],
+            //     ]);
+            // }
+        }
+
+        if ($fullName !== '') {
+            $update = Users::where('id', $vendorId)->update([
+                'full_name' => $fullName,
+            ]);
         }
 
         if ($dealerCode != '') {

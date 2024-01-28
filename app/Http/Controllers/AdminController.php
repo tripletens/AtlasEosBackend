@@ -645,8 +645,11 @@ class AdminController extends Controller
 
     public function deactivate_dealer_dashboard()
     {
-        $switch_state = Users::where('email', '!=', 'info@atlastrailer.com')
-        ->update([
+        $switch_state = Users::where(
+            'email',
+            '!=',
+            'info@atlastrailer.com'
+        )->update([
             'dash_activate' => 0,
         ]);
 
@@ -4676,8 +4679,7 @@ class AdminController extends Controller
 
     public function get_all_dealer_users()
     {
-        $vendors = Users::where('status', '1')
-            ->where('role', '4')
+        $vendors = Users::where('role', '4')
             ->orderBy('id', 'desc')
             ->get();
         $this->result->status = true;

@@ -2470,10 +2470,7 @@ class DealerController extends Controller
 
     public function get_vendor_products($code)
     {
-        if (
-            Products::where('vendor', $code)
-            ->exists()
-        ) {
+        if (Products::where('vendor', $code)->exists()) {
             $vendor_products = Products::where('vendor', $code)
                 ->orderBy('xref', 'asc')
                 ->get();
@@ -2481,15 +2478,15 @@ class DealerController extends Controller
             foreach ($vendor_products as $value) {
                 $atlas_id = $value->atlas_id;
 
-                // if (ProductModel::where('atlas_id', $atlas_id)->exists()) {
-                //     $desc_data = ProductModel::where('atlas_id', $atlas_id)
-                //         ->get()
-                //         ->first();
+                if (ProductModel::where('atlas_id', $atlas_id)->exists()) {
+                    $desc_data = ProductModel::where('atlas_id', $atlas_id)
+                        ->get()
+                        ->first();
 
-                //     $value->full_desc = isset($desc_data->description)
-                //         ? $desc_data->description
-                //         : null;
-                // }
+                    $value->full_desc = isset($desc_data->description)
+                        ? $desc_data->description
+                        : null;
+                }
 
                 $value->spec_data = json_decode($value->spec_data);
             }

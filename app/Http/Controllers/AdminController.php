@@ -4388,18 +4388,20 @@ class AdminController extends Controller
 
     public function get_all_products()
     {
-        $products = Products::where('status', '1')->get();
+        $products = Products::where('status', '1')
+            ->with(['full_desc'])
+            ->get();
 
         foreach ($products as $value) {
             // $atlas_id = $value->atlas_id;
 
-            $desc = ProductDesc::where([
-                'atlas_id' => $value->atlas_id,
-            ])->first();
+            // $desc = ProductDesc::where([
+            //     'atlas_id' => $value->atlas_id,
+            // ])->first();
 
-            $value->full_desc = isset($desc->description)
-                ? $desc->description
-                : '';
+            // $value->full_desc = isset($desc->description)
+            //     ? $desc->description
+            //     : '';
 
             $value->spec_data = json_decode($value->spec_data);
         }

@@ -4393,13 +4393,13 @@ class AdminController extends Controller
         foreach ($products as $value) {
             // $atlas_id = $value->atlas_id;
 
-            // $desc_data = ProductModel::where('atlas_id', $atlas_id)
-            //     ->get()
-            //     ->first();
+            $desc = ProductDesc::where([
+                'atlas_id' => $value->atlas_id,
+            ])->first();
 
-            // $value->full_desc = isset($desc_data->description)
-            //     ? $desc_data->description
-            //     : null;
+            $value->full_desc = isset($desc->description)
+                ? $desc->description
+                : '';
 
             $value->spec_data = json_decode($value->spec_data);
         }

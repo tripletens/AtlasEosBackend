@@ -19,12 +19,12 @@ use DB;
 
 use App\Models\VendorOrderNotify;
 use App\Models\SpecialOrder;
+use App\Models\ProductDesc;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
 set_time_limit(2500000000000);
-
 
 class VendorController extends Controller
 {
@@ -2430,6 +2430,15 @@ class VendorController extends Controller
 
         foreach ($res_data as $value) {
             $spec_data = $value->spec_data;
+
+            $desc = ProductDesc::where([
+                'atlas_id' => $value->atlas_id,
+            ])->first();
+
+            $value->full_desc = isset($desc->description)
+                ? $desc->description
+                : '';
+
             if ($spec_data) {
                 $value->spec_data = json_decode($spec_data);
             }

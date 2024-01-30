@@ -4114,7 +4114,7 @@ class AdminController extends Controller
         $total_item_ordered = 0;
 
         $total_orders = DB::table('cart')
-            ->select('uid')
+            ->select('dealer')
             ->distinct()
             ->get();
 

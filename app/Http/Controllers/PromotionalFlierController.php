@@ -36,6 +36,14 @@ class PromotionalFlierController extends Controller
             'status' => $current_state == '1' ? '0' : '1',
         ]);
 
+        $msg = '';
+
+        if ($current_state == '1') {
+            $msg = 'Deactivate promotional flier was successful';
+        } else {
+            $msg = 'Activate promotional flier was successful';
+        }
+
         // if ($current_state == '1') {
         //     $switch_state = PromotionalFlier::where('id', $id)->update([
         //         'status' => '0',
@@ -49,8 +57,7 @@ class PromotionalFlierController extends Controller
         if ($switch_state) {
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message =
-                'Deactivate promotional flier was successfull';
+            $this->result->message = $msg;
         } else {
             $this->result->status = false;
             $this->result->status_code = 200;
@@ -224,7 +231,9 @@ class PromotionalFlierController extends Controller
 
                 $update_promotional_flier = $one_promotional_flier->update([
                     'name' => $name ? $name : null,
-                    'pdf_url' => $request->hasFile('pdf') ? $full_file_path : null,
+                    'pdf_url' => $request->hasFile('pdf')
+                        ? $full_file_path
+                        : null,
                     'vendor_id' => $vendor_id ? $vendor_id : null,
                     'description' => $description ? $description : null,
                     'image_url' => $image_url ? $image_url : null,

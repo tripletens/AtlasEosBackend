@@ -614,7 +614,7 @@ class BranchController extends Controller
     # fetch all the dashboard data
     public function branch_dashboard($uid)
     {
-        dd($uid);
+        // dd($uid);
         $user_dealers_array = [];
         $user_data = Users::where('id', $uid)
             ->get()
@@ -628,7 +628,7 @@ class BranchController extends Controller
             return response()->json($this->result);
         }
 
-        // return $user_data;
+        dd($user_data);
         // get all the privileged dealers under the person
         $user_privileged_dealers = explode(',', $user_data->privileged_dealers);
 

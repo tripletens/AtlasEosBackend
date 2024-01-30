@@ -614,6 +614,7 @@ class BranchController extends Controller
     # fetch all the dashboard data
     public function branch_dashboard($uid)
     {
+        dd($uid);
         $user_dealers_array = [];
         $user_data = Users::where('id', $uid)
             ->get()

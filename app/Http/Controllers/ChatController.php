@@ -8,7 +8,7 @@ use App\Models\Users;
 use App\Models\ChatHistory;
 
 use Illuminate\Support\Facades\Validator;
-set_time_limit(25000000000000000000);
+set_time_limit(intval(25000000000000000000));
 class ChatController extends Controller
 {
     //

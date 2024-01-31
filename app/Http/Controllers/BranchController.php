@@ -612,8 +612,9 @@ class BranchController extends Controller
     }
 
     # fetch all the dashboard data
-    public function branch_dashboard($uid)
+    public function branch_dashboard_recent($uid)
     {
+        // dd($uid);
         $user_dealers_array = [];
         $user_data = Users::where('id', $uid)
             ->get()
@@ -627,7 +628,6 @@ class BranchController extends Controller
             return response()->json($this->result);
         }
 
-        // return $user_data;
         // get all the privileged dealers under the person
         $user_privileged_dealers = explode(',', $user_data->privileged_dealers);
 
@@ -760,6 +760,90 @@ class BranchController extends Controller
         return response()->json($this->result);
     }
 
+    // get branch dashboard details 
+
+    public function branch_dashboard($uid)
+ {
+    $this->result->status = false;
+    $this->result->status_code = 400;
+    $this->result->data = [];
+    $this->result->message = 'Sorry, user could not be found';
+
+    // Retrieve user data
+    $user_data = Users::find($uid);
+
+    if (!$user_data) {
+        return response()->json($this->result);
+    }
+
+    // Get privileged dealers
+    $user_privileged_dealers = array_filter(explode(',', $user_data->privileged_dealers));
+
+    $total_price = 0;
+    $all_dealers_without_orders = [];
+    $all_dealers_with_orders = [];
+    $all_user_dealers = [];
+
+    foreach ($user_privileged_dealers as $user_privileged_dealer) {
+        // Calculate cart total
+        $cart_data_total = Cart::where('dealer', $user_privileged_dealer)->sum('price');
+        $total_price += $cart_data_total;
+
+        // Get privileged dealer details
+        $get_privileged_dealer_details = Dealer::where('dealer_code', $user_privileged_dealer)->get();
+
+        // Get total user dealers
+        $get_total_user_dealers = Users::where('account_id', $user_privileged_dealer)->get();
+
+        if ($get_privileged_dealer_details->isNotEmpty()) {
+            $dealer_cart = Cart::where('dealer', $user_privileged_dealer)->count();
+
+            if ($dealer_cart > 0) {
+                $all_dealers_with_orders = array_merge($all_dealers_with_orders, $get_privileged_dealer_details->toArray());
+            } else {
+                $all_dealers_without_orders = array_merge($all_dealers_without_orders, $get_privileged_dealer_details->toArray());
+            }
+
+            $all_user_dealers = array_merge($all_user_dealers, $get_total_user_dealers->toArray());
+        }
+    }
+
+    // Counters and arrays
+    $number_of_dealers = count($user_privileged_dealers);
+    $last_loggedin_dealer_count = 0;
+    $last_not_loggedin_dealer_count = 0;
+    $last_login_array = [];
+
+    foreach ($all_user_dealers as $_dealer) {
+        $dealer_inner_details = Users::where('account_id', $_dealer['dealer_code'])
+            ->select('last_login')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->pluck('last_login')
+            ->toArray();
+        array_push($last_login_array, array_values($dealer_inner_details));
+    }
+
+    // Result data
+    $this->result->status = true;
+    $this->result->status_code = 200;
+    $this->result->message = 'Branch dashboard details fetched successfully';
+    $this->result->data->total_sales = $total_price;
+    $this->result->data->total_dealers = $number_of_dealers;
+    $this->result->data->login_array = $last_login_array;
+    $this->result->data->total_logged_in = $last_loggedin_dealer_count;
+    $this->result->data->total_not_logged_in = $last_not_loggedin_dealer_count;
+    $this->result->data->all_dealers_without_orders = $all_dealers_without_orders;
+    $this->result->data->all_dealers_with_orders = $all_dealers_with_orders;
+    $this->result->data->all_dealer_users = $all_user_dealers;
+    $this->result->data->all_dealers_with_orders_count = count($all_dealers_with_orders);
+    $this->result->data->all_dealers_without_orders_count = count($all_dealers_without_orders);
+    $this->result->data->all_dealer_users_count = count($all_user_dealers);
+
+    return response()->json($this->result);
+}
+
+    
     // get dealers that have orders
 
     public function branch_dealers_with_orders($uid)

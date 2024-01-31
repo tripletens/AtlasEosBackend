@@ -41,4 +41,9 @@ class Products extends Model
         'short_note',
         'check_new',
     ];
+
+    public function full_desc()
+    {
+        return $this->hasOne(ProductDesc::class, 'id', 'atlas_id');
+    }
 }

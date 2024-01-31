@@ -1221,25 +1221,21 @@ Route::group(
         );
 
         Route::get(
-            '/branch/dealers-with-orders/{uid}',
-            'BranchController@branch_dealers_with_orders'
+            '/branch/dealers-with-orders/{uid}', [BranchController::class, 'branch_dealers_with_orders']
         );
 
         Route::get(
-            '/branch/dealers-without-orders/{uid}',
-            'BranchController@branch_dealers_without_orders'
+            '/branch/dealers-without-orders/{uid}', [BranchController::class, 'branch_dealers_without_orders']
         );
 
         // branch_dealers_with_orders
         Route::get(
-            '/branch/get-privileged-dealer/{user}',
-            'BranchController@get_privileged_dealers'
+            '/branch/get-privileged-dealer/{user}', [BranchController::class, 'get_privileged_dealers']
         );
 
         // get branch dealers with pending orders
         Route::get(
-            '/branch/get-dealers-pending-orders/{user}',
-            'BranchController@get_dealers_with_account_id_under_branch_with_pending_orders'
+            '/branch/get-dealers-pending-orders/{user}', [BranchController::class, 'get_dealers_with_account_id_under_branch_with_pending_orders']
         );
 
         // ---------------- Branch ends here  --------------------------- //

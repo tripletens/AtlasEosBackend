@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
+use App\Http\Controllers\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -1204,46 +1205,37 @@ Route::group(
         Route::post('/add-chart-date', 'AdminController@add_chart_date');
 
         // ---------------- Branch starts here  ------------------------- //
+
+        Route::get('/branch/get-dealer-order-summary/{uid}', [BranchController::class, 'get_dealer_order_summary']);
+
         Route::get(
-            '/branch/get-dealer-order-summary/{uid}',
-            'BranchController@get_dealer_order_summary'
+            '/branch/get-all-admin-users/{user}', [BranchController::class, 'get_all_admin_users']
         );
 
         Route::get(
-            '/branch/get-all-admin-users/{user}',
-            'BranchController@get_all_admin_users'
+            '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}', [BranchController::class, 'get_dealers_with_account_id_under_branch']
         );
 
         Route::get(
-            '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}',
-            'BranchController@get_dealers_with_account_id_under_branch'
+            '/branch-dashboard/{uid}',[BranchController::class, 'branch_dashboard']
         );
 
         Route::get(
-            '/branch/dashboard/{uid}',
-            'BranchController@branch_dashboard'
+            '/branch/dealers-with-orders/{uid}', [BranchController::class, 'branch_dealers_with_orders']
         );
 
         Route::get(
-            '/branch/dealers-with-orders/{uid}',
-            'BranchController@branch_dealers_with_orders'
-        );
-
-        Route::get(
-            '/branch/dealers-without-orders/{uid}',
-            'BranchController@branch_dealers_without_orders'
+            '/branch/dealers-without-orders/{uid}', [BranchController::class, 'branch_dealers_without_orders']
         );
 
         // branch_dealers_with_orders
         Route::get(
-            '/branch/get-privileged-dealer/{user}',
-            'BranchController@get_privileged_dealers'
+            '/branch/get-privileged-dealer/{user}', [BranchController::class, 'get_privileged_dealers']
         );
 
         // get branch dealers with pending orders
         Route::get(
-            '/branch/get-dealers-pending-orders/{user}',
-            'BranchController@get_dealers_with_account_id_under_branch_with_pending_orders'
+            '/branch/get-dealers-pending-orders/{user}', [BranchController::class, 'get_dealers_with_account_id_under_branch_with_pending_orders']
         );
 
         // ---------------- Branch ends here  --------------------------- //

@@ -630,7 +630,6 @@ class BranchController extends Controller
             return response()->json($this->result);
         }
 
-        dd($user_data);
         // get all the privileged dealers under the person
         $user_privileged_dealers = explode(',', $user_data->privileged_dealers);
 
@@ -766,7 +765,7 @@ class BranchController extends Controller
     // get branch dashboard details 
 
     public function branch_dashboard($uid)
- {
+   {
     $this->result->status = false;
     $this->result->status_code = 400;
     $this->result->data = [];

@@ -19,6 +19,8 @@ use App\Models\Users;
 use DB;
 use App\Models\Chat;
 
+set_time_limit(250000000000);
+
 class BranchController extends Controller
 {
     public function __construct()

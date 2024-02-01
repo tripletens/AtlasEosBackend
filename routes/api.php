@@ -1216,6 +1216,17 @@ Route::group(
             '/branch/get-dealer-order-summary-account-id/{uid}/{account_id}', [BranchController::class, 'get_dealers_with_account_id_under_branch']
         );
 
+
+        // get all branch dealer users that has logged in 
+        Route::get(
+            '/branch/loggedin-dealer-users/{uid}', [BranchController::class, 'branch_loggedin_dealer_users']
+        );
+
+        // get all branch dealer users that has not logged in 
+        Route::get(
+            '/branch/not-loggedin-dealer-users/{uid}', [BranchController::class, 'branch_not_loggedin_dealer_users']
+        );
+        
         Route::get(
             '/branch-dashboard/{uid}',[BranchController::class, 'branch_dashboard']
         );

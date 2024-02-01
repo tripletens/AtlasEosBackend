@@ -632,7 +632,6 @@ public function branch_loggedin_dealer_users($uid){
             "regular",
             "switch_state",
             "dash_activate",
-            "post_show_dashboard",
             "created_at",
             "updated_at",
             "deleted_at")
@@ -686,7 +685,6 @@ public function branch_not_loggedin_dealer_users($uid){
             "regular",
             "switch_state",
             "dash_activate",
-            "post_show_dashboard",
             "created_at",
             "updated_at",
             "deleted_at")

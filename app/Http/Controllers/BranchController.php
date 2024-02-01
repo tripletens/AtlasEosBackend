@@ -586,6 +586,14 @@ class BranchController extends Controller
             $_dealer->amount = array_sum($sum_user_total);
         }
 
+        // Decode the JSON data into an associative array
+        $sorted_data = json_decode($dealer_info_array, true);
+
+        // Define the custom sorting function
+        usort($data, function ($a, $b) {
+            return strcmp($a['dealer_code'], $b['dealer_code']);
+        });
+
         $this->result->status = true;
         $this->result->status_code = 200;
         $this->result->message = 'Branch purchases fetched successfully';

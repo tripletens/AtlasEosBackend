@@ -587,10 +587,10 @@ class BranchController extends Controller
         }
 
         // Decode the JSON data into an associative array
-        $sorted_data = json_decode($dealer_info_array, true);
+        // $sorted_data = json_decode($dealer_info_array, true);
 
         // Define the custom sorting function
-        usort($data, function ($a, $b) {
+        usort($dealer_info_array, function ($a, $b) {
             return strcmp($a['dealer_code'], $b['dealer_code']);
         });
 

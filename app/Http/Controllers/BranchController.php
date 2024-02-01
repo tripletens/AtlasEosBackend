@@ -239,45 +239,27 @@ class BranchController extends Controller
         }
 
         # get all the prixviledged dealer account ids
-        if ($branch_detail->privileged_dealers !== null) {
-            $get_priviledged_account_ids_array = explode(
-                ',',
-                $branch_detail->privileged_dealers
-            );
-        } else {
-            $get_priviledged_account_ids_array = [];
-        }
+
+        $get_priviledged_account_ids_array = array_filter(explode(',', $branch_detail->privileged_dealers));
 
         # array to store the result
         $dealer_summary_result = [];
 
+        // return $get_priviledged_account_ids_array;
+
         # get all the orders for each of the priviledged dealers
         foreach ($get_priviledged_account_ids_array as $priviledged_dealer) {
             # get all dealers with the dealer details
-            // $dealer_details = Users::where('account_id', $priviledged_dealer)
-            //     ->select('id','full_name', 'first_name', 'last_name', 'account_id','last_login')
-            //     ->get();
-
-            $user_privileged_dealers_format = str_replace(
-                '"',
-                '',
-                $priviledged_dealer
-            );
-
             $dealer_details = Dealer::where(
                 'dealer_code',
-                $user_privileged_dealers_format
+                $priviledged_dealer
             )->get();
             # add the dealer info to the result array
-            array_push($dealer_summary_result, json_decode($dealer_details));
+            array_push($dealer_summary_result, ...$dealer_details);
         }
 
-        $result_arr = [];
+        return $dealer_summary_result;
 
-        foreach ($dealer_summary_result as $sub_arr) {
-            $result_arr = array_merge($result_arr, $sub_arr);
-        }
-        return $result_arr;
     }
 
     // public function get_dealer_order_summary($uid)
@@ -314,9 +296,7 @@ class BranchController extends Controller
         $dealer_summary_result = $this->get_dealers_in_branch($uid);
 
         return $dealer_summary_result;
-        // foreach($dealer_summary_result as $dealer){
-        //     # check
-        // }
+        
     }
 
     # get all the dealers under a branch with account id
@@ -978,9 +958,6 @@ public function branch_dashboard($uid)
 
 // return $all_user_dealers;
 
-
-
-
  foreach ($all_user_dealers as $_dealer) {
     if (!is_null($_dealer['last_login'])){
         // the person logged in 
@@ -989,16 +966,7 @@ public function branch_dashboard($uid)
     }else{
         $last_not_loggedin_dealer_count ++;
     }
-    //  $dealer_inner_details = Users::where('account_id', $_dealer['dealer_code'])
-    //      ->select('last_login')
-    //      ->orderBy('created_at', 'desc')
-    //      ->get()
-    //      ->pluck('last_login')
-    //      ->toArray();
-    //  array_push($last_login_array, array_values($dealer_inner_details));
  }
-
-//  return count($last_login_array);
 
  // Result data
  $this->result->status = true;

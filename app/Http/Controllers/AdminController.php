@@ -645,8 +645,11 @@ class AdminController extends Controller
 
     public function deactivate_dealer_dashboard()
     {
-        $switch_state = Users::where('email', '!=', 'info@atlastrailer.com')
-        ->update([
+        $switch_state = Users::where(
+            'email',
+            '!=',
+            'info@atlastrailer.com'
+        )->update([
             'dash_activate' => 0,
         ]);
 
@@ -4111,7 +4114,7 @@ class AdminController extends Controller
         $total_item_ordered = 0;
 
         $total_orders = DB::table('cart')
-            ->select('uid')
+            ->select('dealer')
             ->distinct()
             ->get();
 
@@ -4385,18 +4388,18 @@ class AdminController extends Controller
 
     public function get_all_products()
     {
-        $products = Products::where('status', '1')->get();
+        $products = Products::get();
 
         foreach ($products as $value) {
-            // $atlas_id = $value->atlas_id;
+            $atlas_id = $value->atlas_id;
 
-            // $desc_data = ProductModel::where('atlas_id', $atlas_id)
-            //     ->get()
-            //     ->first();
+            $desc = ProductDesc::where([
+                'atlas_id' => $value->atlas_id,
+            ])->first();
 
-            // $value->full_desc = isset($desc_data->description)
-            //     ? $desc_data->description
-            //     : null;
+            $value->full_desc = isset($desc->description)
+                ? $desc->description
+                : '';
 
             $value->spec_data = json_decode($value->spec_data);
         }
@@ -4676,8 +4679,7 @@ class AdminController extends Controller
 
     public function get_all_dealer_users()
     {
-        $vendors = Users::where('status', '1')
-            ->where('role', '4')
+        $vendors = Users::where('role', '4')
             ->orderBy('id', 'desc')
             ->get();
         $this->result->status = true;
@@ -4690,9 +4692,7 @@ class AdminController extends Controller
     public function deactivate_dealer_user($id)
     {
         // update to the db
-        $update = Users::where('id', $id)->update([
-            'status' => '0',
-        ]);
+        $update = Users::where('id', $id)->delete();
 
         if ($update) {
             $this->result->status = true;
@@ -4988,6 +4988,8 @@ class AdminController extends Controller
         $username = $request->username;
         $email = $request->email;
         $firstName = $request->firstName;
+        $fullName = $request->fullName;
+
         $lastName = $request->lastName;
         $password = $request->password;
         $phone = $request->phone;
@@ -5011,14 +5013,14 @@ class AdminController extends Controller
             ]);
 
             // $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $firstName);
+            // $ex = explode(' ', $firstName);
 
-            if (isset($ex[0])) {
-                //$ex[0] = $firstName;
-                $update = Users::where('id', $vendorId)->update([
-                    'first_name' => $ex[0],
-                ]);
-            }
+            // if (isset($ex[0])) {
+            //     //$ex[0] = $firstName;
+            //     $update = Users::where('id', $vendorId)->update([
+            //         'first_name' => $ex[0],
+            //     ]);
+            // }
         }
 
         if ($lastName != '') {
@@ -5029,15 +5031,21 @@ class AdminController extends Controller
                 'last_name' => $lastName,
             ]);
 
-            $full_name = $current_user_data->full_name;
-            $ex = explode(' ', $full_name);
+            // $full_name = $current_user_data->full_name;
+            // $ex = explode(' ', $full_name);
 
-            if (isset($ex[1])) {
-                $ex[1] = $lastName;
-                $update = Users::where('id', $vendorId)->update([
-                    'full_name' => $ex[0] . ' ' . $ex[1],
-                ]);
-            }
+            // if (isset($ex[1])) {
+            //     $ex[1] = $lastName;
+            //     $update = Users::where('id', $vendorId)->update([
+            //         'full_name' => $ex[0] . ' ' . $ex[1],
+            //     ]);
+            // }
+        }
+
+        if ($fullName !== '') {
+            $update = Users::where('id', $vendorId)->update([
+                'full_name' => $fullName,
+            ]);
         }
 
         if ($dealerCode != '') {
@@ -5262,28 +5270,12 @@ class AdminController extends Controller
     {
         // update to the db
 
-        $user_data = Users::where('id', $id)
-            ->get()
-            ->first();
+        $user_data = Users::where('id', $id)->delete();
 
-        $status = $user_data->status;
-
-        if ($status == '1') {
-            $update = Users::where('id', $id)->update([
-                'status' => '0',
-            ]);
-        } else {
-            $update = Users::where('id', $id)->update([
-                'status' => '1',
-            ]);
-        }
-
-        // DB::table('users')->where('id', $id)->delete();
-
-        if ($update) {
+        if ($user_data) {
             $this->result->status = true;
             $this->result->status_code = 200;
-            $this->result->message = 'Vendor User Activated Successfully';
+            $this->result->message = 'Vendor User Deleted Successfully';
             return response()->json($this->result);
         } else {
             $this->result->status = true;
